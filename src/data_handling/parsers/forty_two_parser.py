@@ -29,7 +29,6 @@ class FortyTwo:
         self.binning_configs = ''
 
         if (dataFiles != '') and (configFiles != ''):
-
             labels, data = self.parse_sim_data(str2lst(dataFiles)[0])
             self.all_headers = labels
             self.sim_data = data

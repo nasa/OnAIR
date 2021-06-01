@@ -12,7 +12,7 @@ from distutils.dir_util import copy_tree
 from time import gmtime, strftime   
 
 # from src.run_scripts.sim import Simulator
-# from src.data_handling.binner import Binner
+from src.data_handling.binner import Binner
 # from src.util.file_io import * 
 
 class ExecutionEngine:

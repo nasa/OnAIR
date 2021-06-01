@@ -14,12 +14,139 @@ class TestFortyTwoParser(unittest.TestCase):
         self.rawDataFilepath = self.run_path + '/data/raw_telemetry_data/'
         self.tlmConfigFilepath = self.run_path + '/data/telemetry_configs/'
 
-    def test_init_parser(self):
+    def test_init_empty_parser(self):
         self.assertEquals(self.P.raw_data_file_path, '')
         self.assertEquals(self.P.metadata_file_path, '')
         self.assertEquals(self.P.all_headers, '')
         self.assertEquals(self.P.sim_data, '')
         self.assertEquals(self.P.binning_configs, '')
+
+    def test_init_nonempty_parser(self):
+        P = FortyTwo(self.run_path + '/data/raw_telemetry_data/',
+                          self.run_path + '/data/telemetry_configs/',
+                          str(['42_TLM.txt']),
+                          str(['42_TLM_CONFIG.txt']))
+
+        self.assertEquals(P.raw_data_file_path, self.run_path + '/data/raw_telemetry_data/')
+        self.assertEquals(P.metadata_file_path, self.run_path + '/data/telemetry_configs/')
+        
+        self.assertEquals(P.all_headers, {'42_TLM.txt': ['TIME', 
+                                                         'SAMPLE.sample_data_tlm_t.sample_data_counter', 
+                                                         'SAMPLE.sample_data_tlm_t.sample_data_value', 
+                                                         'SAMPLE.sample_data_power_t.sample_data_counter', 
+                                                         'SAMPLE.sample_data_power_t.sample_data_voltage', 
+                                                         'SAMPLE.sample_data_power_t.sample_data_current', 
+                                                         'SAMPLE.sample_data_thermal_t.sample_data_counter', 
+                                                         'SAMPLE.sample_data_thermal_t.sample_data_internal_temp', 
+                                                         'SAMPLE.sample_data_thermal_t.sample_data_external_temp', 
+                                                         'SAMPLE.sample_data_gps_t.sample_data_counter', 
+                                                         'SAMPLE.sample_data_gps_t.sample_data_lat', 
+                                                         'SAMPLE.sample_data_gps_t.sample_data_lng', 
+                                                         'SAMPLE.sample_data_gps_t.sample_data_alt']})
+        self.assertEquals(P.sim_data, {'2019-127-12:00:17.300006746': {'42_TLM.txt': ['2019-127-12:00:17.300006746', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00']}, 
+                                       '2019-127-12:00:17.300006747': {'42_TLM.txt': ['2019-127-12:00:17.300006747', 
+                                                                                      '1', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00']}, 
+                                       '2019-127-12:00:17.300006748': {'42_TLM.txt': ['2019-127-12:00:17.300006748', 
+                                                                                      '2', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00']}, 
+                                       '2019-127-12:00:17.300006790': {'42_TLM.txt': ['2019-127-12:00:17.300006790', 
+                                                                                      '3', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00']},
+                                       '2019-127-12:00:17.300006801': {'42_TLM.txt': ['2019-127-12:00:17.300006801', 
+                                                                                      '4', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00', 
+                                                                                      '0.000000000000e+00']}})
+        self.assertEquals(P.binning_configs, {'subsystem_assignments': {'42_TLM.txt': [['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION'], 
+                                                                                       ['MISSION']]}, 
+                                              'test_assignments': {'42_TLM.txt': [[['SYNC', 'TIME']], 
+                                                                                  [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], 
+                                                                                  [['NOOP']], 
+                                                                                  [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], 
+                                                                                  [['NOOP']], 
+                                                                                  [['NOOP']], 
+                                                                                  [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], 
+                                                                                  [['NOOP']], 
+                                                                                  [['NOOP']], 
+                                                                                  [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]],
+                                                                                  [['NOOP']], 
+                                                                                  [['NOOP']], 
+                                                                                  [['NOOP']]]}, 
+                                              'description_assignments': {'42_TLM.txt': ['No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description', 
+                                                                                         'No description']}})
 
     def test_parse_sim_data(self):
         dataFiles = '42_TLM.txt'
@@ -48,15 +175,11 @@ class TestFortyTwoParser(unittest.TestCase):
 
     def test_parse_headers(self):
         txt_file = open(self.rawDataFilepath + 'single_frame.txt',"r+")
-
         data_str = txt_file.read().split('\n[EOF]')[0]
         txt_file.close()
-
         hdrs = self.P.parse_headers(data_str)
-
         self.assertEquals(len(hdrs), 13)
         self.assertEquals(hdrs, ['TIME', 'SAMPLE.sample_data_tlm_t.sample_data_counter', 'SAMPLE.sample_data_tlm_t.sample_data_value', 'SAMPLE.sample_data_power_t.sample_data_counter', 'SAMPLE.sample_data_power_t.sample_data_voltage', 'SAMPLE.sample_data_power_t.sample_data_current', 'SAMPLE.sample_data_thermal_t.sample_data_counter', 'SAMPLE.sample_data_thermal_t.sample_data_internal_temp', 'SAMPLE.sample_data_thermal_t.sample_data_external_temp', 'SAMPLE.sample_data_gps_t.sample_data_counter', 'SAMPLE.sample_data_gps_t.sample_data_lat', 'SAMPLE.sample_data_gps_t.sample_data_lng', 'SAMPLE.sample_data_gps_t.sample_data_alt'])
-
 
     def test_parse_frame(self):
         txt_file = open(self.rawDataFilepath + 'single_frame.txt',"r+")
@@ -99,6 +222,12 @@ class TestFortyTwoParser(unittest.TestCase):
                                                  '2019-127-12:00:17.300006790', 
                                                  '2019-127-12:00:17.300006801'])
         
+    def test_get_sim_data(self):
+        hdrs, data, configs = self.P.get_sim_data()
+        self.assertEquals(hdrs, '')
+        self.assertEquals(data, '')
+        self.assertEquals(configs, '')
+
 
 if __name__ == '__main__':
     unittest.main()

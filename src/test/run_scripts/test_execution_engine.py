@@ -5,6 +5,7 @@ import unittest
 import shutil
 
 from src.run_scripts.execution_engine import ExecutionEngine
+from src.data_handling.parsers.forty_two_parser import FortyTwo
 
 ## TODO: I think I need to set a global run path from the GET 
 
@@ -16,8 +17,7 @@ class TestExecutionEngine(unittest.TestCase):
         
         self.E = ExecutionEngine('', 'test', False)
         self.save_path = os.environ['RESULTS_PATH']
-
-
+        self.run_path = os.environ['RUN_PATH']
         # self.tmp_save_path = os.path.join(os.path.dirname(os.path.realpath(__file__)) + '/../../../', 'results/tmp')
         self.tmp_save_path = os.environ['RESULTS_PATH'] + '/tmp'
 
@@ -51,23 +51,7 @@ class TestExecutionEngine(unittest.TestCase):
         self.assertEquals(self.E.save_flag, False)
         self.assertEquals(self.E.save_name, 'test')
 
-    # Note: the results directory AND tmp subdir needs to already exist
-    # (maybe do a check and if the dir isnt there, make it)
-    def test_init_save_paths(self):
-        self.E.init_save_paths()
-        sub_dirs = os.listdir(self.tmp_save_path)
-        self.assertEquals(sub_dirs, ['associativity', 'diagnosis', 'graphs', 'models', 'tensorboard', 'viz'])
-        
-        # Try to init again now that tmp exits 
-        self.E.init_save_paths()
 
-        sub_dirs = os.listdir(self.tmp_save_path)
-        self.assertEquals(sub_dirs, ['associativity', 'diagnosis', 'graphs', 'models', 'tensorboard', 'viz'])
-        
-    def test_delete_save_paths(self):
-        self.E.delete_save_paths()
-        sub_dirs = os.listdir(self.save_path)
-        self.assertEquals(sub_dirs, [])
 
     def test_parse_configs(self):
         self.E.parse_configs(self.config_fp)
@@ -101,16 +85,37 @@ class TestExecutionEngine(unittest.TestCase):
 
         self.E.parse_data(parser_name, parser_file_name, dataFilePath, metadataFilePath)
         
-        self.assertTrue(self.E.data)
+        self.assertEquals(type(self.E.data), FortyTwo)
 
-        # parser = importlib.import_module('src.data_handling.parsers.' + parser_file_name)
-        # parser_class = getattr(parser, parser_name) # This could be simplified if the parsers all extend a parser class... but this works for now
-        # tm_data_path = os.path.dirname(os.path.realpath(__file__)) + '/../..' + dataFilePath
-        # tm_metadata_path = os.path.dirname(os.path.realpath(__file__)) + '/../..' + metadataFilePath
-        # self.data = parser_class(tm_data_path, tm_metadata_path, self.telemetryFiles, self.metaFiles)
+    def test_setup_sim(self):
+        return
+        # data = FortyTwo(self.run_path + '/data/raw_telemetry_data/',
+        #              self.run_path + '/data/telemetry_configs/',
+        #              str(['small_sample.txt']),
+        #              str(['small_sample_CONFIG.txt']))
+
+        # self.E.setup_sim(data)
 
     def test_run_sim(self):
         return 
+
+    # Note: the results directory AND tmp subdir needs to already exist
+    # (maybe do a check and if the dir isnt there, make it)
+    def test_init_save_paths(self):
+        self.E.init_save_paths()
+        sub_dirs = os.listdir(self.tmp_save_path)
+        self.assertEquals(sub_dirs, ['associativity', 'diagnosis', 'graphs', 'models', 'tensorboard', 'viz'])
+        
+        # Try to init again now that tmp exits 
+        self.E.init_save_paths()
+
+        sub_dirs = os.listdir(self.tmp_save_path)
+        self.assertEquals(sub_dirs, ['associativity', 'diagnosis', 'graphs', 'models', 'tensorboard', 'viz'])
+        
+    def test_delete_save_paths(self):
+        self.E.delete_save_paths()
+        sub_dirs = os.listdir(self.save_path)
+        self.assertEquals(sub_dirs, [])
 
     def test_save_results(self):
         return 
