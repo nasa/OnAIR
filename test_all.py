@@ -4,7 +4,7 @@ import sys
 from src.test.test_driver import TestDriver
 # from src.test.run_scripts.test_execution_engine import TestExecutionEngine
 from src.test.data_handling.parsers.test_forty_two_parser import TestFortyTwoParser
-# from src.test.data_handling.test_binner import TestBinner
+from src.test.data_handling.parsers.test_generic_parser import TestGenericParser
 from src.test.data_handling.test_time_synchronizer import TestTimeSynchronizer
 
 test_dict = {'driver' : 0,
@@ -15,7 +15,7 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDriver))
     # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestExecutionEngine))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestFortyTwoParser))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestBinner))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGenericParser))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTimeSynchronizer))
 
     return suite
