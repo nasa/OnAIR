@@ -6,6 +6,8 @@ import shutil
 
 from src.run_scripts.execution_engine import ExecutionEngine
 from src.data_handling.parsers.forty_two_parser import FortyTwo
+from src.data_handling.data_source import DataSource
+from src.data_handling.time_synchronizer import TimeSynchronizer
 
 ## TODO: I think I need to set a global run path from the GET 
 
@@ -44,8 +46,7 @@ class TestExecutionEngine(unittest.TestCase):
         self.assertEquals(self.E.parser_file_name, '')
         self.assertEquals(self.E.parser_name, '')
         self.assertEquals(self.E.sim_name, '')
-        self.assertEquals(self.E.data, None)
-        self.assertEquals(self.E.binnedData, None)
+        self.assertEquals(self.E.processedSimData, None)
         self.assertEquals(self.E.sim, None)
 
         self.assertEquals(self.E.save_flag, False)
@@ -85,16 +86,23 @@ class TestExecutionEngine(unittest.TestCase):
 
         self.E.parse_data(parser_name, parser_file_name, dataFilePath, metadataFilePath)
         
-        self.assertEquals(type(self.E.data), FortyTwo)
+        self.assertEquals(type(self.E.processedSimData), TimeSynchronizer)
 
-    def test_setup_sim(self):
-        return
-        # data = FortyTwo(self.run_path + '/data/raw_telemetry_data/',
-        #              self.run_path + '/data/telemetry_configs/',
-        #              str(['small_sample.txt']),
-        #              str(['small_sample_CONFIG.txt']))
 
-        # self.E.setup_sim(data)
+    # def test_setup_sim(self):
+
+    #     raw_data = ({'test.txt': ['TIME', 'A', 'B', 'C']},
+    #             {'1000': {'test.txt': ['1000', '0', '0.000000000000e+00', '0.0']}, 
+    #              '1001': {'test.txt': ['1001', '1', '1.000000000000e+00', '1.0']}, 
+    #              '1002': {'test.txt': ['1002', '2', '2.000000000000e+00', '2']}, 
+    #              '1003': {'test.txt': ['1003', '3', '3.000000000000e+00', '3']}},
+    #             {'subsystem_assignments': {'test.txt': [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']]}, 
+    #              'test_assignments': {'test.txt': [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]]]}, 
+    #              'description_assignments': {'test.txt': ['No description', 'No description', 'No description', 'No description']}})
+
+    #     data = TimeSynchronizer(raw_data)
+    #     self.E.processedSimData = data
+    #     self.E.setup_sim()
 
     def test_run_sim(self):
         return 

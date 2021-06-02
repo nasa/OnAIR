@@ -107,3 +107,5 @@ class TimeSynchronizer:
             num_removed = num_removed + 1
         return data
 
+    def get_runtime_data(self):
+        return []

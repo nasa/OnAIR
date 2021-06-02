@@ -11,8 +11,8 @@ import shutil
 from distutils.dir_util import copy_tree
 from time import gmtime, strftime   
 
+from src.data_handling.time_synchronizer import TimeSynchronizer
 # from src.run_scripts.sim import Simulator
-from src.data_handling.binner import Binner
 # from src.util.file_io import * 
 
 class ExecutionEngine:
@@ -40,8 +40,7 @@ class ExecutionEngine:
         self.parser_file_name = ''
         self.parser_name = ''
         self.sim_name = ''
-        self.data = None
-        self.binnedData = None
+        self.processedSimData = None
         self.sim = None
 
         self.save_flag = save_flag
@@ -51,7 +50,7 @@ class ExecutionEngine:
             self.init_save_paths()
             self.parse_configs(config_file)
             self.parse_data(self.parser_name, self.parser_file_name, self.dataFilePath, self.metadataFilePath)
-            self.setup_sim(self.data)
+            self.setup_sim()
 
     def parse_configs(self, config_file_path):
         # print("Using config file: {}".format(config_file_path))
@@ -84,11 +83,11 @@ class ExecutionEngine:
         parser_class = getattr(parser, parser_name) # This could be simplified if the parsers all extend a parser class... but this works for now
         tm_data_path = os.environ['RUN_PATH'] + dataFilePath
         tm_metadata_path = os.environ['RUN_PATH'] +  metadataFilePath
-        self.data = parser_class(tm_data_path, tm_metadata_path, self.telemetryFiles, self.metaFiles, subsystems_breakdown)
+        parsed_data = parser_class(tm_data_path, tm_metadata_path, self.telemetryFiles, self.metaFiles, subsystems_breakdown)
+        self.processedSimData = TimeSynchronizer(*parsed_data.get_sim_data())
 
-    def setup_sim(self, data):
-        self.binnedData = Binner(*data.get_sim_data())
-        self.sim = Simulator(self.sim_name, self.binnedData, self.SBN_Flag)
+    def setup_sim(self):
+        self.sim = Simulator(self.sim_name, self.processedSimData, self.SBN_Flag)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath

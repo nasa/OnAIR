@@ -22,6 +22,7 @@ from src.data_handling.data_source import DataSource
 
 class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):
+
         self.simulator = simType
         spaceCraft = Spacecraft(parsedData.get_sc_configs())
 

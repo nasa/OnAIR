@@ -1,8 +1,6 @@
-""" Test Binner Functionality """
+""" Test Time Sync Functionality """
 import os
-# import sys
 import unittest
-# import shutil
 
 from src.data_handling.time_synchronizer import TimeSynchronizer
 
