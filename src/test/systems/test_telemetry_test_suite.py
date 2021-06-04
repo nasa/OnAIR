@@ -97,6 +97,9 @@ class TestTelemetryTestSuite(unittest.TestCase):
         self.assertEquals(result[0], 'GREEN')
         self.assertEquals(result[1], [({'GREEN'}, 1.0)]) 
 
+    def test_calc_single_status(self):
+        return
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -14,7 +14,7 @@ import json
 import random
 
 from src.reasoning.brain import Brain
-from src.subsystems.spacecraft import Spacecraft
+from src.systems.spacecraft import Spacecraft
 from src.util.file_io import *
 from src.util.print_io import *
 from src.util.sim_io import *
