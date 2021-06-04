@@ -79,5 +79,8 @@ class TestTimeSynchronizer(unittest.TestCase):
         self.assertEquals(clean_data, [[],[]])
 
 
+    def test_get_spacecraft_metadata(self):
+        return
+        
 if __name__ == '__main__':
     unittest.main()

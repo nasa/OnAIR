@@ -24,7 +24,7 @@ class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):
 
         self.simulator = simType
-        spaceCraft = Spacecraft(parsedData.get_sc_configs())
+        spaceCraft = Spacecraft(*parsedData.get_spacecraft_metadata())
 
         if SBN_Flag:
             # TODO: This is ugly, but sbn_client is only available when built for cFS...
