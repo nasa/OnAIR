@@ -3,6 +3,7 @@ import os
 import unittest
 
 from src.systems.spacecraft import Spacecraft
+from src.systems.telemetry_test_suite import TelemetryTestSuite
 from src.systems.status import Status
 from src.data_handling.time_synchronizer import TimeSynchronizer
 
@@ -10,19 +11,13 @@ class TestSpacecraft(unittest.TestCase):
 
     def setUp(self):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
-
-        # self.SC = Spacecraft()
-        # self.SC.headers = ['TIME', 'A', 'B']
-        # self.SC.tests = [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]]
-        # self.SC.curr_data = ['-', '-', '-']
-
         self.SC = Spacecraft(['TIME', 'A', 'B'], [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]])
 
     def test_init_empty_spacecraft(self):
         SC = Spacecraft()
         self.assertEquals(type(SC.status), Status)
         self.assertEquals(SC.headers, [])
-        self.assertEquals(SC.tests, [])
+        self.assertEquals(type(SC.test_suite), TelemetryTestSuite)
         self.assertEquals(SC.curr_data, [])
 
     def test_init_nonempty_spacecraft(self):
@@ -33,7 +28,7 @@ class TestSpacecraft(unittest.TestCase):
 
         self.assertEquals(type(SC.status), Status)
         self.assertEquals(SC.headers, ['TIME', 'A', 'B'])
-        self.assertEquals(SC.tests, [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]])
+        self.assertEquals(type(SC.test_suite), TelemetryTestSuite)
         self.assertEquals(SC.curr_data, ['-', '-', '-'])
 
     def test_update(self):

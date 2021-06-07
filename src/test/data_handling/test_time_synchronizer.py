@@ -78,8 +78,10 @@ class TestTimeSynchronizer(unittest.TestCase):
         clean_data = self.TS.remove_time_datapoints(data, indices_to_remove)
         self.assertEquals(clean_data, [[],[]])
 
-
     def test_get_spacecraft_metadata(self):
+        return 
+
+    def test_get_sim_data(self):
         return
         
 if __name__ == '__main__':

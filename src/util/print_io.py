@@ -36,7 +36,7 @@ status_colors = {'GREEN' : bcolors.OKGREEN,
 def print_sim_header():
     print(bcolors.HEADER + bcolors.BOLD+ "\n***************************************************")
     print("************    SIMULATION STARTED     ************")
-    print("***************************************************\n\n" + bcolors.ENDC)
+    print("***************************************************" + bcolors.ENDC)
 
 # Print when a new step is starting
 def print_sim_step(step_num):
@@ -57,10 +57,12 @@ def print_msg(msg, clrs=['HEADER']):
     print("---- " + msg + bcolors.ENDC)
 
 # Print interpreted mission status
-def print_interpreted_status(brain):
-    print_seperator(bcolors.OKBLUE)
-    print("INTERPRETED MISSION STATUS: " + str(format_status(brain.interpreted_status)))
-    print_seperator(bcolors.OKBLUE)
+def print_mission_status(brain, data = None):
+    # print_seperator(bcolors.OKBLUE)
+    if data != None:
+        print("CURRENT TLM: " + str(data)) 
+    print("INTERPRETED MISSION STATUS: " + str(format_status(brain.mission_status)))
+    # print_seperator(bcolors.OKBLUE)
 
 # Print diagnosis info
 def print_diagnosis(diagnosis):

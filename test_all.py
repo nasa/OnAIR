@@ -13,9 +13,7 @@ from src.test.systems.test_status import TestStatus
 from src.test.reasoning.test_brain import TestBrain
 from src.test.systems.test_telemetry_test_suite import TestTelemetryTestSuite
 from src.test.run_scripts.test_sim import TestSimulator
-
-test_dict = {'driver' : 0,
-             'execution_engine' : 1}
+from src.test.data_driven_components.test_data_driven_learning import TestDataDrivenLearning
 
 def create_suite():
     suite = []
@@ -31,8 +29,8 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestBrain))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTelemetryTestSuite))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
     
-
     return suite
 
 def run_tests(suite):

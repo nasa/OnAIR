@@ -5,11 +5,17 @@ Status Class
 import copy
 
 class Status:
-    def __init__(self, name='MISSION'):
-        self.name =  name
-        self.status = '---'
-        self.bayesian_conf = -1.0
-
+    def __init__(self, name='MISSION', stat='---', conf=-1.0):
+        try:
+            assert(-1.0 <= conf <= 1.0)
+            assert(stat in ['---', 'RED', 'YELLOW', 'GREEN'])
+            self.name =  name
+            self.status = stat
+            self.bayesian_conf = conf
+        except:
+            self.name =  'MISSION'
+            self.status = '---'
+            self.bayesian_conf = -1.0
     ##### GETTERS & SETTERS ##################################
     def set_status(self, stat, bayesianConf=-1.0):
         self.status = stat

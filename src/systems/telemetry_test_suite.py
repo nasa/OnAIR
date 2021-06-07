@@ -5,6 +5,7 @@ Handles telemetry mnemonic testing
 
 # from collections import Counter
 from src.data_handling.data_source import DataSource
+from src.systems.status import Status
 from collections import Counter
 
 
@@ -34,7 +35,7 @@ class TelemetryTestSuite:
     ################################################
     ################  Running Tests  ############### 
 
-    def execute(self, updated_frame, sync_data={}):
+    def execute_suite(self, updated_frame, sync_data={}):
         results = []
         for i in range(len(updated_frame)):
             results.append(self.run_tests(i, updated_frame[i], sync_data))
@@ -56,7 +57,7 @@ class TelemetryTestSuite:
 
         bayesian = self.calc_single_status(status)
         # Add all mass assignments?
-        return TestResult(bayesian[0], bayesian[1])
+        return Status(self.dataFields[header_index], bayesian[0], bayesian[1])
 
 
     def get_latest_result(self, fieldName):
@@ -210,11 +211,6 @@ class TelemetryTestSuite:
     ################################################
     ############## Combining statuses ############## 
     def calc_single_status(self, status_list, mode='max'):
-
-        # processed_status_list = [x for x in status_list if x != '---']
-        # if len(processed_status_list) == 0:
-        #     return 'GREEN', 1.0
-        
         occurences = Counter(status_list)
         max_occurence = occurences.most_common(1)[0][0]
 
@@ -233,17 +229,20 @@ class TelemetryTestSuite:
         else: 
             return max_occurence, 1.0 # return max 
 
+    def get_suite_status(self):
+        return self.calc_single_status([res.get_status() for res in self.latest_results]) 
 
-class TestResult:
-    def __init__(self, stat, bayesian_conf):
-        self.stat = stat
-        self.bayesian_conf  = bayesian_conf
 
-    def get_all_test_results(self):
-        return self.stat, self.bayesian_conf
+# class TestResult:
+#     def __init__(self, stat, bayesian_conf):
+#         self.stat = stat
+#         self.bayesian_conf  = bayesian_conf
 
-    def get_stat(self):
-        return self.stat
+#     def get_all_test_results(self):
+#         return self.stat, self.bayesian_conf
 
-    def get_bayesian_conf(self):
-        return self.bayesian_conf
+#     def get_stat(self):
+#         return self.stat
+
+#     def get_bayesian_conf(self):
+#         return self.bayesian_conf

@@ -110,3 +110,5 @@ class TimeSynchronizer:
     def get_spacecraft_metadata(self):
         return self.ordered_fused_headers, self.ordered_fused_tests
 
+    def get_sim_data(self):
+        return self.sim_data

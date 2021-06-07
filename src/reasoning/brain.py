@@ -7,10 +7,8 @@ import csv
 import copy 
 
 from src.systems.status import Status
-
 # from src.reasoning.diagnosis import Diagnosis
-
-# from src.data_driven_components.supervised_learning import SupervisedLearning
+from src.data_driven_components.data_driven_learning import DataDrivenLearning
 # from src.data_driven_components.associativity import Associativity
 from src.systems.spacecraft import Spacecraft
 # from src.util.print_io import *
@@ -21,13 +19,13 @@ class Brain:
             self.init_brain(spacecraft)
         except:
             self.spacecraft_rep = None
+            self.learning_systems = None
             self.mission_status = '---'
             self.bayesian_status = -1.0
 
-        # self.supervised_learning = SupervisedLearning(self.spacecraft_rep.get_current_data())
-
     def init_brain(self, spacecraft):
         self.spacecraft_rep = spacecraft
+        self.learning_systems = DataDrivenLearning(self.spacecraft_rep.get_headers())
         self.mission_status = self.spacecraft_rep.get_status()
         self.bayesian_status = self.spacecraft_rep.get_bayesian_status()
 
@@ -35,11 +33,10 @@ class Brain:
     def reason(self, frame):
         self.spacecraft_rep.update(frame)
         self.mission_status = self.spacecraft_rep.get_status() 
-        
-        # self.supervised_learning.update(self.spacecraft_rep.get_current_data(True), self.mission_status)
-        # self.NN_status = self.supervised_learning.predict(self.spacecraft_rep.get_current_data(True))
+        self.learning_systems.update(frame, self.mission_status)
 
-    # def diagnose(self, time_step):
+    def diagnose(self, time_step):
+        return None
     #     lstm_predict = self.supervised_learning.lstm_predict()
     #     tree_traversal = self.spacecraft_rep.get_status_object().fault_traversal()
     #     faults = self.spacecraft_rep.get_faulting_mnemonics()

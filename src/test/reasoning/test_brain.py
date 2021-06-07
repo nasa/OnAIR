@@ -30,6 +30,8 @@ class TestBrain(unittest.TestCase):
         self.assertEquals(self.B.spacecraft_rep.get_current_data(), [1,1,1])
         self.assertEquals(self.B.mission_status, '---')
 
+    def test_diagnose(self):
+        return
         
 
 if __name__ == '__main__':

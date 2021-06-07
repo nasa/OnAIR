@@ -3,7 +3,7 @@ import os
 import unittest
 
 from src.systems.status import Status
-from src.systems.telemetry_test_suite import TelemetryTestSuite, TestResult
+from src.systems.telemetry_test_suite import TelemetryTestSuite
 
 class TestTelemetryTestSuite(unittest.TestCase):
 
@@ -27,7 +27,7 @@ class TestTelemetryTestSuite(unittest.TestCase):
     def test_execute(self):
         frame = [1, 2, 3]
         self.assertEquals(self.TTS.latest_results, None)
-        self.TTS.execute(frame)
+        self.TTS.execute_suite(frame)
         self.assertEquals(len(self.TTS.latest_results), 3)
 
     def test_run_tests(self):
@@ -36,17 +36,17 @@ class TestTelemetryTestSuite(unittest.TestCase):
         sync_data = {}
         result = self.TTS.run_tests(i, val, sync_data)
 
-        self.assertEquals(type(result), TestResult)
+        self.assertEquals(type(result), Status)
 
     def test_get_latest_result(self):
         self.assertEquals(self.TTS.get_latest_result('TIME'), None)
         self.assertEquals(self.TTS.get_latest_result('A'), None)
         self.assertEquals(self.TTS.get_latest_result('B'), None)
 
-        self.TTS.execute([1, 2, 3])
-        self.assertEquals(type(self.TTS.get_latest_result('TIME')), TestResult)
-        self.assertEquals(type(self.TTS.get_latest_result('A')), TestResult)
-        self.assertEquals(type(self.TTS.get_latest_result('B')), TestResult)
+        self.TTS.execute_suite([1, 2, 3])
+        self.assertEquals(type(self.TTS.get_latest_result('TIME')), Status)
+        self.assertEquals(type(self.TTS.get_latest_result('A')), Status)
+        self.assertEquals(type(self.TTS.get_latest_result('B')), Status)
 
     def test_sync(self):
         val = 1
