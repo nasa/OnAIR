@@ -12,9 +12,10 @@ import pathlib
 from datetime import datetime
 from test_all import *
 
-# from src.run_scripts.execution_engine import ExecutionEngine
+from src.run_scripts.execution_engine import ExecutionEngine
 
 def main():
+    os.system('find . -name \'.DS_Store\' -type f -delete') # Removes those pesky .DS_Store files that Macs make
 
     """
     This is the standard naming format, for now.
@@ -42,10 +43,10 @@ def main():
 
     save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
 
-    if args.mute: 
+    if args.mute:
         blockPrint()
-    
-    RAISR = ExecutionEngine(args.configfile, save_name, args.save) 
+
+    RAISR = ExecutionEngine(args.configfile, save_name, args.save)
     RAISR.run_sim()
 
 def init_global_paths(test=False):
