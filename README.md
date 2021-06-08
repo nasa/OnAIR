@@ -15,3 +15,19 @@ print_io
 file_io
 feasibility test, double check others ... 
 sim_io
+
+## Running driver file test
+
+Make a results directory in your root folder and test folder:
+
+    mkdir results
+    mkdir src/test/results
+
+Move test data from to src folder, and the config to src, unless you already have data there
+
+    cp -r src/test/data src/
+    mv src/data/config src
+
+Then you can just run the driver
+
+    python driver.py -t
