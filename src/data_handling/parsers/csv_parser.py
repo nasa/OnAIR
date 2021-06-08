@@ -43,6 +43,8 @@ class CSV:
             self.binning_configs['description_assignments'] = {}
 
             for data_file in ast.literal_eval(dataFiles):
+                #Config file will be a .txt, but data file wil be .csv
+                data_file = data_file.replace('.csv', '.txt')
                 self.binning_configs['subsystem_assignments'][data_file] = configs['subsystem_assignments'][data_file]
                 self.binning_configs['test_assignments'][data_file] = configs['test_assignments'][data_file]
                 self.binning_configs['description_assignments'][data_file] = configs['description_assignments'][data_file]
@@ -50,13 +52,13 @@ class CSV:
 ##### INITIAL PROCESSING ####
     def parse_csv_data(self, dataFile):
         
-        dataset = pd.read_csv(os.path.join(self.raw_data_filepath, dataFile), delimiter=',', header=0)
+        dataset = pd.read_csv(os.path.join(self.raw_data_file_path, dataFile), delimiter=',', header=0)
         dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
         all_headers = list(dataset.columns.values)
         all_data = {}
         for index, row in dataset.iterrows():
-            all_data[index] = {}
-            all_data[dataFile] = list(row)
+            innerStructure = {dataFile : list(row)}
+            all_data[index] = innerStructure
         return all_headers, all_data 
 
     def parse_config_data(self, configFile, ss_breakdown):
