@@ -4,7 +4,7 @@ import sys
 import unittest
 import shutil
 
-from src.data_handling.parsers.forty_two_parser import CSV
+from src.data_handling.parsers.csv_parser import CSV
 
 class TestCSVParser(unittest.TestCase):
 

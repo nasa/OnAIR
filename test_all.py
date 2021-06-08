@@ -4,6 +4,7 @@ import sys
 from src.test.test_driver import TestDriver
 from src.test.data_handling.parsers.test_parser_util import TestParserUtil
 from src.test.data_handling.parsers.test_forty_two_parser import TestFortyTwoParser
+from src.test.data_handling.parsers.test_csv_parser import TestCSVParser
 from src.test.data_handling.parsers.test_generic_parser import TestGenericParser
 from src.test.data_handling.test_time_synchronizer import TestTimeSynchronizer
 from src.test.data_handling.test_data_source import TestDataSource
