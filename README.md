@@ -16,6 +16,12 @@ file_io
 feasibility test, double check others ... 
 sim_io
 
+## Generating environment
+
+Create a conda environment with the necessary packages
+
+    conda create --name raisr --file requirements.txt
+
 ## Running driver file test
 
 Make a results directory in your root folder and test folder:
