@@ -110,6 +110,12 @@ class TestExecutionEngine(unittest.TestCase):
     # Note: the results directory AND tmp subdir needs to already exist
     # (maybe do a check and if the dir isnt there, make it)
     def test_init_save_paths(self):
+        
+        ds_file_path = os.path.join(self.tmp_save_path, '.DS_Store')
+        if os.path.exists(ds_file_path):
+            os.remove(ds_file_path)
+
+
         self.E.init_save_paths()
         sub_dirs = os.listdir(self.tmp_save_path)
         sub_dirs.sort() # Sorting alphabetically
