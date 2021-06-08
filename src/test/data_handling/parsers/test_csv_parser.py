@@ -22,10 +22,13 @@ class TestCSVParser(unittest.TestCase):
         self.assertEquals(self.P.binning_configs, '')
 
     def test_init_nonempty_parser(self):
-            P = CSV(self.run_path + '/data/raw_telemetry_data/',
+        P = CSV(self.run_path + '/data/raw_telemetry_data/', 
                             self.run_path + '/data/telemetry_configs/',
-                            str('nominal0.csv']),
+                            str(['nominal0.csv']),
                             str(['nominal0_config.txt']))
+
+        self.assertEquals(P.raw_data_file_path, self.run_path + '/data/raw_telemetry_data/')
+        self.assertEquals(P.metadata_file_path, self.run_path + '/data/telemetry_configs/')
                             
 
                             

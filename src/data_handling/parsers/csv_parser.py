@@ -49,10 +49,24 @@ class CSV:
 
 ##### INITIAL PROCESSING ####
     def parse_csv_data(self, dataFile):
+        
         dataset = pd.read_csv(os.path.join(self.raw_data_filepath, dataFile), delimiter=',', header=0)
+        dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
+        all_headers = list(dataset.columns.values)
+        all_data = {}
+        for index, row in dataset.iterrows():
+            all_data[index] = {}
+            all_data[dataFile] = list(row)
+        return all_headers, all_data 
 
-        return all_headers, all_data
-   
+    def parse_config_data(self, configFile, ss_breakdown):
+        parsed_configs = extract_configs(self.metadata_file_path, [configFile])
+        if ss_breakdown == False:
+            num_elements = len(parsed_configs['subsystem_assignments'][process_filepath(configFile)])
+            parsed_configs['subsystem_assignments'][process_filepath(configFile)] = [['MISSION'] for elem in range(num_elements)]
+        return parsed_configs
+##### GETTERS ##################################
 
-      
+    def get_sim_data(self):
+        return self.all_headers, self.sim_data, self.binning_configs
     

@@ -20,6 +20,7 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDriver))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestParserUtil))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestFortyTwoParser))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCSVParser))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGenericParser))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTimeSynchronizer))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataSource))
