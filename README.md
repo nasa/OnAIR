@@ -1,20 +1,10 @@
 # RAISR-2.0
 
-Hi James! Surprise... !!!!
+## Generating environment
 
-Re-writing a fully tested and rearchitected system. 
+Create a conda environment with the necessary packages
 
-TODO: Multi file source not currently working for 42
-
-UNIT TESTS: To be Completed
-Parser Util
-Execution Engine 
-Sim 
-Driver
-print_io 
-file_io
-feasibility test, double check others ... 
-sim_io
+    conda create --name raisr --file requirements.txt
 
 ## Running driver file test
 
@@ -31,3 +21,9 @@ Move test data from to src folder, and the config to src, unless you already hav
 Then you can just run the driver
 
     python driver.py -t
+
+## Running test_all
+
+Make sure to set the environment variables either before on run or previously 
+
+    RESULTS_PATH=results RUN_PATH=results python test_all.py
