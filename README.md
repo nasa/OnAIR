@@ -16,6 +16,12 @@ file_io
 feasibility test, double check others ... 
 sim_io
 
+## Generating environment
+
+Create a conda environment with the necessary packages
+
+    conda create --name raisr --file requirements.txt
+
 ## Running driver file test
 
 Make a results directory in your root folder and test folder:
@@ -31,3 +37,9 @@ Move test data from to src folder, and the config to src, unless you already hav
 Then you can just run the driver
 
     python driver.py -t
+
+## Running test_all
+
+Make sure to set the environment variables either before on run or previously 
+
+    RESULTS_PATH=results RUN_PATH=results python test_all.py
