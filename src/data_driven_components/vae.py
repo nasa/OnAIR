@@ -3,6 +3,9 @@ LSTM-VAE for streamed satellite telemetry fault diagnosis
 """
 import torch
 from torch import nn
+from torchvision import transforms
+from torch.utils.data import DataLoader, Dataset
+import functools
 
 class VAE(nn.Module):
     def __init__(self, input_dim=30, seq_len=15, z_units=5):
@@ -80,9 +83,9 @@ class VAE(nn.Module):
         :param x: (Tensor) sampling sequence of shape (batch_size, seq_len, z_units)
         :return: (Tensor) output sequence of shape (batch_size, seq_len, input_dim)
         """
-        x, (_, _) = self.dec1(x)
-        x, (_, _) = self.dec2(x)
-        # TODO: deal with x reshaping
+        x, _ = self.dec1(x)
+        x, _ = self.dec2(x)
+
         return self.output_layer(x)
 
     def forward(self, x):
@@ -97,9 +100,10 @@ class VAE(nn.Module):
         x = self.reparametrize(mu, logvar)
         x = x.repeat(1,self.seq_len,1)
         x = self.decoder(x)
+        self.output = x
         return x
 
-    def loss(self, x, mu, logvar, output):
+    def loss(self):#, x, mu, logvar, output):
         """
         Combination of mse (reconstruction error) between input and output and 
             KL-divergence of N(0,1) and N(mu, logvar)
@@ -108,20 +112,62 @@ class VAE(nn.Module):
         :param logvar: (Tensor) Logvariance of representation, shape (batch_size, 1, z_units)
         :param output: mse+KL divergence loss
         """
+        x = self.input
+        mu = self.mu
+        logvar = self.logvar
+        output = self.output
         num_batches = x.shape[0]
         mse_loss = nn.functional.mse_loss(x, output)
         mse_loss = torch.mean(mse_loss, dim=0)
         kldivergence_loss = torch.mean(-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim = 1), dim = 0)
+        kldivergence_loss = torch.sum(kldivergence_loss, dim=0)
         # TODO: double check batch size averaging
         return mse_loss + kldivergence_loss
 
+class TimeseriesDataset(Dataset):
+    def __init__(self, data, transform = None):
+        self.data = data
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        datum = self.data[idx]
+        if self.transform:
+            datum = self.transform(datum)
+        return datum
+
 if __name__ == "__main__":
+    data = range(30)
+    data = [[list(data), list(data)]]
+
+    transform = lambda x: torch.tensor(x).float()
+    dataset = TimeseriesDataset(data, transform)
+    dataloader = DataLoader(dataset, batch_size=1)
+
+    print(len(dataset))
+
     print("Creating VAE...")
-    vae = VAE(input_dim=30, seq_len=1, z_units=5)
+    vae = VAE(input_dim=30, seq_len=2, z_units=5)
     # TODO: training loop
     print("Successfuly created VAE")
-    data = range(30)
-    data = [float(x) for x in data]
-    x = torch.tensor([[data]])
-    out = vae(x)
-    print("Input data: {}\nOutput reconstruction: {}".format(x, out))
+
+    for x in dataloader:
+        print(x.shape, vae(x).shape)
+
+    print('First data point', dataset[0])
+
+    x = dataset[0]
+
+    optimizer = torch.optim.Adam(vae.parameters(), lr=1e-1)
+
+    vae.train()
+    for i in range(500):
+        for x in dataloader:
+            vae(x)
+            loss = vae.loss()
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+    print(vae(x))
