@@ -3,7 +3,6 @@ LSTM-VAE for streamed satellite telemetry fault diagnosis
 """
 import torch
 from torch import nn
-from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 import functools
 
@@ -11,6 +10,7 @@ class VAE(nn.Module):
     def __init__(self, input_dim=30, seq_len=15, z_units=5):
         """
         LSTM-VAE class for anomaly detection and diagnosis
+        Make sure seq_len is always the same, TODO: accept any seq_len
         :param input_dim: (int) number of input features
         :param seq_len: (int) number of data points in our data sequence
         :param z_units: (int) dimensions of our latent space gaussian representation
@@ -59,7 +59,10 @@ class VAE(nn.Module):
         :param x: (Tensor) input sequence of shape (batch_size, seq_len, input_dim)
         :return: (average, logvar) each of shape (batch_size, 1, z_units)
         """
-        x = x.reshape((1, self.seq_len, self.input_dim)) # TODO: should move to data processing
+        print(x.shape)
+        #print(x.shape)
+        #x = x.reshape((1, self.seq_len, self.input_dim)) # TODO: should move to data processing
+
         # LSTM output is tuple (output, (hidden state, cell state))
         x, (_, _) = self.enc1(x)
         _, (hidden_state, _) = self.enc2(x)
@@ -126,6 +129,10 @@ class VAE(nn.Module):
 
 class TimeseriesDataset(Dataset):
     def __init__(self, data, transform = None):
+        """
+        Timeseries dataset class, contains sequential data and applies transformation before returning datum
+        :param data: (Arraylike) 3D data container, first dimension is datum, second is time, third is features
+        """
         self.data = data
         self.transform = transform
 
@@ -140,34 +147,34 @@ class TimeseriesDataset(Dataset):
 
 if __name__ == "__main__":
     data = range(30)
-    data = [[list(data), list(data)]]
+    data = [[list(data)]] # serrated shape
+
+    data2 = [1]*30
+    data2 = [[data2]] # uniform
 
     transform = lambda x: torch.tensor(x).float()
-    dataset = TimeseriesDataset(data, transform)
-    dataloader = DataLoader(dataset, batch_size=1)
+    train_dataset = TimeseriesDataset(data, transform)
+    train_dataloader = DataLoader(train_dataset, batch_size=1)
 
-    print(len(dataset))
+    test_dataset = TimeseriesDataset(data2, transform)
+    test_dataloader = DataLoader(test_dataset, batch_size=1)
 
     print("Creating VAE...")
     vae = VAE(input_dim=30, seq_len=2, z_units=5)
-    # TODO: training loop
     print("Successfuly created VAE")
-
-    for x in dataloader:
-        print(x.shape, vae(x).shape)
-
-    print('First data point', dataset[0])
-
-    x = dataset[0]
 
     optimizer = torch.optim.Adam(vae.parameters(), lr=1e-1)
 
-    vae.train()
+    vae.train(True)
     for i in range(500):
-        for x in dataloader:
+        for x in dataloader_train:
             vae(x)
             loss = vae.loss()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+    vae.train(False)
+    for x in dataloader_test:
+        vae(x)
+        loss = vae.loss()
     print(vae(x))
