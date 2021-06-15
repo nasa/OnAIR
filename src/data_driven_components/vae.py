@@ -59,8 +59,6 @@ class VAE(nn.Module):
         :param x: (Tensor) input sequence of shape (batch_size, seq_len, input_dim)
         :return: (average, logvar) each of shape (batch_size, 1, z_units)
         """
-        print(x.shape)
-        #print(x.shape)
         #x = x.reshape((1, self.seq_len, self.input_dim)) # TODO: should move to data processing
 
         # LSTM output is tuple (output, (hidden state, cell state))
@@ -94,7 +92,8 @@ class VAE(nn.Module):
     def forward(self, x):
         """
         :param x: (Tensor) input sequence of shape (batch_size, seq_len, input_dim)
-        :return: (Tensor) output sequence of shape (batch_size, seq_len, input_dim)
+        :return: (Tensor, Float) tuple of output sequence of shape (batch_size, seq_len, input_dim)
+                and mse reconstruction error
         """
         self.input = x
         mu, logvar = self.encoder(x)
@@ -104,7 +103,15 @@ class VAE(nn.Module):
         x = x.repeat(1,self.seq_len,1)
         x = self.decoder(x)
         self.output = x
-        return x
+        mse = nn.functional.mse_loss(self.input, self.output)
+        return mse
+
+    def reconstruction(self):
+        """
+        Return the autoencoders reconstruction
+        :return: (Tensor) reconstructed tensor of shape (batch_size, seq_len, input_dim)
+        """
+        return self.output
 
     def loss(self):#, x, mu, logvar, output):
         """
@@ -126,6 +133,7 @@ class VAE(nn.Module):
         kldivergence_loss = torch.sum(kldivergence_loss, dim=0)
         # TODO: double check batch size averaging
         return mse_loss + kldivergence_loss
+
 
 class TimeseriesDataset(Dataset):
     def __init__(self, data, transform = None):
@@ -167,14 +175,14 @@ if __name__ == "__main__":
 
     vae.train(True)
     for i in range(500):
-        for x in dataloader_train:
+        for x in train_dataloader:
             vae(x)
             loss = vae.loss()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
     vae.train(False)
-    for x in dataloader_test:
+    for x in test_dataloader:
         vae(x)
         loss = vae.loss()
     print(vae(x))
