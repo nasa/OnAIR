@@ -5,6 +5,8 @@ import unittest
 import importlib
 
 from src.data_handling.parsers.forty_two_parser import FortyTwo
+from src.data_handling.parsers.csv_parser import CSV
+
 
 class TestGenericParser(unittest.TestCase):
 
@@ -15,11 +17,11 @@ class TestGenericParser(unittest.TestCase):
         self.rawDataFilepath = self.run_path + '/data/raw_telemetry_data/'
         self.tlmConfigFilepath = self.run_path + '/data/telemetry_configs/'
 
-        self.parser_names = ['FortyTwo']
-        self.parser_file_names = ['forty_two_parser']
+        self.parser_names = ['FortyTwo', 'CSV']
+        self.parser_file_names = ['forty_two_parser', 'csv_parser']
 
-        self.data_files = [str(['generic_test_42.txt'])]
-        self.config_files = [str(['generic_test_42_CONFIG.txt'])]
+        self.data_files = [str(['generic_test_42.txt']), str(['generic_test_csv.csv'])]
+        self.config_files = [str(['generic_test_42_CONFIG.txt']), str(['generic_test_csv_CONFIG.txt'])]
 
     # THESE THREE THINGS are needed by the time sync engine
     def test_singlesource_parse_sim_data(self):
