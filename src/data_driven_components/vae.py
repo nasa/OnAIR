@@ -4,7 +4,14 @@ LSTM-VAE for streamed satellite telemetry fault diagnosis
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
+from captum.attr import KernelShap
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+import shap
 import functools
+import os
+
+shap.initjs() # TODO deal with viz
 
 class VAE(nn.Module):
     def __init__(self, input_dim=30, seq_len=15, z_units=5):
@@ -134,6 +141,92 @@ class VAE(nn.Module):
         # TODO: double check batch size averaging
         return mse_loss + kldivergence_loss
 
+class VAEExplainer():
+    def __init__(self, vae, n_features=30, n_samples=200):
+        """
+        Takes in vae model to explain.
+        :param vae: (VAE) vae model
+        :param n_features: (optional int) number of features for a sequence input, defaults to 30
+        :param n_samples: (optional int) number of times to evaluate model, defaults to 200
+        """
+        self.explainer = KernelShap(vae)
+        self.n_features = n_features
+        self.n_samples = n_samples
+    
+    def shap(self, input, baseline):
+        """
+        Calculate shapley values for a given input as compared to baseline
+        :param input: (Tensor) input shape (batch_size, seq_len, input_dim)
+        :param baseline: (Tensor) baseline sample shape (batch_size, seq_len, input_dim)
+        """
+        self.input = input
+        self.shap_values = self.explainer.attribute(input, baseline, n_samples=self.n_samples)
+        return self.shap_values
+
+    def viz(self):
+        """
+        Return values to visualize previously calculated shapley values
+        To plot, call shap.force_plot(0, shap_values, data, data_names)
+        :return: (shap_values, data, data_names) shap_values array of shape (n_features,) with shapley
+                value for each feature, data array of shape (n_features,) with data of each feature, data_names array (n_features,) with name of each feature
+        """
+        shap_values = self.shap_values.detach().numpy().reshape((self.n_features))
+        data = self.input.detach().numpy().reshape((self.n_features))
+        data_names = list(range(self.n_features))
+        return (shap_values, data, data_names)
+
+def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "val"]):
+    """
+    Training loop util
+    :param loaders: {train: train_loader, val: val_loader} data loaders in dictionary
+    :param epochs: (optional int) number of epochs to train for, defaults to 20
+    :param lr: (optional float) learning rate, defaults to 1e-1
+    :param checkpoint: (optional bool) save model to directory, defaults to False
+    :param phases: (string list) phases in training, defaults to ["train", "val"],
+                each phase should have a corresponding data loader
+    """
+    checkpoint_dir = os.path.dirname(os.path.realpath(__file__))
+
+    optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
+
+    for epoch_counter in tqdm(range(epochs)):
+        for phase in phases:
+            if phase == "train":
+                vae.train(True)
+            else:
+                vae.train(False)
+
+            running_loss = 0.0
+
+            for x in loaders[phase]:
+                if phase == "train":
+                    vae(x)
+                    loss = vae.loss()
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+                else:
+                    with torch.no_grad():
+                        vae(x)
+                        loss = vae.loss()
+
+                running_loss += loss
+
+            avg_loss = running_loss / len(loaders[phase])
+
+        if checkpoint:
+            checkpoint_name = 'checkpoint_{:04d}.pth.tar'.format(epoch_counter)
+            torch.save({
+                'epoch': epoch_counter,
+                'state_dict': vae.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'loss': avg_loss
+            }, os.path.join(checkpoint_dir, checkpoint_name))
+
+            
+
+
+
 
 class TimeseriesDataset(Dataset):
     def __init__(self, data, transform = None):
@@ -168,21 +261,29 @@ if __name__ == "__main__":
     test_dataloader = DataLoader(test_dataset, batch_size=1)
 
     print("Creating VAE...")
-    vae = VAE(input_dim=30, seq_len=2, z_units=5)
+    vae = VAE(input_dim=30, seq_len=1, z_units=5)
     print("Successfuly created VAE")
 
-    optimizer = torch.optim.Adam(vae.parameters(), lr=1e-1)
+    train(vae, {'train': train_dataloader}, phases=["train"])
 
+    """
+    optimizer = torch.optim.Adam(vae.parameters(), lr=1e-1)
     vae.train(True)
+    print('Begin training')
     for i in range(500):
         for x in train_dataloader:
+            bass = x
             vae(x)
             loss = vae.loss()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
     vae.train(False)
+    print('Begin testing')
     for x in test_dataloader:
         vae(x)
-        loss = vae.loss()
-    print(vae(x))
+        e = VAEExplainer(vae)
+        print(e.shap(x, bass))
+        e.viz()
+    """
+
