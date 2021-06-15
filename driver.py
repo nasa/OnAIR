@@ -54,6 +54,7 @@ def init_global_paths(test=False):
     results_path = 'src/test/results' if test == True else 'results/'
     os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
     os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), results_path)
+    os.environ['SRC_ROOT_PATH'] = os.path.dirname(os.path.realpath(__file__))
 
 # Disable
 def blockPrint():
