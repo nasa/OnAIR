@@ -44,9 +44,9 @@ class TestGenericParser(unittest.TestCase):
                                            '1001': { headerName : ['1001', '1', '1.000000000000e+00', '1.0']}, 
                                            '1002': { headerName : ['1002', '2', '2.000000000000e+00', '2']}, 
                                            '1003': { headerName : ['1003', '3', '3.000000000000e+00', '3']}})
-            self.assertEquals(P.binning_configs, {'subsystem_assignments': {'generic_test_42.txt': [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']]}, 
-                                                  'test_assignments': {'generic_test_42.txt': [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]]]}, 
-                                                  'description_assignments': {'generic_test_42.txt': ['No description', 'No description', 'No description', 'No description']}})        
+            self.assertEquals(P.binning_configs, {'subsystem_assignments': {headerName: [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']]}, 
+                                                  'test_assignments': {headerName: [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]]]}, 
+                                                  'description_assignments': {headerName: ['No description', 'No description', 'No description', 'No description']}})        
 
 
     # def test_multisource_parse_sim_data(self):

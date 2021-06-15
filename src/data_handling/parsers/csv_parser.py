@@ -31,15 +31,14 @@ class CSV:
         self.binning_configs = ''
 
         if (dataFiles != '') and (configFiles != ''):
-
+            #Get CSV Configuration
             configs = self.parse_config_data(str2lst(configFiles)[0], ss_breakdown)
 
             self.binning_configs = {}
             self.binning_configs['subsystem_assignments'] = {}
             self.binning_configs['test_assignments'] = {}
             self.binning_configs['description_assignments'] = {}
-
-            sync_attributes = []
+            
             for data_file in ast.literal_eval(dataFiles):
                 #Config file will be a .txt, but data file wil be .csv
                 data_file = data_file.replace('.csv', '.txt')
@@ -47,11 +46,13 @@ class CSV:
                 self.binning_configs['test_assignments'][data_file] = configs['test_assignments'][data_file]
                 self.binning_configs['description_assignments'][data_file] = configs['description_assignments'][data_file]
 
-                for attribute in range(len(self.binning_configs['test_assignments'][data_file])):
-                    if (self.binning_configs['test_assignments'][data_file][attribute][0][0] == 'SYNC'):
-                        sync_attributes.append(attribute)
-
-            labels, data = self.parse_csv_data(str2lst(dataFiles)[0], sync_attributes)
+                #Search for a sync configuration and find the attribute that syncs the data in order to keep that as the key
+                for attribute in range(len(self.binning_configs['test_assignments'][data_file])):                    
+                    if (any('SYNC' in sublist for sublist in self.binning_configs['test_assignments'][data_file][attribute])):
+                        sync_attribute = attribute
+            #Get labels and data
+            # Data format: {index(hopefully synced):{filename : [Attribute value1, attribute value2, ...]}}
+            labels, data = self.parse_csv_data(str2lst(dataFiles)[0], sync_attribute)
             self.all_headers = labels              
             self.sim_data = data
 
@@ -69,7 +70,8 @@ class CSV:
         for index, row in dataset.iterrows():
             rowVals = list(row)
             innerStructure = {dataFile : list(row)}
-            if (len(syncAttributes) == 0):
+            #If a sync attribute wasn't provided, just assume normal indexing
+            if (syncAttributes != None):
                 all_data[index] = innerStructure
             else:
                 all_data[rowVals[syncAttributes[0]]] = innerStructure
