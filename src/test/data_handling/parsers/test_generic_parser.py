@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 import importlib
+import ast
 
 from src.data_handling.parsers.forty_two_parser import FortyTwo
 from src.data_handling.parsers.csv_parser import CSV
@@ -37,11 +38,12 @@ class TestGenericParser(unittest.TestCase):
 
             headers, sim_data, configs = P.get_sim_data()
 
-            self.assertEquals(P.all_headers, {'generic_test_42.txt': ['TIME', 'A', 'B', 'C']})
-            self.assertEquals(P.sim_data, {'1000': {'generic_test_42.txt': ['1000', '0', '0.000000000000e+00', '0.0']}, 
-                                           '1001': {'generic_test_42.txt': ['1001', '1', '1.000000000000e+00', '1.0']}, 
-                                           '1002': {'generic_test_42.txt': ['1002', '2', '2.000000000000e+00', '2']}, 
-                                           '1003': {'generic_test_42.txt': ['1003', '3', '3.000000000000e+00', '3']}})
+            headerName = ast.literal_eval(self.data_files[i])[0]
+            self.assertEquals(P.all_headers, { headerName : ['TIME', 'A', 'B', 'C']})
+            self.assertEquals(P.sim_data, {'1000': { headerName : ['1000', '0', '0.000000000000e+00', '0.0']}, 
+                                           '1001': { headerName : ['1001', '1', '1.000000000000e+00', '1.0']}, 
+                                           '1002': { headerName : ['1002', '2', '2.000000000000e+00', '2']}, 
+                                           '1003': { headerName : ['1003', '3', '3.000000000000e+00', '3']}})
             self.assertEquals(P.binning_configs, {'subsystem_assignments': {'generic_test_42.txt': [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']]}, 
                                                   'test_assignments': {'generic_test_42.txt': [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]]]}, 
                                                   'description_assignments': {'generic_test_42.txt': ['No description', 'No description', 'No description', 'No description']}})        

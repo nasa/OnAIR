@@ -1,6 +1,6 @@
 import unittest
 import sys 
-
+import os
 from src.test.test_driver import TestDriver
 from src.test.data_handling.parsers.test_parser_util import TestParserUtil
 from src.test.data_handling.parsers.test_forty_two_parser import TestFortyTwoParser
@@ -44,6 +44,10 @@ def test_individual_suite(test):
 
 if __name__ == '__main__':
     suite = create_suite()
+    run_path = 'src/test'
+    results_path = 'src/test/results'
+    os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
+    os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), results_path)
     if len(sys.argv) == 2:
         try: 
             test_individual_suite(suite[int(sys.argv[1])])

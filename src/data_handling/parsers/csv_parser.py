@@ -31,9 +31,6 @@ class CSV:
         self.binning_configs = ''
 
         if (dataFiles != '') and (configFiles != ''):
-            labels, data = self.parse_csv_data(str2lst(dataFiles)[0])
-            self.all_headers = labels
-            self.sim_data = data
 
             configs = self.parse_config_data(str2lst(configFiles)[0], ss_breakdown)
 
@@ -42,6 +39,7 @@ class CSV:
             self.binning_configs['test_assignments'] = {}
             self.binning_configs['description_assignments'] = {}
 
+            sync_attributes = []
             for data_file in ast.literal_eval(dataFiles):
                 #Config file will be a .txt, but data file wil be .csv
                 data_file = data_file.replace('.csv', '.txt')
@@ -49,16 +47,32 @@ class CSV:
                 self.binning_configs['test_assignments'][data_file] = configs['test_assignments'][data_file]
                 self.binning_configs['description_assignments'][data_file] = configs['description_assignments'][data_file]
 
+                for attribute in range(len(self.binning_configs['test_assignments'][data_file])):
+                    if (self.binning_configs['test_assignments'][data_file][attribute][0][0] == 'SYNC'):
+                        sync_attributes.append(attribute)
+
+            labels, data = self.parse_csv_data(str2lst(dataFiles)[0], sync_attributes)
+            self.all_headers = labels              
+            self.sim_data = data
+
+            
+
 ##### INITIAL PROCESSING ####
-    def parse_csv_data(self, dataFile):
+    def parse_csv_data(self, dataFile, syncAttributes):
         
         dataset = pd.read_csv(os.path.join(self.raw_data_file_path, dataFile), delimiter=',', header=0)
         dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
-        all_headers = list(dataset.columns.values)
+        headersDict = {}
+        headersDict[dataFile] = list(dataset.columns.values)
+        all_headers = headersDict
         all_data = {}
         for index, row in dataset.iterrows():
+            rowVals = list(row)
             innerStructure = {dataFile : list(row)}
-            all_data[index] = innerStructure
+            if (len(syncAttributes) == 0):
+                all_data[index] = innerStructure
+            else:
+                all_data[rowVals[syncAttributes[0]]] = innerStructure
         return all_headers, all_data 
 
     def parse_config_data(self, configFile, ss_breakdown):
