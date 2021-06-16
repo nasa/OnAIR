@@ -39,6 +39,7 @@ class CSV:
             self.binning_configs['test_assignments'] = {}
             self.binning_configs['description_assignments'] = {}
             
+            sync_attribute = None
             for data_file in ast.literal_eval(dataFiles):
                 #Config file will be a .txt, but data file wil be .csv
                 data_file = data_file.replace('.csv', '.txt')
