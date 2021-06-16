@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import shap
 import functools
 import os
+from datetime import datetime 
+from torch.utils.tensorboard import SummaryWriter
 
 shap.initjs() # TODO deal with viz
 
@@ -185,7 +187,11 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "
     :param phases: (string list) phases in training, defaults to ["train", "val"],
                 each phase should have a corresponding data loader
     """
-    checkpoint_dir = os.path.dirname(os.path.realpath(__file__))
+    checkpoint_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"runs")
+
+    e = datetime.now()
+
+    writer = SummaryWriter(os.path.join(checkpoint_dir, "{}-{}-{}_{}:{}:{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second)))
 
     optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
 
@@ -210,6 +216,8 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "
                         vae(x)
                         loss = vae.loss()
 
+                writer.add_scalar('Loss/' + phase, loss, epoch_counter)
+
                 running_loss += loss
 
             avg_loss = running_loss / len(loaders[phase])
@@ -222,11 +230,6 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "
                 'optimizer': optimizer.state_dict(),
                 'loss': avg_loss
             }, os.path.join(checkpoint_dir, checkpoint_name))
-
-            
-
-
-
 
 class TimeseriesDataset(Dataset):
     def __init__(self, data, transform = None):
