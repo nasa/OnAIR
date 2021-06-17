@@ -12,7 +12,7 @@ import pathlib
 from datetime import datetime
 from test_all import *
 
-#from src.run_scripts.execution_engine import ExecutionEngine
+from src.run_scripts.execution_engine import ExecutionEngine
 
 def main():
     os.system('find . -name \'.DS_Store\' -type f -delete') # Removes those pesky .DS_Store files that Macs make
