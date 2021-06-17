@@ -43,13 +43,7 @@ def test_individual_suite(test):
     unittest.TextTestRunner(verbosity=1).run(test) 
 
 if __name__ == '__main__':
-    suite = create_suite()
-    
-    run_path = 'src/test'
-    results_path = 'src/test/results'
-    os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
-    os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), results_path)
-    
+    suite = create_suite()    
     if len(sys.argv) == 2:
         try: 
             test_individual_suite(suite[int(sys.argv[1])])
