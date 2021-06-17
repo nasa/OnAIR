@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 import importlib
+import ast 
 
 from src.data_handling.parsers.forty_two_parser import FortyTwo
 from src.data_handling.parsers.csv_parser import CSV
