@@ -22,8 +22,3 @@ Then you can just run the driver
 
     python driver.py -t
 
-## Running test_all
-
-Make sure to set the environment variables either before on run or previously 
-
-    RESULTS_PATH=results RUN_PATH=results python test_all.py
