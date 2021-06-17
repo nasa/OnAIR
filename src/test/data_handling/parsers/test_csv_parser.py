@@ -29,8 +29,6 @@ class TestCSVParser(unittest.TestCase):
 
         self.assertEquals(P.raw_data_file_path, self.run_path + '/data/raw_telemetry_data/')
         self.assertEquals(P.metadata_file_path, self.run_path + '/data/telemetry_configs/')
-                            
-
-                            
+                      
 if __name__ == '__main__':
     unittest.main()
