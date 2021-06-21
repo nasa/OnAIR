@@ -1,6 +1,7 @@
 import unittest
 import sys 
 import os
+
 from src.test.test_driver import TestDriver
 from src.test.data_handling.parsers.test_parser_util import TestParserUtil
 from src.test.data_handling.parsers.test_forty_two_parser import TestFortyTwoParser
@@ -15,6 +16,7 @@ from src.test.reasoning.test_brain import TestBrain
 from src.test.systems.test_telemetry_test_suite import TestTelemetryTestSuite
 from src.test.run_scripts.test_sim import TestSimulator
 from src.test.data_driven_components.test_data_driven_learning import TestDataDrivenLearning
+from src.test.cleanup.test_cleanup import TestCleanup
 
 def create_suite():
     suite = []
@@ -32,7 +34,8 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTelemetryTestSuite))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
-    
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCleanup))
+
     return suite
 
 def run_tests(suite):
@@ -40,15 +43,14 @@ def run_tests(suite):
         unittest.TextTestRunner(verbosity=1).run(test)
 
 def test_individual_suite(test):
-    unittest.TextTestRunner(verbosity=1).run(test) 
+    unittest.TextTestRunner(verbosity=1).run(test)
 
 if __name__ == '__main__':
     suite = create_suite()    
     if len(sys.argv) == 2:
-        try: 
+        try:
             test_individual_suite(suite[int(sys.argv[1])])
-        except: 
+        except:
             print('Please enter a valid test index')
     else:
         run_tests(suite)
-
