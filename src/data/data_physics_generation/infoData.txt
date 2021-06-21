@@ -1,0 +1,51 @@
+VOLTAGE:
+	Should be between 13 to 18
+	Shouldn't change quickly
+	Fine if it changes slowly
+	Associated with CURRENT
+	Associated with THRUST
+
+CURRENT:
+	Should be between 3 to 5
+	Shouldn't change quickly
+	Fine if it changes slowly
+	Associated with VOLTAGE
+	Associated with THRUST
+
+THRUST:
+	Should be between -200 to 200
+	Fine if it changes quickly
+	Fine if it changes slowly
+	Associated with CURRENT
+	Associated with VOLTAGE
+	Associated with VELOCITY
+	Associated with ALTITUDE
+
+ALTITUDE:
+	Should be between 1,200 to 2,800
+	Shouldn't change quickly
+	Fine if it changes slowly
+	Associated with THRUST
+	Associated with VELOCITY
+	Associated with TEMPERATURE
+
+ACCELERATION:
+	Should be between -20 to 20
+	Fine if it changes quickly
+	Fine if it changes closely
+	Associated with THRUST
+	Associated with ALTITUDE
+
+TEMPERATURE:
+	Should be between 10 - 90
+	Shouldn't change quickly
+	Fine if it changes slowly
+	Associated with ALTITUDE
+
+SCIENCE_COLLECTION:
+	0 = Science Data Not Being Collected
+	1 = Science Data Being Collected
+
+[LABEL]: ERROR STATE:
+	0 = No Errors
+	1 = Error
