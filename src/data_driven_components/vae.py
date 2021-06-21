@@ -5,7 +5,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from captum.attr import KernelShap
-from tqdm import tqdm
+
 import matplotlib.pyplot as plt
 import shap
 import functools
@@ -15,23 +15,42 @@ from torch.utils.tensorboard import SummaryWriter
 
 shap.initjs() # TODO deal with viz
 
+def isNotebook():
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True   # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False      # Probably standard Python interpreter
+
+if isNotebook():
+    from tqdm.notebook import tqdm
+else:
+    from tqdm import tqdm
+
 class VAE(nn.Module):
-    def __init__(self, input_dim=30, seq_len=15, z_units=5):
+    def __init__(self, input_dim=30, seq_len=15, z_units=5, hidden_units=100):
         """
         LSTM-VAE class for anomaly detection and diagnosis
         Make sure seq_len is always the same, TODO: accept any seq_len
         :param input_dim: (int) number of input features
         :param seq_len: (int) number of data points in our data sequence
         :param z_units: (int) dimensions of our latent space gaussian representation
+        :param hidden_units: (int) dimension of our hidden_units
         """
         super(VAE, self).__init__()
 
         self.input_dim = input_dim
-        self.hidden_dim = z_units * 2 # good rule of thumb
+        self.hidden_dim = hidden_units
         self.z_units = z_units
         self.seq_len = seq_len # TODO: maybe detect automatically from data?
 
         # batch_first = true makes output tensor of size (batch, seq, feature).
+        self.norm = nn.BatchNorm1d(self.seq_len)
         self.enc1 = nn.LSTM(
             input_size=self.input_dim,
             hidden_size=self.hidden_dim,
@@ -71,8 +90,11 @@ class VAE(nn.Module):
         #x = x.reshape((1, self.seq_len, self.input_dim)) # TODO: should move to data processing
 
         # LSTM output is tuple (output, (hidden state, cell state))
+        x = self.norm(x)
+        self.input = x
         x, (_, _) = self.enc1(x)
         _, (hidden_state, _) = self.enc2(x)
+        hidden_state = torch.transpose(hidden_state, 0, 1) # Hidden state has batch in middle
         mu = self.mulinear(hidden_state)
         logvar = self.logvarlinear(hidden_state)
         
@@ -104,7 +126,7 @@ class VAE(nn.Module):
         :return: (Tensor, Float) tuple of output sequence of shape (batch_size, seq_len, input_dim)
                 and mse reconstruction error
         """
-        self.input = x
+        batch_size = x.shape[0]
         mu, logvar = self.encoder(x)
         self.mu = mu
         self.logvar = logvar
@@ -144,15 +166,19 @@ class VAE(nn.Module):
         return mse_loss + kldivergence_loss
 
 class VAEExplainer():
-    def __init__(self, vae, n_features=30, n_samples=200):
+    def __init__(self, vae, headers, n_features=7, seq_len=1, n_samples=200):
         """
         Takes in vae model to explain.
         :param vae: (VAE) vae model
+        :param headers: (string list) ordered list of headers, must have n_features elements
         :param n_features: (optional int) number of features for a sequence input, defaults to 30
+        :param seq_len: (optional int) number of sequence components per input
         :param n_samples: (optional int) number of times to evaluate model, defaults to 200
         """
         self.explainer = KernelShap(vae)
+        self.headers = headers
         self.n_features = n_features
+        self.seq_len = seq_len
         self.n_samples = n_samples
     
     def shap(self, input, baseline):
@@ -165,16 +191,39 @@ class VAEExplainer():
         self.shap_values = self.explainer.attribute(input, baseline, n_samples=self.n_samples)
         return self.shap_values
 
-    def viz(self):
+    def makeLongHeaders(self):
+        """
+        Make sequential headers from single header list
+        """
+        long_header = []
+        for t in range(self.seq_len):
+            long_header += [str(t) + '_' + h for h in self.headers]
+        return long_header
+
+    def viz(self, average=False):
         """
         Return values to visualize previously calculated shapley values
         To plot, call shap.force_plot(0, shap_values, data, data_names)
+        :param average: (bool) if seq_len > 1, whether to average data and shap over sequence length
         :return: (shap_values, data, data_names) shap_values array of shape (n_features,) with shapley
                 value for each feature, data array of shape (n_features,) with data of each feature, data_names array (n_features,) with name of each feature
         """
-        shap_values = self.shap_values.detach().numpy().reshape((self.n_features))
-        data = self.input.detach().numpy().reshape((self.n_features))
-        data_names = list(range(self.n_features))
+        if self.seq_len == 1:
+            # Point data
+            shap_values = self.shap_values.detach().numpy().reshape((self.n_features))
+            data = self.input.detach().numpy().reshape((self.n_features))
+            data_names = self.headers
+        elif average:
+            # Averaging timeseries
+            shap_values = self.shap_values.detach().numpy().reshape((self.seq_len, self.n_features)).sum(axis=0)/self.seq_len
+            data = self.input.detach().numpy().reshape((self.seq_len, self.n_features)).sum(axis=0)/self.seq_len
+            data_names = self.headers
+        else:
+            # Timeseries data we don't want to average
+            shap_values = self.shap_values.detach().numpy().reshape((self.seq_len*self.n_features))
+            data = self.input.detach().numpy().reshape((self.seq_len*self.n_features))
+            data_names = self.makeLongHeaders()
+
         return (shap_values, data, data_names)
 
 def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "val"]):
@@ -190,8 +239,10 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "
     checkpoint_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"runs")
 
     e = datetime.now()
+    run_dir = os.path.join(checkpoint_dir, "{}-{}-{}_{}:{}:{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second))
 
-    writer = SummaryWriter(os.path.join(checkpoint_dir, "{}-{}-{}_{}:{}:{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second)))
+    writer = SummaryWriter(run_dir)
+    print("Starting training, see run at", run_dir)
 
     optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
 
@@ -216,11 +267,11 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "
                         vae(x)
                         loss = vae.loss()
 
-                writer.add_scalar('Loss/' + phase, loss, epoch_counter)
-
                 running_loss += loss
 
             avg_loss = running_loss / len(loaders[phase])
+
+            writer.add_scalar('Loss/' + phase, avg_loss, epoch_counter)
 
         if checkpoint:
             checkpoint_name = 'checkpoint_{:04d}.pth.tar'.format(epoch_counter)
@@ -229,7 +280,7 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "
                 'state_dict': vae.state_dict(),
                 'optimizer': optimizer.state_dict(),
                 'loss': avg_loss
-            }, os.path.join(checkpoint_dir, checkpoint_name))
+            }, os.path.join(run_dir, checkpoint_name))
 
 class TimeseriesDataset(Dataset):
     def __init__(self, data, transform = None):
@@ -248,6 +299,22 @@ class TimeseriesDataset(Dataset):
         if self.transform:
             datum = self.transform(datum)
         return datum
+
+def findThreshold(vae, dataset, error_margin):
+    """
+    Finds fault threshold based on upper bound for reconstruction error and a percent margin
+    :param vae: (VAE) model to evaluate on
+    :param dataset: (Dataset) pytorch dataset containing normal data
+    :param error_margin: (float) the error margin as a float, for example, to add 20% to the threshold
+                        this should be set to 0.2
+    """
+    dataloader = DataLoader(dataset, batch_size=1)
+    reconstruction_error = 0
+    for d in tqdm(dataloader):
+        if (x := vae(d)) > reconstruction_error:
+            reconstruction_error = x
+
+    return reconstruction_error * (1+error_margin)
 
 if __name__ == "__main__":
     data = range(30)
