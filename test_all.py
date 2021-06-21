@@ -1,9 +1,11 @@
 import unittest
-import sys
+import sys 
+import os
 
 from src.test.test_driver import TestDriver
 from src.test.data_handling.parsers.test_parser_util import TestParserUtil
 from src.test.data_handling.parsers.test_forty_two_parser import TestFortyTwoParser
+from src.test.data_handling.parsers.test_csv_parser import TestCSVParser
 from src.test.data_handling.parsers.test_generic_parser import TestGenericParser
 from src.test.data_handling.test_time_synchronizer import TestTimeSynchronizer
 from src.test.data_handling.test_data_source import TestDataSource
@@ -21,6 +23,7 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDriver))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestParserUtil))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestFortyTwoParser))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCSVParser))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGenericParser))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTimeSynchronizer))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataSource))
@@ -43,7 +46,7 @@ def test_individual_suite(test):
     unittest.TextTestRunner(verbosity=1).run(test)
 
 if __name__ == '__main__':
-    suite = create_suite()
+    suite = create_suite()    
     if len(sys.argv) == 2:
         try:
             test_individual_suite(suite[int(sys.argv[1])])
