@@ -11,11 +11,12 @@ import argparse
 import pathlib
 from datetime import datetime
 from test_all import *
+import src.util.cleanup as cleanup
 
 from src.run_scripts.execution_engine import ExecutionEngine
 
 def main():
-    os.system('find . -name \'.DS_Store\' -type f -delete') # Removes those pesky .DS_Store files that Macs make
+    cleanup.clean(True) # Perform PreRun Cleanup
 
     """
     This is the standard naming format, for now.
@@ -37,8 +38,10 @@ def main():
     init_global_paths(args.test)
 
     if args.test:
+        cleanup.clean(True, path='src/test/') # Perform PreRun Cleanup
         suite = create_suite()
         run_tests(suite)
+        cleanup.clean(False) # Perform PostRun Cleanup
         return
 
     save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
@@ -48,6 +51,8 @@ def main():
 
     RAISR = ExecutionEngine(args.configfile, save_name, args.save)
     RAISR.run_sim()
+
+    cleanup.clean(False) # Perform PostRun Cleanup
 
 def init_global_paths(test=False):
     run_path = 'src/test' if test == True else 'src/'
