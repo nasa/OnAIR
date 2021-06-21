@@ -11,13 +11,11 @@ import argparse
 import pathlib
 from datetime import datetime
 from test_all import *
-import src.util.cleanup as cleanup
+from src.util.cleanup import *
 
 from src.run_scripts.execution_engine import ExecutionEngine
 
 def main():
-    cleanup.clean(True) # Perform PreRun Cleanup
-
     """
     This is the standard naming format, for now.
     filename.txt and filename_CONFIG.txt
@@ -36,36 +34,38 @@ def main():
     args = arg_parser.parse_args()
 
     init_global_paths(args.test)
+    setup_folders(os.environ['RESULTS_PATH'])
 
     if args.test:
-        cleanup.clean(True, path='src/test/') # Perform PreRun Cleanup
         suite = create_suite()
         run_tests(suite)
-        cleanup.clean(False) # Perform PostRun Cleanup
+        clean_all(os.environ['BASE_PATH']) 
         return
-
-    save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
 
     if args.mute:
         blockPrint()
 
+    save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
     RAISR = ExecutionEngine(args.configfile, save_name, args.save)
     RAISR.run_sim()
 
-    cleanup.clean(False) # Perform PostRun Cleanup
+    clean_all(os.environ['BASE_PATH']) 
 
+""" Initializes global paths, used throughout execution """
 def init_global_paths(test=False):
     run_path = 'src/test' if test == True else 'src/'
     results_path = 'src/test/results' if test == True else 'results/'
+
+    os.environ['BASE_PATH'] = os.path.dirname(os.path.realpath(__file__))
     os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
     os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), results_path)
     os.environ['SRC_ROOT_PATH'] = os.path.dirname(os.path.realpath(__file__))
 
-# Disable
+""" Disable terminal output """
 def blockPrint():
     sys.stdout = open(os.devnull, 'w')
 
-# Restore
+""" Restore terminal output """
 def enablePrint():
     sys.stdout = sys.__stdout__
 

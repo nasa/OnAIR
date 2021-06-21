@@ -16,7 +16,7 @@ from src.test.reasoning.test_brain import TestBrain
 from src.test.systems.test_telemetry_test_suite import TestTelemetryTestSuite
 from src.test.run_scripts.test_sim import TestSimulator
 from src.test.data_driven_components.test_data_driven_learning import TestDataDrivenLearning
-from src.test.cleanup.test_cleanup import TestCleanup
+from src.test.util.test_cleanup import TestCleanup
 
 def create_suite():
     suite = []
