@@ -64,8 +64,8 @@ class GeneralizabilityEngine:
                 data_sets.append(DataWrapper(path, *parse_data(path)))
         return data_sets
 
-    def extract_dimensional_info(self, construct_name, sample=None):
-        sample = self.data_samples[0] if sample == None else sample
+    def extract_dimensional_info(self, construct_name):
+        sample = self.data_samples[0]
         input_dim = len(sample.get_headers())         # VAE
         seq_len = sample.get_num_frames()           # VAE
 
@@ -80,7 +80,6 @@ class GeneralizabilityEngine:
                 'Associativity' : [headers, sample_input],
                 'POMDP' : [name, path, telemetry_headers]}
         return args[construct_name]
-
 
     # def run_generalizability_tests(self):
     #     for sample in self.data_samples:
