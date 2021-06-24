@@ -7,8 +7,8 @@ import os
 import numpy as np
 
 from src.util.print_io import *
-# from src.data_driven_components.lstm import LongShortTermMemory
-# from src.data_driven_components.associativity import Associativity
+
+from src.data_driven_components.associativity.associativity import Associativity
 
 class DataDrivenLearning:
     def __init__(self, headers=[], sample_input=[]):
@@ -25,28 +25,20 @@ class DataDrivenLearning:
         except:
             self.headers = []
 
+    """ Initialize all learning systems with necessary dimensional info """
     def init_learning_systems(self, headers, sample=[]):
         assert(len(headers)>0)
-        self.headers = headers
-
-        if sample == []:
-            sample_input = [0.0]*len(headers)
-        else:
-            sample_input = self.floatify_input(sample)
-
+        sample_input = [0.0]*len(headers) if sample == [] else self.floatify_input(sample)
         sample_output = self.status_to_oneHot('---')
-
-        # self.associations = Associativity(name, headers, sample_input)
-        # self.LSTM = LongShortTermMemory(name, sample_input, sample_output, 5)
-        # self.LSTM.setXLabels(headers)
-
+        self.headers = headers
+        self.associations = Associativity(headers, sample_input, True)
         return sample_input, sample_output
 
     def update(self, curr_data, status):
         input_data = self.floatify_input(curr_data)
         output_data = self.status_to_oneHot(status)
+        self.associations.update(input_data)
         return input_data, output_data 
-        # self.associations.update(input_data)
 
     def apriori_training(self, batch_data):
         # assert(self.LSTM is not None)
