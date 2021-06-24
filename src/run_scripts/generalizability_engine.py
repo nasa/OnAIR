@@ -11,7 +11,7 @@ import pandas as pd
 import csv 
 
 from src.data_driven_components.associativity import Associativity
-from src.data_driven_components.vae import VAE
+#from src.data_driven_components.vae import VAE
 from src.data_driven_components.pomdp import POMDP
 
 # -----------------------------------------------------

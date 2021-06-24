@@ -4,33 +4,12 @@ LSTM-VAE for streamed satellite telemetry fault diagnosis
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
-from captum.attr import KernelShap
+from src.util.vae_train import train
 
 import matplotlib.pyplot as plt
-import shap
-import functools
-import os
-from datetime import datetime 
-from torch.utils.tensorboard import SummaryWriter
 
-shap.initjs() # TODO deal with viz
-
-def isNotebook():
-    try:
-        shell = get_ipython().__class__.__name__
-        if shell == 'ZMQInteractiveShell':
-            return True   # Jupyter notebook or qtconsole
-        elif shell == 'TerminalInteractiveShell':
-            return False  # Terminal running IPython
-        else:
-            return False  # Other type (?)
-    except NameError:
-        return False      # Probably standard Python interpreter
-
-if isNotebook():
-    from tqdm.notebook import tqdm
-else:
-    from tqdm import tqdm
+#import shap
+# shap.initjs() # TODO deal with viz
 
 class VAE(nn.Module):
     def __init__(self, input_dim=30, seq_len=15, z_units=5, hidden_units=100):
@@ -165,123 +144,6 @@ class VAE(nn.Module):
 
         return mse_loss + kldivergence_loss
 
-class VAEExplainer():
-    def __init__(self, vae, headers, n_features=7, seq_len=1, n_samples=200):
-        """
-        Takes in vae model to explain.
-        :param vae: (VAE) vae model
-        :param headers: (string list) ordered list of headers, must have n_features elements
-        :param n_features: (optional int) number of features for a sequence input, defaults to 30
-        :param seq_len: (optional int) number of sequence components per input
-        :param n_samples: (optional int) number of times to evaluate model, defaults to 200
-        """
-        self.explainer = KernelShap(vae)
-        self.headers = headers
-        self.n_features = n_features
-        self.seq_len = seq_len
-        self.n_samples = n_samples
-    
-    def shap(self, input, baseline):
-        """
-        Calculate shapley values for a given input as compared to baseline
-        :param input: (Tensor) input shape (batch_size, seq_len, input_dim)
-        :param baseline: (Tensor) baseline sample shape (batch_size, seq_len, input_dim)
-        """
-        self.input = input
-        self.shap_values = self.explainer.attribute(input, baseline, n_samples=self.n_samples)
-        return self.shap_values
-
-    def makeLongHeaders(self):
-        """
-        Make sequential headers from single header list
-        """
-        long_header = []
-        for t in range(self.seq_len):
-            long_header += [str(t) + '_' + h for h in self.headers]
-        return long_header
-
-    def viz(self, average=False):
-        """
-        Return values to visualize previously calculated shapley values
-        To plot, call shap.force_plot(0, shap_values, data, data_names)
-        :param average: (bool) if seq_len > 1, whether to average data and shap over sequence length
-        :return: (shap_values, data, data_names) shap_values array of shape (n_features,) with shapley
-                value for each feature, data array of shape (n_features,) with data of each feature, data_names array (n_features,) with name of each feature
-        """
-        if self.seq_len == 1:
-            # Point data
-            shap_values = self.shap_values.detach().numpy().reshape((self.n_features))
-            data = self.input.detach().numpy().reshape((self.n_features))
-            data_names = self.headers
-        elif average:
-            # Averaging timeseries
-            shap_values = self.shap_values.detach().numpy().reshape((self.seq_len, self.n_features)).sum(axis=0)/self.seq_len
-            data = self.input.detach().numpy().reshape((self.seq_len, self.n_features)).sum(axis=0)/self.seq_len
-            data_names = self.headers
-        else:
-            # Timeseries data we don't want to average
-            shap_values = self.shap_values.detach().numpy().reshape((self.seq_len*self.n_features))
-            data = self.input.detach().numpy().reshape((self.seq_len*self.n_features))
-            data_names = self.makeLongHeaders()
-
-        return (shap_values, data, data_names)
-
-def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "val"]):
-    """
-    Training loop util
-    :param loaders: {train: train_loader, val: val_loader} data loaders in dictionary
-    :param epochs: (optional int) number of epochs to train for, defaults to 20
-    :param lr: (optional float) learning rate, defaults to 1e-1
-    :param checkpoint: (optional bool) save model to directory, defaults to False
-    :param phases: (string list) phases in training, defaults to ["train", "val"],
-                each phase should have a corresponding data loader
-    """
-    checkpoint_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"runs")
-
-    e = datetime.now()
-    run_dir = os.path.join(checkpoint_dir, "{}-{}-{}_{}:{}:{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second))
-
-    writer = SummaryWriter(run_dir)
-    print("Starting training, see run at", run_dir)
-
-    optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
-
-    for epoch_counter in tqdm(range(epochs)):
-        for phase in phases:
-            if phase == "train":
-                vae.train(True)
-            else:
-                vae.train(False)
-
-            running_loss = 0.0
-
-            for x in loaders[phase]:
-                if phase == "train":
-                    vae(x)
-                    loss = vae.loss()
-                    optimizer.zero_grad()
-                    loss.backward()
-                    optimizer.step()
-                else:
-                    with torch.no_grad():
-                        vae(x)
-                        loss = vae.loss()
-
-                running_loss += loss
-
-            avg_loss = running_loss / len(loaders[phase])
-
-            writer.add_scalar('Loss/' + phase, avg_loss, epoch_counter)
-
-        if checkpoint:
-            checkpoint_name = 'checkpoint_{:04d}.pth.tar'.format(epoch_counter)
-            torch.save({
-                'epoch': epoch_counter,
-                'state_dict': vae.state_dict(),
-                'optimizer': optimizer.state_dict(),
-                'loss': avg_loss
-            }, os.path.join(run_dir, checkpoint_name))
-
 class TimeseriesDataset(Dataset):
     def __init__(self, data, transform = None):
         """
@@ -300,21 +162,7 @@ class TimeseriesDataset(Dataset):
             datum = self.transform(datum)
         return datum
 
-def findThreshold(vae, dataset, error_margin):
-    """
-    Finds fault threshold based on upper bound for reconstruction error and a percent margin
-    :param vae: (VAE) model to evaluate on
-    :param dataset: (Dataset) pytorch dataset containing normal data
-    :param error_margin: (float) the error margin as a float, for example, to add 20% to the threshold
-                        this should be set to 0.2
-    """
-    dataloader = DataLoader(dataset, batch_size=1)
-    reconstruction_error = 0
-    for d in tqdm(dataloader):
-        if (x := vae(d)) > reconstruction_error:
-            reconstruction_error = x
 
-    return reconstruction_error * (1+error_margin)
 
 if __name__ == "__main__":
     data = range(30)
