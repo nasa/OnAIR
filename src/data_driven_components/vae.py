@@ -162,7 +162,7 @@ class VAE(nn.Module):
         mse_loss = torch.mean(mse_loss, dim=0)
         kldivergence_loss = torch.mean(-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim = 1), dim = 0)
         kldivergence_loss = torch.sum(kldivergence_loss, dim=0)
-        # TODO: double check batch size averaging
+
         return mse_loss + kldivergence_loss
 
 class VAEExplainer():
