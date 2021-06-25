@@ -60,8 +60,8 @@ class Simulator:
 
         while self.simData.has_more() and time_step < 2050:
 
-            next = self.simData.get_next()
-            self.brain.reason(next)
+            _next = self.simData.get_next()
+            self.brain.reason(_next)
             self.IO_check(time_step, IO_Flag)
             
             ### Stop when a fault is reached  
@@ -85,6 +85,7 @@ class Simulator:
         # render_diagnosis(diagnosis_list)
         # print_diagnosis(final_diagnosis) if (IO_Flag == True) else ''
 
+        print(final_diagnosis)
         return final_diagnosis
 
 

@@ -27,6 +27,10 @@ class CurveCharacterizer:
         self.frame_size = 20
         self.root_data_path = main_data_path
         self.model_built = False 
+        self.classes = {0:'increase',
+                        1:'decrease',
+                        2:'sinusoidal',
+                        3:'constant'}
 
         if prepModel == True: 
             self.build_characterizer()
@@ -47,10 +51,11 @@ class CurveCharacterizer:
             self.build_characterizer()
             self.model_built = True
 
-        return self.model.predict([sample, sample, sample])
+        prediction = self.model.predict([sample, sample, sample])
+        return self.classes[np.argmax(prediction)]
 
     """ Run an experiment """
-    def train_model(self, data_path, repeats=10):
+    def train_model(self, data_path, repeats=2):
         trainX, trainy, testX, testy = load_dataset(data_path)
         scores = list()
         for r in range(repeats):

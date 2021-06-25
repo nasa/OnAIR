@@ -44,6 +44,8 @@ class DataDrivenLearning:
         # assert(self.LSTM is not None)
         return 
 
+    def diagnose(self):
+        return self.associations.render_diagnosis()
     # def set_historical_data(self, input_samples, output_samples):
     #     assert len(input_samples) == len(output_samples)
     #     for system in self.ssNames:

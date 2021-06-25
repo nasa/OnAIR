@@ -9,7 +9,6 @@ import copy
 from src.systems.status import Status
 # from src.reasoning.diagnosis import Diagnosis
 from src.data_driven_components.data_driven_learning import DataDrivenLearning
-# from src.data_driven_components.associativity import Associativity
 from src.systems.spacecraft import Spacecraft
 # from src.util.print_io import *
 
@@ -36,7 +35,9 @@ class Brain:
         self.learning_systems.update(frame, self.mission_status)
 
     def diagnose(self, time_step):
-        return None
+
+        return self.learning_systems.diagnose()
+        
     #     lstm_predict = self.supervised_learning.lstm_predict()
     #     tree_traversal = self.spacecraft_rep.get_status_object().fault_traversal()
     #     faults = self.spacecraft_rep.get_faulting_mnemonics()
