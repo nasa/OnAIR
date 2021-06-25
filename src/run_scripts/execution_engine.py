@@ -54,9 +54,7 @@ class ExecutionEngine:
 
     def parse_configs(self, config_file_path):
         # print("Using config file: {}".format(config_file_path))
-        if not os.path.isabs(config_file_path):
-            config_file_path = os.path.join(os.environ['SRC_ROOT_PATH'], config_file_path)
-            
+
         config = configparser.ConfigParser()
         config.read(config_file_path)
         ## Sort Data: Telementry Data & Configuration
