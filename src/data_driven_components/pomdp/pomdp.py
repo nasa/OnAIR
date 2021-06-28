@@ -25,7 +25,7 @@ class POMDP:
         # = 0, agent will only learn about actions that yield an immediate my_reward
     # Epsilon = exploratory rate, generally set between 0 and 1
         # 0.1 = 10% chance to take a random action during training
-    def __init__(self, name, path, config, print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=10, reward_correct=100, reward_incorrect=-100, reward_action=-1):
+    def __init__(self, name, path, config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
         self.name = name
         self.path = path
         self.print_on = print_on
@@ -40,7 +40,10 @@ class POMDP:
             self.alpha = alpha
             self.discount = discount
             self.epsilon = epsilon
-            self.config = config
+            if config_path == "":
+                print("Error: You need to set config_path for new models!")
+                exit()
+            _, self.config = util.load_config(config_path)
             self.reportable_states = reportable_states
             index = 0
             for key in self.config:
@@ -48,9 +51,12 @@ class POMDP:
                     self.actions.append("view_" + key)
                     self.config[key].append(index)
                     index +=1
+            if run_limit == -1:
+                self.run_limit = len(self.actions)+1
+            else:
+                self.run_limit = run_limit
             for r in self.reportable_states:
                 self.actions.append("report_" + r)
-            self.run_limit = run_limit
             self.rewards = [reward_correct, reward_incorrect, reward_action]
             self.kappa = 0 # Cohen's Kappa
             self.confusion_matrix = [1, 1, 1, 1]
@@ -137,9 +143,15 @@ class POMDP:
                 self.update_quality_values(old_state_index, action_index, self.current_state_index, self.rewards[1])
 
     ## data_train = list of frames, with headers and labels as described in self.config
-    def apriori_training(self, data_train, data_test=[], lookback=15, batch_size=250):
+    def apriori_training(self, data_train, data_test=[], lookback=15, batch_size=250, use_stratified=True):
         split_data_train = util.split_by_lookback(data_train)
         split_data_test = util.split_by_lookback(data_test)
+
+        if use_stratified:
+            split_data_train = util.stratified_sampling(self.config, split_data_train)
+
+        split_data_train = util.dict_sort_data(self.config, split_data_train)
+        split_data_test = util.dict_sort_data(self.config, split_data_test)
 
         avg_rewards = []
         avg_accuracies = []
@@ -159,7 +171,6 @@ class POMDP:
                     self.plot_graph(batches, avg_accuracies, "Batch #", "Avg. Accuracy")
                 self.save_model()
         self.save_model()
-
 
     def mass_train(self, training_data, testing_data, batch_size, test_while_running=True, kappa_test=False):
         avg_rewards = []
@@ -191,7 +202,7 @@ class POMDP:
         FP = 1 # false positive = there was no error, agent incorrect
         TN = 1 # true negative = there was no error, agent correct
         for i in range(len(testing_data)):
-            self.run_test(testing_data[i])
+            _ = self.run_test(testing_data[i])
             if self.correct:
                 if self.answer == 1:
                     TP += 1
@@ -227,11 +238,15 @@ class POMDP:
         reward_sum = 0
         accuracy_sum = 0
         for i in range(len(testing_data)):
-            self.run_test(testing_data[i])
+            _ = self.run_test(testing_data[i])
             reward_sum += self.total_reward
             if self.correct:
                 accuracy_sum += 1
         return reward_sum/len(testing_data), accuracy_sum/len(testing_data)
+
+    def diagnose_frames(self, time_chunk):
+        data_dictionary = util.dict_sort_data(self.config, [time_chunk])[0]
+        return self.run_test(data_dictionary)
 
     def run_test(self, data):
         self.total_reward = 0
@@ -239,6 +254,7 @@ class POMDP:
         self.correct = False
         self.current_state_index = self.get_starting_state()
         done = False
+        action_index = 0
         if self.print_on:
             print("\nAgent's Actions:", self.actions)
             print("\n-=-=-=- New Testing Run -=-=-=-")
@@ -250,6 +266,8 @@ class POMDP:
             if (not done) and (self.run_time > self.run_limit):
                 done = True
                 self.total_reward += self.rewards[1]
+                return "over_runtime_limit"
+        return self.actions[action_index]
 
     def get_answer(self):
         return self.answer
@@ -290,8 +308,8 @@ class POMDP:
             return True
         return False
 
-    def set_print_on(self, newprint_on):
-        self.print_on = newprint_on
+    def set_print_on(self, new_print_on):
+        self.print_on = new_print_on
 
     def plot_graph(self, x, y, x_title, y_title):
         plt.clf() # Clear Previous Graph

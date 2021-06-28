@@ -24,6 +24,33 @@ def mass_load_data(folder, lookback, filetype=".csv"):
                 data.append(new_point)
     return dict_config, data
 
+# Dictionary-Sort Data
+def dict_sort_data(dict_config, data):
+    output_data = []
+    for time_chunk in data:
+        # time_chunk is a list of N frames for some N > 0
+        attributes = [[] for i in range(len(time_chunk))]
+        for frame in time_chunk:
+            for i in range(len(frame)):
+                attributes[i].append(frame[i])
+        new_point = {}
+        for key in config:
+            index_for_key = config[key][3]
+            new_point[key] = attributes[index_for_key]
+        output_data.append(new_point)
+    return output_data
+
+    for i in range(1+lookback, len(file_data)):
+        new_point = {}
+        for k in range(len(config[0])):
+            new_point[config[0][k]] = []
+        for j in range(lookback):
+            frame = file_data[i-lookback+j]
+            for k in range(len(config[0])):
+                new_point[config[0][k]].append(frame[k])
+                data.append(new_point)
+    return dict_config, data
+
 ## Load data from a .csv file
 def load_data(file_path, delimiter=',', quotechar='\"'):
     with open(file_path, 'r') as csvfile:
@@ -59,6 +86,7 @@ def split_headers_helper(arrayed_headers, master_list, current_depth):
             new_headers.append(new_header)
     return new_headers
 
+# data should be split by lookback at this point
 def stratified_sampling(config, data):
     error_data = []
     no_error_data = []
@@ -80,57 +108,18 @@ def stratified_sampling(config, data):
         min_len -= 1
     if len(no_error_data) < min_len:
         min_len = len(no_error_data)
-    training_data = []
-    testing_data = []
-    for i in range(min_len-1):
-        training_data.append(error_data[i])
-        training_data.append(no_error_data[i])
-        i += 1
-        testing_data.append(error_data[i])
-        testing_data.append(no_error_data[i])
-    return training_data, testing_data
-
-def stratified_sampling_threes(config, data):
-    error_data = []
-    no_error_data = []
-    label_key = check_label(config)
-    for i in range(len(data)):
-        error = False
-        for j in range(len(data[i][label_key])):
-            if data[i][label_key][j] == '1':
-                error = True
-                break
-        if error:
-            error_data.append(data[i])
-        else:
-            no_error_data.append(data[i])
-    random.shuffle(error_data)
-    random.shuffle(no_error_data)
-    min_len = len(error_data)
-    while min_len % 3 != 0:
-        min_len -= 1
-    if len(no_error_data) < min_len:
-        min_len = len(no_error_data)
-    training_data = []
-    kappa_testing_data = []
-    forest_testing_data = []
-    for i in range(min_len-2):
-        training_data.append(error_data[i])
-        training_data.append(no_error_data[i])
-        i += 1
-        kappa_testing_data.append(error_data[i])
-        kappa_testing_data.append(no_error_data[i])
-        i += 1
-        forest_testing_data.append(error_data[i])
-        forest_testing_data.append(no_error_data[i])
-    return training_data, kappa_testing_data, forest_testing_data
+    output_data = []
+    for i in range(min_len):
+        output_data.append(error_data[i])
+        output_data.append(no_error_data[i])
+    return output_data
 
 ## Load the config
-def load_config(folder):
+def load_config(config_path):
     try:
-        config = load_data(folder + "config.csv")
+        config = load_data(config_path)
     except:
-        print("Error: Please put a config.csv into the data folder!")
+        print("Error: config.csv not found at " + config_path)
         exit()
     dict_config = {}
     for i in range(len(config[0])):
