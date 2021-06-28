@@ -5,9 +5,9 @@ import unittest
 
 from src.run_scripts.generalizability_engine import GeneralizabilityEngine, DataWrapper
 
-from src.data_driven_components.associativity import Associativity
-from src.data_driven_components.vae import VAE
-from src.data_driven_components.pomdp import POMDP
+from src.data_driven_components.associativity.associativity import Associativity
+from src.data_driven_components.vae.vae import VAE
+from src.data_driven_components.pomdp.pomdp import POMDP
 
 class TestGeneralizabilityEngine(unittest.TestCase):
 

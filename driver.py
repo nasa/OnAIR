@@ -50,12 +50,13 @@ def main():
         RAISR = ExecutionEngine(args.configfile, save_name, args.save)
         RAISR.run_sim()
 
-    clean_all(os.environ['BASE_PATH']) 
+    clean_all(os.environ['SRC_ROOT_PATH']) 
 
 """ Runs generalizability tests on specific component """
 def run_generalizability_tests(component):
+    assert(component in ['Associativity', 'POMDP', 'VAE', 'CurveCharacterizer'])
     gen = GeneralizabilityEngine(os.environ['RUN_PATH'], component)
-    
+    # gen.run_integration_test()
 
 """ Runs all unit tests """
 def run_unit_tests():
@@ -67,7 +68,6 @@ def init_global_paths(test=False):
     run_path = 'src/test' if test == True else 'src/'
     results_path = 'src/test/results' if test == True else 'results/'
 
-    os.environ['BASE_PATH'] = os.path.dirname(os.path.realpath(__file__))
     os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
     os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), results_path)
     os.environ['SRC_ROOT_PATH'] = os.path.dirname(os.path.realpath(__file__))

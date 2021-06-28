@@ -10,9 +10,10 @@ import shutil
 import pandas as pd
 import csv 
 
-from src.data_driven_components.associativity import Associativity
-from src.data_driven_components.vae import VAE
-from src.data_driven_components.pomdp import POMDP
+from src.data_driven_components.associativity.associativity import Associativity
+from src.data_driven_components.curve_characterizer.curve_characterizer import CurveCharacterizer
+from src.data_driven_components.vae.vae import VAE
+from src.data_driven_components.pomdp.pomdp import POMDP
 
 # -----------------------------------------------------
 # data has a folder for each 
@@ -33,24 +34,28 @@ class GeneralizabilityEngine:
                                      'data_physics_generation/Errors/',
                                      'data_physics_generation/No_Errors/']):
         try: 
+            self.run_path = run_path
             self.construct_files = {'Associativity' : 'associativity',
                                     'VAE' : 'vae',
-                                    'POMDP' : 'pomdp'}
+                                    'POMDP' : 'pomdp',
+                                    'CurveCharacterizer' : 'curve_characterizer'}
             self.sample_paths = sample_paths
 
             self.data_samples = self.init_samples(run_path + '/data/raw_telemetry_data/' )
             self.construct = self.init_construct(construct_name)
         except:
+            self.run_path = ''
             self.construct_files = {'Associativity' : 'associativity',
                                     'VAE' : 'vae',
-                                    'POMDP' : 'pomdp'}
+                                    'POMDP' : 'pomdp', 
+                                    'CurveCharacterizer' : 'curve_characterizer'}
             self.sample_paths = []
 
             self.data_samples = []
             self.construct = None
 
     def init_construct(self, construct_name, construct_inits=[]):
-        _construct = importlib.import_module('src.data_driven_components.' + self.construct_files[construct_name])
+        _construct = importlib.import_module('src.data_driven_components.' + construct_name.lower() + '.' + self.construct_files[construct_name])
         construct_class = getattr(_construct, construct_name)
         construct_inits = self.extract_dimensional_info(construct_name) if construct_inits == [] else construct_inits
         return construct_class(*construct_inits)
@@ -78,8 +83,12 @@ class GeneralizabilityEngine:
 
         args = {'VAE' : [input_dim, seq_len],
                 'Associativity' : [headers, sample_input],
-                'POMDP' : [name, path, telemetry_headers]}
+                'POMDP' : [name, path, telemetry_headers],
+                'CurveCharacterizer' : [self.run_path  + 'data/']}
         return args[construct_name]
+
+    def run_integration_test(self):
+        cc = CurveCharacterizer(self.run_path + 'data/')
 
     # def run_generalizability_tests(self):
     #     for sample in self.data_samples:
