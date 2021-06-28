@@ -4,7 +4,7 @@ LSTM-VAE for streamed satellite telemetry fault diagnosis
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
-from src.util.vae_train import train
+from src.data_driven_components.vae.vae_train import train
 
 import matplotlib.pyplot as plt
 
@@ -60,6 +60,42 @@ class VAE(nn.Module):
         )
 
         self.output_layer = nn.Linear(self.input_dim, self.input_dim) # TODO: add activation, maybe relu?
+
+    def apriori_training(self, data_train, data_test=[]):
+        """
+        TBD
+        """
+        
+        data_test = [data_train[1]]
+        data_train = [data_train[0]]
+
+
+        data = range(30)
+        data = [[list(data)]] # serrated shape
+
+        print(data_test)
+        print(data)
+
+        data2 = [1]*30
+        data2 = [[data2]] # uniform
+
+        print(data_train)
+        print(data2)
+
+
+        transform = lambda x: torch.tensor(x).float()
+        train_dataset = TimeseriesDataset(data_train, transform)
+        train_dataloader = DataLoader(train_dataset, batch_size=1)
+
+        test_dataset = TimeseriesDataset(data_test, transform)
+        test_dataloader = DataLoader(test_dataset, batch_size=1)
+
+        print("Creating VAE...")
+        vae = VAE(input_dim=17, seq_len=1, z_units=5)
+        print("Successfuly created VAE")
+
+        train(vae, {'train': train_dataloader}, phases=["train"])
+
 
     def encoder(self, x):
         """

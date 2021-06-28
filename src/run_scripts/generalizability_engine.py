@@ -88,7 +88,12 @@ class GeneralizabilityEngine:
         return args[construct_name]
 
     def run_integration_test(self):
-        cc = CurveCharacterizer(self.run_path + 'data/')
+        data = self.data_samples[0].get_data()
+        
+        self.construct.apriori_training(data)
+
+        # cc = CurveCharacterizer(self.run_path + 'data/')
+        # vae = VAE()
 
     # def run_generalizability_tests(self):
     #     for sample in self.data_samples:
@@ -113,8 +118,8 @@ class DataWrapper:
         self.path = _path
         self.name = _path.split('/')[-1]
         self.headers = _headers
-        self.input_data = _input_data_frames
-        self.output_data = _output_data_frames
+        self.input_data = [floatify_input(elem) for elem in _input_data_frames]
+        self.output_data = [floatify_input(elem) for elem in _output_data_frames]
 
     def get_name(self):
         return self.name
@@ -131,6 +136,11 @@ class DataWrapper:
     def get_sample(self):
         return self.input_data[0]
 
+    def get_data(self, labels=False):
+        if labels == True:
+            return self.input_data, self.output_data
+        return self.input_data
+
 # -----------------------------------------------------
 
 """Can abstract this out of this file"""
@@ -141,6 +151,27 @@ def parse_data(dataFile):
         for row in reader:
             all_data.append(row)
     return all_data[0], all_data[1:]
+
+def floatify_input(_input, remove_str=False):
+    floatified = []
+    for i in _input:
+        if type(i) is str:
+            try:
+                x = float(i)
+                floatified.append(x)
+            except:
+                try:
+                    x = i.replace('-', '').replace(':', '').replace('.', '')
+                    floatified.append(float(x))
+                except:
+                    if remove_str == False:
+                        floatified.append(0.0)
+                    else:
+                        continue
+                    continue
+        else:
+            floatified.append(float(i))
+    return floatified
 # -----------------------------------------------------------
 
 

@@ -32,6 +32,8 @@ class DataDrivenLearning:
         sample_output = self.status_to_oneHot('---')
         self.headers = headers
         self.associations = Associativity(headers, sample_input, True)
+        # self.vae = VAE()
+        
         return sample_input, sample_output
 
     def update(self, curr_data, status):

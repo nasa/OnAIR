@@ -1,6 +1,6 @@
 from torch.utils.data import DataLoader, Dataset
 from captum.attr import KernelShap
-from src.util.viz import isNotebook
+from src.data_driven_components.vae.viz import isNotebook
 
 if isNotebook():
     from tqdm.notebook import tqdm

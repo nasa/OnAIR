@@ -1,7 +1,7 @@
 import os
 from datetime import datetime 
 import torch
-from src.util.viz import isNotebook
+from src.data_driven_components.vae.viz import isNotebook
 from torch.utils.tensorboard import SummaryWriter
 
 if isNotebook():

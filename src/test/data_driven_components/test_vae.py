@@ -2,9 +2,9 @@
 import os
 import unittest
 
-from src.data_driven_components.vae import VAE, TimeseriesDataset
-from src.util.vae_train import train
-from src.util.vae_diagnosis import findThreshold, VAEExplainer
+from src.data_driven_components.vae.vae import VAE, TimeseriesDataset
+from src.data_driven_components.vae.vae_train import train
+from src.data_driven_components.vae.vae_diagnosis import findThreshold, VAEExplainer
 from torch.utils.data import DataLoader
 import torch
 
