@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from src.data_driven_components.vae.vae_train import train
+from src.data_driven_components.vae.vae_diagnosis import VAEExplainer
 
 import matplotlib.pyplot as plt
 
@@ -12,7 +13,7 @@ import matplotlib.pyplot as plt
 # shap.initjs() # TODO deal with viz
 
 class VAE(nn.Module):
-    def __init__(self, input_dim=30, seq_len=15, z_units=5, hidden_units=100):
+    def __init__(self, headers, input_dim=30, seq_len=15, z_units=5, hidden_units=100):
         """
         LSTM-VAE class for anomaly detection and diagnosis
         Make sure seq_len is always the same, TODO: accept any seq_len
@@ -22,6 +23,10 @@ class VAE(nn.Module):
         :param hidden_units: (int) dimension of our hidden_units
         """
         super(VAE, self).__init__()
+
+        self.headers = headers
+        self.window_size = 10
+        self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
 
         self.input_dim = input_dim
         self.hidden_dim = hidden_units
@@ -61,40 +66,47 @@ class VAE(nn.Module):
 
         self.output_layer = nn.Linear(self.input_dim, self.input_dim) # TODO: add activation, maybe relu?
 
-    def apriori_training(self, data_train, data_test=[]):
+    def update(self, frame):
         """
-        TBD
+        :param frame: (list of floats) input sequence of len (input_dim)
+        :return: None
         """
+
+        self.frames.append(frame)
+        self.frames.pop(0)
         
-        data_test = [data_train[1]]
-        data_train = [data_train[0]]
+        seq = [self.frames]
+
+        transform = lambda x: torch.tensor(x).float()
+        prediction_dataset = TimeseriesDataset(seq, transform)
+        dataloader = DataLoader(prediction_dataset, batch_size=1)
+
+        for x in dataloader:
+            self(x)
+
+        #     print("******** predicted ********")
+        #     e = VAEExplainer(self, self.headers)
+        #     # print(e.shap(x, bass))
+        #     e.viz()
 
 
-        data = range(30)
-        data = [[list(data)]] # serrated shape
+    def apriori_training(self, data_train):
+        """
+        :param data_train: (list of lists) input sequence of shape : 
+                           (batch_size, seq_len, input_dim)
+        :return: None
+        """
 
-        print(data_test)
-        print(data)
+        _input_dim = len(data_train[0])
+        _batch_size = len(data_train)
 
-        data2 = [1]*30
-        data2 = [[data2]] # uniform
-
-        print(data_train)
-        print(data2)
-
+        data_train = [data_train]
 
         transform = lambda x: torch.tensor(x).float()
         train_dataset = TimeseriesDataset(data_train, transform)
-        train_dataloader = DataLoader(train_dataset, batch_size=1)
+        train_dataloader = DataLoader(train_dataset, batch_size=_batch_size)
 
-        test_dataset = TimeseriesDataset(data_test, transform)
-        test_dataloader = DataLoader(test_dataset, batch_size=1)
-
-        print("Creating VAE...")
-        vae = VAE(input_dim=17, seq_len=1, z_units=5)
-        print("Successfuly created VAE")
-
-        train(vae, {'train': train_dataloader}, phases=["train"])
+        train(self, {'train': train_dataloader}, phases=["train"])
 
 
     def encoder(self, x):

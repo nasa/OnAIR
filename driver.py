@@ -56,7 +56,7 @@ def main():
 def run_generalizability_tests(component):
     assert(component in ['Associativity', 'POMDP', 'VAE', 'CurveCharacterizer'])
     gen = GeneralizabilityEngine(os.environ['RUN_PATH'], component)
-    # gen.run_integration_test()
+    gen.run_integration_test()
 
 """ Runs all unit tests """
 def run_unit_tests():

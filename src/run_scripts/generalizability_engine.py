@@ -72,7 +72,9 @@ class GeneralizabilityEngine:
     def extract_dimensional_info(self, construct_name):
         sample = self.data_samples[0]
         input_dim = len(sample.get_headers())         # VAE
+    
         seq_len = sample.get_num_frames()           # VAE
+        seq_len = 10 # Window size
 
         headers = sample.get_headers()              # ASSOC
         sample_input = sample.get_sample()          # ASSOC
@@ -81,7 +83,7 @@ class GeneralizabilityEngine:
         path = sample.get_path()                    # POMDP
         telemetry_headers = sample.get_headers()    # POMDP
 
-        args = {'VAE' : [input_dim, seq_len],
+        args = {'VAE' : [headers, input_dim, seq_len], 
                 'Associativity' : [headers, sample_input],
                 'POMDP' : [name, path, telemetry_headers],
                 'CurveCharacterizer' : [self.run_path  + 'data/']}
@@ -89,22 +91,18 @@ class GeneralizabilityEngine:
 
     def run_integration_test(self):
         data = self.data_samples[0].get_data()
-        
-        self.construct.apriori_training(data)
+
+        frame = data[:10]
+        self.construct.apriori_training(frame)
+        self.construct.update(frame[0])
+        # for frame in frame:
+        #     self.construct.update(frame)
 
         # cc = CurveCharacterizer(self.run_path + 'data/')
         # vae = VAE()
 
     # def run_generalizability_tests(self):
     #     for sample in self.data_samples:
-            
-# VAE: input_dim=30, seq_len=15, z_units=5, hidden_units=100
-# ASSOC: headers=[], sample_input=[]
-# POMDP: name, path, telemetry_headers, 
-#        print_on=False, save_me=True, reportable_states=['no_error', 'error'], 
-#        alpha=0.01, discount=0.8, epsilon=0.2, run_limit=100, reward_correct=100, 
-#        reward_incorrect=-100, reward_action=-1
-
 
 # -----------------------------------------------------------
 # ---------------- PULL THIS STUFF OUT ----------------------
