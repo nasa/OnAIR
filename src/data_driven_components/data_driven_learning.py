@@ -11,7 +11,7 @@ from src.util.print_io import *
 from src.data_driven_components.associativity.associativity import Associativity
 
 class DataDrivenLearning:
-    def __init__(self, headers=[], sample_input=[]):
+    def __init__(self, headers=[]):
         self.classes = {'RED' : 0,
                      'YELLOW' : 1,
                       'GREEN' : 2,
@@ -20,32 +20,35 @@ class DataDrivenLearning:
                                  1 : 'YELLOW',
                                  2 : 'GREEN',
                                  3 : '---'}
-        try:
-            self.init_learning_systems(headers, sample_input)
-        except:
-            self.headers = []
+        # try:
+        self.init_learning_systems(headers)
+        # except:
+        #     self.headers = []
 
     """ Initialize all learning systems with necessary dimensional info """
-    def init_learning_systems(self, headers, sample=[]):
+    def init_learning_systems(self, headers):
         assert(len(headers)>0)
-        sample_input = [0.0]*len(headers) if sample == [] else self.floatify_input(sample)
+        sample_input = [0.0]*len(headers) 
         sample_output = self.status_to_oneHot('---')
         self.headers = headers
-        self.associations = Associativity(headers, sample_input, False)
-        # self.vae = VAE()
+
+        self.associations = Associativity(headers, 20, True)
+        # self.vae = VAE(headers, 20)
         
         return sample_input, sample_output
 
     def update(self, curr_data, status):
         input_data = self.floatify_input(curr_data)
         output_data = self.status_to_oneHot(status)
+
         self.associations.update(input_data)
+        # self.vae.update(input_data)
         
         return input_data, output_data 
 
     def apriori_training(self, batch_data):
-        # assert(self.LSTM is not None)
-        return 
+        self.associations.apriori_training(batch_data)
+        # self.vae.apriori_training(batch_data)
 
     def diagnose(self):
         return self.associations.render_diagnosis()

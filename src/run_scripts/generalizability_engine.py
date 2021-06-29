@@ -21,7 +21,7 @@ from src.data_driven_components.pomdp.pomdp import POMDP
 #  -- Nicks data (CSV's of set size)
 #  -- the actual sounding rocket TLM 
 #  -- KSP 
-
+#   
 # Two modes: either generate data, or do not. 
 # Maybe try running on each of the static sets, 
 # then do a few iterations of each of the data generated 
@@ -29,33 +29,22 @@ from src.data_driven_components.pomdp.pomdp import POMDP
 
 # TODO WRITE A TEST FOR THIS!! 
 class GeneralizabilityEngine:
-    def __init__(self, run_path='', construct_name=None, construct_inits=[], 
+    def __init__(self, run_path='', construct_name='Associativity', construct_inits=[], 
                        sample_paths=['2020_handmade_data/',
                                      'data_physics_generation/Errors/',
-                                     'data_physics_generation/No_Errors/']):
-        try: 
-            self.run_path = run_path
-            self.construct_files = {'Associativity' : 'associativity',
-                                    'VAE' : 'vae',
-                                    'POMDP' : 'pomdp',
-                                    'CurveCharacterizer' : 'curve_characterizer'}
-            self.sample_paths = sample_paths
+                                     'data_physics_generation/No_Errors/']): 
+        self.run_path = run_path
+        self.construct_files = {'Associativity' : 'associativity',
+                                'VAE' : 'vae',
+                                'POMDP' : 'pomdp',
+                                'CurveCharacterizer' : 'curve_characterizer'}
+        self.sample_paths = sample_paths
 
-            self.data_samples = self.init_samples(run_path + '/data/raw_telemetry_data/' )
-            self.construct = self.init_construct(construct_name)
-        except:
-            self.run_path = ''
-            self.construct_files = {'Associativity' : 'associativity',
-                                    'VAE' : 'vae',
-                                    'POMDP' : 'pomdp', 
-                                    'CurveCharacterizer' : 'curve_characterizer'}
-            self.sample_paths = []
-
-            self.data_samples = []
-            self.construct = None
+        self.data_samples = self.init_samples(run_path + '/data/raw_telemetry_data/' )
+        self.construct = self.init_construct(construct_name)
 
     def init_construct(self, construct_name, construct_inits=[]):
-        _construct = importlib.import_module('src.data_driven_components.' + construct_name.lower() + '.' + self.construct_files[construct_name])
+        _construct = importlib.import_module('src.data_driven_components.' + self.construct_files[construct_name] + '.' + self.construct_files[construct_name])
         construct_class = getattr(_construct, construct_name)
         construct_inits = self.extract_dimensional_info(construct_name) if construct_inits == [] else construct_inits
         return construct_class(*construct_inits)
@@ -70,31 +59,36 @@ class GeneralizabilityEngine:
         return data_sets
 
     def extract_dimensional_info(self, construct_name):
-        sample = self.data_samples[0]
-        input_dim = len(sample.get_headers())         # VAE
-    
-        seq_len = sample.get_num_frames()           # VAE
-        seq_len = 10 # Window size
+        return [self.data_samples[0].get_headers(), 10]
 
-        headers = sample.get_headers()              # ASSOC
-        sample_input = sample.get_sample()          # ASSOC
+        # sample = self.data_samples[0]
 
-        name = sample.get_name()                    # POMDP
-        path = sample.get_path()                    # POMDP
-        telemetry_headers = sample.get_headers()    # POMDP
+        # input_dim = len(sample.get_headers())       # VAE
+        # seq_len = sample.get_num_frames()           # VAE
+        # window_size = 10 # Window size
 
-        args = {'VAE' : [headers, input_dim, seq_len], 
-                'Associativity' : [headers, sample_input],
-                'POMDP' : [name, path, telemetry_headers],
-                'CurveCharacterizer' : [self.run_path  + 'data/']}
-        return args[construct_name]
+        # headers = sample.get_headers()              # ASSOC
+        # sample_input = sample.get_sample()          # ASSOC
+
+        # name = sample.get_name()                    # POMDP
+        # path = sample.get_path()                    # POMDP
+        # telemetry_headers = sample.get_headers()    # POMDP
+
+        # args = {'VAE' : [headers, window_size], 
+        #         'Associativity' : [headers, window_size+10],
+        #         'POMDP' : [name, path, telemetry_headers],
+        #         'CurveCharacterizer' : [self.run_path  + 'data/']}
+
+        # return args[construct_name]
 
     def run_integration_test(self):
         data = self.data_samples[0].get_data()
 
-        frame = data[:10]
-        self.construct.apriori_training(frame)
-        self.construct.update(frame[0])
+        frames = data[:10]
+
+        self.construct.apriori_training(frames)
+        self.construct.update(frames[0])
+        
         # for frame in frame:
         #     self.construct.update(frame)
 

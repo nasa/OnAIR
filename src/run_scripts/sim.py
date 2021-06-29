@@ -38,18 +38,13 @@ class Simulator:
             self.simData = DataSource(parsedData.get_sim_data())
         self.brain = Brain(spaceCraft)
 
-    #####################################################
-    # MAKE FUNCTIONALITY FOR A PRORI TRAINING
-    #
-    # def generate_supervised_learning_data(self):
-    #     historicalData = copy.deepcopy(self.simData)
-    #     self.brain.set_past_history(historicalData)
-    #
-    # def train_supervised_learning(self):
-    #     self.brain.supervised_learning.train_all()
-    #####################################################
 
+    #####################################################
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
+
+        self.apriori_training()
+        print("DONE TRAINING")
+        return
 
         print_sim_header() if (IO_Flag == True) else ''
         print_msg('Please wait...\n') if (IO_Flag == 'strict') else ''
@@ -88,6 +83,8 @@ class Simulator:
         print(final_diagnosis)
         return final_diagnosis
 
+    def apriori_training(self):
+        self.brain.learning_systems.apriori_training(self.simData.data)
 
     def set_benchmark_data(self, filepath, files, indices):
         self.brain.supervised_learning.set_benchmark_data(filepath, files, indices)

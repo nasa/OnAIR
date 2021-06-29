@@ -13,8 +13,9 @@ from efficient_apriori import apriori
 from src.data_driven_components.associativity.associativity_data_manager import AssociativityDataManager
 
 class Associativity:
-    def __init__(self, headers=[], sample_input=[], prepModel=False):
-        self.window_size = 20 ##make sure common vars in this and data manager are set sync
+    def __init__(self, headers=[], window_size=20,
+                       prepModel=False):
+        self.window_size = window_size ##make sure common vars in this and data manager are set sync
         self.frame_id = 0
         self.benchmark_file_path = None
         self.number_of_sensors = 0
@@ -30,6 +31,9 @@ class Associativity:
         self.verbose = False
         self.visualize_graph = False
 
+    def apriori_training(self, data_train):
+        return
+        
     def update(self, frame):
         self.associativityDataManager.add_frame(frame)
         self.frame_id += 1

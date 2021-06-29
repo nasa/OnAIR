@@ -34,9 +34,26 @@ class CurveCharacterizer:
                         2:'sinusoidal',
                         3:'constant'}
 
-        if prepModel == True: 
+        self.model_path = os.path.dirname(os.path.realpath(__file__)) + '/models/'
+        
+        try:
+            self.model = load_model(self.model_path + "my_model")
+        except:
             self.build_characterizer()
+            self.model.save(self.model_path + "my_model")
             self.model_built = True
+
+        # if prepModel == True: 
+            # self.build_characterizer()
+            # self.model_built = True
+
+    """ Trains RAISR """
+    def apriori_training(self, data_train):
+        return
+
+    """ Updates based on RAISR frames """
+    def update(self, frame):
+        return
 
     """ Make characterizater """
     def build_characterizer(self, data_path=''):
@@ -49,10 +66,9 @@ class CurveCharacterizer:
 
     """ Render curve characterization """
     def predict(self, sample):
-        if self.model_built == False:
-            self.build_characterizer()
-            self.model_built = True
-
+        # if self.model_built == False:
+        #     self.build_characterizer()
+        #     self.model_built = True
         prediction = self.model.predict([sample, sample, sample])
         return self.classes[np.argmax(prediction)]
 

@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 # shap.initjs() # TODO deal with viz
 
 class VAE(nn.Module):
-    def __init__(self, headers, input_dim=30, seq_len=15, z_units=5, hidden_units=100):
+    def __init__(self, headers=[], window_size=10, 
+                       z_units=5, hidden_units=100):
         """
         LSTM-VAE class for anomaly detection and diagnosis
         Make sure seq_len is always the same, TODO: accept any seq_len
@@ -25,13 +26,13 @@ class VAE(nn.Module):
         super(VAE, self).__init__()
 
         self.headers = headers
-        self.window_size = 10
+        self.window_size = window_size
         self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
 
-        self.input_dim = input_dim
         self.hidden_dim = hidden_units
         self.z_units = z_units
-        self.seq_len = seq_len # TODO: maybe detect automatically from data?
+        self.input_dim = len(headers)
+        self.seq_len = self.window_size
 
         # batch_first = true makes output tensor of size (batch, seq, feature).
         self.norm = nn.BatchNorm1d(self.seq_len)

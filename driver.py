@@ -32,7 +32,7 @@ def main():
     arg_parser.add_argument('--save_name', '--name', '-n', help='Name of saved log files')
     arg_parser.add_argument('--mute', '-m', action='store_true', help='Mute all non-error output')
     arg_parser.add_argument('--test', '-t', action='store_true', help='Run tests')
-    arg_parser.add_argument('--generalizability', '-gen', '-g', help='Run generalizabilty test on specific component', choices=['Associativity', 'POMDP', 'VAE'])
+    arg_parser.add_argument('--generalizability', '-gen', '-g', help='Run generalizabilty test on specific component', choices=['Associativity', 'POMDP', 'VAE', 'CurveCharacterizer'])
     args = arg_parser.parse_args()
 
     if args.mute:

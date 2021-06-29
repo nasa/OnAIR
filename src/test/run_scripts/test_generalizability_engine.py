@@ -14,12 +14,13 @@ class TestGeneralizabilityEngine(unittest.TestCase):
     def setUp(self):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
         self.run_path = os.environ['RUN_PATH']
-
-    def test_init_empty_engine(self):
-        GE = GeneralizabilityEngine()
-        self.assertEquals(GE.sample_paths, [])
-        self.assertEquals(GE.data_samples, [])
-        self.assertEquals(GE.construct, None)
+        self.GE = GeneralizabilityEngine(self.run_path, 'Associativity', sample_paths=['generalizability_testing/'])
+    
+    # def test_init_empty_engine(self):
+    #     GE = GeneralizabilityEngine()
+    #     self.assertEquals(GE.sample_paths, [])
+    #     self.assertEquals(GE.data_samples, [])
+    #     self.assertEquals(GE.construct, None)
 
     def test_init_nonempty_engine(self):
         GE = GeneralizabilityEngine(self.run_path, 'Associativity', sample_paths=['generalizability_testing/'])
@@ -36,26 +37,26 @@ class TestGeneralizabilityEngine(unittest.TestCase):
         self.assertTrue(len(GE.data_samples) > 0)
         self.assertEquals(type(GE.construct), VAE)
 
-        GE = GeneralizabilityEngine(self.run_path, 'POMDP', sample_paths=['generalizability_testing/'])
+        # GE = GeneralizabilityEngine(self.run_path, 'POMDP', sample_paths=['generalizability_testing/'])
 
-        self.assertEquals(GE.sample_paths, ['generalizability_testing/'])
-        self.assertEquals(type(GE.data_samples[0]), DataWrapper)
-        self.assertTrue(len(GE.data_samples) > 0)
-        self.assertEquals(type(GE.construct), POMDP)
+        # self.assertEquals(GE.sample_paths, ['generalizability_testing/'])
+        # self.assertEquals(type(GE.data_samples[0]), DataWrapper)
+        # self.assertTrue(len(GE.data_samples) > 0)
+        # self.assertEquals(type(GE.construct), POMDP)
 
     def test_init_construct(self):
-        GE = GeneralizabilityEngine()
+        GE = self.GE
         construct = GE.init_construct('Associativity', [['A', 'B'], [1,3]])
         self.assertEquals(type(construct), Associativity)
 
         construct = GE.init_construct('VAE', [['A', 'B'], 1,3])
         self.assertEquals(type(construct), VAE)
 
-        construct = GE.init_construct('POMDP', ['name', '/path/name.csv', ['A', 'B']])
-        self.assertEquals(type(construct), POMDP)
+        # construct = GE.init_construct('POMDP', ['name', '/path/name.csv', ['A', 'B']])
+        # self.assertEquals(type(construct), POMDP)
 
     def test_init_samples(self):
-        GE = GeneralizabilityEngine()
+        GE = self.GE
         GE.sample_paths = ['generalizability_testing/']
         data_samples = GE.init_samples(self.run_path + '/data/raw_telemetry_data/')
 
@@ -63,17 +64,17 @@ class TestGeneralizabilityEngine(unittest.TestCase):
         self.assertTrue(len(data_samples )> 0)
 
     def test_extract_dimensional_info(self):
-        GE = GeneralizabilityEngine()
+        GE = self.GE
         wrapper = DataWrapper('temp/path', ['A'], [[1]])
         GE.data_samples = [wrapper]
         dim_info = GE.extract_dimensional_info('Associativity')
-        self.assertEquals(dim_info, [['A'], [1.0]])
+        self.assertEquals(dim_info, [['A'], 10])
 
-        dim_info = GE.extract_dimensional_info('POMDP')
-        self.assertEquals(dim_info, ['path', 'temp/path', ['A'] ])
+        # dim_info = GE.extract_dimensional_info('POMDP')
+        # self.assertEquals(dim_info, ['path', 'temp/path', ['A'] ])
 
         dim_info = GE.extract_dimensional_info('VAE')
-        self.assertEquals(dim_info, [['A'],1,10])
+        self.assertEquals(dim_info, [['A'],10])
 
 if __name__ == '__main__':
     unittest.main()
