@@ -31,7 +31,7 @@ class DataDrivenLearning:
         sample_input = [0.0]*len(headers) if sample == [] else self.floatify_input(sample)
         sample_output = self.status_to_oneHot('---')
         self.headers = headers
-        self.associations = Associativity(headers, sample_input, True)
+        self.associations = Associativity(headers, sample_input, False)
         # self.vae = VAE()
         
         return sample_input, sample_output
@@ -40,6 +40,7 @@ class DataDrivenLearning:
         input_data = self.floatify_input(curr_data)
         output_data = self.status_to_oneHot(status)
         self.associations.update(input_data)
+        
         return input_data, output_data 
 
     def apriori_training(self, batch_data):

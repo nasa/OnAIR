@@ -3,6 +3,8 @@
    https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/
 """
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+
 import numpy as np
 from keras.utils.vis_utils import plot_model
 from keras.models import Model, save_model, load_model
@@ -95,7 +97,7 @@ class CurveCharacterizer:
         model = Model(inputs=[inputs1, inputs2, inputs3], outputs=outputs)
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-        model.fit([trainX,trainX,trainX], trainy, epochs=epochs, batch_size=batch_size, verbose=verbose)
+        model.fit([trainX,trainX,trainX], trainy, epochs=epochs, batch_size=batch_size, verbose=0)
         _, accuracy = model.evaluate([testX,testX,testX], testy, batch_size=batch_size, verbose=0)
 
         return accuracy, model

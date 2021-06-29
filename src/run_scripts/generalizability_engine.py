@@ -150,6 +150,7 @@ def parse_data(dataFile):
             all_data.append(row)
     return all_data[0], all_data[1:]
 
+# This needs to be able to handle sci notation e+..
 def floatify_input(_input, remove_str=False):
     floatified = []
     for i in _input:

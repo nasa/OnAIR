@@ -48,7 +48,7 @@ class TestGeneralizabilityEngine(unittest.TestCase):
         construct = GE.init_construct('Associativity', [['A', 'B'], [1,3]])
         self.assertEquals(type(construct), Associativity)
 
-        construct = GE.init_construct('VAE', [1,3])
+        construct = GE.init_construct('VAE', [['A', 'B'], 1,3])
         self.assertEquals(type(construct), VAE)
 
         construct = GE.init_construct('POMDP', ['name', '/path/name.csv', ['A', 'B']])
@@ -64,16 +64,16 @@ class TestGeneralizabilityEngine(unittest.TestCase):
 
     def test_extract_dimensional_info(self):
         GE = GeneralizabilityEngine()
-        wrapper = DataWrapper('temp/path', ['A'], [1])
+        wrapper = DataWrapper('temp/path', ['A'], [[1]])
         GE.data_samples = [wrapper]
         dim_info = GE.extract_dimensional_info('Associativity')
-        self.assertEquals(dim_info, [['A'], 1])
+        self.assertEquals(dim_info, [['A'], [1.0]])
 
         dim_info = GE.extract_dimensional_info('POMDP')
         self.assertEquals(dim_info, ['path', 'temp/path', ['A'] ])
 
         dim_info = GE.extract_dimensional_info('VAE')
-        self.assertEquals(dim_info, [1,1])
+        self.assertEquals(dim_info, [['A'],1,10])
 
 if __name__ == '__main__':
     unittest.main()
