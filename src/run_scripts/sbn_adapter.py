@@ -18,10 +18,10 @@ import message_headers as msg_hdr
 # Note: The double buffer does not clear between switching. If fresh data doesn't come in, stale data is returned (delayed by 1 frame)
 
 # msgID_lookup_table format { msgID : [ "<APP NAME>" , msg_hdr.<data struct in message_headers.py> , "<data category>" ] }
-msgID_lookup_table = {0x0885 : ["SAMPLE", msg_hdr.sample_data_tlm_t, "GNC"],
-                      0x0887 : ["SAMPLE", msg_hdr.sample_data_power_t, "POWER"],
-                      0x0889 : ["SAMPLE", msg_hdr.sample_data_thermal_t, "THERMAL"],
-                      0x088A : ["SAMPLE", msg_hdr.sample_data_gps_t, "GNC"]}
+msgID_lookup_table = {0x0885 : ["SAMPLE", msg_hdr.sample_data_tlm_t],
+                      0x0887 : ["SAMPLE", msg_hdr.sample_data_power_t],
+                      0x0889 : ["SAMPLE", msg_hdr.sample_data_thermal_t],
+                      0x088A : ["SAMPLE", msg_hdr.sample_data_gps_t]}
 
 def message_listener_thread():
     """Thread to listen for incoming messages from SBN"""
@@ -34,7 +34,7 @@ def message_listener_thread():
         curr_time = seconds + (2**(-32) * subseconds) # a subsecond is equal to 2^-32 second
         time = start_time + datetime.timedelta(seconds=curr_time)
         str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
-        current_buffer['CDH']['data'] = [str_time]
+        current_buffer['data'][0] = str_time
         return str_time
 
     while(True):
@@ -42,7 +42,7 @@ def message_listener_thread():
         sbn.recv_msg(generic_recv_msg_p)
 
         msgID = generic_recv_msg_p.contents.TlmHeader.Primary.StreamId
-        app_name, data_struct, data_category = msgID_lookup_table[msgID]
+        app_name, data_struct = msgID_lookup_table[msgID]
 
         recv_msg_p = POINTER(data_struct)()
         recv_msg_p.contents = generic_recv_msg_p.contents
@@ -59,9 +59,9 @@ def message_listener_thread():
 
         for field_name, field_type in data_struct._fields_[1:]:
             header_name = app_name + "." + data_struct.__name__ + "." + str(field_name)
-            idx = current_buffer[data_category]['headers'].index(header_name)
+            idx = current_buffer['headers'].index(header_name)
             data = str(getattr(recv_msg, field_name))
-            current_buffer[msgID_lookup_table[msgID][2]]['data'][idx] = data
+            current_buffer['data'][idx] = data
 
         with AdapterDataSource.new_data_lock:
             AdapterDataSource.new_data = True
@@ -72,24 +72,19 @@ class AdapterDataSource(DataSource):
     currentData = []
 
     for x in range(0,2):
-        print("Index {}".format(x))
-        currentData.append({'CDH' : {'headers' : [], 'data' : []},
-             'COMMUNICATION' : {'headers' : [], 'data' : []},
-                'ELECTRICAL' : {'headers' : [], 'data' : []},
-                       'GNC' : {'headers' : [], 'data' : []},
-                     'POWER' : {'headers' : [], 'data' : []},
-                'PROPULSION' : {'headers' : [], 'data' : []},
-                   'THERMAL' : {'headers' : [], 'data' : []},
-                   'OVERALL' : {'headers' : [], 'data' : []}})
+        currentData.append({'headers' : [], 'data' : []})
+        #print("Index {}".format(x))
 
-        currentData[x]['CDH']['headers'].append('TIME')
+        # First element is always the time, set to a dummy value here
+        currentData[x]['headers'].append('TIME')
+        currentData[x]['data'].append('2000-001-12:00:00.000000000')
 
         for msgID in msgID_lookup_table.keys():
-            app_name, data_struct, data_category = msgID_lookup_table[msgID]
+            app_name, data_struct = msgID_lookup_table[msgID]
             struct_name = data_struct.__name__
             for field_name, field_type in data_struct._fields_[1:]:
-                currentData[x][data_category]['headers'].append(app_name + "." + struct_name + "." + str(field_name))
-            currentData[x][data_category]['data'].extend([0]*len(data_struct._fields_[1:])) #initialize all the data arrays with zero
+                currentData[x]['headers'].append(app_name + "." + struct_name + "." + str(field_name))
+            currentData[x]['data'].extend([0]*len(data_struct._fields_[1:])) #initialize all the data arrays with zero
 
     new_data_lock = threading.Lock()
     new_data = False
@@ -140,7 +135,7 @@ class AdapterDataSource(DataSource):
             read_index = AdapterDataSource.double_buffer_read_index
 
         print("Reading buffer: {}".format(read_index))
-        return self.currentData[read_index]
+        return self.currentData[read_index]['data']
 
     def has_more(self):
         """Returns true if the adapter has more data. Always true: connection should be live as long as cFS is running"""
