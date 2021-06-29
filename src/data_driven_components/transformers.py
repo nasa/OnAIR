@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 class TransformerModel(nn.Module):
 
-    def __init__(self, input_dim=30, seq_len=15, z_units=5, hidden_units=100, att_head=3, hidden_layers=2):
+    def __init__(self, input_dim=30, seq_len=15, z_units=5, hidden_units=100, att_heads=3, hidden_layers=2):
         """
         Vanilla-ish transformer model, see https://arxiv.org/pdf/1706.03762.pdf figure 1
         Note: pytorch 1.7 does not support batch_first, make sure to pass data (seq_len, batch, features)
@@ -32,7 +32,7 @@ class TransformerModel(nn.Module):
 
         self.pos_encoder = PositionalEncoding(input_dim)
 
-        encoder_layers = TransformerEncoderLayer(input_dim, att_head, dim_feedforward=hidden_units)
+        encoder_layers = TransformerEncoderLayer(input_dim, att_heads, dim_feedforward=hidden_units)
         self.transformer_encoder = TransformerEncoder(encoder_layers, hidden_layers)
 
         self.mulinear = nn.Linear(self.input_dim, self.z_units)
@@ -40,7 +40,7 @@ class TransformerModel(nn.Module):
 
         self.latentencoder = nn.Linear(self.z_units, self.input_dim)
 
-        decoder_layers = TransformerDecoderLayer(input_dim, att_head, dim_feedforward=hidden_units)
+        decoder_layers = TransformerDecoderLayer(input_dim, att_heads, dim_feedforward=hidden_units)
         self.transformer_decoder = TransformerDecoder(decoder_layers, hidden_layers)
 
         self.out_linear = nn.Linear(input_dim, input_dim) # Single output, TODO: add reconstruction error output
@@ -145,7 +145,11 @@ class PositionalEncoding(nn.Module):
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, input_dim, 2).float() * (-math.log(10000.0) / input_dim))
         pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
+
+        if input_dim % 2: # if odd remove last term
+            pe[:, 1::2] = torch.cos(position * div_term)[:,:-1]
+        else:
+            pe[:, 1::2] = torch.cos(position * div_term)
         pe = pe.unsqueeze(0).transpose(0, 1)
         self.register_buffer('pe', pe)
 
@@ -171,7 +175,7 @@ class TimeseriesDataset(Dataset):
             datum = self.transform(datum)
         return datum
 
-class VAEExplainer():
+class TransformerExplainer():
     def __init__(self, vae, headers, n_features=7, seq_len=1, n_samples=200):
         """
         Takes in vae model to explain.
