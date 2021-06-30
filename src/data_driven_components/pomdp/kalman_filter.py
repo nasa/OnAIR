@@ -73,3 +73,12 @@ def current_attribute_chunk_get_error(kf, data):
     if (mean_residuals < 1.5):
         return False
     return True
+
+def preprocess_data_for_kalman(data):
+    data_dict = {}
+    for attribute in len(data[0]):
+        data_list = []
+        for i in range(len(data)):
+            data_list.append(data[i][attribute])
+        data_dict[attribute] = data_list
+    return data_dict
