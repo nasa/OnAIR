@@ -10,27 +10,16 @@ from collections import Counter
 
 
 class TelemetryTestSuite:
-
     def __init__(self, headers=[], tests=[]):
-        try:
-            self.init_suite(headers, tests)
-        except:
-            self.dataFields = []
-            self.tests = []
-            self.latest_results = None
-            self.epsilon = 0.00001
-
+        self.dataFields = headers
+        self.tests = tests
+        self.latest_results = None
+        self.epsilon = 0.00001 # should define this intelligently 
         self.all_tests = {'SYNC' : self.sync,
                     'ROTATIONAL' : self.rotational, 
                          'STATE' : self.state,
                    'FEASIBILITY' : self.feasibility, 
                            'NOOP': self.noop}
-
-    def init_suite(self, headers, tests):
-        self.dataFields = headers
-        self.tests = tests
-        self.latest_results = None
-        self.epsilon = 0.00001 # should define this intelligently 
 
     ################################################
     ################  Running Tests  ############### 

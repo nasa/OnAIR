@@ -12,12 +12,6 @@ class TestBrain(unittest.TestCase):
         SC = Spacecraft(['TIME', 'A', 'B'], [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]])
         self.B = Brain(SC)
 
-    def test_init_empty_brain(self):
-        B = Brain()
-        self.assertEquals(B.spacecraft_rep, None)
-        self.assertEquals(B.mission_status, '---')
-        self.assertEquals(B.bayesian_status, -1.0)
-
     def test_init_nonempty_brain(self):
         self.assertEquals(type(self.B.spacecraft_rep), Spacecraft)
         self.assertEquals(self.B.mission_status, '---')

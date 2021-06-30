@@ -11,7 +11,7 @@ from src.util.print_io import *
 # from src.data_driven_components.associativity import Associativity
 
 class DataDrivenLearning:
-    def __init__(self, headers=[], sample_input=[]):
+    def __init__(self, headers=[], sample=[]):
         self.classes = {'RED' : 0,
                      'YELLOW' : 1,
                       'GREEN' : 2,
@@ -20,12 +20,7 @@ class DataDrivenLearning:
                                  1 : 'YELLOW',
                                  2 : 'GREEN',
                                  3 : '---'}
-        try:
-            self.init_learning_systems(headers, sample_input)
-        except:
-            self.headers = []
 
-    def init_learning_systems(self, headers, sample=[]):
         assert(len(headers)>0)
         self.headers = headers
 
@@ -40,7 +35,8 @@ class DataDrivenLearning:
         # self.LSTM = LongShortTermMemory(name, sample_input, sample_output, 5)
         # self.LSTM.setXLabels(headers)
 
-        return sample_input, sample_output
+
+        # return sample_input, sample_output
 
     def update(self, curr_data, status):
         input_data = self.floatify_input(curr_data)
