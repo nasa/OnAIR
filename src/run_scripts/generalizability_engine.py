@@ -32,22 +32,14 @@ class GeneralizabilityEngine:
                        sample_paths=['2020_handmade_data/',
                                      'data_physics_generation/Errors/',
                                      'data_physics_generation/No_Errors/']):
-        try: 
-            self.construct_files = {'Associativity' : 'associativity',
-                                    'VAE' : 'vae',
-                                    'POMDP' : 'pomdp'}
-            self.sample_paths = sample_paths
+        self.construct_files = {'Associativity' : 'associativity',
+                                'VAE' : 'vae',
+                                'POMDP' : 'pomdp'}
+        self.sample_paths = sample_paths
 
-            self.data_samples = self.init_samples(run_path + '/data/raw_telemetry_data/' )
-            self.construct = self.init_construct(construct_name)
-        except:
-            self.construct_files = {'Associativity' : 'associativity',
-                                    'VAE' : 'vae',
-                                    'POMDP' : 'pomdp'}
-            self.sample_paths = []
+        self.data_samples = self.init_samples(run_path + '/data/raw_telemetry_data/' )
+        self.construct = self.init_construct(construct_name)
 
-            self.data_samples = []
-            self.construct = None
 
     def init_construct(self, construct_name, construct_inits=[]):
         _construct = importlib.import_module('src.data_driven_components.' + self.construct_files[construct_name])

@@ -15,15 +15,6 @@ from src.systems.spacecraft import Spacecraft
 
 class Brain:
     def __init__(self, spacecraft=None):
-        try:
-            self.init_brain(spacecraft)
-        except:
-            self.spacecraft_rep = None
-            self.learning_systems = None
-            self.mission_status = '---'
-            self.bayesian_status = -1.0
-
-    def init_brain(self, spacecraft):
         self.spacecraft_rep = spacecraft
         self.learning_systems = DataDrivenLearning(self.spacecraft_rep.get_headers())
         self.mission_status = self.spacecraft_rep.get_status()
