@@ -9,15 +9,12 @@ class TestDataDrivenLearning(unittest.TestCase):
     def setUp(self):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
 
-    # def test_init_empty_ddl(self):
-    #     L = DataDrivenLearning()
-    #     self.assertEquals(L.headers, [])
-
-    def test_init_nonempty_ddl(self):
+    def test_init(self):
         L = DataDrivenLearning(['A'])
         self.assertEquals(L.headers, ['A'])
-        self.assertEquals(L.init_learning_systems(['A'])[0], [0.0])
-        self.assertEquals(L.init_learning_systems(['A'])[1], [0.0, 0.0, 0.0, 1.0])
+
+        # self.assertEquals(L.init_learning_systems(['A'])[0], [0.0])
+        # self.assertEquals(L.init_learning_systems(['A'])[1], [0.0, 0.0, 0.0, 1.0])
 
     def test_update(self):
         headers = ['TIME', 'A', 'B']

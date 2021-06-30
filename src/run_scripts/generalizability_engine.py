@@ -39,7 +39,6 @@ class GeneralizabilityEngine:
                                 'POMDP' : 'pomdp',
                                 'CurveCharacterizer' : 'curve_characterizer'}
         self.sample_paths = sample_paths
-
         self.data_samples = self.init_samples(run_path + '/data/raw_telemetry_data/' )
         self.construct = self.init_construct(construct_name)
 

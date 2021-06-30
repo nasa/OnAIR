@@ -9,20 +9,15 @@ from src.data_driven_components.associativity.associativity import Associativity
 from src.data_driven_components.vae.vae import VAE
 from src.data_driven_components.pomdp.pomdp import POMDP
 
+
 class TestGeneralizabilityEngine(unittest.TestCase):
 
     def setUp(self):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
         self.run_path = os.environ['RUN_PATH']
         self.GE = GeneralizabilityEngine(self.run_path, 'Associativity', sample_paths=['generalizability_testing/'])
-    
-    # def test_init_empty_engine(self):
-    #     GE = GeneralizabilityEngine()
-    #     self.assertEquals(GE.sample_paths, [])
-    #     self.assertEquals(GE.data_samples, [])
-    #     self.assertEquals(GE.construct, None)
 
-    def test_init_nonempty_engine(self):
+    def test_init(self):
         GE = GeneralizabilityEngine(self.run_path, 'Associativity', sample_paths=['generalizability_testing/'])
 
         self.assertEquals(GE.sample_paths, ['generalizability_testing/'])
@@ -78,10 +73,6 @@ class TestGeneralizabilityEngine(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
-
 
 
 

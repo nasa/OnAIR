@@ -20,13 +20,7 @@ class DataDrivenLearning:
                                  1 : 'YELLOW',
                                  2 : 'GREEN',
                                  3 : '---'}
-        # try:
-        self.init_learning_systems(headers)
-        # except:
-        #     self.headers = []
 
-    """ Initialize all learning systems with necessary dimensional info """
-    def init_learning_systems(self, headers):
         assert(len(headers)>0)
         sample_input = [0.0]*len(headers) 
         sample_output = self.status_to_oneHot('---')
@@ -34,8 +28,7 @@ class DataDrivenLearning:
 
         self.associations = Associativity(headers, 20, True)
         # self.vae = VAE(headers, 20)
-        
-        return sample_input, sample_output
+
 
     def update(self, curr_data, status):
         input_data = self.floatify_input(curr_data)

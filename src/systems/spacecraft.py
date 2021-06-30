@@ -10,15 +10,6 @@ from src.util.print_io import *
 
 class Spacecraft:
     def __init__(self, headers=[], tests=[]): # metaData is a timesynchronizer obj
-        try:
-            self.init_spacecraft(headers, tests)
-        except:
-            self.status = Status('MISSION')
-            self.headers = []
-            self.test_suite = TelemetryTestSuite()
-            self.curr_data = []
-
-    def init_spacecraft(self, headers, tests):
         assert(len(headers) == len(tests))
         self.status = Status('MISSION')
         self.headers = headers
