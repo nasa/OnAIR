@@ -50,7 +50,7 @@ class POMDP:
                 if self.config[key][0] == "data":
                     self.actions.append("view_" + key)
                     self.config[key].append(index)
-                    index +=1
+                    index += 1
             if run_limit == -1:
                 self.run_limit = len(self.actions)+1
             else:
@@ -144,14 +144,14 @@ class POMDP:
 
     ## data_train = list of frames, with headers and labels as described in self.config
     def apriori_training(self, data_train, data_test=[], lookback=15, batch_size=250, use_stratified=True):
-        split_data_train = util.split_by_lookback(data_train)
-        split_data_test = util.split_by_lookback(data_test)
-
-        if use_stratified:
-            split_data_train = util.stratified_sampling(self.config, split_data_train)
+        split_data_train = util.split_by_lookback(data_train, lookback)
+        split_data_test = util.split_by_lookback(data_test, lookback)
 
         split_data_train = util.dict_sort_data(self.config, split_data_train)
         split_data_test = util.dict_sort_data(self.config, split_data_test)
+
+        if use_stratified:
+            split_data_train = util.stratified_sampling(self.config, split_data_train)
 
         avg_rewards = []
         avg_accuracies = []
