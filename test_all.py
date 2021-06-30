@@ -15,6 +15,7 @@ from src.test.systems.test_telemetry_test_suite import TestTelemetryTestSuite
 from src.test.run_scripts.test_sim import TestSimulator
 from src.test.data_driven_components.test_data_driven_learning import TestDataDrivenLearning
 from src.test.data_driven_components.pomdp.test_kalman_filter import TestKalmanFilter
+from src.test.data_driven_components.pomdp.test_observation import TestObservation
 from src.test.cleanup.test_cleanup import TestCleanup
 
 def create_suite():
@@ -33,6 +34,7 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestKalmanFilter))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestObservation))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCleanup))
 
     return suite
