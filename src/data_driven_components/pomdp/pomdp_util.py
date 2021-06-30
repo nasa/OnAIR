@@ -9,7 +9,7 @@ import copy
 ## Load All The Data
 def mass_load_data(folder, lookback, filetype=".csv"):
     data = []
-    config, dict_config = load_config(folder)
+    config, dict_config = load_config(folder + "config.csv")
     for file in os.listdir(folder):
         if file.find(filetype) != -1 and file != "config.csv":
             file_data = load_data(folder + file)
@@ -29,27 +29,17 @@ def dict_sort_data(dict_config, data):
     output_data = []
     for time_chunk in data:
         # time_chunk is a list of N frames for some N > 0
-        attributes = [[] for i in range(len(time_chunk))]
+        attributes = [[] for i in range(len(time_chunk[0]))]
         for frame in time_chunk:
             for i in range(len(frame)):
                 attributes[i].append(frame[i])
         new_point = {}
-        for key in config:
-            index_for_key = config[key][3]
+        index_for_key = 0
+        for key in dict_config:
             new_point[key] = attributes[index_for_key]
+            index_for_key += 1
         output_data.append(new_point)
     return output_data
-
-    for i in range(1+lookback, len(file_data)):
-        new_point = {}
-        for k in range(len(config[0])):
-            new_point[config[0][k]] = []
-        for j in range(lookback):
-            frame = file_data[i-lookback+j]
-            for k in range(len(config[0])):
-                new_point[config[0][k]].append(frame[k])
-                data.append(new_point)
-    return dict_config, data
 
 ## Load data from a .csv file
 def load_data(file_path, delimiter=',', quotechar='\"'):
