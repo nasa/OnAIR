@@ -18,6 +18,7 @@ from src.test.run_scripts.test_sim import TestSimulator
 from src.test.data_driven_components.test_data_driven_learning import TestDataDrivenLearning
 from src.test.util.test_cleanup import TestCleanup
 from src.test.run_scripts.test_generalizability_engine import TestGeneralizabilityEngine
+from src.test.data_driven_components.test_transformer import TestTransformer
 
 def create_suite():
     suite = []
@@ -37,6 +38,7 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCleanup))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGeneralizabilityEngine))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTransformer))
 
     return suite
 

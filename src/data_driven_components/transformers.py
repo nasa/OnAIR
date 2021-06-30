@@ -4,18 +4,21 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer, TransformerDecoder, TransformerDecoderLayer
+from captum.attr import KernelShap, DeepLift, DeepLiftShap
+import os
+from datetime import datetime
 import torch
 from torch import nn
-from vae import *
 import numpy as np
 from tqdm import tqdm
+from torch.utils.data import DataLoader, Dataset
 
 class TransformerModel(nn.Module):
 
     def __init__(self, input_dim=30, seq_len=15, z_units=5, hidden_units=100, att_heads=3, hidden_layers=2):
         """
         Vanilla-ish transformer model, see https://arxiv.org/pdf/1706.03762.pdf figure 1
-        Note: pytorch 1.7 does not support batch_first, make sure to pass data (seq_len, batch, features)
+        Note: pytorch 1.7 does not support batch_first, but data is still (batch, seq_len, features)
         :param input_dim: (optional int) Number of input features, default 100
         :param seq_len: (int) number of data points in our data sequence
         :param z_units: (optional int) Size of latent distribution (posterior), default 5
@@ -43,12 +46,13 @@ class TransformerModel(nn.Module):
         decoder_layers = TransformerDecoderLayer(input_dim, att_heads, dim_feedforward=hidden_units)
         self.transformer_decoder = TransformerDecoder(decoder_layers, hidden_layers)
 
-        self.out_linear = nn.Linear(input_dim, input_dim) # Single output, TODO: add reconstruction error output
+        self.out_linear = nn.Linear(input_dim, input_dim)
 
     def generate_square_subsequent_mask(self, seq_len):
         """
         Prevent peak-ahead in decoder. Masked tokens are -inf, unmasked are 0.
         :param seq_len: (int) Sequence length # Since this is an autoencoder this'll be input seq_len
+        :return: (Tensor) 2D tensor mask of shape (seq_len, seq_len)
         """
         mask = (torch.triu(torch.ones(seq_len, seq_len)) == 1).transpose(0, 1)
         mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
@@ -67,7 +71,11 @@ class TransformerModel(nn.Module):
 
     def forward(self, x, x_mask, target_mask):
         """
-        Assume x: (seq_len, batch_size, input_dim)
+        Note! Pytorch 1.7 does not support batch size first TODO: revert this fix
+        :param x: (Tensor) input shape (batch_size, seq_len, input_dim))
+        :param x_mask: (Tensor) mask for input, shape (seq_len, seq_len)
+        :param target_mask: (Tensor) mask for target, shape (seq_len+1, seq_len+1)
+        :return: (int) reconstruction error
         """
         #x = x.transpose(0,1) # put batch first for batchnorm
         x = self.norm(x)
@@ -112,10 +120,7 @@ class TransformerModel(nn.Module):
         """
         Combination of mse (reconstruction error) between input and output and 
             KL-divergence of N(0,1) and N(mu, logvar)
-        :param x: (Tensor) input sequence of shape (batch_size, seq_len, input_dim)
-        :param mu: (Tensor) Latent space average tensor of shape (batch_size, 1, z_units)
-        :param logvar: (Tensor) Logvariance of representation, shape (batch_size, 1, z_units)
-        :param output: mse+KL divergence loss
+        :return: (int) loss
         """
         x = self.input
         mu = self.mu
@@ -137,6 +142,7 @@ class PositionalEncoding(nn.Module):
             encode position
         :param input_dim: (int) number of input features
         :param dropout: (float) dropout for encoding
+        :param max_len: (int) max length of sequence
         """
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
@@ -154,6 +160,9 @@ class PositionalEncoding(nn.Module):
         self.register_buffer('pe', pe)
 
     def forward(self, x):
+        """
+        :param x: (Tensor) input to encode positions shape (batch_size, seq_len, num_inputs)
+        """
         x = x + self.pe[:x.size(0), :]
         return self.dropout(x) # Better for training robust representations
 
@@ -236,7 +245,7 @@ class TransformerExplainer():
 
         return (shap_values, data, data_names)
 
-def train(vae, seq_len, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "val"]):
+def train(vae, seq_len, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["train", "val"], logging=False):
     """
     Training loop util
     :param vae: Transformer autoencoder
@@ -247,14 +256,16 @@ def train(vae, seq_len, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["
     :param checkpoint: (optional bool) save model to directory, defaults to False
     :param phases: (string list) phases in training, defaults to ["train", "val"],
                 each phase should have a corresponding data loader
+    :param logging: (optional bool) whether to log run to file, defaults to false
     """
     checkpoint_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"runs")
 
     e = datetime.now()
     run_dir = os.path.join(checkpoint_dir, "{}-{}-{}_{}:{}:{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second))
 
-    writer = SummaryWriter(run_dir)
-    print("Starting training, see run at", run_dir)
+    if logging:
+        writer = SummaryWriter(run_dir)
+        print("Starting training, see run at", run_dir)
 
     optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
 
@@ -285,8 +296,8 @@ def train(vae, seq_len, loaders, epochs=20, lr=1e-1, checkpoint=False, phases=["
                 running_loss += loss
 
             avg_loss = running_loss / len(loaders[phase])
-
-            writer.add_scalar('Loss/' + phase, avg_loss, epoch_counter)
+            if logging:
+                writer.add_scalar('Loss/' + phase, avg_loss, epoch_counter)
 
         if checkpoint:
             checkpoint_name = 'checkpoint_{:04d}.pth.tar'.format(epoch_counter)
