@@ -9,9 +9,10 @@ import numpy as np
 from src.util.print_io import *
 
 from src.data_driven_components.associativity.associativity import Associativity
+from src.data_driven_components.vae.vae import VAE
 
 class DataDrivenLearning:
-    def __init__(self, headers=[]):
+    def __init__(self, headers=[], window_size=10):
         self.classes = {'RED' : 0,
                      'YELLOW' : 1,
                       'GREEN' : 2,
@@ -22,13 +23,12 @@ class DataDrivenLearning:
                                  3 : '---'}
 
         assert(len(headers)>0)
-        sample_input = [0.0]*len(headers) 
-        sample_output = self.status_to_oneHot('---')
+        # sample_input = [0.0]*len(headers) 
+        # sample_output = self.status_to_oneHot('---')
         self.headers = headers
-
-        self.associations = Associativity(headers, 20, True)
-        # self.vae = VAE(headers, 20)
-
+        self.window_size = window_size
+        self.associations = Associativity(headers, self.window_size, True)
+        self.vae = VAE(headers, self.window_size)
 
     def update(self, curr_data, status):
         input_data = self.floatify_input(curr_data)
@@ -40,8 +40,17 @@ class DataDrivenLearning:
         return input_data, output_data 
 
     def apriori_training(self, batch_data):
+        extra_frames = len(batch_data)%self.window_size
+        batch_data = batch_data[:len(batch_data)-extra_frames]
+
+        batch_data = [self.floatify_input(elem) for elem in batch_data]
+        num_batches = int(len(batch_data)/self.window_size)
+        num_features = len(batch_data[0])
+        batch_data = np.array(batch_data).reshape(num_batches, self.window_size, num_features)
+        batch_data = list(batch_data)
+
         self.associations.apriori_training(batch_data)
-        # self.vae.apriori_training(batch_data)
+        self.vae.apriori_training(batch_data)
 
     def diagnose(self):
         return self.associations.render_diagnosis()
@@ -90,7 +99,7 @@ class DataDrivenLearning:
     def floatify_input(self, _input, remove_str=False):
         floatified = []
         for i in _input:
-            if type(i) is str:
+            if type(i) == str:
                 try:
                     x = float(i)
                     floatified.append(x)

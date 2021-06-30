@@ -9,7 +9,7 @@ if isNotebook():
 else:
     from tqdm import tqdm
 
-def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=True, phases=["train", "val"]):
+def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, phases=["train", "val"]):
     """
     Training loop util
     :param loaders: {train: train_loader, val: val_loader} data loaders in dictionary
@@ -31,7 +31,7 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=True, phas
 
     optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
 
-    for epoch_counter in tqdm(range(epochs)):
+    for epoch_counter in tqdm(range(epochs), disable=True):
         for phase in phases:
             if phase == "train":
                 vae.train(True)

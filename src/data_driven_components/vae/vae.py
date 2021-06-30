@@ -97,11 +97,8 @@ class VAE(nn.Module):
                            (batch_size, seq_len, input_dim)
         :return: None
         """
-
-        _input_dim = len(data_train[0])
-        _batch_size = len(data_train)
-
-        data_train = [data_train]
+        _batch_size = len(data_train[0])
+        _input_dim = len(data_train[0][0])
 
         transform = lambda x: torch.tensor(x).float()
         train_dataset = TimeseriesDataset(data_train, transform)
@@ -213,25 +210,25 @@ class TimeseriesDataset(Dataset):
 
 
 
-if __name__ == "__main__":
-    data = range(30)
-    data = [[list(data)]] # serrated shape
+# if __name__ == "__main__":
+#     data = range(30)
+#     data = [[list(data)]] # serrated shape
 
-    data2 = [1]*30
-    data2 = [[data2]] # uniform
+#     data2 = [1]*30
+#     data2 = [[data2]] # uniform
 
-    transform = lambda x: torch.tensor(x).float()
-    train_dataset = TimeseriesDataset(data, transform)
-    train_dataloader = DataLoader(train_dataset, batch_size=1)
+#     transform = lambda x: torch.tensor(x).float()
+#     train_dataset = TimeseriesDataset(data, transform)
+#     train_dataloader = DataLoader(train_dataset, batch_size=1)
 
-    test_dataset = TimeseriesDataset(data2, transform)
-    test_dataloader = DataLoader(test_dataset, batch_size=1)
+#     test_dataset = TimeseriesDataset(data2, transform)
+#     test_dataloader = DataLoader(test_dataset, batch_size=1)
 
-    print("Creating VAE...")
-    vae = VAE(input_dim=30, seq_len=1, z_units=5)
-    print("Successfuly created VAE")
+#     print("Creating VAE...")
+#     vae = VAE(input_dim=30, seq_len=1, z_units=5)
+#     print("Successfuly created VAE")
 
-    train(vae, {'train': train_dataloader}, phases=["train"])
+#     train(vae, {'train': train_dataloader}, phases=["train"])
 
     """
     optimizer = torch.optim.Adam(vae.parameters(), lr=1e-1)

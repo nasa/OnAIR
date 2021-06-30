@@ -50,7 +50,7 @@ class TestTelemetryTestSuite(unittest.TestCase):
 
     def test_sync(self):
         val = 1
-        params = [1] # this is fed to the tset suite... hmmm ... I should prob do this diff
+        params = [1] # this is fed to the tset suite... hmmm ... I should `ob do this diff
         epsilon = 0.000001
 
         result = self.TTS.sync(val, params, epsilon)

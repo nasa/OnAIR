@@ -43,8 +43,6 @@ class Simulator:
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
 
         self.apriori_training()
-        print("DONE TRAINING")
-        return
 
         print_sim_header() if (IO_Flag == True) else ''
         print_msg('Please wait...\n') if (IO_Flag == 'strict') else ''
@@ -80,7 +78,7 @@ class Simulator:
         # render_diagnosis(diagnosis_list)
         # print_diagnosis(final_diagnosis) if (IO_Flag == True) else ''
 
-        print(final_diagnosis)
+        # print(final_diagnosis)
         return final_diagnosis
 
     def apriori_training(self):

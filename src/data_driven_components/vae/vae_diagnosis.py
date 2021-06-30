@@ -17,7 +17,7 @@ def findThreshold(vae, dataset, error_margin):
     """
     dataloader = DataLoader(dataset, batch_size=1)
     reconstruction_error = 0
-    for d in tqdm(dataloader):
+    for d in tqdm(dataloader, disable=True):
         if (x := vae(d)) > reconstruction_error:
             reconstruction_error = x
 
