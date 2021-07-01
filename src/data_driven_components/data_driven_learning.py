@@ -31,6 +31,7 @@ class DataDrivenLearning:
         self.vae = VAE(headers, self.window_size)
 
     def apriori_training(self, data):
+        
         batch_data = prep_apriori_training_data(data, self.window_size)
         self.associations.apriori_training(batch_data)
         self.vae.apriori_training(batch_data)

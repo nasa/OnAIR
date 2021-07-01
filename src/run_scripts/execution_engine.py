@@ -13,7 +13,6 @@ from time import gmtime, strftime
 
 from src.data_handling.time_synchronizer import TimeSynchronizer
 from src.run_scripts.sim import Simulator
-from src.util.file_io import * 
 
 class ExecutionEngine:
     def __init__(self, config_file='', run_name='', save_flag=False):

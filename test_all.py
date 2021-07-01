@@ -23,25 +23,24 @@ from src.test.util.test_data_reformatting import TestDataReformatting
 
 def create_suite():
     suite = []
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDriver))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestParserUtil))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestFortyTwoParser))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCSVParser))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGenericParser))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTimeSynchronizer))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataSource))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestExecutionEngine))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSpacecraft))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestStatus))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestBrain))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTelemetryTestSuite))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCleanup))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGeneralizabilityEngine))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
-    # suite.append(unittest.TestLoader().loadTestsFromTestCase(TestVAE))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDriver))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestParserUtil))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestFortyTwoParser))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCSVParser))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGenericParser))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTimeSynchronizer))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataSource))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestExecutionEngine))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSpacecraft))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestStatus))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestBrain))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTelemetryTestSuite))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCleanup))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGeneralizabilityEngine))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestVAE))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataReformatting))
-
     return suite
 
 def run_tests(suite):

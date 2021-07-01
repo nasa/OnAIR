@@ -15,7 +15,6 @@ import random
 
 from src.reasoning.brain import Brain
 from src.systems.spacecraft import Spacecraft
-from src.util.file_io import *
 from src.util.print_io import *
 from src.util.sim_io import *
 from src.data_handling.data_source import DataSource
@@ -74,10 +73,10 @@ class Simulator:
             diagnosis_list.append(self.brain.diagnose(time_step))
         final_diagnosis = diagnosis_list[-1]
 
-        # Renderings
         # render_diagnosis(diagnosis_list)
         # print_diagnosis(final_diagnosis) if (IO_Flag == True) else ''
         # print(final_diagnosis)
+
         return final_diagnosis
 
     def apriori_training(self):
