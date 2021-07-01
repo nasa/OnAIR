@@ -118,11 +118,6 @@ class TelemetryTestSuite:
         if len(test_params) == 2:
             statuses = ['RED', 'GREEN', 'RED']
 
-        # if val in test_params:
-        #     index = test_params.index(val)
-        #     left_status = 
-
-
         if val <= lowest_bound: 
             stat = statuses[0]
             left_stat = statuses[1]
@@ -206,7 +201,6 @@ class TelemetryTestSuite:
         if mode == 'strict':
             if occurences['RED'] > 0:
                 conf = occurences['RED']/len(status_list)
-                # conf = -1.0
                 return 'RED', conf
 
         if mode == 'distr':

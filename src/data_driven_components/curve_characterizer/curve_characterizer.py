@@ -42,10 +42,6 @@ class CurveCharacterizer:
             self.model.save(self.model_path + "my_model")
             self.model_built = True
 
-        # if prepModel == True: 
-            # self.build_characterizer()
-            # self.model_built = True
-
     """ Trains RAISR """
     def apriori_training(self, data_train):
         return
@@ -122,9 +118,4 @@ class CurveCharacterizer:
         print(scores)
         m, s = np.mean(scores), np.std(scores)
         print('Accuracy: %.3f%% (+/-%.3f)' % (m, s))
-
-
-
-
-
-
+ 

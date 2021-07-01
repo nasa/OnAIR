@@ -6,6 +6,11 @@ import sys
 
 from src.data_driven_components.curve_characterizer.file_io import * 
 
+labels = {'increase':0,
+          'decrease':1,
+          'sinusoidal':2,
+          'constant':3}
+
 # LINEAR INCREASE LABEL: 1
 def linear_increase(num_samples, frame_size=10):
     x_data = []
@@ -18,7 +23,7 @@ def linear_increase(num_samples, frame_size=10):
         for j in range(frame_size):
             sample.append(float(i + j*delta))
         x_data.append(sample)
-        y_data.append(1)
+        y_data.append(labels['increase'])
 
     return x_data, y_data
 
@@ -35,7 +40,7 @@ def linear_decrease(num_samples, frame_size=10):
             sample.append(float(i + j*delta))
         sample.reverse()
         x_data.append(sample)
-        y_data.append(2)
+        y_data.append(labels['decrease'])
         
     return x_data, y_data
 
@@ -52,7 +57,7 @@ def sinusoidal(num_samples, frame_size=10):
             behavior = j%3 - 1
             sample.append(float(i + behavior*epsilon))
         x_data.append(sample)
-        y_data.append(3)
+        y_data.append(labels['sinusoidal'])
 
     return x_data, y_data
 
@@ -82,7 +87,7 @@ def flat(num_samples, frame_size=10):
                 sample.append(float(constant))
         
         x_data.append(sample)
-        y_data.append(4)
+        y_data.append(labels['constant'])
 
     return x_data, y_data
 
@@ -107,10 +112,3 @@ def gen_data(samples, frame_size=10):
     y_data += y
 
     return x_data, y_data
-
-
-
-
-
-
-
