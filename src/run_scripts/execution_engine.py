@@ -95,8 +95,6 @@ class ExecutionEngine:
             self.sim.set_benchmark_data(fp, fls, bi)
         except:
             pass
-        # except:
-        #     print("Unable to set benchmark matrices")
 
     def run_sim(self):
         self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag)

@@ -41,6 +41,7 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestVAE))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataReformatting))
+    
     return suite
 
 def run_tests(suite):

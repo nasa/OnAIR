@@ -13,9 +13,6 @@ class TestDataDrivenLearning(unittest.TestCase):
         L = DataDrivenLearning(['A'])
         self.assertEquals(L.headers, ['A'])
 
-        # self.assertEquals(L.init_learning_systems(['A'])[0], [0.0])
-        # self.assertEquals(L.init_learning_systems(['A'])[1], [0.0, 0.0, 0.0, 1.0])
-
     def test_update(self):
         headers = ['TIME', 'A', 'B']
 
@@ -28,6 +25,14 @@ class TestDataDrivenLearning(unittest.TestCase):
     def test_apriori_training(self):
         return
 
+    def test_update(self):
+        return
+
+    def test_diagnose(self):
+        return 
+
+    def test_status_to_oneHot(self):
+        return 
 
 if __name__ == '__main__':
     unittest.main()
