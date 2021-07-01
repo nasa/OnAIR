@@ -87,7 +87,7 @@ def flat(num_samples, frame_size=10):
                 sample.append(float(constant))
         
         x_data.append(sample)
-        y_data.append(labels['flat'])
+        y_data.append(labels['constant'])
 
     return x_data, y_data
 
