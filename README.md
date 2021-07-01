@@ -15,12 +15,21 @@ You might run into libffy issues, see [here](https://github.com/mesonbuild/meson
 
 Create and activate a new conda environment (optional):
 
-    conda create --name raisr2.0 python=3.9
+    conda create --name raisr2.0 python=3.9.5
     conda activate raisr2.0
 
 Install requirements
 
     pip install -r pip.requirements.txt
+
+If you run into
+
+    AttributeError: module 'keras.utils.generic_utils' has no attribute 'populate_dict_with_module_objects'
+
+Uninstall and reinstall latest tensorflow version
+
+    pip uninstall tensorflow
+    pip install tensorflow --upgrade --force-reinstall
 
 ## Generating environment
 
