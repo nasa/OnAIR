@@ -1,5 +1,27 @@
 # RAISR-2.0
 
+## Installing RAISR
+
+Install headers, if on macOS:
+
+    brew install cairo pkg-config
+    brew install pygobject3 gtk+3
+
+See [here](https://pycairo.readthedocs.io/en/latest/getting_started.html) and [here](https://pygobject.readthedocs.io/en/latest/getting_started.html#getting-started) for other systems.
+
+You might run into libffy issues, see [here](https://github.com/mesonbuild/meson/issues/2273#issuecomment-420412230) and run (on macOS):
+
+    export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
+
+Create and activate a new conda environment (optional):
+
+    conda create --name raisr2.0 python=3.9
+    conda activate raisr2.0
+
+Install requirements
+
+    pip install -r pip.requirements.txt
+
 ## Generating environment
 
 Create a conda environment with the necessary packages
