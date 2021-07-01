@@ -6,8 +6,6 @@ June 9th 2021
 '''
 
 import numpy as np
-import matplotlib.pyplot as plt
-import networkx as nwx
 from efficient_apriori import apriori
 
 from src.data_driven_components.associativity.associativity_data_manager import AssociativityDataManager
@@ -27,9 +25,6 @@ class Associativity:
         self.graph_edges_with_weights = []
         self.graph_edges = {}
         self.associativityDataManager = AssociativityDataManager(headers)
-        
-        self.verbose = False
-        self.visualize_graph = False
 
     ########################################################################
     #### RAISR FUNCTIONS ####
@@ -39,8 +34,6 @@ class Associativity:
     def update(self, frame):
         self.associativityDataManager.add_frame(frame)
         self.frame_id += 1
-            # if self.visualize_graph == True:
-            #     self.create_and_view_graph()
 
     def render_diagnosis(self):
         rules = self.compute_association_rules()
@@ -58,26 +51,6 @@ class Associativity:
             return association_rules
         else:
             print('[associativity.py] ERROR: Records are empty. Is the window size too large?')
-
-            # if self.verbose == True:
-            #     for association in association_rules:
-            #         pair = association[0]
-            #         items = [x for x in pair]
-            #         try:
-            #             if len(items) >= 2 and len(association) >= 2:
-            #                 association_rule_index += 1
-            #                 print(f'\n--------------Start of Association Rule {association_rule_index}------------ ')
-            #                 print('Rule: ' + items[0] + '->' + items[1])
-            #                 print('Support: ' + str(association[1]))
-            #                 print(f'---------------End of Association Rule {association_rule_index}----------------')
-            #                 self.graph_nodes.append(items[0])
-            #                 self.graph_nodes.append(items[1])
-            #                 edge_weight_pairing = (items[0], items[1], {'weight': association[1]})
-            #                 self.graph_edges_with_weights.append(edge_weight_pairing)
-            #         except:
-            #             continue ##this block is usually only called if it is a index out of bounds error
-            # if self.visualize_graph == True:
-            #     create_and_view_graph()
 
     def load_ground_truth_matrix(self):
         try:
@@ -105,20 +78,6 @@ class Associativity:
 
     def get_association_matrix(self):
         return self.associations
-
-    def create_and_view_graph(self):
-        associativity_graph = nwx.Graph()
-        associativity_graph.add_nodes_from(self.graph_nodes)
-        associativity_graph.add_edges_from(self.graph_edges_with_weights)
-        edge_labelsa = nwx.get_edge_attributes(associativity_graph, 'weight')
-        pos = nwx.spring_layout(associativity_graph)
-        nwx.draw(associativity_graph, pos, with_labels = True)
-        nwx.draw_networkx_edge_labels(associativity_graph, pos, edge_labels = edge_labelsa)
-
-        if self.save_graph == True:
-            plt.savefig('pathtofig')
-
-        plt.show()
     
     def compute_confusion_matrix(self):
         TN, TP, FN, FP = 0, 0, 0, 0

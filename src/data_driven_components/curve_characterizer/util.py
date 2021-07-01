@@ -104,10 +104,3 @@ def recolor_points(orig_chars, new_chars, big_frame_size, small_frame_size, chun
         for j in range(small_frame_size):
             orig_chars[offset_chunk_end] = new_chars[offset_chunk_end]
     return orig_chars
-
-
-
-
-
-
-

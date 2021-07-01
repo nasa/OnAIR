@@ -5,15 +5,12 @@ import os
 import shutil 
 
 def setup_folders(data_path):
-    try:
-        if not os.path.isdir(data_path):
-            os.mkdir(data_path)
-        if not os.path.isdir(data_path + '/train/'):  
-            os.mkdir(data_path + '/train/')
-        if not os.path.isdir(data_path + '/test/'):  
-            os.mkdir(data_path + '/test/')
-    except:
-        pass
+    if not os.path.isdir(data_path):
+        os.mkdir(data_path)
+    if not os.path.isdir(data_path + '/train/'):  
+        os.mkdir(data_path + '/train/')
+    if not os.path.isdir(data_path + '/test/'):  
+        os.mkdir(data_path + '/test/')
 
 
 def breakdown_folders(data_path):
@@ -83,3 +80,4 @@ def to_categorical(y, num_classes=None, dtype='float32'):
     output_shape = input_shape + (num_classes,)
     categorical = np.reshape(categorical, output_shape)
     return categorical
+    
