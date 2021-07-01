@@ -67,34 +67,11 @@ class VAE(nn.Module):
 
         self.output_layer = nn.Linear(self.input_dim, self.input_dim) # TODO: add activation, maybe relu?
 
-    def update(self, frame):
-        """
-        :param frame: (list of floats) input sequence of len (input_dim)
-        :return: None
-        """
-
-        self.frames.append(frame)
-        self.frames.pop(0)
-        
-        seq = [self.frames]
-
-        transform = lambda x: torch.tensor(x).float()
-        prediction_dataset = TimeseriesDataset(seq, transform)
-        dataloader = DataLoader(prediction_dataset, batch_size=1)
-
-        for x in dataloader:
-            self(x)
-
-        #     print("******** predicted ********")
-        #     e = VAEExplainer(self, self.headers)
-        #     # print(e.shap(x, bass))
-        #     e.viz()
-
-
+    ########################################################################
+    #### RAISR FUNCTIONS ####
     def apriori_training(self, data_train):
         """
-        :param data_train: (list of lists) input sequence of shape : 
-                           (batch_size, seq_len, input_dim)
+        :param data_train: (list of lists) input sequence of shape (batch_size, seq_len, input_dim)
         :return: None
         """
         _batch_size = len(data_train[0])
@@ -105,6 +82,33 @@ class VAE(nn.Module):
         train_dataloader = DataLoader(train_dataset, batch_size=_batch_size)
 
         train(self, {'train': train_dataloader}, phases=["train"])
+
+    def update(self, frame):
+        """
+        :param frame: (list of floats) input sequence of len (input_dim)
+        :return: None
+        """
+        self.frames.append(frame)
+        self.frames.pop(0)
+
+    def render_diagnosis(self):
+        """
+        :param None
+        :return: 1; stub
+        """
+        seq = [self.frames]
+        transform = lambda x: torch.tensor(x).float()
+        prediction_dataset = TimeseriesDataset(seq, transform)
+        dataloader = DataLoader(prediction_dataset, batch_size=1)
+        # for x in dataloader:
+        #     self(x)
+        #     print("******** predicted ********")
+        #     e = VAEExplainer(self, self.headers)
+        #     # print(e.shap(x, bass))
+        #     e.viz()
+
+        return 1
+    ########################################################################
 
 
     def encoder(self, x):

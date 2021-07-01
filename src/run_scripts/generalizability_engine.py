@@ -15,6 +15,7 @@ from src.data_driven_components.curve_characterizer.curve_characterizer import C
 from src.data_driven_components.vae.vae import VAE
 from src.data_driven_components.pomdp.pomdp import POMDP
 
+from src.util.data_reformatting import *
 # -----------------------------------------------------
 # data has a folder for each 
 #  -- My generated Data 
@@ -32,12 +33,15 @@ class GeneralizabilityEngine:
     def __init__(self, run_path='', construct_name='Associativity', construct_inits=[], 
                        sample_paths=['2020_handmade_data/',
                                      'data_physics_generation/Errors/',
-                                     'data_physics_generation/No_Errors/']): 
-        self.run_path = run_path
+                                     'data_physics_generation/No_Errors/'], window_size=10): 
+        
         self.construct_files = {'Associativity' : 'associativity',
                                 'VAE' : 'vae',
                                 'POMDP' : 'pomdp',
                                 'CurveCharacterizer' : 'curve_characterizer'}
+        
+        self.window_size = window_size
+        self.run_path = run_path
         self.sample_paths = sample_paths
         self.data_samples = self.init_samples(run_path + '/data/raw_telemetry_data/' )
         self.construct = self.init_construct(construct_name)
@@ -58,7 +62,8 @@ class GeneralizabilityEngine:
         return data_sets
 
     def extract_dimensional_info(self, construct_name):
-        return [self.data_samples[0].get_headers(), 10]
+        window_size = self.window_size
+        headers = self.data_samples[0].get_headers()
 
         # sample = self.data_samples[0]
 
@@ -69,24 +74,21 @@ class GeneralizabilityEngine:
         # headers = sample.get_headers()              # ASSOC
         # sample_input = sample.get_sample()          # ASSOC
 
-        # name = sample.get_name()                    # POMDP
-        # path = sample.get_path()                    # POMDP
-        # telemetry_headers = sample.get_headers()    # POMDP
+        name = 'POMDP'                              # POMDP
+        path = self.run_path                        # POMDP
 
-        # args = {'VAE' : [headers, window_size], 
-        #         'Associativity' : [headers, window_size+10],
-        #         'POMDP' : [name, path, telemetry_headers],
-        #         'CurveCharacterizer' : [self.run_path  + 'data/']}
+        args = {'VAE' : [headers, window_size], 
+                'Associativity' : [headers, window_size],
+                'POMDP' : [name, path, headers],
+                'CurveCharacterizer' : [path+'data/']}
 
-        # return args[construct_name]
+        return args[construct_name]
 
     def run_integration_test(self):
         data = self.data_samples[0].get_data()
-
-        frames = data[:10]
-
-        self.construct.apriori_training(frames)
-        self.construct.update(frames[0])
+        batch_data = prep_apriori_training_data(data, self.window_size)
+        self.construct.apriori_training(batch_data)
+        self.construct.update(batch_data[0][0])
         
         # for frame in frame:
         #     self.construct.update(frame)

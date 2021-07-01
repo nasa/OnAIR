@@ -22,7 +22,7 @@ from src.data_driven_components.curve_characterizer.util import *
 
 #TODO Write tests 
 class CurveCharacterizer:
-    def __init__(self, main_data_path='', prepModel=False):
+    def __init__(self, main_data_path=''):
         # Could have these passed to init or inferred. 
         # Hardcoded for now.
         self.num_frames = 2000

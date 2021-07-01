@@ -26,7 +26,7 @@ class Brain:
         self.learning_systems.update(frame, self.mission_status)
 
     def diagnose(self, time_step):
-
+        
         return self.learning_systems.diagnose()
         
     #     lstm_predict = self.supervised_learning.lstm_predict()

@@ -26,11 +26,13 @@ class Associativity:
         self.graph_weights = []
         self.graph_edges_with_weights = []
         self.graph_edges = {}
-        self.associativityDataManager = AssociativityDataManager(headers, prepModel)
+        self.associativityDataManager = AssociativityDataManager(headers)
         
         self.verbose = False
         self.visualize_graph = False
 
+    ########################################################################
+    #### RAISR FUNCTIONS ####
     def apriori_training(self, data_train):
         return
         
@@ -43,6 +45,7 @@ class Associativity:
     def render_diagnosis(self):
         rules = self.compute_association_rules()
         return rules
+    ########################################################################
 
     def compute_association_rules(self):
         data = self.associativityDataManager.get_data()

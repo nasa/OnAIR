@@ -77,7 +77,6 @@ class Simulator:
         # Renderings
         # render_diagnosis(diagnosis_list)
         # print_diagnosis(final_diagnosis) if (IO_Flag == True) else ''
-
         # print(final_diagnosis)
         return final_diagnosis
 

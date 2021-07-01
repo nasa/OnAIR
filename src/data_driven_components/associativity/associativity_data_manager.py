@@ -14,13 +14,13 @@ import os
 from src.data_driven_components.curve_characterizer.curve_characterizer import CurveCharacterizer
 
 class AssociativityDataManager:
-    def __init__(self, _headers=[], prepModel=False):
+    def __init__(self, _headers=[]):
         self.window_size = 20
         self.headers = _headers
         self.frames = [['0.0']*len(_headers) for i in range(self.window_size)]
         self.frame_id = 0
         self.categorical_data = []
-        self.curve_characterizer = CurveCharacterizer(os.environ['RUN_PATH'] + '/data/', prepModel)
+        self.curve_characterizer = CurveCharacterizer(os.environ['RUN_PATH'] + '/data/')
         
     def add_frame(self, frame):
         self.frames.append(frame)
