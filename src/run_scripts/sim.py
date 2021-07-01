@@ -83,9 +83,6 @@ class Simulator:
     def apriori_training(self):
         self.brain.learning_systems.apriori_training(self.simData.data)
 
-    def set_benchmark_data(self, filepath, files, indices):
-        self.brain.supervised_learning.set_benchmark_data(filepath, files, indices)
-
     def IO_check(self, time_step, IO_Flag):
         if IO_Flag == True:
             print_sim_step(time_step + 1)
