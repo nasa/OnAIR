@@ -22,9 +22,7 @@ class Spacecraft:
             if frame[i] != '-':
                 self.curr_data[i] = frame[i]
         self.test_suite.execute_suite(frame)
-        self.mission_status = self.test_suite.get_suite_status()
-
-        # UPDATE STATUS! 
+        self.status.set_status(*self.test_suite.get_suite_status())
 
     ##### GETTERS AND SETTERS #####
     def get_headers(self):
