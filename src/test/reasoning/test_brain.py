@@ -22,7 +22,7 @@ class TestBrain(unittest.TestCase):
         self.B.reason(frame)
 
         self.assertEquals(self.B.spacecraft_rep.get_current_data(), [1,1,1])
-        self.assertEquals(self.B.mission_status, '---')
+        self.assertEquals(self.B.mission_status, 'GREEN')
 
     def test_diagnose(self):
         return
