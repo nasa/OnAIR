@@ -1,6 +1,7 @@
 """
 LSTM-VAE for streamed satellite telemetry fault diagnosis
 """
+import os
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
@@ -8,6 +9,28 @@ from src.data_driven_components.vae.vae_train import train
 from src.data_driven_components.vae.vae_diagnosis import VAEExplainer
 
 import matplotlib.pyplot as plt
+
+def loadVAE(self, path, headers=[], window_size=10, 
+                       z_units=5, hidden_units=100):
+    """
+    Loads VAE from previous save if possible, if not, creates a new LSTM-VAE
+        with given parameters
+    Make sure seq_len is always the same, TODO: accept any seq_len
+    :param path: (string) path of vae save relative to src directory
+    :param headers: (string list) list of headers for each input feature
+    :param window_size: (int) number of data points in our data sequence
+    :param z_units: (int) dimensions of our latent space gaussian representation
+    :param hidden_units: (int) dimension of our hidden_units
+    """
+    try:
+        checkpoint_path = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data_driven_components/vae/runs/checkpoint_latest.pth.tar')
+        model = VAE(headers, window_size, z_units, hidden_units)
+        model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
+        return model
+    except:
+        return VAE(headers, window_size, z_units, hidden_units)
+
+
 
 #import shap
 # shap.initjs() # TODO deal with viz
@@ -18,13 +41,12 @@ class VAE(nn.Module):
         """
         LSTM-VAE class for anomaly detection and diagnosis
         Make sure seq_len is always the same, TODO: accept any seq_len
-        :param input_dim: (int) number of input features
-        :param seq_len: (int) number of data points in our data sequence
+        :param headers: (string list) list of headers for each input feature
+        :param window_size: (int) number of data points in our data sequence
         :param z_units: (int) dimensions of our latent space gaussian representation
         :param hidden_units: (int) dimension of our hidden_units
         """
         super(VAE, self).__init__()
-
         self.headers = headers
         self.window_size = window_size
         self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
@@ -81,7 +103,10 @@ class VAE(nn.Module):
         train_dataset = TimeseriesDataset(data_train, transform)
         train_dataloader = DataLoader(train_dataset, batch_size=_batch_size)
 
-        train(self, {'train': train_dataloader}, phases=["train"])
+        try:
+            self.load_state_dict(torch.load(os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data_driven_components/vae/runs/checkpoint_latest.pth.tar')))
+        except:
+            train(self, {'train': train_dataloader}, phases=["train"], checkpoint=True)
 
     def update(self, frame):
         """

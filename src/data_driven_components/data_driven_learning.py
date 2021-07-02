@@ -10,7 +10,7 @@ from src.util.print_io import *
 from src.util.data_reformatting import *
 
 from src.data_driven_components.associativity.associativity import Associativity
-from src.data_driven_components.vae.vae import VAE
+from src.data_driven_components.vae.vae import VAE, loadVAE
 
 class DataDrivenLearning:
     def __init__(self, headers=[], window_size=10):
@@ -28,7 +28,7 @@ class DataDrivenLearning:
         self.headers = headers
         self.window_size = window_size
         self.associations = Associativity(headers, self.window_size, True)
-        self.vae = VAE(headers, self.window_size)
+        self.vae = loadVAE('data_driven_components/vae/runs/2-7-2021_13:6:25/checkpoint_0019.pth.tar', headers=headers, window_size=self.window_size)
 
     def apriori_training(self, data):
         batch_data = prep_apriori_training_data(data, self.window_size)
