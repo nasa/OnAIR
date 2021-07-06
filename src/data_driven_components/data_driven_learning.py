@@ -31,7 +31,9 @@ class DataDrivenLearning:
         self.vae = loadVAE('data_driven_components/vae/runs/2-7-2021_13:6:25/checkpoint_0019.pth.tar', headers=headers, window_size=self.window_size)
 
     def apriori_training(self, data):
-        batch_data = prep_apriori_training_data(data, self.window_size)
+        if not data == []:
+            batch_data = prep_apriori_training_data(data, self.window_size)
+            
         self.associations.apriori_training(batch_data)
         self.vae.apriori_training(batch_data)
 
