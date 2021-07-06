@@ -33,6 +33,8 @@ class DataDrivenLearning:
     def apriori_training(self, data):
         if not data == []:
             batch_data = prep_apriori_training_data(data, self.window_size)
+        else:
+            batch_data = []
             
         self.associations.apriori_training(batch_data)
         self.vae.apriori_training(batch_data)
