@@ -50,8 +50,8 @@ class TestGenericParser(unittest.TestCase):
 
 
     def test_multisource_parse_sim_data(self):
-        multi_source_data_files = [str(['generic_test_42.txt', 'generic_test_42_file2.txt'])]
-        multi_source_config_files = [str(['generic_test_42_CONFIG.txt', 'generic_test_42_file2_CONFIG.txt'])]
+        multi_source_data_files = [str(['generic_test_42.txt', 'generic_test_42_file2.txt']), str(['generic_test_csv.csv', 'generic_test_csv_file2.csv'])]
+        multi_source_config_files = [str(['generic_test_42_CONFIG.txt', 'generic_test_42_file2_CONFIG.txt']), str(['generic_test_csv_CONFIG.txt', 'generic_test_csv_file2_CONFIG.txt'])]
         for i in range(len(self.parser_names)):
             parser = importlib.import_module('src.data_handling.parsers.' + self.parser_file_names[i])
             parser_class = getattr(parser, self.parser_names[i])
