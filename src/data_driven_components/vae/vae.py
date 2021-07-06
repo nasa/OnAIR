@@ -10,7 +10,7 @@ from src.data_driven_components.vae.vae_diagnosis import VAEExplainer
 
 import matplotlib.pyplot as plt
 
-def loadVAE(self, path, headers=[], window_size=10, 
+def loadVAE(path, headers=[], window_size=10, 
                        z_units=5, hidden_units=100):
     """
     Loads VAE from previous save if possible, if not, creates a new LSTM-VAE
