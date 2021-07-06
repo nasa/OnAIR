@@ -97,6 +97,8 @@ class VAE(nn.Module):
         :return: None
         """
 
+        return
+
         try:
             self.load_state_dict(torch.load(os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data_driven_components/vae/models/checkpoint_latest.pth.tar')))
         except:
