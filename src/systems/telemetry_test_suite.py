@@ -118,11 +118,6 @@ class TelemetryTestSuite:
         if len(test_params) == 2:
             statuses = ['RED', 'GREEN', 'RED']
 
-        # if val in test_params:
-        #     index = test_params.index(val)
-        #     left_status = 
-
-
         if val <= lowest_bound: 
             stat = statuses[0]
             left_stat = statuses[1]
@@ -206,7 +201,6 @@ class TelemetryTestSuite:
         if mode == 'strict':
             if occurences['RED'] > 0:
                 conf = occurences['RED']/len(status_list)
-                # conf = -1.0
                 return 'RED', conf
 
         if mode == 'distr':
@@ -220,18 +214,3 @@ class TelemetryTestSuite:
 
     def get_suite_status(self):
         return self.calc_single_status([res.get_status() for res in self.latest_results]) 
-
-
-# class TestResult:
-#     def __init__(self, stat, bayesian_conf):
-#         self.stat = stat
-#         self.bayesian_conf  = bayesian_conf
-
-#     def get_all_test_results(self):
-#         return self.stat, self.bayesian_conf
-
-#     def get_stat(self):
-#         return self.stat
-
-#     def get_bayesian_conf(self):
-#         return self.bayesian_conf

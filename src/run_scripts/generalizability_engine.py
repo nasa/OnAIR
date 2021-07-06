@@ -10,17 +10,19 @@ import shutil
 import pandas as pd
 import csv 
 
-from src.data_driven_components.associativity import Associativity
-from src.data_driven_components.vae import VAE
-from src.data_driven_components.pomdp import POMDP
+from src.data_driven_components.associativity.associativity import Associativity
+from src.data_driven_components.curve_characterizer.curve_characterizer import CurveCharacterizer
+from src.data_driven_components.vae.vae import VAE
+from src.data_driven_components.pomdp.pomdp import POMDP
 
+from src.util.data_reformatting import *
 # -----------------------------------------------------
 # data has a folder for each 
 #  -- My generated Data 
 #  -- Nicks data (CSV's of set size)
 #  -- the actual sounding rocket TLM 
 #  -- KSP 
-
+#   
 # Two modes: either generate data, or do not. 
 # Maybe try running on each of the static sets, 
 # then do a few iterations of each of the data generated 
@@ -28,21 +30,24 @@ from src.data_driven_components.pomdp import POMDP
 
 # TODO WRITE A TEST FOR THIS!! 
 class GeneralizabilityEngine:
-    def __init__(self, run_path='', construct_name=None, construct_inits=[], 
+    def __init__(self, run_path='', construct_name='Associativity', construct_inits=[], 
                        sample_paths=['2020_handmade_data/',
                                      'data_physics_generation/Errors/',
-                                     'data_physics_generation/No_Errors/']):
+                                     'data_physics_generation/No_Errors/'], window_size=10): 
+        
         self.construct_files = {'Associativity' : 'associativity',
                                 'VAE' : 'vae',
-                                'POMDP' : 'pomdp'}
+                                'POMDP' : 'pomdp',
+                                'CurveCharacterizer' : 'curve_characterizer'}
+        
+        self.window_size = window_size
+        self.run_path = run_path
         self.sample_paths = sample_paths
-
         self.data_samples = self.init_samples(run_path + '/data/raw_telemetry_data/' )
         self.construct = self.init_construct(construct_name)
 
-
     def init_construct(self, construct_name, construct_inits=[]):
-        _construct = importlib.import_module('src.data_driven_components.' + self.construct_files[construct_name])
+        _construct = importlib.import_module('src.data_driven_components.' + self.construct_files[construct_name] + '.' + self.construct_files[construct_name])
         construct_class = getattr(_construct, construct_name)
         construct_inits = self.extract_dimensional_info(construct_name) if construct_inits == [] else construct_inits
         return construct_class(*construct_inits)
@@ -57,32 +62,42 @@ class GeneralizabilityEngine:
         return data_sets
 
     def extract_dimensional_info(self, construct_name):
-        sample = self.data_samples[0]
-        input_dim = len(sample.get_headers())         # VAE
-        seq_len = sample.get_num_frames()           # VAE
+        window_size = self.window_size
+        headers = self.data_samples[0].get_headers()
 
-        headers = sample.get_headers()              # ASSOC
-        sample_input = sample.get_sample()          # ASSOC
+        # sample = self.data_samples[0]
 
-        name = sample.get_name()                    # POMDP
-        path = sample.get_path()                    # POMDP
-        telemetry_headers = sample.get_headers()    # POMDP
+        # input_dim = len(sample.get_headers())       # VAE
+        # seq_len = sample.get_num_frames()           # VAE
+        # window_size = 10 # Window size
 
-        args = {'VAE' : [input_dim, seq_len],
-                'Associativity' : [headers, sample_input],
-                'POMDP' : [name, path, telemetry_headers]}
+        # headers = sample.get_headers()              # ASSOC
+        # sample_input = sample.get_sample()          # ASSOC
+
+        name = 'POMDP'                              # POMDP
+        path = self.run_path                        # POMDP
+
+        args = {'VAE' : [headers, window_size], 
+                'Associativity' : [headers, window_size],
+                'POMDP' : [name, path, headers],
+                'CurveCharacterizer' : [path+'data/']}
+
         return args[construct_name]
+
+    def run_integration_test(self):
+        data = self.data_samples[0].get_data()
+        batch_data = prep_apriori_training_data(data, self.window_size)
+        self.construct.apriori_training(batch_data)
+        self.construct.update(batch_data[0][0])
+        
+        # for frame in frame:
+        #     self.construct.update(frame)
+
+        # cc = CurveCharacterizer(self.run_path + 'data/')
+        # vae = VAE()
 
     # def run_generalizability_tests(self):
     #     for sample in self.data_samples:
-            
-# VAE: input_dim=30, seq_len=15, z_units=5, hidden_units=100
-# ASSOC: headers=[], sample_input=[]
-# POMDP: name, path, telemetry_headers, 
-#        print_on=False, save_me=True, reportable_states=['no_error', 'error'], 
-#        alpha=0.01, discount=0.8, epsilon=0.2, run_limit=100, reward_correct=100, 
-#        reward_incorrect=-100, reward_action=-1
-
 
 # -----------------------------------------------------------
 # ---------------- PULL THIS STUFF OUT ----------------------
@@ -96,8 +111,8 @@ class DataWrapper:
         self.path = _path
         self.name = _path.split('/')[-1]
         self.headers = _headers
-        self.input_data = _input_data_frames
-        self.output_data = _output_data_frames
+        self.input_data = [floatify_input(elem) for elem in _input_data_frames]
+        self.output_data = [floatify_input(elem) for elem in _output_data_frames]
 
     def get_name(self):
         return self.name
@@ -114,6 +129,11 @@ class DataWrapper:
     def get_sample(self):
         return self.input_data[0]
 
+    def get_data(self, labels=False):
+        if labels == True:
+            return self.input_data, self.output_data
+        return self.input_data
+
 # -----------------------------------------------------
 
 """Can abstract this out of this file"""
@@ -124,6 +144,28 @@ def parse_data(dataFile):
         for row in reader:
             all_data.append(row)
     return all_data[0], all_data[1:]
+
+# This needs to be able to handle sci notation e+..
+def floatify_input(_input, remove_str=False):
+    floatified = []
+    for i in _input:
+        if type(i) is str:
+            try:
+                x = float(i)
+                floatified.append(x)
+            except:
+                try:
+                    x = i.replace('-', '').replace(':', '').replace('.', '')
+                    floatified.append(float(x))
+                except:
+                    if remove_str == False:
+                        floatified.append(0.0)
+                    else:
+                        continue
+                    continue
+        else:
+            floatified.append(float(i))
+    return floatified
 # -----------------------------------------------------------
 
 
