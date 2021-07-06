@@ -96,16 +96,16 @@ class VAE(nn.Module):
         :param data_train: (list of lists) input sequence of shape (batch_size, seq_len, input_dim)
         :return: None
         """
-        _batch_size = len(data_train[0])
-        _input_dim = len(data_train[0][0])
-
-        transform = lambda x: torch.tensor(x).float()
-        train_dataset = TimeseriesDataset(data_train, transform)
-        train_dataloader = DataLoader(train_dataset, batch_size=_batch_size)
 
         try:
             self.load_state_dict(torch.load(os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data_driven_components/vae/runs/checkpoint_latest.pth.tar')))
         except:
+            _batch_size = len(data_train[0])
+            _input_dim = len(data_train[0][0])
+
+            transform = lambda x: torch.tensor(x).float()
+            train_dataset = TimeseriesDataset(data_train, transform)
+            train_dataloader = DataLoader(train_dataset, batch_size=_batch_size)
             train(self, {'train': train_dataloader}, phases=["train"], checkpoint=True)
 
     def update(self, frame):
