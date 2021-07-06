@@ -98,7 +98,7 @@ class VAE(nn.Module):
         """
 
         try:
-            self.load_state_dict(torch.load(os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data_driven_components/vae/runs/checkpoint_latest.pth.tar')))
+            self.load_state_dict(torch.load(os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data_driven_components/vae/models/checkpoint_latest.pth.tar')))
         except:
             _batch_size = len(data_train[0])
             _input_dim = len(data_train[0][0])
