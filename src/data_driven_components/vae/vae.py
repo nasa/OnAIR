@@ -23,7 +23,7 @@ def loadVAE(path, headers=[], window_size=10,
     :param hidden_units: (int) dimension of our hidden_units
     """
     try:
-        checkpoint_path = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data_driven_components/vae/runs/checkpoint_latest.pth.tar')
+        checkpoint_path = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data_driven_components/vae/models/checkpoint_latest.pth.tar')
         model = VAE(headers, window_size, z_units, hidden_units)
         model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
         return model
