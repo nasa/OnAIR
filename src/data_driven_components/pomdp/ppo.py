@@ -132,6 +132,7 @@ class PPO(POMDP):
         accuracy = []
         rewards = []
         for iteration in range(iterations):
+            print("####### Batch " + str(iteration + 1) + "/" + str(iterations) +" ####### \n")
             # Walk through batch, get states, actions, log probabilites, and discounted rewards
             old_observed, old_actions, old_log_probs, disc_rewards = self.walk_through_batch(train_data[(batch_size*iteration):(batch_size*(iteration+1))])
             self.train_update_step(old_observed, old_actions, old_log_probs, disc_rewards)
