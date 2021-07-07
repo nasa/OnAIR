@@ -213,4 +213,6 @@ class TelemetryTestSuite:
             return max_occurence, 1.0 # return max 
 
     def get_suite_status(self):
-        return self.calc_single_status([res.get_status() for res in self.latest_results]) 
+        status_strings = [res.get_status() for res in self.latest_results]
+        return self.calc_single_status(status_strings) 
+

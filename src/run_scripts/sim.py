@@ -15,7 +15,6 @@ import random
 
 from src.reasoning.brain import Brain
 from src.systems.spacecraft import Spacecraft
-from src.util.file_io import *
 from src.util.print_io import *
 from src.util.sim_io import *
 from src.data_handling.data_source import DataSource
@@ -74,17 +73,14 @@ class Simulator:
             diagnosis_list.append(self.brain.diagnose(time_step))
         final_diagnosis = diagnosis_list[-1]
 
-        # Renderings
         # render_diagnosis(diagnosis_list)
         # print_diagnosis(final_diagnosis) if (IO_Flag == True) else ''
         # print(final_diagnosis)
+
         return final_diagnosis
 
     def apriori_training(self):
         self.brain.learning_systems.apriori_training(self.simData.data)
-
-    def set_benchmark_data(self, filepath, files, indices):
-        self.brain.supervised_learning.set_benchmark_data(filepath, files, indices)
 
     def IO_check(self, time_step, IO_Flag):
         if IO_Flag == True:

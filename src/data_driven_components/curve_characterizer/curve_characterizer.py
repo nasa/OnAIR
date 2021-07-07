@@ -17,7 +17,6 @@ from keras.layers.convolutional import MaxPooling1D
 from keras.layers.merge import concatenate
 
 from src.data_driven_components.curve_characterizer.gen_data import * 
-from src.data_driven_components.curve_characterizer.file_io import * 
 from src.data_driven_components.curve_characterizer.util import * 
 
 #TODO Write tests 

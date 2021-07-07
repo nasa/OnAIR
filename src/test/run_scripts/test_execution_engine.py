@@ -15,7 +15,7 @@ class TestExecutionEngine(unittest.TestCase):
 
     def setUp(self):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
-        self.config_fp = self.test_path + '/../data/config/default_config.ini'
+        self.config_fp = self.test_path + '/../config/default_config.ini'
         
         self.E = ExecutionEngine('', 'test', False)
         self.save_path = os.environ['RESULTS_PATH']
@@ -89,21 +89,9 @@ class TestExecutionEngine(unittest.TestCase):
         self.assertEquals(type(self.E.processedSimData), TimeSynchronizer)
 
 
-    # def test_setup_sim(self):
-
-    #     raw_data = ({'test.txt': ['TIME', 'A', 'B', 'C']},
-    #             {'1000': {'test.txt': ['1000', '0', '0.000000000000e+00', '0.0']}, 
-    #              '1001': {'test.txt': ['1001', '1', '1.000000000000e+00', '1.0']}, 
-    #              '1002': {'test.txt': ['1002', '2', '2.000000000000e+00', '2']}, 
-    #              '1003': {'test.txt': ['1003', '3', '3.000000000000e+00', '3']}},
-    #             {'subsystem_assignments': {'test.txt': [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']]}, 
-    #              'test_assignments': {'test.txt': [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]]]}, 
-    #              'description_assignments': {'test.txt': ['No description', 'No description', 'No description', 'No description']}})
-
-    #     data = TimeSynchronizer(raw_data)
-    #     self.E.processedSimData = data
-    #     self.E.setup_sim()
-
+    def test_setup_sim(self):
+        return 
+        
     def test_run_sim(self):
         return 
 
