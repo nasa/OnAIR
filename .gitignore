@@ -13,3 +13,4 @@ src/data_driven_components/logs/
 results/tmp/
 results/saved/sensitive/
 src/test/data/Model/
+**/runs
