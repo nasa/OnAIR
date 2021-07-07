@@ -2,7 +2,7 @@
 ## NASA GSFC
 ## reward.py
 
-import pomdp_util as util
+import src.data_driven_components.pomdp.pomdp_util as util
 # action = "view_X" where X is VOLTAGE, CURRENT, etc. or "report_error" or "report_no_error"
 # data = ['Time', 'VOLTAGE', 'CURRENT', 'THRUST', 'ALTITUDE', 'ACCELERATION', 'TEMPERATURE', 'SCIENCE_COLLECTION', '[LABEL]: ERROR_STATE']
 # rewards = [rewCor, rewWro, rewAct]

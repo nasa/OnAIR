@@ -4,7 +4,7 @@
 
 import copy
 import numpy as np
-from kalman_filter import return_KF, current_attribute_chunk_get_error
+from src.data_driven_components.pomdp.kalman_filter import return_KF, current_attribute_chunk_get_error
 
 
 # Current tools we're using, semi-hardcoded to allow more tools being added and more generalization

@@ -3,10 +3,10 @@
 
 import random
 import pickle
-import observation
-import reward
+import src.data_driven_components.pomdp.observation as observation
+import src.data_driven_components.pomdp.reward as reward
 import numpy as np
-import pomdp_util as util
+import src.data_driven_components.pomdp.pomdp_util as util
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 

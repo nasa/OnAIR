@@ -3,9 +3,9 @@
 ###############
 
 #### related files ####
-import observation
-import pomdp_util
-from pomdp import POMDP
+import src.data_driven_components.pomdp.observation as observation
+import src.data_driven_components.pomdp.pomdp_util as pomdp_util
+from src.data_driven_components.pomdp.pomdp import POMDP
 ########################
 #### libraries ####
 import os

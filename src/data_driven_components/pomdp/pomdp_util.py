@@ -9,10 +9,10 @@ import copy
 ## Load All The Data
 def mass_load_data(folder, lookback, filetype=".csv"):
     data = []
-    config, dict_config = load_config(folder + "config.csv")
+    config, dict_config = load_config(os.path.join(folder, "config.csv"))
     for file in os.listdir(folder):
         if file.find(filetype) != -1 and file != "config.csv":
-            file_data = load_data(folder + file)
+            file_data = load_data(os.path.join(folder, file))
             for i in range(1+lookback, len(file_data)):
                 new_point = {}
                 for k in range(len(config[0])):
