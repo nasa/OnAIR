@@ -9,11 +9,12 @@ from pomdp import POMDP
 ########################
 #### libraries ####
 import os
-from tqdm import tqdm
+import random
 import torch
 import pickle
 import numpy as np
 import torch.nn as nn
+from tqdm import tqdm
 from torch.optim import Adam
 from torch.distributions import Categorical
 from math import exp
@@ -136,13 +137,16 @@ class PPO(POMDP):
             # Walk through batch, get states, actions, log probabilites, and discounted rewards
             old_observed, old_actions, old_log_probs, disc_rewards = self.walk_through_batch(train_data[(batch_size*iteration):(batch_size*(iteration+1))])
             self.train_update_step(old_observed, old_actions, old_log_probs, disc_rewards)
-            reward_accuracy, correct_accuracy = self.test(test_data)
-            timestep.append(iteration)
+            random.shuffle(test_data)
+            reward_accuracy, correct_accuracy = self.test(test_data[:batch_size])
+            timestep.append(iteration+1)
             accuracy.append(correct_accuracy)
             rewards.append(reward_accuracy) 
             self.plot_graph(timestep, rewards, "Batch #", "Avg. Rewards")
             self.plot_graph(timestep, accuracy, "Batch #", "Avg. Accuracy")    
-            self.save_PPO()               
+            self.save_PPO()  
+        reward_accuracy, correct_accuracy = self.test(test_data)
+        print("####### Accuracy " + str(correct_accuracy) +" ####### \n")          
 
     def train_update_step(self, old_observed, old_actions, old_log_probs, disc_rewards):
         old_observed = torch.tensor(old_observed, dtype=torch.float)
@@ -172,6 +176,7 @@ class PPO(POMDP):
             run_time = 0 #Variable to keep track of how many decisions it's making
             run_through_rewards = []
             obs = self.states[self.get_starting_state()]
+            self.current_state_index = self.get_starting_state()
             obs = observation.floatify_state(obs)
             obs = self.state_flatten_preprocess(obs)
             while(not done):
@@ -209,6 +214,7 @@ class PPO(POMDP):
         states = []
         #Get first state
         obs = self.states[self.get_starting_state()]
+        self.current_state_index = self.get_starting_state()
         states.append(obs)
         obs = observation.floatify_state(obs)
         obs = self.state_flatten_preprocess(obs)
