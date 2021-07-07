@@ -39,9 +39,13 @@ class Simulator:
 
 
     #####################################################
-    def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
+    def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True, run_model_flag=True):
+        """
+        :param Run_Model_Flag: (bool) whether to run models, false for testing purposes
+        """
 
-        self.apriori_training()
+        if run_model_flag:
+            self.apriori_training()
 
         print_sim_header() if (IO_Flag == True) else ''
         print_msg('Please wait...\n') if (IO_Flag == 'strict') else ''
