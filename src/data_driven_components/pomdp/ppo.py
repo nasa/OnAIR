@@ -136,7 +136,7 @@ class PPO(POMDP):
             # Walk through batch, get states, actions, log probabilites, and discounted rewards
             old_observed, old_actions, old_log_probs, disc_rewards = self.walk_through_batch(train_data[(batch_size*iteration):(batch_size*(iteration+1))])
             self.train_update_step(old_observed, old_actions, old_log_probs, disc_rewards)
-            reward_accuracy, correct_accuracy = self.test(test_data[(batch_size*iteration):(batch_size*(iteration+1))])
+            reward_accuracy, correct_accuracy = self.test(test_data)
             timestep.append(iteration)
             accuracy.append(correct_accuracy)
             rewards.append(reward_accuracy) 
