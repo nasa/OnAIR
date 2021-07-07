@@ -3,10 +3,13 @@
 ###############
 
 #### related files ####
-import pomdp
 import observation
+import pomdp_util
+from pomdp import POMDP
 ########################
 #### libraries ####
+import os
+from tqdm import tqdm
 import torch
 import pickle
 import numpy as np
@@ -17,8 +20,8 @@ from math import exp
 ########################
 
 class PPO(POMDP):
-    def __init__(self, state_dimensions, action_dimensions, epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
-        super().__init__()
+    def __init__(self, name, path, state_dimensions, action_dimensions, config_path="", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
+        super().__init__(name, path, config_path)
         self.epsilon = epsilon
         self.discount = discount
         self.epochs = epochs
@@ -60,7 +63,6 @@ class PPO(POMDP):
         self.actor.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_actor_policy_state_dict.pt"))
         self.critic.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_critic_policy_state_dict.pt"))    
     ###---### ###---### ###---###  ###---###
-    
     
     """Gets state values and the action probabilities"""                 
     def evaluate(self, state, action):
@@ -122,3 +124,129 @@ class PPO(POMDP):
         loss = -torch.min(value1, value2) + 0.5*self.MseLoss(state_values, rewards) - 0.01*dist_entropy
         return loss
 
+    ###---### Training ###---###
+
+    def train_ppo(self, train_data, test_data, batch_size):
+        iterations = int(len(train_data)/batch_size)
+        timestep = []
+        accuracy = []
+        rewards = []
+        for iteration in range(iterations):
+            # Walk through batch, get states, actions, log probabilites, and discounted rewards
+            old_observed, old_actions, old_log_probs, disc_rewards = self.walk_through_batch(train_data[(batch_size*iteration):(batch_size*(iteration+1))])
+            self.train_update_step(old_observed, old_actions, old_log_probs, disc_rewards)
+            reward_accuracy, correct_accuracy = self.test(test_data[(batch_size*iteration):(batch_size*(iteration+1))])
+            timestep.append(k)
+            accuracy.append(correct_accuracy)
+            rewards.append(reward_accuracy) 
+            self.plot_graph(timestep, rewards, "Batch #", "Avg. Rewards")
+            self.plot_graph(timestep, accuracy, "Batch #", "Avg. Accuracy")    
+            self.save()               
+
+    def train_update_step(self, old_observed, old_actions, old_log_probs, disc_rewards):
+        old_observed = torch.tensor(old_observed, dtype=torch.float)
+        old_actions = torch.tensor(old_actions, dtype=torch.float)
+        old_log_probs = torch.tensor(old_log_probs, dtype=torch.float)
+        disc_rewards = torch.tensor(disc_rewards, dtype=torch.float)
+        #Normalize rewards
+        disc_rewards = (disc_rewards - disc_rewards.mean()) / (disc_rewards.std() + 1e-7)
+        for k in range(self.epochs):
+            state_values, curr_log_probs, dist_entropy = self.evaluate(old_observed, old_actions)
+            A_k = disc_rewards - state_values.detach() # The advantage at this current step (what kind of reward does a state value associate with)
+            ratios = torch.exp(curr_log_probs - old_log_probs) # Get ratio r(theta), we can simply subtract because we're taking probabilities in log form
+            loss = self.get_loss(ratios, A_k, state_values, disc_rewards, dist_entropy) # Get loss
+            #Gradient
+            self.optimizer.zero_grad()
+            loss.mean().backward()
+            self.optimizer.step()
+
+    def walk_through_batch(self, data):
+        total_states = []
+        total_actions = []
+        total_rewards = []
+        total_prob = []
+
+        for data_point in tqdm(range(len(data))):
+            done = False
+            run_time = 0 #Variable to keep track of how many decisions it's making
+            run_through_rewards = []
+            obs = self.states[self.get_starting_state()]
+            obs = observation.floatify_state(obs)
+            obs = self.state_flatten_preprocess(obs)
+            while(not done):
+                run_time += 1
+                total_states.append(obs) #Add current state to total states
+                action, log_prob = self.action(obs) #Get the action and its probability distribution
+                reward, done = self.take_action(action, data[data_point])
+                obs = self.states[self.current_state_index]
+                obs = observation.floatify_state(obs)
+                obs = state_flatten_preprocess(obs)
+                total_actions.append(action)                
+                total_prob.append(log_prob)
+                if run_time >= self.run_limit:
+                    done = True
+                    run_through_rewards.append(-600)
+                else:
+                    run_through_rewards.append(reward)
+                total_rewards.append(run_through_rewards)    
+        total_rewards = self.discounted_rewards(total_rewards)
+        return total_states, total_actions, total_prob, total_rewards                   
+    
+    ###---### ###---### ###---###  ###---###
+
+
+    ###---### Testing ###---###
+
+    def test_instance(self, data_point, obs):
+        total_reward = 0
+        run_time = 0
+        done = False
+        correct = False
+        while(not done):
+            run_time += 1
+            action, log_prob = self.action(obs)
+            reward, done = self.take_action(action, data_point, False)
+            total_reward += reward
+            obs = self.states[self.current_state_index]
+            obs = observation.floatify_state(obs)
+            obs = self.state_flatten_preprocess(obs)
+            if run_time >= self.run_limit:
+                done = True
+                total_reward += -600
+                correct = False
+        if reward == 100:
+            correct = True
+        else:
+            correct = False
+        return total_reward, correct
+
+    def test(self, data):
+        correct_sum = 0
+        reward_sum = 0
+        for data_point_index in tqdm(range(len(data))):
+            obs = self.states[self.get_starting_state()]
+            obs = observation.floatify_state(obs)
+            obs = self.state_flatten_preprocess(obs)
+            reward, correct = self.test_instance(data[data_point_index], obs)
+            reward_sum += reward
+            if correct:
+                correct_sum += 1
+        return reward_sum/len(data), correct_sum/len(data)
+    
+    ###---### ###---### ###---###  ###---###
+
+
+    ###---### Helper Functions ###---###
+
+    def state_flatten_preprocess(self, state):
+        state = np.array(state)
+        states = state.flatten()
+        return states
+
+    ###---### ###---### ###---###  ###---###
+
+if __name__ == "__main__":
+    dict_config, data = pomdp_util.mass_load_data('RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\', lookback=15)
+    training_data = pomdp_util.stratified_sampling(dict_config, data)
+    agent = PPO('ppo_train', "RAISR-2.0\\src\\data_driven_components\\pomdp\\models\\", 7, 9,config_path='RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\config.csv')
+    agent.train_ppo(training_data, training_data, 1090)

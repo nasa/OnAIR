@@ -305,8 +305,8 @@ class POMDP:
                 self.correct = True
             else:
                 self.correct = False
-            return True
-        return False
+            return my_reward, True
+        return my_reward, False
 
     def set_print_on(self, new_print_on):
         self.print_on = new_print_on
