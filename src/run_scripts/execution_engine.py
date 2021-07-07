@@ -13,7 +13,6 @@ from time import gmtime, strftime
 
 from src.data_handling.time_synchronizer import TimeSynchronizer
 from src.run_scripts.sim import Simulator
-from src.util.file_io import * 
 
 class ExecutionEngine:
     def __init__(self, config_file='', run_name='', save_flag=False):
@@ -54,9 +53,7 @@ class ExecutionEngine:
 
     def parse_configs(self, config_file_path):
         # print("Using config file: {}".format(config_file_path))
-        if not os.path.isabs(config_file_path):
-            config_file_path = os.path.join(os.environ['SRC_ROOT_PATH'], config_file_path)
-            
+
         config = configparser.ConfigParser()
         config.read(config_file_path)
         ## Sort Data: Telementry Data & Configuration
@@ -98,8 +95,6 @@ class ExecutionEngine:
             self.sim.set_benchmark_data(fp, fls, bi)
         except:
             pass
-        # except:
-        #     print("Unable to set benchmark matrices")
 
     def run_sim(self):
         self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag)

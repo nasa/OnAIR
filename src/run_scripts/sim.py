@@ -15,7 +15,6 @@ import random
 
 from src.reasoning.brain import Brain
 from src.systems.spacecraft import Spacecraft
-from src.util.file_io import *
 from src.util.print_io import *
 from src.util.sim_io import *
 from src.data_handling.data_source import DataSource
@@ -38,18 +37,11 @@ class Simulator:
             self.simData = DataSource(parsedData.get_sim_data())
         self.brain = Brain(spaceCraft)
 
-    #####################################################
-    # MAKE FUNCTIONALITY FOR A PRORI TRAINING
-    #
-    # def generate_supervised_learning_data(self):
-    #     historicalData = copy.deepcopy(self.simData)
-    #     self.brain.set_past_history(historicalData)
-    #
-    # def train_supervised_learning(self):
-    #     self.brain.supervised_learning.train_all()
-    #####################################################
 
+    #####################################################
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
+
+        self.apriori_training()
 
         print_sim_header() if (IO_Flag == True) else ''
         print_msg('Please wait...\n') if (IO_Flag == 'strict') else ''
@@ -60,8 +52,8 @@ class Simulator:
 
         while self.simData.has_more() and time_step < 2050:
 
-            next = self.simData.get_next()
-            self.brain.reason(next)
+            _next = self.simData.get_next()
+            self.brain.reason(_next)
             self.IO_check(time_step, IO_Flag)
             
             ### Stop when a fault is reached  
@@ -81,15 +73,14 @@ class Simulator:
             diagnosis_list.append(self.brain.diagnose(time_step))
         final_diagnosis = diagnosis_list[-1]
 
-        # Renderings
         # render_diagnosis(diagnosis_list)
         # print_diagnosis(final_diagnosis) if (IO_Flag == True) else ''
+        # print(final_diagnosis)
 
         return final_diagnosis
 
-
-    def set_benchmark_data(self, filepath, files, indices):
-        self.brain.supervised_learning.set_benchmark_data(filepath, files, indices)
+    def apriori_training(self):
+        self.brain.learning_systems.apriori_training(self.simData.data)
 
     def IO_check(self, time_step, IO_Flag):
         if IO_Flag == True:

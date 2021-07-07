@@ -8,19 +8,53 @@ class TestTimeSynchronizer(unittest.TestCase):
 
     def setUp(self):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
-        self.TS = TimeSynchronizer()
+        headers = {'test_sample_01' : ['TIME', 'hdr_A', 'hdr_B'],
+                   'test_sample_02' : ['TIME', 'hdr_C']}      
+        dataFrames = {'1234' : {'test_sample_01' : ['1234','202','0.3'],
+                                'test_sample_02' : ['1234','0.3']},
+                      '2235' : {'test_sample_02' : ['2235','202']},
+                      '1035' : {'test_sample_01' : ['1035','202','0.3'],
+                                'test_sample_02' : ['1035','0.3']},
+                      '1305' : {'test_sample_01' : ['1005','202','0.3']},
+                      '1350' : {'test_sample_01' : ['1350','202','0.3'],
+                                'test_sample_02' : ['1350','0.3']}}
+        test_configs = {'test_assignments': {'test_sample_01': [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]],
+                                             'test_sample_02': [[['SYNC', 'TIME']], [['NOOP']]]}, 
+                        'description_assignments': {'test_sample_01': ['Time', 'No description', 'No description']}}
+ 
+        self.TS = TimeSynchronizer(headers,dataFrames,test_configs)
 
-    def test_init_empty_sync_data(self):
-        self.assertEquals(self.TS.ordered_sources, [])
-        self.assertEquals(self.TS.ordered_fused_headers, [])
-        self.assertEquals(self.TS.ordered_fused_tests, [])
-        self.assertEquals(self.TS.indices_to_remove, [])
-        self.assertEquals(self.TS.offsets, {})
-        self.assertEquals(self.TS.sim_data, [])
+    def test_init(self):
+        headers = {'test_sample_01' : ['TIME', 'hdr_A', 'hdr_B'],
+                   'test_sample_02' : ['TIME', 'hdr_C']}      
+        dataFrames = {'1234' : {'test_sample_01' : ['1234','202','0.3'],
+                                'test_sample_02' : ['1234','0.3']},
+                      '2235' : {'test_sample_02' : ['2235','202']},
+                      '1035' : {'test_sample_01' : ['1035','202','0.3'],
+                                'test_sample_02' : ['1035','0.3']},
+                      '1305' : {'test_sample_01' : ['1005','202','0.3']},
+                      '1350' : {'test_sample_01' : ['1350','202','0.3'],
+                                'test_sample_02' : ['1350','0.3']}}
+        test_configs = {'test_assignments': {'test_sample_01': [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]],
+                                             'test_sample_02': [[['SYNC', 'TIME']], [['NOOP']]]}, 
+                        'description_assignments': {'test_sample_01': ['Time', 'No description', 'No description']}}
+ 
+        TS = TimeSynchronizer(headers,dataFrames,test_configs)
+
+        self.assertEquals(self.TS.ordered_fused_tests, [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']], [['NOOP']]])
+        self.assertEquals(self.TS.ordered_sources, ['test_sample_01', 'test_sample_02'])
+        self.assertEquals(self.TS.ordered_fused_headers, ['TIME', 'hdr_A', 'hdr_B', 'hdr_C'])
+        self.assertEquals(self.TS.indices_to_remove, [0,3])
+        self.assertEquals(self.TS.offsets, {'test_sample_01': 0, 'test_sample_02': 3})
+        self.assertEquals(TS.sim_data, [['1035', '202', '0.3', '0.3'], 
+                                        ['1234', '202', '0.3', '0.3'], 
+                                        ['1305', '202', '0.3', '-'], 
+                                        ['1350', '202', '0.3', '0.3'], 
+                                        ['2235', '-', '-', '202']])
 
     def test_init_sync_data(self):
-        hdrs = {'test_sample_01' : ['TIME', 'hdr_A', 'hdr_B'],
-                'test_sample_02' : ['TIME', 'hdr_C']}        
+        hdrs = {'test_sample_01' : ['TIME', 'hdr_1', 'hdr_2'],
+                'test_sample_02' : ['TIME', 'hdr_3']}        
         
         # Even if you give configs with ss assignments, they should not be here at the binner stage 
         configs = {'test_assignments': {'test_sample_01': [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]],
@@ -31,10 +65,9 @@ class TestTimeSynchronizer(unittest.TestCase):
 
         self.assertEquals(self.TS.ordered_fused_tests, [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']], [['NOOP']]])
         self.assertEquals(self.TS.ordered_sources, ['test_sample_01', 'test_sample_02'])
-        self.assertEquals(self.TS.ordered_fused_headers, ['TIME', 'hdr_A', 'hdr_B', 'hdr_C'])
+        self.assertEquals(self.TS.ordered_fused_headers, ['TIME', 'hdr_1', 'hdr_2', 'hdr_3'])
         self.assertEquals(self.TS.indices_to_remove, [0,3])
         self.assertEquals(self.TS.offsets, {'test_sample_01': 0, 'test_sample_02': 3})
-        self.assertEquals(self.TS.sim_data, [])
 
     def test_sort_data(self):
 

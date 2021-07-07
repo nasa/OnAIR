@@ -11,13 +11,12 @@ import argparse
 import pathlib
 from datetime import datetime
 from test_all import *
-import src.util.cleanup as cleanup
+from src.util.cleanup import *
 
 from src.run_scripts.execution_engine import ExecutionEngine
+from src.run_scripts.generalizability_engine import GeneralizabilityEngine
 
 def main():
-    cleanup.clean(True) # Perform PreRun Cleanup
-
     """
     This is the standard naming format, for now.
     filename.txt and filename_CONFIG.txt
@@ -33,39 +32,51 @@ def main():
     arg_parser.add_argument('--save_name', '--name', '-n', help='Name of saved log files')
     arg_parser.add_argument('--mute', '-m', action='store_true', help='Mute all non-error output')
     arg_parser.add_argument('--test', '-t', action='store_true', help='Run tests')
+    arg_parser.add_argument('--generalizability', '-gen', '-g', help='Run generalizabilty test on specific component', choices=['Associativity', 'POMDP', 'VAE', 'CurveCharacterizer'])
     args = arg_parser.parse_args()
-
-    init_global_paths(args.test)
-
-    if args.test:
-        cleanup.clean(True, path='src/test/') # Perform PreRun Cleanup
-        suite = create_suite()
-        run_tests(suite)
-        cleanup.clean(False) # Perform PostRun Cleanup
-        return
-
-    save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
 
     if args.mute:
         blockPrint()
 
-    RAISR = ExecutionEngine(args.configfile, save_name, args.save)
-    RAISR.run_sim()
+    init_global_paths(args.test)
+    setup_folders(os.environ['RESULTS_PATH'])
 
-    cleanup.clean(False) # Perform PostRun Cleanup
+    if args.test:
+        run_unit_tests()
+    elif args.generalizability:
+        run_generalizability_tests(args.generalizability)
+    else:
+        save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
+        RAISR = ExecutionEngine(args.configfile, save_name, args.save)
+        RAISR.run_sim()
 
+    clean_all(os.environ['SRC_ROOT_PATH']) 
+
+""" Runs generalizability tests on specific component """
+def run_generalizability_tests(component):
+    assert(component in ['Associativity', 'POMDP', 'VAE', 'CurveCharacterizer'])
+    gen = GeneralizabilityEngine(os.environ['RUN_PATH'], component)
+    gen.run_integration_test()
+
+""" Runs all unit tests """
+def run_unit_tests():
+    suite = create_suite()
+    run_tests(suite)
+
+""" Initializes global paths, used throughout execution """
 def init_global_paths(test=False):
     run_path = 'src/test' if test == True else 'src/'
     results_path = 'src/test/results' if test == True else 'results/'
+
     os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
     os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), results_path)
     os.environ['SRC_ROOT_PATH'] = os.path.dirname(os.path.realpath(__file__))
 
-# Disable
+""" Disable terminal output """
 def blockPrint():
     sys.stdout = open(os.devnull, 'w')
 
-# Restore
+""" Restore terminal output """
 def enablePrint():
     sys.stdout = sys.__stdout__
 

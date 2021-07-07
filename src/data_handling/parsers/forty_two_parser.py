@@ -8,7 +8,6 @@ import os
 import re
 import time
 
-from src.util.file_io import *
 from src.util.print_io import *
 from src.data_handling.parsers.parser_util import * 
 
