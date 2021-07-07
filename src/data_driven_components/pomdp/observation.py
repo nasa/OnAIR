@@ -13,11 +13,12 @@ OBSERVATION_TOOLS = {"THRESH" : 0, "KAL" : 1}
 
 # -=-=-=- State Related Functions -=-=-=- #
 # This not only gives the starting state, but also the general state configuration for the whole POMDP
-def get_starting_state(telemetry_headers):
+def get_starting_state(config):
     state = []
-    for h in telemetry_headers: # For each property ['VOLTAGE', 'CURRENT', 'THRUST', 'ALTITUDE', 'ACCELERATION', 'TEMPERATURE', 'SCIENCE_COLLECTION']...
-        observation_state_list = ["?"] * len(OBSERVATION_TOOLS)
-        state.append(observation_state_list) # ...the state remembers: [broke threshold, or didn't, or unknown; kalman filter approves, or finds suspicious, or unknown]
+    for h in config: # For each property ['VOLTAGE', 'CURRENT', 'THRUST', 'ALTITUDE', 'ACCELERATION', 'TEMPERATURE', 'SCIENCE_COLLECTION']...
+        if(config[h][0] == 'data'):
+            observation_state_list = ["?"] * len(OBSERVATION_TOOLS)
+            state.append(observation_state_list) # ...the state remembers: [broke threshold, or didn't, or unknown; kalman filter approves, or finds suspicious, or unknown]
     return state
 
 def floatify_state(state):

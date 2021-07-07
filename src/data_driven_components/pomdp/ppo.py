@@ -20,24 +20,24 @@ from math import exp
 ########################
 
 class PPO(POMDP):
-    def __init__(self, name, path, state_dimensions, action_dimensions, config_path="", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
+    def __init__(self, name, path, config_path="", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
         super().__init__(name, path, config_path)
         self.epsilon = epsilon
         self.discount = discount
         self.epochs = epochs
-        self.state_dim = state_dimensions
-        self.act_dim = action_dimensions
+        self.state_dim = len(observation.floatify_state(self.states[self.get_starting_state()]))
+        self.act_dim = len(self.actions)
         # The Actor : ouputs probabilities of actions from one state
         self.actor = nn.Sequential(
-                            nn.Linear(state_dimensions, 64),
+                            nn.Linear(self.state_dim, 64),
                             nn.ReLU(),
                             nn.Linear(64, 64),
                             nn.ReLU(),
-                            nn.Linear(64, action_dimensions),
+                            nn.Linear(64, self.act_dim),
                             nn.Softmax(dim=-1))
         # The Critic : determines state value (V) from input state
         self.critic = nn.Sequential(
-                        nn.Linear(state_dimensions, 64),
+                        nn.Linear(self.state_dim, 64),
                         nn.ReLU(),
                         nn.Linear(64, 64),
                         nn.ReLU(),
@@ -53,12 +53,12 @@ class PPO(POMDP):
         self.MseLoss = nn.MSELoss()
     
     ###---### Save and Load PPO model ###---###
-    def save(self):
-        pickle.dump([self.states, self.quality_values, self.actions, self.alpha, self.discount, self.epsilon, self.telemetry_headers, self.reportable_states, self.run_limit, self.rewards],open(self.path + "pomdp_model_" + str(self.name) + ".pkl","wb"))
+    def save_PPO(self):
+        pickle.dump(self.get_save_data(),open(self.path + "pomdp_model_" + str(self.name) + ".pkl","wb"))
         torch.save(self.actor.state_dict(), self.path + "pomdp_model_" + str(self.name) + "_actor_policy_state_dict.pt")
         torch.save(self.critic.state_dict(), self.path + "pomdp_model_" + str(self.name) + "_critic_policy_state_dict.pt")
    
-    def load(self, path = ""):
+    def load_PPO(self, path = ""):
         self.load_model()
         self.actor.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_actor_policy_state_dict.pt"))
         self.critic.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_critic_policy_state_dict.pt"))    
@@ -142,7 +142,7 @@ class PPO(POMDP):
             rewards.append(reward_accuracy) 
             self.plot_graph(timestep, rewards, "Batch #", "Avg. Rewards")
             self.plot_graph(timestep, accuracy, "Batch #", "Avg. Accuracy")    
-            self.save()               
+            self.save_PPO()               
 
     def train_update_step(self, old_observed, old_actions, old_log_probs, disc_rewards):
         old_observed = torch.tensor(old_observed, dtype=torch.float)
@@ -186,10 +186,10 @@ class PPO(POMDP):
                 total_prob.append(log_prob)
                 if run_time >= self.run_limit:
                     done = True
-                    run_through_rewards.append(-600)
+                    run_through_rewards.append(self.rewards[1]-1) #reward incorrect is rewards[1]
                 else:
                     run_through_rewards.append(reward)
-                total_rewards.append(run_through_rewards)    
+            total_rewards.append(run_through_rewards)    
         total_rewards = self.discounted_rewards(total_rewards)
         return total_states, total_actions, total_prob, total_rewards                   
     
@@ -248,6 +248,8 @@ class PPO(POMDP):
 
 if __name__ == "__main__":
     dict_config, data = pomdp_util.mass_load_data('RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\', lookback=15)
-    training_data = pomdp_util.stratified_sampling(dict_config, data)
-    agent = PPO('ppo_train', "RAISR-2.0\\src\\data_driven_components\\pomdp\\models\\", 54, 9,config_path='RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\config.csv')
-    agent.train_ppo(training_data, training_data, 1090)
+    data = pomdp_util.stratified_sampling(dict_config, data)
+    training_data = data[:int(len(data)*(0.7))]
+    testing_data = data[int(len(data)*(0.7)):]
+    agent = PPO('ppo_train', "RAISR-2.0\\src\\data_driven_components\\pomdp\\models\\", config_path='RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\config.csv')
+    agent.train_ppo(training_data, testing_data, 1090)
