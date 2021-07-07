@@ -198,42 +198,56 @@ class PPO(POMDP):
 
     ###---### Testing ###---###
 
-    def test_instance(self, data_point, obs):
+    def test_instance(self, data_point):
+        #Initializing running variables
         total_reward = 0
         run_time = 0
         done = False
         correct = False
+        #Initialize diagnosis information
+        actions = [] 
+        states = []
+        #Get first state
+        obs = self.states[self.get_starting_state()]
+        states.append(obs)
+        obs = observation.floatify_state(obs)
+        obs = self.state_flatten_preprocess(obs)
         while(not done):
-            run_time += 1
+            run_time += 1            
             action, log_prob = self.action(obs)
+            actions.append(self.actions[action])
             reward, done = self.take_action(action, data_point, False)
             total_reward += reward
             obs = self.states[self.current_state_index]
+            states.append(obs)
             obs = observation.floatify_state(obs)
             obs = self.state_flatten_preprocess(obs)
             if run_time >= self.run_limit:
                 done = True
-                total_reward += -600
+                total_reward += (self.rewards[1]-100)
                 correct = False
-        if reward == 100:
+        if reward == self.rewards[0]:
             correct = True
         else:
             correct = False
-        return total_reward, correct
+        return total_reward, correct, actions, states
 
     def test(self, data):
         correct_sum = 0
         reward_sum = 0
         for data_point_index in tqdm(range(len(data))):
-            obs = self.states[self.get_starting_state()]
-            obs = observation.floatify_state(obs)
-            obs = self.state_flatten_preprocess(obs)
-            reward, correct = self.test_instance(data[data_point_index], obs)
+            reward, correct, _, _ = self.test_instance(data[data_point_index])
             reward_sum += reward
             if correct:
                 correct_sum += 1
         return reward_sum/len(data), correct_sum/len(data)
     
+    def diagnose_frames(self, time_chunk):
+        # Time_chunk should be in the form 
+        # { Attribute : [List of data points for attribute of size lookback]}
+        reward, correct, actions, states = test_instance(time_chunk)
+        return reward, correct, actions, states
+
     ###---### ###---### ###---###  ###---###
 
 
