@@ -29,7 +29,7 @@ class VAEModel(DataLearner):
         # TODO: double check sizes
         """
         try:
-            self.load_state_dict(torch.load(os.path.join(os.environ['SRC_ROOT_PATH'], self.path)))
+            self.model.load_state_dict(torch.load(os.path.join(os.environ['SRC_ROOT_PATH'], self.path)))
         except:
             _batch_size = len(data_train[0])
             _input_dim = len(data_train[0][0])
