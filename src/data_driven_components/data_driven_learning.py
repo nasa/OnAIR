@@ -5,7 +5,6 @@ Data driven learning class for managing all data driven AI components
 import copy
 import os
 import numpy as np
-from abc import ABC, abstractmethod
 
 from src.util.print_io import *
 from src.util.data_reformatting import *
@@ -62,30 +61,3 @@ class DataDrivenLearning:
         one_hot = [0.0, 0.0, 0.0, 0.0]
         one_hot[self.classes[status]] = 1.0
         return list(one_hot)
-
-class DataLearner(ABC):
-    @abstractmethod
-    def __init__(self):
-        """
-        Abstract superclass for data driven components: VAE, PPO, etc. Allows for easier modularity.
-        """
-        pass
-
-    @abstractmethod
-    def apriori_training(self):
-        """
-        Given data, system should learn any priors necessary for realtime diagnosis.
-        """
-        pass
-    @abstractmethod
-    def update(self):
-        """
-        Given streamed data point, system should update internally
-        """
-        pass
-    @abstractmethod
-    def render_diagnosis(self):
-        """
-        System should return its diagnosis
-        """
-        pass
