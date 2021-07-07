@@ -74,7 +74,7 @@ class ExecutionEngine:
         self.sim_name = config['DEFAULT']['SimName']
 
         ## Sort Data: Testing
-        self.Run_Model_Flag = config.getboolean('TESTING', 'RunModels', fallback=False)
+        self.Run_Model_Flag = config.getboolean('TESTING', 'RunModels', fallback=True)
 
         ## Sort Data: Flags
         self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
