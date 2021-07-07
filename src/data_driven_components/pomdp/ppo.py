@@ -180,7 +180,7 @@ class PPO(POMDP):
                 reward, done = self.take_action(action, data[data_point])
                 obs = self.states[self.current_state_index]
                 obs = observation.floatify_state(obs)
-                obs = state_flatten_preprocess(obs)
+                obs = self.state_flatten_preprocess(obs)
                 total_actions.append(action)                
                 total_prob.append(log_prob)
                 if run_time >= self.run_limit:
@@ -248,5 +248,5 @@ class PPO(POMDP):
 if __name__ == "__main__":
     dict_config, data = pomdp_util.mass_load_data('RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\', lookback=15)
     training_data = pomdp_util.stratified_sampling(dict_config, data)
-    agent = PPO('ppo_train', "RAISR-2.0\\src\\data_driven_components\\pomdp\\models\\", 7, 9,config_path='RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\config.csv')
+    agent = PPO('ppo_train', "RAISR-2.0\\src\\data_driven_components\\pomdp\\models\\", 54, 9,config_path='RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\config.csv')
     agent.train_ppo(training_data, training_data, 1090)
