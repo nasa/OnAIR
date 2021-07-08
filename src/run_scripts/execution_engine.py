@@ -59,7 +59,6 @@ class ExecutionEngine:
 
         ## Sort Data: Telementry Data & Configuration
         self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
-        print(self.dataFilePath)
         self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
         self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for spacecraft telemetry
         self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Spacecraft telemetry data
