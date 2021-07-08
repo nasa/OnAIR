@@ -11,7 +11,7 @@ class PPOModel(DataLearner):
         :param window_size: (int) length of time agent examines
         :param config_path: (optional String) path to PPO config
         """
-        self.frames = []
+        self.frames = {}
         self.window_size = window_size
 
         self.agent = PPO(config_path=config_path)
@@ -35,10 +35,16 @@ class PPOModel(DataLearner):
         #A stub for once config is integrated with initialization 
 
         #Use self.agent.config to find the headers in the pomdp
-        #single_frame = {}
         #for h in range(len(self.agent.headers)):
-        #   single_frame[self.agent.headers[h]] = frame[self.agent.config[self.agent.headers[h]][3]]
-        #self.frames.append(single_frame)
+        #   if self.agent.headers[h] in self.frames:
+        #       self.frames[self.agent.headers[h]].append(frame[self.agent.config[self.agent.headers[h]][3]])
+        #       if(len(self.frames[self.agent.headers[h]])>self.window_size):
+        #           self.frames[self.agent.headers[h]].pop(0)
+        #   else:
+        #       self.frames[self.agent.headers[h]] = []
+        #       self.frames[self.agent.headers[h]].append(frame[self.agent.config[self.agent.headers[h]][3]])
+        #       if(len(self.frames[self.agent.headers[h]])>self.window_size):
+        #           self.frames[self.agent.headers[h]].pop(0)
         
         self.frames.append(frame)
         if(len(self.frames)>self.window_size):
@@ -48,4 +54,7 @@ class PPOModel(DataLearner):
         """
         System should return its diagnosis
         """
+
+        #A stub for once config is integrated
+        #reward, correct, actions, states = self.agent.diagnose_frames(self.frames)
         pass
