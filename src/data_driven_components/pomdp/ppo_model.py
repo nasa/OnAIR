@@ -13,16 +13,12 @@ class PPOModel(DataLearner):
         """
         self.frames = []
         self.window_size = window_size
+        
         config_path = os.path.join(os.environ['SRC_ROOT_PATH'], config_path)
 
         self.agent = PPO(config_path=config_path)
 
     def apriori_training(self, data, use_stratified=True):
-        """
-        Given data, system should learn any priors necessary for realtime diagnosis.
-        :param data_train: (Tensor) shape (batch_size, seq_size, feat_size)
-        # TODO: double check sizes
-        """
         #data_path = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data/raw_telemetry_data/data_physics_generation/Errors')
         #dict_config, data = mass_load_data(data_path, self.window_size)
         split_data = split_by_lookback(data, self.window_size)
