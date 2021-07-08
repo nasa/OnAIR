@@ -1,6 +1,6 @@
 ## Nick Pellegrino
 ## pomdp.py
-
+import os
 import random
 import pickle
 import src.data_driven_components.pomdp.observation as observation
@@ -25,9 +25,12 @@ class POMDP:
         # = 0, agent will only learn about actions that yield an immediate my_reward
     # Epsilon = exploratory rate, generally set between 0 and 1
         # 0.1 = 10% chance to take a random action during training
-    def __init__(self, name, path, config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
+    def __init__(self, name="pomdp", path="models/", config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
         self.name = name
-        self.path = path
+        base_path = ""
+        if (os.path.dirname(__file__) != ""):
+            base_path = os.path.dirname(__file__) + "/"
+        self.path = base_path + path
         self.print_on = print_on
         self.save_me = save_me
         self.answer = 0
