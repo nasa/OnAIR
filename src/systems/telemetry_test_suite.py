@@ -60,7 +60,7 @@ class TelemetryTestSuite:
     ################   Test Suites  ################ 
 
     def sync(self, val, test_params, epsilon):
-        return 'GREEN', [{'GREEN',1.0}]
+        return 'GREEN', [({'GREEN'}, 1.0)]
         mass_assignments = [] # list of tuples
         if len(test_params) == 0:
             stat = 'RED'
@@ -111,6 +111,7 @@ class TelemetryTestSuite:
         # between [1] - [2] is green 
         # between [2] - [3] is yellow
         # after [3] is green
+
         # if len(test_params == 2) then the thresholds are as follows:
         # before [0] is red
         # between [0] - [1] is green
@@ -120,10 +121,6 @@ class TelemetryTestSuite:
 
         stat = '---'
         mass_assignments = []
-        stats = {}
-        stats["left_stat"] = ''
-        stats["stat"] = ''
-        stats["right_stat"] = ''
 
         val = float(val)
 
@@ -140,63 +137,47 @@ class TelemetryTestSuite:
         if val <= lowest_bound:
             stat = statuses[0]
             right_stat = statuses[1]
-            
-            stats["left_stat"] = 'RED' # We want to ignore left, because left of red is just more red
-            stats["stat"] = stat # We know the stat is red
-            stats["right_stat"] = '' # Focus on what is the right if within a certain confidence of lower boundary
 
             l_range = lowest_bound - delta 
 
             if val == lowest_bound:
                 stats["right_stat"] = right_stat
-                mass_assignments.append((stats, 1.0))
+                mass_assignments.append(({stat}, 1.0))
             else:
                 if val < l_range:
-                    mass_assignments.append((stats, 1.0))
+                    mass_assignments.append(({stat}, 1.0))
                 else:
                     mass = abs(lowest_bound - val)/delta
-                    mass_assignments.append((stats, mass))
+                    mass_assignments.append(({stat}, mass))
 
                     red_yellow_mass = 1.0 - mass
-                    red_yellow_stats = stats.copy()                    
-                    red_yellow_stats["right_stat"] = right_stat
-                    mass_assignments.append((red_yellow_stats, red_yellow_mass))
+                    mass_assignments.append(({stat, right_stat}, red_yellow_mass))
         # Upper boundary values     stat : red  stat_left: green/yellow      
         elif val >= highest_bound:
             stat = statuses[len(statuses)-1]
             left_stat = statuses[len(statuses)-2]
 
-            stats["left_stat"] = '' # Focus on what is the left if within a certain confidence of upper boundary
-            stats["stat"] = stat # We know the stat is red
-            stats["right_stat"] = 'RED' # We want to ignore right, because right of red is just more red
-
             u_range = highest_bound + delta 
 
             if val == highest_bound:
-                stats["left_stat"] = left_stat
-                mass_assignments.append((stats, 1.0))
+                mass_assignments.append(({left_stat, stat}, 1.0))
             else:
                 if val > u_range:
-                    mass_assignments.append((stats, 1.0))
+                    mass_assignments.append(({stat}, 1.0))
                 else:
                     mass = abs(highest_bound - val)/delta
-                    mass_assignments.append((stats, mass))
+                    mass_assignments.append(({stat}, mass))
 
                     red_yellow_mass = 1.0 - mass
-                    red_yellow_stats = stats.copy()
-                    red_yellow_stats["left_stat"] = left_stat
-                    mass_assignments.append((red_yellow_stats, red_yellow_mass))
-
+                    mass_assignments.append(({left_stat, stat}, red_yellow_mass))
+        #Between boundaries
         else:
-            stats["left_stat"] = '' 
-            stats["stat"] = '' 
-            stats["right_stat"] = '' 
             for i in range(0, len(test_params) - 1): #This may need to change... 
                 l_bound = test_params[i]
                 u_bound = test_params[i+1]
 
                 left_stat = statuses[i] 
-                stat = statuses[i+1]  
+                temp_mid_stat = statuses[i+1]  
                 right_stat = statuses[i+2] 
 
                 lb_buffer = l_bound + delta 
@@ -205,31 +186,27 @@ class TelemetryTestSuite:
                 if l_bound < val < u_bound:
                     # Lower bound 
                     if val < lb_buffer:
-                        mass = abs(l_bound - val)/delta
-                        mass_assignments.append((stats, mass))
-                        stats["left_stat"] = left_stat
-                        stats["stat"] = stat
-                        mass_assignments.append((stats, 1.0 - mass))
+                        stat = temp_mid_stat
+                        mass = abs(l_bound - val)/delta                        
+                        mass_assignments.append(({stat}, mass))
+                        mass_assignments.append(({left_stat, stat}, 1.0 - mass))
                     # Upper bound 
                     elif val > ub_buffer:
+                        stat = temp_mid_stat
                         mass = abs(u_bound - val)/delta
-                        mass_assignments.append((stats, mass))
-                        stats["right_stat"] = right_stat
-                        stats["stat"] = stat
-                        mass_assignments.append((stats, 1.0 - mass))
+                        mass_assignments.append(({stat}, mass))
+                        mass_assignments.append(({stat, right_stat}, 1.0 - mass))
                     else:
-                        stats["stat"] = stat
-                        mass_assignments.append((stats, 1.0))
+                        stat = temp_mid_stat
+                        mass_assignments.append(({stat}, 1.0))
                 else:
                     if val == l_bound:
-                        stats["left_stat"] = left_stat
-                        stats["stat"] = stat
-                        mass_assignments.append((stats, 1.0))
-                    # elif val == u_bound:
-                    #     mass = 1.0
-                    #     mass_assignments.append(({right_stat, stat}, mass))
-
-        return stats["stat"], mass_assignments
+                        stat = temp_mid_stat
+                        mass_assignments.append(({left_stat, stat}, 1.0))
+                    elif val == u_bound:
+                        stat = temp_mid_stat
+                        mass_assignments.append(({stat, right_stat}, 1.0))
+        return stat, mass_assignments
 
     def noop(self, val, test_params, epsilon):
         stat = 'GREEN'
