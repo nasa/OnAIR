@@ -110,7 +110,7 @@ class PPO(POMDP):
         for run_through_reward in reversed(rewards):
             discounted_reward = 0
             for reward in reversed(run_through_reward):
-                discounted_reward = reward + discounted_reward * self.discount
+                discounted_reward = reward + discounted_reward * self.discount 
                 discounted_rewards.insert(0, discounted_reward)
         return discounted_rewards
 
