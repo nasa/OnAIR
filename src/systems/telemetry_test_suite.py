@@ -141,8 +141,7 @@ class TelemetryTestSuite:
             l_range = lowest_bound - delta 
 
             if val == lowest_bound:
-                stats["right_stat"] = right_stat
-                mass_assignments.append(({stat}, 1.0))
+                mass_assignments.append(({stat, right_stat}, 1.0))
             else:
                 if val < l_range:
                     mass_assignments.append(({stat}, 1.0))
@@ -203,9 +202,9 @@ class TelemetryTestSuite:
                     if val == l_bound:
                         stat = temp_mid_stat
                         mass_assignments.append(({left_stat, stat}, 1.0))
-                    elif val == u_bound:
-                        stat = temp_mid_stat
-                        mass_assignments.append(({stat, right_stat}, 1.0))
+                    #elif val == u_bound:
+                    #   stat = temp_mid_stat
+                    #    mass_assignments.append(({stat, right_stat}, 1.0))
         return stat, mass_assignments
 
     def noop(self, val, test_params, epsilon):

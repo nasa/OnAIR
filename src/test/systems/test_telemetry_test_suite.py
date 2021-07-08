@@ -98,54 +98,64 @@ class TestTelemetryTestSuite(unittest.TestCase):
         val = 0
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'RED')
-        self.assertEquals(mass_assignments, [({'left_stat' : 'RED', 'stat': 'RED', 'right_stat':'GREEN'}, 1.0)])
+        self.assertEquals(mass_assignments, [({'RED', 'GREEN'}, 1.0)])
         #Test one above lower boundary
         val = 1
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'GREEN')
-        self.assertEquals(mass_assignments, [({'left_stat' : '', 'stat': 'GREEN', 'right_stat':''}, 1.0)])
+        self.assertEquals(mass_assignments, [({'GREEN'}, 1.0)])
         #Test on upper boundary
         val = 10
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'RED')
-        self.assertEquals(mass_assignments, [({'left_stat' : 'GREEN', 'stat': 'RED', 'right_stat':'RED'}, 1.0)])
+        self.assertEquals(mass_assignments, [({'GREEN', 'RED'}, 1.0)])
         #Test one below upper boundary
         val = 9
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'GREEN')
-        self.assertEquals(mass_assignments, [({'left_stat' : '', 'stat': 'GREEN', 'right_stat':''}, 1.0)])
+        self.assertEquals(mass_assignments, [({'GREEN'}, 1.0)])
         #Test in middle of boundaries
         val = 5
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'GREEN')
-        self.assertEquals(mass_assignments, [({'left_stat' : '', 'stat': 'GREEN', 'right_stat':''}, 1.0)]) 
+        self.assertEquals(mass_assignments, [({'GREEN'}, 1.0)]) 
         #Test below lower boundary
         val = -5
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'RED')
-        self.assertEquals(mass_assignments, [({'left_stat' : 'RED', 'stat': 'RED', 'right_stat':''}, 1.0)]) 
+        self.assertEquals(mass_assignments, [({'RED'}, 1.0)]) 
         #Test above upper boundary
         val = 15
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'RED')
-        self.assertEquals(mass_assignments, [({'left_stat' : '', 'stat': 'RED', 'right_stat':'RED'}, 1.0)])
+        self.assertEquals(mass_assignments, [({'RED'}, 1.0)])
         #Test with param length of 4
         params = [0,10,20,30]
         #Test in lower yellow range        
         val = 5
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'YELLOW')
-        self.assertEquals(mass_assignments, [({'left_stat' : '', 'stat': 'YELLOW', 'right_stat':''}, 1.0)])
+        self.assertEquals(mass_assignments, [({'YELLOW'}, 1.0)])
+        #Test in lower green boundary        
+        val = 10
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'GREEN')
+        self.assertEquals(mass_assignments, [({'YELLOW', 'GREEN'}, 1.0)])
         #Test in green range
         val = 15
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'GREEN')
-        self.assertEquals(mass_assignments, [({'left_stat' : '', 'stat': 'GREEN', 'right_stat':''}, 1.0)])
+        self.assertEquals(mass_assignments, [({'GREEN'}, 1.0)])
         #Test in higher yellow range
         val = 25
         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
         self.assertEquals(state, 'YELLOW')
-        self.assertEquals(mass_assignments, [({'left_stat' : '', 'stat': 'YELLOW', 'right_stat':''}, 1.0)]) 
+        self.assertEquals(mass_assignments, [({'YELLOW'}, 1.0)])
+        #Test in lower yellow boundary        
+        val = 20
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'YELLOW')
+        self.assertEquals(mass_assignments, [({'GREEN','YELLOW'}, 1.0)])
         return
 
     def test_noop(self):
