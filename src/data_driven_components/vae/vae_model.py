@@ -1,9 +1,12 @@
+import os
+
+import torch
+from src.data_driven_components.data_learners import DataLearner
 from src.data_driven_components.vae.vae import VAE, TimeseriesDataset
 from src.data_driven_components.vae.vae_train import train
-from src.data_driven_components.data_learners import DataLearner
-import os
-import torch
+from src.data_driven_components.vae.vae_diagnosis import VAEExplainer
 from torch.utils.data import DataLoader, Dataset
+
 
 class VAEModel(DataLearner):
 
@@ -21,6 +24,7 @@ class VAEModel(DataLearner):
         self.window_size = window_size
         self.model = VAE(headers, window_size, z_units, hidden_units)
         self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
+        self.explainer = VAEExplainer(self.model, headers, len(headers), self.window_size)
 
     def apriori_training(self, data_train):
         """
@@ -52,4 +56,7 @@ class VAEModel(DataLearner):
         """
         System should return its diagnosis
         """
-        pass
+        data = torch.Tensor(self.frames).unsqueeze(0)
+        self.explainer.shap(data, data) # TODO switch to baseline
+        return self.explainer.viz()
+
