@@ -31,6 +31,14 @@ class PPOModel(DataLearner):
         :param frame: (list of floats) input sequence of len (input_dim)
         :return: None
         """
+
+        #A stub for once config is integrated with initialization 
+
+        #Use self.agent.config to find the headers in the pomdp
+        #single_frame = {}
+        #for h in range(len(self.agent.headers)):
+        #   single_frame[self.agent.headers[h]] = frame[self.agent.config[self.agent.headers[h]][3]]
+        #self.frames.append(single_frame)
         
         self.frames.append(frame)
         if(len(self.frames)>self.window_size):
