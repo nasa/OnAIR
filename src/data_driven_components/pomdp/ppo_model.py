@@ -13,8 +13,6 @@ class PPOModel(DataLearner):
         """
         self.frames = []
         self.window_size = window_size
-        
-        config_path = os.path.join(os.environ['SRC_ROOT_PATH'], config_path)
 
         self.agent = PPO(config_path=config_path)
 
