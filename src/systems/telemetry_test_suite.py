@@ -241,3 +241,17 @@ class TelemetryTestSuite:
         # print(self.dataFields)
         # print(status_strings)
         return self.calc_single_status(status_strings) 
+
+# class TestResult:
+#     def __init__(self, stat, bayesian_conf):
+#         self.stat = stat
+#         self.bayesian_conf  = bayesian_conf
+
+#     def get_all_test_results(self):
+#         return self.stat, self.bayesian_conf
+
+#     def get_stat(self):
+#         return self.stat
+
+#     def get_bayesian_conf(self):
+#         return self.bayesian_conf
