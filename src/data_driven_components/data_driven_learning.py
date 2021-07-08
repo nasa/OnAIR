@@ -30,7 +30,7 @@ class DataDrivenLearning:
         self.window_size = window_size
         self.associations = Associativity(headers, self.window_size, True)
         self.vae = VAEModel(headers=headers, window_size=self.window_size)
-        self.ppo = PPOModel()
+        self.ppo = PPOModel(window_size=self.window_size)
 
     def apriori_training(self, data):
         if not data == []:

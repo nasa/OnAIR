@@ -6,17 +6,18 @@ import os
 
 class PPOModel(DataLearner):
 
-    def __init__(self, window_size, config_path='src/data/raw_telemetry_data/data_physics_generation/Errors/config.csv', model_path='src/data_driven_components/pomdp/models'):
+    def __init__(self, window_size, config_path='src/data/raw_telemetry_data/data_physics_generation/Errors/config.csv'):
         """
         :param window_size: (int) length of time agent examines
         :param config_path: (optional String) path to PPO config
         :param model_path: (optional String) path to saved model
         """
         self.frames = []
+        self.window_size = window_size
         model_path = os.path.join(os.environ['SRC_ROOT_PATH'], model_path)
         config_path = os.path.join(os.environ['SRC_ROOT_PATH'], config_path)
 
-        self.agent = PPO('ppo_train', model_path, config_path=config_path)
+        self.agent = PPO(config_path=config_path)
 
     def apriori_training(self, data):
         """
@@ -25,7 +26,7 @@ class PPOModel(DataLearner):
         # TODO: double check sizes
         """
         #data_path = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data/raw_telemetry_data/data_physics_generation/Errors')
-        #dict_config, data = mass_load_data(data_path, lookback=15)
+        #dict_config, data = mass_load_data(data_path, self.window_size)
         data = stratified_sampling(dict_config, data)
         training_data = data[:int(len(data)*(0.7))]
         testing_data = data[int(len(data)*(0.7)):]

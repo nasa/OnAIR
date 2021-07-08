@@ -21,8 +21,11 @@ from math import exp
 ########################
 
 class PPO(POMDP):
-    def __init__(self, name, path, config_path="", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
-        super().__init__(name, path, config_path)
+    def __init__(self, name="ppo", path="models/", config_path="", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
+        base_path = ""
+        if (os.path.dirname(__file__) != ""):
+            base_path = os.path.dirname(__file__) + "/"
+        super().__init__(name, base_path+path, config_path)
         self.epsilon = epsilon
         self.discount = discount
         self.epochs = epochs
