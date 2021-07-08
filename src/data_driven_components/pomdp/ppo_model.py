@@ -31,8 +31,10 @@ class PPOModel(DataLearner):
         :param frame: (list of floats) input sequence of len (input_dim)
         :return: None
         """
+        
         self.frames.append(frame)
-        self.frames.pop(0)
+        if(len(self.frames)>self.window_size):
+            self.frames.pop(0)
 
     def render_diagnosis(self):
         """

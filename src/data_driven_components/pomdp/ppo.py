@@ -134,6 +134,7 @@ class PPO(POMDP):
 
     ###---### Training ###---###
 
+    """Simulate a run for a batch, run train_update_step, and then move onto the next batch"""
     def train_ppo(self, train_data, batch_size, test_data = []):
         iterations = int(len(train_data)/batch_size)
         timestep = []
@@ -156,7 +157,8 @@ class PPO(POMDP):
         if (len(test_data)!=0):
             reward_accuracy, correct_accuracy = self.test(test_data)
             print("####### Accuracy " + str(correct_accuracy) +" ####### \n")
-
+    
+    """Update actor and critic models"""
     def train_update_step(self, old_observed, old_actions, old_log_probs, disc_rewards):
         old_observed = torch.tensor(old_observed, dtype=torch.float)
         old_actions = torch.tensor(old_actions, dtype=torch.float)
@@ -173,8 +175,12 @@ class PPO(POMDP):
             self.optimizer.zero_grad()
             loss.mean().backward()
             self.optimizer.step()
-
+    
+    """Simulate a run for each data point in the batch"""
     def walk_through_batch(self, data):
+        '''
+        Takes in data and returns the states, actions, rewards, and probabilities taken for each data point in the data batch
+        '''
         total_states = []
         total_actions = []
         total_rewards = []
@@ -211,7 +217,8 @@ class PPO(POMDP):
 
 
     ###---### Testing ###---###
-
+    
+    """Given a datapoint run through options and eventually report"""
     def test_instance(self, data_point):
         #Initializing running variables
         total_reward = 0
@@ -247,6 +254,7 @@ class PPO(POMDP):
             correct = False
         return total_reward, correct, actions, states
 
+    """Test all data points in a large set of data"""
     def test(self, data):
         correct_sum = 0
         reward_sum = 0
@@ -257,6 +265,7 @@ class PPO(POMDP):
                 correct_sum += 1
         return reward_sum/len(data), correct_sum/len(data)
 
+    """Diagnose the current time_chunk"""
     def diagnose_frames(self, time_chunk):
         # Time_chunk should be in the form
         # { Attribute : [List of data points for attribute of size lookback]}
@@ -276,9 +285,11 @@ class PPO(POMDP):
     ###---### ###---### ###---###  ###---###
 
 if __name__ == "__main__":
+    '''
     dict_config, data = pomdp_util.mass_load_data('RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\', lookback=15)
     data = pomdp_util.stratified_sampling(dict_config, data)
     training_data = data[:int(len(data)*(0.7))]
     testing_data = data[int(len(data)*(0.7)):]
     agent = PPO('ppo_train', "RAISR-2.0\\src\\data_driven_components\\pomdp\\models\\", config_path='RAISR-2.0\\src\\data\\raw_telemetry_data\\data_physics_generation\\Errors\\config.csv')
     agent.train_ppo(training_data, testing_data, 1090)
+    '''
