@@ -58,8 +58,15 @@ class PPO(POMDP):
         pickle.dump(self.get_save_data(),open(self.path + "pomdp_model_" + str(self.name) + ".pkl","wb"))
         torch.save(self.actor.state_dict(), self.path + "pomdp_model_" + str(self.name) + "_actor_policy_state_dict.pt")
         torch.save(self.critic.state_dict(), self.path + "pomdp_model_" + str(self.name) + "_critic_policy_state_dict.pt")
+        self.save_weights_helper()
 
-    def load_PPO(self, path = ""):
+    def save_weights_helper(self):
+        weights = []
+        for i in range(len(list(self.actor.parameters()))):
+            weights.append(list(self.actor.parameters())[i].data.numpy())
+        pickle.dump(weights, open(self.path + "ppo_weights_" + str(self.name) + ".pkl","wb"))
+
+    def load_PPO(self):
         self.load_model()
         self.actor.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_actor_policy_state_dict.pt"))
         self.critic.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_critic_policy_state_dict.pt"))
