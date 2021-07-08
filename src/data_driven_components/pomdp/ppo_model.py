@@ -26,12 +26,11 @@ class PPOModel(DataLearner):
         #data_path = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data/raw_telemetry_data/data_physics_generation/Errors')
         #dict_config, data = mass_load_data(data_path, self.window_size)
         split_data = split_by_lookback(data, self.window_size)
-
         data_train = dict_sort_data(self.agent.config, split_data)
-
         if use_stratified:
             split_data_train = stratified_sampling(self.agent.config, data_train)
-        self.agent.train_ppo(split_data_train, 1090)
+        #Data should be in the format of { Time : [ 0, 1, 2] , Voltage : [5, 5, 5] } at this point
+        self.agent.train_ppo(split_data_train, batch_size=1090)
 
     def update(self, frame):
         """
