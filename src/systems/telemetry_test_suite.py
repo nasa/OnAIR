@@ -1,3 +1,4 @@
+ 
 """
 TelemetryTestSuite Class
 Handles telemetry mnemonic testing
@@ -59,7 +60,7 @@ class TelemetryTestSuite:
     ################   Test Suites  ################ 
 
     def sync(self, val, test_params, epsilon):
-        
+        return 'GREEN', [{'GREEN',1.0}]
         mass_assignments = [] # list of tuples
         if len(test_params) == 0:
             stat = 'RED'
@@ -102,10 +103,27 @@ class TelemetryTestSuite:
         return stat, mass_assignments
 
     def feasibility(self, val, test_params, epsilon):
+        '''
+        Test_Params : threshold ranges an attribute should fall in
+        # if len(test_params == 4) then the thresholds are as follows:
+        # before [0] is red
+        # between [0] - [1] is yellow
+        # between [1] - [2] is green 
+        # between [2] - [3] is yellow
+        # after [3] is green
+        # if len(test_params == 2) then the thresholds are as follows:
+        # before [0] is red
+        # between [0] - [1] is green
+        # after [1] is red
+        '''
         assert( (len(test_params) == 2) or (len(test_params) == 4))
 
         stat = '---'
         mass_assignments = []
+        stats = {}
+        stats["left_stat"] = ''
+        stats["stat"] = ''
+        stats["right_stat"] = ''
 
         val = float(val)
 
@@ -118,52 +136,69 @@ class TelemetryTestSuite:
         if len(test_params) == 2:
             statuses = ['RED', 'GREEN', 'RED']
 
-        # if val in test_params:
-        #     index = test_params.index(val)
-        #     left_status = 
-
-
-        if val <= lowest_bound: 
+        #Lower boundary values   stat: red   stat_right:  green / yellow
+        if val <= lowest_bound:
             stat = statuses[0]
-            left_stat = statuses[1]
+            right_stat = statuses[1]
+            
+            stats["left_stat"] = 'RED' # We want to ignore left, because left of red is just more red
+            stats["stat"] = stat # We know the stat is red
+            stats["right_stat"] = '' # Focus on what is the right if within a certain confidence of lower boundary
+
             l_range = lowest_bound - delta 
 
             if val == lowest_bound:
-                mass_assignments.append(({stat, left_stat}, 1.0))
+                stats["right_stat"] = right_stat
+                mass_assignments.append((stats, 1.0))
             else:
                 if val < l_range:
-                    mass = 1.0
-                    mass_assignments.append(({stat}, mass))
+                    mass_assignments.append((stats, 1.0))
                 else:
                     mass = abs(lowest_bound - val)/delta
+                    mass_assignments.append((stats, mass))
+
                     red_yellow_mass = 1.0 - mass
-                    mass_assignments.append(({stat}, mass))
-                    mass_assignments.append(({stat, left_stat}, red_yellow_mass))
-                    
+                    red_yellow_stats = stats.copy()                    
+                    red_yellow_stats["right_stat"] = right_stat
+                    mass_assignments.append((red_yellow_stats, red_yellow_mass))
+        # Upper boundary values     stat : red  stat_left: green/yellow      
         elif val >= highest_bound:
             stat = statuses[len(statuses)-1]
-            right_stat = statuses[len(statuses)-2]
+            left_stat = statuses[len(statuses)-2]
+
+            stats["left_stat"] = '' # Focus on what is the left if within a certain confidence of upper boundary
+            stats["stat"] = stat # We know the stat is red
+            stats["right_stat"] = 'RED' # We want to ignore right, because right of red is just more red
+
             u_range = highest_bound + delta 
 
             if val == highest_bound:
-                mass_assignments.append(({stat, right_stat}, 1.0))
+                stats["left_stat"] = left_stat
+                mass_assignments.append((stats, 1.0))
             else:
                 if val > u_range:
-                    mass = 1.0
-                    mass_assignments.append(({stat}, mass))
+                    mass_assignments.append((stats, 1.0))
                 else:
                     mass = abs(highest_bound - val)/delta
+                    mass_assignments.append((stats, mass))
+
                     red_yellow_mass = 1.0 - mass
-                    mass_assignments.append(({stat}, mass))
-                    mass_assignments.append(({stat, right_stat}, red_yellow_mass))
+                    red_yellow_stats = stats.copy()
+                    red_yellow_stats["left_stat"] = left_stat
+                    mass_assignments.append((red_yellow_stats, red_yellow_mass))
 
         else:
+            stats["left_stat"] = '' 
+            stats["stat"] = '' 
+            stats["right_stat"] = '' 
             for i in range(0, len(test_params) - 1): #This may need to change... 
                 l_bound = test_params[i]
                 u_bound = test_params[i+1]
-                left_stat = statuses[i]
-                stat = statuses[i+1]
-                right_stat = statuses[i+2]
+
+                left_stat = statuses[i] 
+                stat = statuses[i+1]  
+                right_stat = statuses[i+2] 
+
                 lb_buffer = l_bound + delta 
                 ub_buffer = u_bound - delta 
 
@@ -171,25 +206,30 @@ class TelemetryTestSuite:
                     # Lower bound 
                     if val < lb_buffer:
                         mass = abs(l_bound - val)/delta
-                        mass_assignments.append(({stat}, mass))
-                        mass_assignments.append(({stat, left_stat}, 1.0 - mass))
+                        mass_assignments.append((stats, mass))
+                        stats["left_stat"] = left_stat
+                        stats["stat"] = stat
+                        mass_assignments.append((stats, 1.0 - mass))
                     # Upper bound 
                     elif val > ub_buffer:
                         mass = abs(u_bound - val)/delta
-                        mass_assignments.append(({stat}, mass))
-                        mass_assignments.append(({stat, right_stat}, 1.0 - mass))
+                        mass_assignments.append((stats, mass))
+                        stats["right_stat"] = right_stat
+                        stats["stat"] = stat
+                        mass_assignments.append((stats, 1.0 - mass))
                     else:
-                        mass = 1.0
-                        mass_assignments.append(({stat}, mass))
+                        stats["stat"] = stat
+                        mass_assignments.append((stats, 1.0))
                 else:
                     if val == l_bound:
-                        mass = 1.0
-                        mass_assignments.append(({left_stat, stat}, mass))
+                        stats["left_stat"] = left_stat
+                        stats["stat"] = stat
+                        mass_assignments.append((stats, 1.0))
                     # elif val == u_bound:
                     #     mass = 1.0
                     #     mass_assignments.append(({right_stat, stat}, mass))
 
-        return stat, mass_assignments
+        return stats["stat"], mass_assignments
 
     def noop(self, val, test_params, epsilon):
         stat = 'GREEN'
@@ -199,15 +239,16 @@ class TelemetryTestSuite:
 
     ################################################
     ############## Combining statuses ############## 
-    def calc_single_status(self, status_list, mode='max'):
+    def calc_single_status(self, status_list, mode='strict'):
         occurences = Counter(status_list)
         max_occurence = occurences.most_common(1)[0][0]
 
         if mode == 'strict':
             if occurences['RED'] > 0:
                 conf = occurences['RED']/len(status_list)
-                # conf = -1.0
                 return 'RED', conf
+            else:
+                return max_occurence, 1.0 # return max 
 
         if mode == 'distr':
             conf = occurences[max_occurence]/len(status_list)
@@ -219,19 +260,8 @@ class TelemetryTestSuite:
             return max_occurence, 1.0 # return max 
 
     def get_suite_status(self):
-        return self.calc_single_status([res.get_status() for res in self.latest_results]) 
-
-
-# class TestResult:
-#     def __init__(self, stat, bayesian_conf):
-#         self.stat = stat
-#         self.bayesian_conf  = bayesian_conf
-
-#     def get_all_test_results(self):
-#         return self.stat, self.bayesian_conf
-
-#     def get_stat(self):
-#         return self.stat
-
-#     def get_bayesian_conf(self):
-#         return self.bayesian_conf
+        status_strings = [res.get_status() for res in self.latest_results]
+        # print(self.tests)
+        # print(self.dataFields)
+        # print(status_strings)
+        return self.calc_single_status(status_strings) 
