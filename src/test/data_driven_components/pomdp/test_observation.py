@@ -10,9 +10,9 @@ class TestObservation(unittest.TestCase):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
 
     def test_get_starting_state(self):
-        headers = ["VOL", "CUR", "TMP"]
+        config = {'VOL' : ['data',0, 5, 0], 'CUR': ['data',0, 5, 1], 'TMP': ['data',60, 100, 2]}
         starting_state = [['?', '?'],['?', '?'],['?', '?']]
-        self.assertEquals(observation.get_starting_state(headers), starting_state)
+        self.assertEquals(observation.get_starting_state(config), starting_state)
 
     def test_floatify_state(self):
         state = [['?', 'STABLE', 'BROKEN']]

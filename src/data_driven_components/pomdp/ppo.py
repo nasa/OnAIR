@@ -130,7 +130,7 @@ class PPO(POMDP):
 
     ###---### Training ###---###
 
-    def train_ppo(self, train_data, test_data, batch_size):
+    def train_ppo(self, train_data, batch_size, test_data = []):
         iterations = int(len(train_data)/batch_size)
         timestep = []
         accuracy = []
@@ -140,16 +140,18 @@ class PPO(POMDP):
             # Walk through batch, get states, actions, log probabilites, and discounted rewards
             old_observed, old_actions, old_log_probs, disc_rewards = self.walk_through_batch(train_data[(batch_size*iteration):(batch_size*(iteration+1))])
             self.train_update_step(old_observed, old_actions, old_log_probs, disc_rewards)
-            random.shuffle(test_data)
-            reward_accuracy, correct_accuracy = self.test(test_data[:batch_size])
-            timestep.append(iteration+1)
-            accuracy.append(correct_accuracy)
-            rewards.append(reward_accuracy)
-            self.plot_graph(timestep, rewards, "Batch #", "Avg. Rewards")
-            self.plot_graph(timestep, accuracy, "Batch #", "Avg. Accuracy")
+            if (len(test_data)!=0):
+                random.shuffle(test_data)
+                reward_accuracy, correct_accuracy = self.test(test_data[:batch_size])
+                timestep.append(iteration+1)
+                accuracy.append(correct_accuracy)
+                rewards.append(reward_accuracy)
+                self.plot_graph(timestep, rewards, "Batch #", "Avg. Rewards")
+                self.plot_graph(timestep, accuracy, "Batch #", "Avg. Accuracy")
             self.save_PPO()
-        reward_accuracy, correct_accuracy = self.test(test_data)
-        print("####### Accuracy " + str(correct_accuracy) +" ####### \n")
+        if (len(test_data)!=0):
+            reward_accuracy, correct_accuracy = self.test(test_data)
+            print("####### Accuracy " + str(correct_accuracy) +" ####### \n")
 
     def train_update_step(self, old_observed, old_actions, old_log_probs, disc_rewards):
         old_observed = torch.tensor(old_observed, dtype=torch.float)
