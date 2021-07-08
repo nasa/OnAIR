@@ -51,6 +51,7 @@ class POMDP:
             index = 0
             for key in self.config:
                 if self.config[key][0] == "data":
+                    self.headers.append(key)
                     self.actions.append("view_" + key)
                     self.config[key].append(index)
                     index += 1
@@ -75,7 +76,7 @@ class POMDP:
             pickle.dump(self.get_save_data(),open(self.path + "pomdp_model_" + str(self.name) + ".pkl","wb"))
 
     def get_save_data(self):
-        return [self.states, self.quality_values, self.actions, self.alpha, self.discount, self.epsilon, self.config, self.reportable_states, self.run_limit, self.rewards, self.kappa, self.confusion_matrix]
+        return [self.states, self.quality_values, self.actions, self.alpha, self.discount, self.epsilon, self.config, self.reportable_states, self.run_limit, self.rewards, self.kappa, self.confusion_matrix, self.headers]
 
     def get_current_state(self):
         return self.states[self.current_state_index]
@@ -93,6 +94,7 @@ class POMDP:
         self.rewards = data[9]
         self.kappa = data[10]
         self.confusion_matrix = data[11]
+        self.headers = data[12]
 
     def load_model(self):
         data = pickle.load(open(self.path + "pomdp_model_" + str(self.name) + ".pkl","rb"))
