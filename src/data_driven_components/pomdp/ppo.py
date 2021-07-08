@@ -52,24 +52,24 @@ class PPO(POMDP):
                         {'params': self.critic.parameters(), 'lr': learning_rate_critic}
                     ])
         self.MseLoss = nn.MSELoss()
-    
+
     ###---### Save and Load PPO model ###---###
     def save_PPO(self):
         pickle.dump(self.get_save_data(),open(self.path + "pomdp_model_" + str(self.name) + ".pkl","wb"))
         torch.save(self.actor.state_dict(), self.path + "pomdp_model_" + str(self.name) + "_actor_policy_state_dict.pt")
         torch.save(self.critic.state_dict(), self.path + "pomdp_model_" + str(self.name) + "_critic_policy_state_dict.pt")
-   
+
     def load_PPO(self, path = ""):
         self.load_model()
         self.actor.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_actor_policy_state_dict.pt"))
-        self.critic.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_critic_policy_state_dict.pt"))    
+        self.critic.load_state_dict(torch.load(self.path + "pomdp_model_" + str(self.name) + "_critic_policy_state_dict.pt"))
     ###---### ###---### ###---###  ###---###
-    
-    """Gets state values and the action probabilities"""                 
+
+    """Gets state values and the action probabilities"""
     def evaluate(self, state, action):
         '''
         Input:
-        state - current state 
+        state - current state
         action - action taken at state
 
         Output:
@@ -82,15 +82,15 @@ class PPO(POMDP):
         V = self.critic(state).squeeze()
         action_probs = self.actor(state)
         dist = Categorical(action_probs)
-        logprobs = dist.log_prob(action)    
-        dist_entropy = dist.entropy()    
+        logprobs = dist.log_prob(action)
+        dist_entropy = dist.entropy()
         return V, logprobs, dist_entropy
 
     """Get an action to take from actor network"""
     def action(self, state):
         '''
         Input:
-        state - current state 
+        state - current state
 
         Output:
         action - the action index chosen (aka which action it will take)
@@ -108,15 +108,15 @@ class PPO(POMDP):
     def discounted_rewards(self, rewards):
         discounted_rewards = []
         for run_through_reward in reversed(rewards):
-            discounted_reward = 0 
+            discounted_reward = 0
             for reward in reversed(run_through_reward):
                 discounted_reward = reward + discounted_reward * self.discount
                 discounted_rewards.insert(0, discounted_reward)
         return discounted_rewards
-    
+
     """Get loss as calculated in PPO clip formulas """
     def get_loss(self, ratios, advantage, state_values, rewards, dist_entropy):
-        # Part 1 of formula: r(theta)*advantage            
+        # Part 1 of formula: r(theta)*advantage
         value1 = ratios * advantage
         # Part 2 of formula: clip(rations, 1 - epsilon, 1 + epsilon)*advantage
         value2 = torch.clamp(ratios, 1 - self.epsilon, 1 + self.epsilon) * advantage
@@ -141,12 +141,12 @@ class PPO(POMDP):
             reward_accuracy, correct_accuracy = self.test(test_data[:batch_size])
             timestep.append(iteration+1)
             accuracy.append(correct_accuracy)
-            rewards.append(reward_accuracy) 
+            rewards.append(reward_accuracy)
             self.plot_graph(timestep, rewards, "Batch #", "Avg. Rewards")
-            self.plot_graph(timestep, accuracy, "Batch #", "Avg. Accuracy")    
-            self.save_PPO()  
+            self.plot_graph(timestep, accuracy, "Batch #", "Avg. Accuracy")
+            self.save_PPO()
         reward_accuracy, correct_accuracy = self.test(test_data)
-        print("####### Accuracy " + str(correct_accuracy) +" ####### \n")          
+        print("####### Accuracy " + str(correct_accuracy) +" ####### \n")
 
     def train_update_step(self, old_observed, old_actions, old_log_probs, disc_rewards):
         old_observed = torch.tensor(old_observed, dtype=torch.float)
@@ -187,17 +187,17 @@ class PPO(POMDP):
                 obs = self.states[self.current_state_index]
                 obs = observation.floatify_state(obs)
                 obs = self.state_flatten_preprocess(obs)
-                total_actions.append(action)                
+                total_actions.append(action)
                 total_prob.append(log_prob)
                 if run_time >= self.run_limit:
                     done = True
                     run_through_rewards.append(self.rewards[1]-1) #reward incorrect is rewards[1]
                 else:
                     run_through_rewards.append(reward)
-            total_rewards.append(run_through_rewards)    
+            total_rewards.append(run_through_rewards)
         total_rewards = self.discounted_rewards(total_rewards)
-        return total_states, total_actions, total_prob, total_rewards                   
-    
+        return total_states, total_actions, total_prob, total_rewards
+
     ###---### ###---### ###---###  ###---###
 
 
@@ -210,7 +210,7 @@ class PPO(POMDP):
         done = False
         correct = False
         #Initialize diagnosis information
-        actions = [] 
+        actions = []
         states = []
         #Get first state
         obs = self.states[self.get_starting_state()]
@@ -219,7 +219,7 @@ class PPO(POMDP):
         obs = observation.floatify_state(obs)
         obs = self.state_flatten_preprocess(obs)
         while(not done):
-            run_time += 1            
+            run_time += 1
             action, log_prob = self.action(obs)
             actions.append(self.actions[action])
             reward, done = self.take_action(action, data_point, False)
@@ -247,11 +247,11 @@ class PPO(POMDP):
             if correct:
                 correct_sum += 1
         return reward_sum/len(data), correct_sum/len(data)
-    
+
     def diagnose_frames(self, time_chunk):
-        # Time_chunk should be in the form 
+        # Time_chunk should be in the form
         # { Attribute : [List of data points for attribute of size lookback]}
-        reward, correct, actions, states = test_instance(time_chunk)
+        reward, correct, actions, states = self.test_instance(time_chunk)
         return reward, correct, actions, states
 
     ###---### ###---### ###---###  ###---###
