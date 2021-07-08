@@ -72,7 +72,7 @@ class FortyTwo:
         for i in range(len(times)):
             all_data[times[i]] = {dataFile : frames[i]}
 
-        return all_headers, all_data
+        return all_headers, {}
 
     def parse_headers(self, frame):
         headers = []

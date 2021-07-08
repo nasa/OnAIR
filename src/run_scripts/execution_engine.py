@@ -13,7 +13,6 @@ from time import gmtime, strftime
 
 from src.data_handling.time_synchronizer import TimeSynchronizer
 from src.run_scripts.sim import Simulator
-from src.util.file_io import * 
 
 class ExecutionEngine:
     def __init__(self, config_file='', run_name='', save_flag=False):
@@ -73,6 +72,9 @@ class ExecutionEngine:
         self.parser_name = config['DEFAULT']['ParserName']
         self.sim_name = config['DEFAULT']['SimName']
 
+        ## Sort Data: Testing
+        self.Run_Model_Flag = config.getboolean('TESTING', 'RunModels', fallback=True)
+
         ## Sort Data: Flags
         self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
         self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
@@ -96,11 +98,9 @@ class ExecutionEngine:
             self.sim.set_benchmark_data(fp, fls, bi)
         except:
             pass
-        # except:
-        #     print("Unable to set benchmark matrices")
 
     def run_sim(self):
-        self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag)
+        self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag, self.Run_Model_Flag)
         if self.save_flag:
             self.save_results(self.save_name)
 

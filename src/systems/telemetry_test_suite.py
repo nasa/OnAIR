@@ -134,7 +134,7 @@ class TelemetryTestSuite:
             statuses = ['RED', 'GREEN', 'RED']
 
         #Lower boundary values   stat: red   stat_right:  green / yellow
-        if val <= lowest_bound:
+        if val <= lowest_bound: 
             stat = statuses[0]
             right_stat = statuses[1]
 
@@ -255,3 +255,4 @@ class TelemetryTestSuite:
 
 #     def get_bayesian_conf(self):
 #         return self.bayesian_conf
+
