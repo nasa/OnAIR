@@ -19,6 +19,8 @@ from src.util.print_io import *
 from src.util.sim_io import *
 from src.data_handling.data_source import DataSource
 
+from src.util.config import get_config
+
 class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):
 
@@ -37,14 +39,15 @@ class Simulator:
             self.simData = DataSource(parsedData.get_sim_data())
         self.brain = Brain(spaceCraft)
 
+        self.Run_Model_Flag = get_config().getboolean('TESTING', 'RunModels', fallback=True)
+
 
     #####################################################
-    def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True, run_model_flag=True):
+    def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
         """
         :param Run_Model_Flag: (bool) whether to run models, false for testing purposes
         """
-
-        if run_model_flag:
+        if self.Run_Model_Flag:
             self.apriori_training()
 
         print_sim_header() if (IO_Flag == True) else ''
