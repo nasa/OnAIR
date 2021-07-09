@@ -24,7 +24,9 @@ class VAEModel(DataLearner):
         self.window_size = window_size
         self.model = VAE(headers, window_size, z_units, hidden_units)
         self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
-        self.explainer = VAEExplainer(self.model, headers, len(headers), self.window_size)
+        self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
+
+
 
     def apriori_training(self, data_train):
         """
@@ -44,6 +46,8 @@ class VAEModel(DataLearner):
 
             train(self.model, {'train': train_dataloader}, phases=["train"], checkpoint=True)
 
+        self.explainer.updateModel(self.model)
+
     def update(self, frame):
         """
         :param frame: (list of floats) input sequence of len (input_dim)
@@ -54,9 +58,11 @@ class VAEModel(DataLearner):
 
     def render_diagnosis(self):
         """
-        System should return its diagnosis
+        System should return its diagnosis, do not run unless model is loaded
         """
-        data = torch.Tensor(self.frames).unsqueeze(0)
-        self.explainer.shap(data, data) # TODO switch to baseline
+        self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
+        data = torch.Tensor(self.frames).float().unsqueeze(0)
+        self.explainer.shap(torch.randn_like(data), torch.ones_like(data)*2) # TODO switch to baseline
         return self.explainer.viz()
+
 
