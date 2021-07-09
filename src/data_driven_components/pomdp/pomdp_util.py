@@ -135,7 +135,7 @@ def load_config_from_txt(config_path):
             lower_thresh = 0
             upper_thresh = 1
         elif (len(third_attribute) == 2 and third_attribute[1] == "TIME"):
-            data_type = 'ignore'
+            data_type = 'time'
         elif (len(third_attribute) > 2 and third_attribute[0] == "FEASIBILITY"):
             data_type = 'data'
             lower_thresh = third_attribute[1]
@@ -168,15 +168,17 @@ def split_by_lookback(data_train, lookback):
 
 # Takes in a list of numbers/data [1,2,3...] where each number is associated with a header in the same index position
 # The frame of data should be in the format {'Header' : [x, x2, x3...] (for size of window)}
-def list_to_dictionary_with_headers(list_of_numbers, headers, config, dictionary, window_size):
+def list_to_dictionary_with_headers(list_of_numbers, headers, dictionary, window_size):
+
     for h in range(len(headers)):
-           if headers[h] in dictionary:
-               dictionary[headers[h]].append(list_of_numbers[dictionary[config[headers[h]][3]]]) # Uses the known headers saved with the model and model config to add each number to an existing frame of data
-               if(len(headers[headers[h]])>window_size): # If the frame of data is greater than the window size, it pops the first element of the list
-                   dictionary[headers[h]].pop(0)
-           else:
-               dictionary[headers[h]] = []
-               dictionary[headers[h]].append(list_of_numbers[dictionary[config[headers[h]][3]]])
-               if(len(dictionary[headers[h]])>window_size):
-                   dictionary[headers[h]].pop(0)
+        #Example: If header = 'Time' and time is not in dictionary 
+        if headers[h] in dictionary:
+            dictionary[headers[h]].append(list_of_numbers[h]) 
+            if(len(dictionary[headers[h]])>window_size): # If the frame of data is greater than the window size, it pops the first element of the list
+                dictionary[headers[h]].pop(0)
+        else:
+            dictionary[headers[h]] = []
+            dictionary[headers[h]].append(list_of_numbers[h])
+            if(len(dictionary[headers[h]])>window_size):
+                dictionary[headers[h]].pop(0)
     return dictionary

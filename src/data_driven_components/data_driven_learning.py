@@ -30,7 +30,7 @@ class DataDrivenLearning:
         self.window_size = window_size
         self.associations = Associativity(headers, self.window_size, True)
         self.vae = VAEModel(headers=headers, window_size=self.window_size)
-        self.ppo = PPOModel(window_size=self.window_size)
+        self.ppo = PPOModel(headers=headers, window_size=self.window_size)
 
     def apriori_training(self, data):
         if not data == []:
@@ -39,6 +39,7 @@ class DataDrivenLearning:
             batch_data = []
         self.associations.apriori_training(batch_data)
         self.vae.apriori_training(batch_data)
+        self.ppo.apriori_training(batch_data)
 
     def update(self, curr_data, status):
         input_data = floatify_input(curr_data, self.window_size)
@@ -46,7 +47,7 @@ class DataDrivenLearning:
 
         self.associations.update(input_data)
         self.vae.update(input_data)
-        
+        self.ppo.update(input_data)
         return input_data, output_data 
 
     def diagnose(self):

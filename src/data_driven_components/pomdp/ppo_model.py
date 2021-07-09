@@ -7,12 +7,13 @@ import os
 
 class PPOModel(DataLearner):
 
-    def __init__(self, window_size):
+    def __init__(self, headers, window_size):
         """
         :param window_size: (int) length of time agent examines
         :param config_path: (optional String) path to PPO config
         """
         self.frames = {}
+        self.headers = headers
         self.window_size = window_size
         self.agent = PPO()
 
@@ -29,8 +30,7 @@ class PPOModel(DataLearner):
         :param frame: (list of floats) input sequence of len (input_dim)
         :return: None
         """
-        config = self.agent.config #Dictionary in format {Header:[data, lower_thresh, upper_thresh, index associated with header]}
-        self.frames = list_to_dictionary_with_headers(frame, self.agent.headers, config, self.frames, self.window_size)
+        self.frames = list_to_dictionary_with_headers(frame, self.headers, self.frames, self.window_size)
 
     def render_diagnosis(self):
         """
