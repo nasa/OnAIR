@@ -52,6 +52,8 @@ class PPO(POMDP):
                         {'params': self.critic.parameters(), 'lr': learning_rate_critic}
                     ])
         self.MseLoss = nn.MSELoss()
+        try:
+            self.load_PPO()
 
     ###---### Save and Load PPO model ###---###
     def save_PPO(self):

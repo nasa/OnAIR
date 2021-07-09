@@ -37,6 +37,7 @@ class PPOModel(DataLearner):
         System should return its diagnosis
         """
 
-        #A stub for once config is integrated
+        #A stub for once ppo is fully integrated
         #reward, correct, actions, states = self.agent.diagnose_frames(self.frames)
+        # potentially the the library-less runner?
         pass
