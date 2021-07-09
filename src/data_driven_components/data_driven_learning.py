@@ -51,6 +51,7 @@ class DataDrivenLearning:
         diagnosis = {}
         diagnosis['associativity_diagnosis'] = self.associations.render_diagnosis()
         diagnosis['vae_diagnosis'] = self.vae.render_diagnosis()
+        diagnosis['pomdp_diagnosis'] = None
         return diagnosis     
 
     ###### HELPER FUNCTIONS

@@ -58,32 +58,24 @@ class Simulator:
         last_fault = time_step
 
         while self.simData.has_more() and time_step < 2050:
-
             _next = self.simData.get_next()
             self.brain.reason(_next)
             self.IO_check(time_step, IO_Flag)
             
             ### Stop when a fault is reached  
             if self.brain.mission_status == 'RED':
-                if last_fault == time_step - 1: #if they are consecutive
-                    if (time_step - last_diagnosis) % 100 == 0:
-                        diagnosis_list.append(self.brain.diagnose(time_step))
-                        last_diagnosis = time_step
-                else:
-                    diagnosis_list.append(self.brain.diagnose(time_step))
-                    last_diagnosis = time_step
-                last_fault = time_step
+                diagnosis_list.append(self.brain.diagnose(time_step))
+                break 
             time_step += 1
             
         # Final diagnosis processing
         if len(diagnosis_list) == 0:
             diagnosis_list.append(self.brain.diagnose(time_step))
+        
         final_diagnosis = diagnosis_list[-1]
-
-        # render_diagnosis(diagnosis_list)
-        # print_diagnosis(final_diagnosis) if (IO_Flag == True) else ''
-        # print(final_diagnosis)
-
+        print("**** FINAL DIAGNOSIS ****")
+        print(final_diagnosis)
+        
         return final_diagnosis
 
     def apriori_training(self):

@@ -20,6 +20,7 @@ from src.test.data_driven_components.test_vae import TestVAE
 from src.test.util.test_cleanup import TestCleanup
 from src.test.run_scripts.test_generalizability_engine import TestGeneralizabilityEngine
 from src.test.util.test_data_reformatting import TestDataReformatting
+from src.test.reasoning.test_diagnosis import TestDiagnosis
 
 def create_suite():
     suite = []
@@ -41,7 +42,7 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestVAE))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataReformatting))
-    
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDiagnosis))
     return suite
 
 def run_tests(suite):

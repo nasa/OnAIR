@@ -28,6 +28,9 @@ class Spacecraft:
     def get_headers(self):
         return self.headers
 
+    def get_current_faulting_mnemonics(self):
+        return self.test_suite.get_status_specific_mnemonics()
+
     def get_current_data(self):
         return self.curr_data
 
