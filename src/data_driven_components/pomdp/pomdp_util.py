@@ -121,7 +121,7 @@ def load_config_from_txt(config_path):
     #Config should be in the format {Header:[data, lower_thresh, upper_thresh, index associated with header]}
     #The index associated with the header will be set in the pomdp.py class
     config_dictionary = {}
-    config_path = os.path.join(os.environ['SRC_ROOT_PATH'], config_path)
+    config_path = os.path.join(os.environ['RUN_PATH'], config_path)
     config = open(config_path,"r")
     config_text = config.read().split("\n")
     for attribute in config_text:
@@ -130,7 +130,7 @@ def load_config_from_txt(config_path):
         data_type = ''
         lower_thresh = None
         upper_thresh = None
-        if (len(third_attribute) == 1 and third_attribute[0] == "LABEL"):
+        if (len(third_attribute) == 2 and third_attribute[1] == "LABEL"):
             data_type = 'label'
             lower_thresh = 0
             upper_thresh = 1
