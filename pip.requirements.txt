@@ -11,7 +11,7 @@ backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
 bleach @ file:///tmp/build/80754af9/bleach_1612211392645/work
 brotlipy==0.7.0
 cachetools==4.2.2
-captum==0.3.1
+captum==0.4.0
 certifi==2021.5.30
 cffi @ file:///opt/concourse/worker/volumes/live/a70943eb-ad97-40c6-78c9-98764c1bee07/volume/cffi_1613246936716/work
 chardet==4.0.0
@@ -61,7 +61,7 @@ nbformat @ file:///tmp/build/80754af9/nbformat_1617383369282/work
 nest-asyncio @ file:///tmp/build/80754af9/nest-asyncio_1613680548246/work
 networkx==2.5.1
 notebook @ file:///opt/concourse/worker/volumes/live/8b811b26-0985-4d66-61d2-eae9abb84ef2/volume/notebook_1621625613100/work
-numpy==1.19.5
+numpy==1.21.0
 oauthlib==3.1.1
 opt-einsum==3.3.0
 packaging @ file:///tmp/build/80754af9/packaging_1611952188834/work
@@ -70,7 +70,7 @@ pandocfilters @ file:///opt/concourse/worker/volumes/live/d8ef4635-066d-4ffe-534
 parso==0.7.0
 pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
 pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
-Pillow==8.2.0
+Pillow==8.3.1
 prometheus-client @ file:///tmp/build/80754af9/prometheus_client_1623189609245/work
 prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1616415428029/work
 protobuf==3.17.3
@@ -83,13 +83,13 @@ pydot==1.4.2
 Pygments @ file:///tmp/build/80754af9/pygments_1621606182707/work
 PyGObject==3.40.1
 pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1608057966937/work
-pyparsing @ file:///home/linux1/recipes/ci/pyparsing_1610983426697/work
+pyparsing==2.4.7
 PyQt5==5.15.4
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.8.1
 pyrsistent @ file:///opt/concourse/worker/volumes/live/f4188029-c4e5-4376-5777-96466a6d9de1/volume/pyrsistent_1625052316913/work
 PySocks @ file:///opt/concourse/worker/volumes/live/112288ac-9cb0-4e73-768b-13baf4ca6419/volume/pysocks_1605305820043/work
-python-dateutil @ file:///home/ktietz/src/ci/python-dateutil_1611928101742/work
+python-dateutil==2.8.1
 pytz @ file:///tmp/build/80754af9/pytz_1612215392582/work
 PyYAML==5.4.1
 pyzmq==20.0.0
@@ -100,7 +100,7 @@ scikit-learn==0.24.2
 scipy==1.6.3
 Send2Trash @ file:///tmp/build/80754af9/send2trash_1607525499227/work
 simdkalman==1.0.1
-six==1.15.0
+six==1.16.0
 sklearn==0.0
 sniffio @ file:///opt/concourse/worker/volumes/live/38ca9e9e-09d1-4d43-5a0f-b546422e7807/volume/sniffio_1614030472707/work
 tensorboard==2.5.0
@@ -116,7 +116,7 @@ torch==1.9.0
 tornado @ file:///opt/concourse/worker/volumes/live/2c1a63a2-006b-48ee-56b9-0cfe8b4927f9/volume/tornado_1606942321278/work
 tqdm==4.61.1
 traitlets @ file:///home/ktietz/src/ci/traitlets_1611929699868/work
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.0
 urllib3==1.26.5
 wcwidth @ file:///tmp/build/80754af9/wcwidth_1593447189090/work
 webencodings==0.5.1
