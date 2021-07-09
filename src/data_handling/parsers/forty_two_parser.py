@@ -28,21 +28,42 @@ class FortyTwo:
         self.binning_configs = ''
 
         if (dataFiles != '') and (configFiles != ''):
-            labels, data = self.parse_sim_data(str2lst(dataFiles)[0])
-            self.all_headers = labels
-            self.sim_data = data
+            # Setup headers, data
+            headers_dict = {}
+            data_dict = {}
 
-            configs = self.parse_config_data(str2lst(configFiles)[0], ss_breakdown)
+            # Parse data across multiple files
+            for data_file in str2lst(dataFiles):
+                labels, data = self.parse_sim_data(data_file)
+                # Header format : { Filename : ['Header', 'Another Header', 'Etc.']}
+                headers_dict[data_file] = labels[data_file] #The key for labels is the file name, so we're able to add that to our "big" dictionary
+                # Data format : { 'index': { Filename : ['Data_Point', 'Another Data_Point', 'Etc.']}}
+                for key in data:
+                    # If the key does not exist in the data dictionary already, then data_dict[key][data_file] will give an error
+                    # In order to skirt this issue, if the key does not exist create an empty dictionary for it, then give it the data file
+                    if key in data_dict:
+                        data_dict[key][data_file] = data[key][data_file]
+                    else:
+                        data_dict[key] = {}
+                        data_dict[key][data_file] = data[key][data_file]
+                        
+            self.all_headers = headers_dict
+            self.sim_data = data_dict
 
+            # Setup binning config information
             self.binning_configs = {}
             self.binning_configs['subsystem_assignments'] = {}
             self.binning_configs['test_assignments'] = {}
             self.binning_configs['description_assignments'] = {}
-
-            for data_file in ast.literal_eval(dataFiles):
-                self.binning_configs['subsystem_assignments'][data_file] = configs['subsystem_assignments'][data_file]
-                self.binning_configs['test_assignments'][data_file] = configs['test_assignments'][data_file]
-                self.binning_configs['description_assignments'][data_file] = configs['description_assignments'][data_file]
+            
+            for config_file in str2lst(configFiles):
+                # Config format {'subsystem' : {data_file : ['Etc.']}}
+                config = self.parse_config_data(config_file, ss_breakdown)
+                # Although this is a for loop, it should only execute once because the config currently has only read in one single file 
+                for data_file_key in config['subsystem_assignments']:
+                    self.binning_configs['subsystem_assignments'][data_file_key] = config['subsystem_assignments'][data_file_key]
+                    self.binning_configs['test_assignments'][data_file_key] = config['test_assignments'][data_file_key]
+                    self.binning_configs['description_assignments'][data_file_key] = config['description_assignments'][data_file_key]
 
     ##### INITIAL PROCESSING ####
     def parse_sim_data(self, dataFile):
