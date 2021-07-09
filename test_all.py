@@ -37,7 +37,6 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestBrain))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTelemetryTestSuite))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
-    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestKalmanFilter))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestObservation))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGeneralizabilityEngine))
