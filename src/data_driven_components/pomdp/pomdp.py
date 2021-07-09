@@ -96,7 +96,13 @@ class POMDP:
         self.rewards = data[9]
         self.kappa = data[10]
         self.confusion_matrix = data[11]
-        self.headers = data[12]
+        try:
+            self.headers = data[12]
+        except:
+            self.headers = []
+            for key in self.config:
+                if self.config[key][0] == "data":
+                    self.headers.append(key)
 
     def load_model(self):
         data = pickle.load(open(self.path + "pomdp_model_" + str(self.name) + ".pkl","rb"))
