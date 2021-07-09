@@ -171,12 +171,12 @@ def split_by_lookback(data_train, lookback):
 def list_to_dictionary_with_headers(list_of_numbers, headers, config, dictionary, window_size):
     for h in range(len(headers)):
            if headers[h] in dictionary:
-               dictionary[headers[h]].append(dictionary[config[headers[h]][3]]) # Uses the known headers saved with the model and model config to add each number to an existing frame of data
+               dictionary[headers[h]].append(list_of_numbers[dictionary[config[headers[h]][3]]]) # Uses the known headers saved with the model and model config to add each number to an existing frame of data
                if(len(headers[headers[h]])>window_size): # If the frame of data is greater than the window size, it pops the first element of the list
                    dictionary[headers[h]].pop(0)
            else:
                dictionary[headers[h]] = []
-               dictionary[headers[h]].append(dictionary[config[headers[h]][3]])
+               dictionary[headers[h]].append(list_of_numbers[dictionary[config[headers[h]][3]]])
                if(len(dictionary[headers[h]])>window_size):
                    dictionary[headers[h]].pop(0)
     return dictionary
