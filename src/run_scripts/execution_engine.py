@@ -13,6 +13,7 @@ from time import gmtime, strftime
 
 from src.data_handling.time_synchronizer import TimeSynchronizer
 from src.run_scripts.sim import Simulator
+from src.util.config import get_config
 
 class ExecutionEngine:
     def __init__(self, config_file='', run_name='', save_flag=False):
@@ -54,8 +55,8 @@ class ExecutionEngine:
     def parse_configs(self, config_file_path):
         # print("Using config file: {}".format(config_file_path))
 
-        config = configparser.ConfigParser()
-        config.read(config_file_path)
+        config = get_config()
+
         ## Sort Data: Telementry Data & Configuration
         self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
         self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
@@ -71,9 +72,6 @@ class ExecutionEngine:
         self.parser_file_name = config['DEFAULT']['ParserFileName']
         self.parser_name = config['DEFAULT']['ParserName']
         self.sim_name = config['DEFAULT']['SimName']
-
-        ## Sort Data: Testing
-        self.Run_Model_Flag = config.getboolean('TESTING', 'RunModels', fallback=True)
 
         ## Sort Data: Flags
         self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
@@ -100,7 +98,7 @@ class ExecutionEngine:
             pass
 
     def run_sim(self):
-        self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag, self.Run_Model_Flag)
+        self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag)
         if self.save_flag:
             self.save_results(self.save_name)
 
