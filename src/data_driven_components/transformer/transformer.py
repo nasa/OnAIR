@@ -13,7 +13,7 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader, Dataset
 
-class TransformerModel(nn.Module):
+class Transformer(nn.Module):
 
     def __init__(self, input_dim=30, seq_len=15, z_units=5, hidden_units=100, att_heads=3, hidden_layers=2):
         """
@@ -26,7 +26,7 @@ class TransformerModel(nn.Module):
         :param att_head: (optional int) Number of attention heads
         :param hidden_layers: (optional int) Depth of transformer encoder/decoder, default 1
         """
-        super(TransformerModel, self).__init__()
+        super(Transformer, self).__init__()
         self.model_type = 'Transformer'
         self.input_dim = input_dim
         self.z_units = z_units
@@ -165,24 +165,6 @@ class PositionalEncoding(nn.Module):
         """
         x = x + self.pe[:x.size(0), :]
         return self.dropout(x) # Better for training robust representations
-
-class TimeseriesDataset(Dataset):
-    def __init__(self, data, transform = None):
-        """
-        Timeseries dataset class, contains sequential data and applies transformation before returning datum
-        :param data: (Arraylike) 3D data container, first dimension is datum, second is time, third is features
-        """
-        self.data = data
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, idx):
-        datum = self.data[idx]
-        if self.transform:
-            datum = self.transform(datum)
-        return datum
 
 class TransformerExplainer():
     def __init__(self, vae, headers, n_features=7, seq_len=1, n_samples=200):
@@ -323,7 +305,7 @@ if __name__ == "__main__":
     test_dataloader = DataLoader(test_dataset, batch_size=1)
 
 
-    transformer = TransformerModel(seq_len=2)
+    transformer = Transformer(seq_len=2)
 
     train(transformer, 2, {"train": train_dataloader}, phases=["train"])
 
