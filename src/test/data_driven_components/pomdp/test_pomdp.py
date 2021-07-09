@@ -5,7 +5,7 @@ import random
 
 from src.data_driven_components.pomdp.pomdp import POMDP
 
-class TestReward(unittest.TestCase):
+class TestPOMDP(unittest.TestCase):
 
     def setUp(self):
         self.save_path = os.path.dirname(__file__) + "/models"
@@ -18,6 +18,7 @@ class TestReward(unittest.TestCase):
 
     def test_load_save_model(self):
         file_path = self.save_path + "pomdp_model_test.pkl"
+        os.system("rm file_path")
         self.assertTrue(not os.path.isfile(file_path))
         self.pomdp = POMDP("test", self.save_path, config_path=self.data_path + "config.csv", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1)
         self.pomdp.save_model()
