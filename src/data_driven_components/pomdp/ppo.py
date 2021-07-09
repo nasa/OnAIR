@@ -54,6 +54,8 @@ class PPO(POMDP):
         self.MseLoss = nn.MSELoss()
         try:
             self.load_PPO()
+        except Exception:
+            pass
 
     ###---### Save and Load PPO model ###---###
     def save_PPO(self):
