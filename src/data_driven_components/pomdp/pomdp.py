@@ -6,7 +6,9 @@ import pickle
 import src.data_driven_components.pomdp.observation as observation
 import src.data_driven_components.pomdp.reward as reward
 import numpy as np
+import ast
 import src.data_driven_components.pomdp.pomdp_util as util
+from src.util.config import get_config
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
@@ -43,11 +45,11 @@ class POMDP:
             self.alpha = alpha
             self.discount = discount
             self.epsilon = epsilon
-            if config_path == "":
-                print("Error: You need to set config_path for new models!")
-                exit()
-            _, self.config = util.load_config(config_path)
+            config_path = get_config()['DEFAULT']['TelemetryMetadataFilePath']
+            config_path = config_path + ast.literal_eval(get_config()['DEFAULT']['MetaFiles'])[0]
+            self.config = util.load_config_from_txt(config_path)
             self.reportable_states = reportable_states
+            self.headers = []
             index = 0
             for key in self.config:
                 if self.config[key][0] == "data":

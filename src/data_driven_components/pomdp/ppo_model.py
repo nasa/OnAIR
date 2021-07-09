@@ -1,24 +1,22 @@
 
-from src.data_driven_components.pomdp.pomdp_util import mass_load_data, stratified_sampling, split_by_lookback, dict_sort_data
+from src.data_driven_components.pomdp.pomdp_util import mass_load_data, stratified_sampling, split_by_lookback, dict_sort_data, list_to_dictionary_with_headers
 from src.data_driven_components.pomdp.ppo import PPO
 from src.data_driven_components.data_learners import DataLearner
 import os
 
+
 class PPOModel(DataLearner):
 
-    def __init__(self, window_size, config_path='src/data/raw_telemetry_data/data_physics_generation/Errors/config.csv'):
+    def __init__(self, window_size):
         """
         :param window_size: (int) length of time agent examines
         :param config_path: (optional String) path to PPO config
         """
         self.frames = {}
         self.window_size = window_size
-
-        self.agent = PPO(config_path=config_path)
+        self.agent = PPO()
 
     def apriori_training(self, data, use_stratified=True):
-        #data_path = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/data/raw_telemetry_data/data_physics_generation/Errors')
-        #dict_config, data = mass_load_data(data_path, self.window_size)
         split_data = split_by_lookback(data, self.window_size)
         data_train = dict_sort_data(self.agent.config, split_data)
         if use_stratified:
@@ -31,24 +29,8 @@ class PPOModel(DataLearner):
         :param frame: (list of floats) input sequence of len (input_dim)
         :return: None
         """
-
-        #A stub for once config is integrated with initialization 
-
-        #Use self.agent.config to find the headers in the pomdp
-        #for h in range(len(self.agent.headers)):
-        #   if self.agent.headers[h] in self.frames:
-        #       self.frames[self.agent.headers[h]].append(frame[self.agent.config[self.agent.headers[h]][3]])
-        #       if(len(self.frames[self.agent.headers[h]])>self.window_size):
-        #           self.frames[self.agent.headers[h]].pop(0)
-        #   else:
-        #       self.frames[self.agent.headers[h]] = []
-        #       self.frames[self.agent.headers[h]].append(frame[self.agent.config[self.agent.headers[h]][3]])
-        #       if(len(self.frames[self.agent.headers[h]])>self.window_size):
-        #           self.frames[self.agent.headers[h]].pop(0)
-        
-        self.frames.append(frame)
-        if(len(self.frames)>self.window_size):
-            self.frames.pop(0)
+        config = self.agent.config #Dictionary in format {Header:[data, lower_thresh, upper_thresh, index associated with header]}
+        self.frames = list_to_dictionary_with_headers(frame, self.agent.headers, config, self.frames, self.window_size)
 
     def render_diagnosis(self):
         """

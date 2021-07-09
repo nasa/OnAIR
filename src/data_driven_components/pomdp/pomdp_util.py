@@ -5,6 +5,7 @@ import os
 import csv
 import random
 import copy
+import ast
 
 ## Load All The Data
 def mass_load_data(folder, lookback, filetype=".csv"):
@@ -116,6 +117,37 @@ def load_config(config_path):
         dict_config[config[0][i]] = [config[1][i], config[2][i], config[3][i]]
     return config, dict_config
 
+def load_config_from_txt(config_path):
+    #Config should be in the format {Header:[data, lower_thresh, upper_thresh, index associated with header]}
+    #The index associated with the header will be set in the pomdp.py class
+    config_dictionary = {}
+    config_path = os.path.join(os.environ['SRC_ROOT_PATH'], config_path)
+    config = open(config_path,"r")
+    config_text = config.read().split("\n")
+    for attribute in config_text:
+        split_attribute = attribute.split(" ")
+        third_attribute = ast.literal_eval(split_attribute[2])
+        data_type = ''
+        lower_thresh = None
+        upper_thresh = None
+        if (len(third_attribute) == 1 and third_attribute[0] == "LABEL"):
+            data_type = 'label'
+            lower_thresh = 0
+            upper_thresh = 1
+        elif (len(third_attribute) == 2 and third_attribute[1] == "TIME"):
+            data_type = 'ignore'
+        elif (len(third_attribute) > 2 and third_attribute[0] == "FEASIBILITY"):
+            data_type = 'data'
+            lower_thresh = third_attribute[1]
+            upper_thresh = third_attribute[len(third_attribute)-1]
+        else:
+            data_type = 'ignore'
+        if upper_thresh != None and lower_thresh !=None:
+            config_dictionary[split_attribute[0]] = [data_type, lower_thresh, upper_thresh]
+        else:
+            config_dictionary[split_attribute[0]] = [data_type, '', '']
+    return config_dictionary
+
 def check_label(config):
     label_key = "Colomar"
     for key in config:
@@ -133,3 +165,18 @@ def split_by_lookback(data_train, lookback):
     for i in range(lookback, len(data_train)+1):
         new_data.append(data_train[i-lookback:i])
     return new_data
+
+# Takes in a list of numbers/data [1,2,3...] where each number is associated with a header in the same index position
+# The frame of data should be in the format {'Header' : [x, x2, x3...] (for size of window)}
+def list_to_dictionary_with_headers(list_of_numbers, headers, config, dictionary, window_size):
+    for h in range(len(headers)):
+           if headers[h] in dictionary:
+               dictionary[headers[h]].append(dictionary[config[headers[h]][3]]) # Uses the known headers saved with the model and model config to add each number to an existing frame of data
+               if(len(headers[headers[h]])>window_size): # If the frame of data is greater than the window size, it pops the first element of the list
+                   dictionary[headers[h]].pop(0)
+           else:
+               dictionary[headers[h]] = []
+               dictionary[headers[h]].append(dictionary[config[headers[h]][3]])
+               if(len(dictionary[headers[h]])>window_size):
+                   dictionary[headers[h]].pop(0)
+    return dictionary
