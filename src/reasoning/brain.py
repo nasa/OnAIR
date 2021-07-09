@@ -9,21 +9,11 @@ import copy
 from src.systems.status import Status
 # from src.reasoning.diagnosis import Diagnosis
 from src.data_driven_components.data_driven_learning import DataDrivenLearning
-# from src.data_driven_components.associativity import Associativity
 from src.systems.spacecraft import Spacecraft
 # from src.util.print_io import *
 
 class Brain:
     def __init__(self, spacecraft=None):
-        try:
-            self.init_brain(spacecraft)
-        except:
-            self.spacecraft_rep = None
-            self.learning_systems = None
-            self.mission_status = '---'
-            self.bayesian_status = -1.0
-
-    def init_brain(self, spacecraft):
         self.spacecraft_rep = spacecraft
         self.learning_systems = DataDrivenLearning(self.spacecraft_rep.get_headers())
         self.mission_status = self.spacecraft_rep.get_status()
@@ -36,7 +26,9 @@ class Brain:
         self.learning_systems.update(frame, self.mission_status)
 
     def diagnose(self, time_step):
-        return None
+        
+        return self.learning_systems.diagnose()
+        
     #     lstm_predict = self.supervised_learning.lstm_predict()
     #     tree_traversal = self.spacecraft_rep.get_status_object().fault_traversal()
     #     faults = self.spacecraft_rep.get_faulting_mnemonics()
