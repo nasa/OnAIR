@@ -1,5 +1,8 @@
 """
 42 Parser
+
+Only headers are parsed on init. This parser is used for the cFS adapter, which does not
+have real data upon start up.
 """
 
 import csv
@@ -59,18 +62,10 @@ class FortyTwo:
         dataPts.remove('')
         headers = self.parse_headers(dataPts[0])
 
-        for dataPt in dataPts:
-            frames.append(self.parse_frame(dataPt))
-
         # Process into binning format
         all_headers = {}
-        all_data = {}
 
-        times = [frame[0] for frame in frames]
         all_headers[dataFile] = headers
-
-        for i in range(len(times)):
-            all_data[times[i]] = {dataFile : frames[i]}
 
         return all_headers, {}
 
@@ -88,22 +83,6 @@ class FortyTwo:
             headers.append(datum.split(' = ')[0])
 
         return headers
-
-    def parse_frame(self, frame):
-        clean_frame = []
-        data = frame.split('\n')
-
-        # Parse out unique fields
-        time = data[0].split(' ')[1]
-        clean_frame.append(time)
-        data = data[1:] # remove time
-
-        spacecraft = data[0].split('.')[0] # Not doing anything with this for now.. may parse it out
-
-        for datum in data:
-            clean_frame.append(datum.split(' = ')[1])
-
-        return clean_frame
 
     def parse_config_data(self, configFile, ss_breakdown):
         parsed_configs = extract_configs(self.metadata_file_path, [configFile])
