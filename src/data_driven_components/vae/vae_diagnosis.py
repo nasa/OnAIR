@@ -33,11 +33,20 @@ class VAEExplainer():
         :param seq_len: (optional int) number of sequence components per input
         :param n_samples: (optional int) number of times to evaluate model, defaults to 200
         """
+        self.vae = vae
         self.explainer = KernelShap(vae)
         self.headers = headers
         self.n_features = n_features
         self.seq_len = seq_len
         self.n_samples = n_samples
+
+    def updateModel(self, vae):
+        """
+        Update Kernel model
+        :param vae: (VAE model) new model to update to
+        """
+        self.vae = vae
+        self.explainer = KernelShap(vae)
     
     def shap(self, input, baseline):
         """

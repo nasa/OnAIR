@@ -45,7 +45,7 @@ class DataDrivenLearning:
         input_data = floatify_input(curr_data, self.window_size)
         output_data = self.status_to_oneHot(status)
 
-        self.associations.update(input_data)
+        #self.associations.update(input_data)
         self.vae.update(input_data)
         self.ppo.update(input_data)
         return input_data, output_data 
