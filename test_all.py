@@ -21,6 +21,7 @@ from src.test.data_driven_components.pomdp.test_observation import TestObservati
 from src.test.data_driven_components.test_vae import TestVAE
 from src.test.run_scripts.test_generalizability_engine import TestGeneralizabilityEngine
 from src.test.util.test_data_reformatting import TestDataReformatting
+from src.test.data_driven_components.pomdp.test_ppo_model import TestPPOModel
 
 def create_suite():
     suite = []
@@ -43,7 +44,7 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestVAE))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataReformatting))
-    
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestPPOModel))
     return suite
 
 def run_tests(suite):

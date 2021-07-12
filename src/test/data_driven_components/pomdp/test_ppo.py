@@ -49,6 +49,7 @@ class TestPPO(unittest.TestCase):
         self.assertTrue(True)
 
     def test_apriori_training(self):
+        print(self.ppo.config)
         self.ppo.train_ppo(self.true_mass_data, 2) # This also tests plot_graph and test
         self.assertTrue(os.path.isfile(self.save_path + "pomdp_model_test.pkl"))
         self.assertTrue(os.path.isfile(self.save_path + "graph_test_Avg. Rewards.png"))

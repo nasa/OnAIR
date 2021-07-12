@@ -9,8 +9,8 @@ class PPOModel(DataLearner):
 
     def __init__(self, headers, window_size):
         """
-        :param window_size: (int) length of time agent examines
-        :param config_path: (optional String) path to PPO config
+        :param headers: (int) length of time agent examines
+        :param window_size: (int) size of time window to examine
         """
         self.frames = {}
         self.headers = headers
@@ -18,12 +18,15 @@ class PPOModel(DataLearner):
         self.agent = PPO()
 
     def apriori_training(self, data, use_stratified=True):
+        """
+        :param data: (3D array) first dim data points, second time frames and third features so (batch_size, window_size, input_dim)
+        """
         split_data = split_by_lookback(data, self.window_size)
         data_train = dict_sort_data(self.agent.config, split_data)
         if use_stratified:
-            split_data_train = stratified_sampling(self.agent.config, data_train)
+            data_train = stratified_sampling(self.agent.config, data_train)
         #Data should be in the format of { Time : [ 0, 1, 2] , Voltage : [5, 5, 5] } at this point
-        self.agent.train_ppo(split_data_train, batch_size=1090)
+        self.agent.train_ppo(data_train, batch_size=1090)
 
     def update(self, frame):
         """
