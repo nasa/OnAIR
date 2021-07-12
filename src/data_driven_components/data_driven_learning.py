@@ -27,7 +27,7 @@ class DataDrivenLearning:
 
         self.headers = headers
         self.window_size = window_size
-        self.associations = Associativity(headers, self.window_size, True)
+        # self.associations = Associativity(headers, self.window_size, True)
         self.vae = VAEModel(headers=headers, window_size=self.window_size)
 
     def apriori_training(self, data):
@@ -35,7 +35,7 @@ class DataDrivenLearning:
             batch_data = prep_apriori_training_data(data, self.window_size)
         else:
             batch_data = []
-        self.associations.apriori_training(batch_data)
+        # self.associations.apriori_training(batch_data)
         self.vae.apriori_training(batch_data)
 
     def update(self, curr_data, status):
@@ -49,8 +49,18 @@ class DataDrivenLearning:
 
     def diagnose(self):
         diagnosis = {}
-        diagnosis['associativity_diagnosis'] = self.associations.render_diagnosis()
-        diagnosis['vae_diagnosis'] = self.vae.render_diagnosis()
+
+        # diagnosis['associativity_diagnosis'] = self.associations.render_diagnosis()
+        diagnosis['associativity_diagnosis'] = None
+        
+        # VAE Processing
+        vae_diagnosis = self.vae.render_diagnosis()
+        shap = list(vae_diagnosis[0])
+        data_vals = list(vae_diagnosis[1])
+        hdrs = list(vae_diagnosis[2])
+        s, h = zip(*sorted(zip(shap, hdrs), reverse=True))
+
+        diagnosis['vae_diagnosis'] = h
         diagnosis['pomdp_diagnosis'] = None
         return diagnosis     
 
