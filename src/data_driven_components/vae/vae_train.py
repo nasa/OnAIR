@@ -21,6 +21,7 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
                 each phase should have a corresponding data loader
     """
     checkpoint_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"runs")
+    latest_model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"models")
     e = datetime.now()
     run_dir = os.path.join(checkpoint_dir, "{}-{}-{}_{}:{}:{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second))
 
@@ -65,4 +66,4 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
                 'optimizer': optimizer.state_dict(),
                 'loss': avg_loss
             }, os.path.join(run_dir, checkpoint_name))
-            torch.save(vae.state_dict(), os.path.join(checkpoint_dir, 'checkpoint_latest.pth.tar'))
+            torch.save(vae.state_dict(), os.path.join(latest_model_dir, 'checkpoint_latest.pth.tar'))
