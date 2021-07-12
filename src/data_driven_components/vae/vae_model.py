@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader, Dataset
 class VAEModel(DataLearner):
 
     def __init__(self, headers, window_size, z_units=5, hidden_units=100, 
-            path='src/data_driven_components/vae/models/checkpoint_latest.pth.tar'):
+            path=os.path.join('src','data_driven_components','vae','models','checkpoint_latest.pth.tar')):
         """
         :param headers: (string list) list of headers for each input feature
         :param window_size: (int) number of data points in our data sequence
