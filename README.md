@@ -31,6 +31,14 @@ Uninstall and reinstall latest tensorflow version
     pip uninstall tensorflow
     pip install tensorflow --upgrade --force-reinstall
 
+If you run into
+
+    ZeroDivisionError: Weights sum to zero, can't be normalized
+
+Reinstall latest version of captum
+
+    pip install --upgrade --force-reinstall captum
+
 ## Generating environment
 
 Create a conda environment with the necessary packages
