@@ -68,13 +68,17 @@ class TestGenericParser(unittest.TestCase):
                                            '1002': { fileName1 : ['1002', '2', '2.000000000000e+00', '2']}, 
                                            '1003': { fileName1 : ['1003', '3', '3.000000000000e+00', '3'], fileName2 : ['1003','1', '1.000000000000e+00']},
                                            '1004': { fileName2 : ['1004','2', '2.000000000000e+00']}})
+            '''
             self.assertEquals(P.binning_configs, {'subsystem_assignments': {fileName1: [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']], 
                                                                             fileName2 : [['MISSION'], ['MISSION'], ['MISSION']]}, 
                                                   'test_assignments': {fileName1: [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]]], 
                                                                         fileName2 : [[['SYNC', 'TIME']], [['FEASIBILITY',-1.0, 0.0, 10.0, 15.0]], [['NOOP']]]}, 
                                                   'description_assignments': {fileName1: ['No description', 'No description', 'No description', 'No description'], 
                                                                                 fileName2 : ['No description', 'No description', 'No description']}})
-        
+            '''
+
+    def test_multiple_files_on_single_config(self):
+        pass
         
         
 

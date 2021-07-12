@@ -30,12 +30,22 @@ class CSV:
         self.binning_configs = ''
 
         if (dataFiles != '') and (configFiles != ''):
+
+            # Setup binning config information
+            self.binning_configs = {}
+            self.binning_configs['subsystem_assignments'] = {}
+            self.binning_configs['test_assignments'] = {}
+            self.binning_configs['description_assignments'] = {}
+
+            config = self.parse_config_data_CSV(str2lst(configFiles)[0], ss_breakdown)
+
             # Setup headers, data
             headers_dict = {}
             data_dict = {}
             
             # Parse data across multiple files
             for data_file in str2lst(dataFiles):
+                
                 labels, data = self.parse_csv_data(data_file)
                 # Header format : { Filename : ['Header', 'Another Header', 'Etc.']}
                 headers_dict[data_file] = labels[data_file] #The key for labels is the file name, so we're able to add that to our "big" dictionary
@@ -48,24 +58,13 @@ class CSV:
                     else:
                         data_dict[key] = {}
                         data_dict[key][data_file] = data[key][data_file]
+                self.binning_configs['subsystem_assignments'][data_file] = config['subsystem_assignments']
+                self.binning_configs['test_assignments'][data_file]= config['test_assignments']
+                self.binning_configs['description_assignments'][data_file] = config['description_assignments']
                         
             self.all_headers = headers_dict
             self.sim_data = data_dict
 
-            # Setup binning config information
-            self.binning_configs = {}
-            self.binning_configs['subsystem_assignments'] = {}
-            self.binning_configs['test_assignments'] = {}
-            self.binning_configs['description_assignments'] = {}
-
-            for config_file in str2lst(configFiles):
-                # Config format {'subsystem' : {data_file : ['Etc.']}}
-                config = self.parse_config_data_CSV(config_file, ss_breakdown)
-                # Although this is a for loop, it should only execute once because the config currently has only read in one single file 
-                for data_file_key in config['subsystem_assignments']:
-                    self.binning_configs['subsystem_assignments'][data_file_key] = config['subsystem_assignments'][data_file_key]
-                    self.binning_configs['test_assignments'][data_file_key] = config['test_assignments'][data_file_key]
-                    self.binning_configs['description_assignments'][data_file_key] = config['description_assignments'][data_file_key]
 
             
 
@@ -102,8 +101,8 @@ class CSV:
     def parse_config_data_CSV(self, configFile, ss_breakdown):
         parsed_configs = extract_configs(self.metadata_file_path, [configFile], csv=True)
         if ss_breakdown == False:
-            num_elements = len(parsed_configs['subsystem_assignments'][process_filepath(configFile, csv=True)])
-            parsed_configs['subsystem_assignments'][process_filepath(configFile, csv=True)] = [['MISSION'] for elem in range(num_elements)]
+            num_elements = len(parsed_configs['subsystem_assignments'])
+            parsed_configs['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
         return parsed_configs
 
 ##### GETTERS ##################################
