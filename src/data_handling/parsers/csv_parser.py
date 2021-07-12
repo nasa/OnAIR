@@ -30,7 +30,6 @@ class CSV:
         self.binning_configs = ''
 
         if (dataFiles != '') and (configFiles != ''):
-
             # Setup binning config information
             self.binning_configs = {}
             self.binning_configs['subsystem_assignments'] = {}
@@ -45,7 +44,6 @@ class CSV:
             
             # Parse data across multiple files
             for data_file in str2lst(dataFiles):
-                
                 labels, data = self.parse_csv_data(data_file)
                 # Header format : { Filename : ['Header', 'Another Header', 'Etc.']}
                 headers_dict[data_file] = labels[data_file] #The key for labels is the file name, so we're able to add that to our "big" dictionary

@@ -52,11 +52,6 @@ def test_individual_suite(test):
     unittest.TextTestRunner(verbosity=1).run(test)
 
 if __name__ == '__main__':
-    run_path = 'src/test' 
-    results_path = 'src/test/results' 
-    os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
-    os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), results_path)
-    os.environ['SRC_ROOT_PATH'] = os.path.dirname(os.path.realpath(__file__))
     suite = create_suite()    
     if len(sys.argv) == 2:
         try:
