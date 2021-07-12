@@ -1,4 +1,4 @@
-""" Test POMDP Functionality """
+""" Test PPO Functionality """
 import os
 import unittest
 import random
