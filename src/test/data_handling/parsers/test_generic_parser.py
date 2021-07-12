@@ -7,6 +7,7 @@ import ast
 
 from src.data_handling.parsers.forty_two_parser import FortyTwo
 from src.data_handling.parsers.csv_parser import CSV
+from src.util.config import *
 
 
 class TestGenericParser(unittest.TestCase):
@@ -78,7 +79,34 @@ class TestGenericParser(unittest.TestCase):
             '''
 
     def test_multiple_files_on_single_config(self):
-        pass
+
+        config_files = str(['generic_test_42_CONFIG.txt'])
+        data_files = str(['generic_test_42.txt', 'generic_test_42_double.txt'])
+
+        parser = importlib.import_module('src.data_handling.parsers.' + self.parser_file_names[0])
+        parser_class = getattr(parser, self.parser_names[0])
+
+        P = parser_class(self.rawDataFilepath, 
+                            self.tlmConfigFilepath,
+                            data_files,
+                            config_files)
+        headers, sim_data, configs = P.get_sim_data()
+        self.assertEquals(P.all_headers, { 'generic_test_42.txt' : ['TIME', 'A', 'B', 'C'], 'generic_test_42_double.txt' : ['TIME', 'A', 'B', 'C']})
+        self.assertEquals(P.sim_data, {'1000': { 'generic_test_42.txt' : ['1000', '0', '0.000000000000e+00', '0.0'], 'generic_test_42_double.txt' : ['1000', '1', '0.000000000000e+00', '1.0']}, 
+                                                '1001': { 'generic_test_42.txt' : ['1001', '1', '1.000000000000e+00', '1.0'], 'generic_test_42_double.txt' : ['1001', '1', '1.000000000000e+00', '1.0']}, 
+                                                '1002': { 'generic_test_42.txt' : ['1002', '2', '2.000000000000e+00', '2'], 'generic_test_42_double.txt' : ['1002', '3', '2.000000000000e+00', '3']}, 
+                                                '1003': { 'generic_test_42.txt' : ['1003', '3', '3.000000000000e+00', '3'], 'generic_test_42_double.txt' : ['1003', '3', '3.000000000000e+00', '3']}})
+        subsystem = [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']]
+        test = [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]]]
+        description =  ['No description', 'No description', 'No description', 'No description']
+        self.assertEquals(P.binning_configs, {'subsystem_assignments': {'generic_test_42.txt':subsystem, 
+                                                                            'generic_test_42_double.txt' : subsystem}, 
+                                                  'test_assignments': {'generic_test_42.txt': test, 
+                                                                         'generic_test_42_double.txt' : test}, 
+                                                  'description_assignments': {'generic_test_42.txt': description, 
+                                                                                 'generic_test_42_double.txt' : description}})
+
+        
         
         
 
