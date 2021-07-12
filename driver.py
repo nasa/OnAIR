@@ -80,7 +80,7 @@ def init_global_paths(config_path, test=False):
     os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
     os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), results_path)
     os.environ['SRC_ROOT_PATH'] = os.path.dirname(os.path.realpath(__file__))
-    os.environ['CONFIG_PATH'] = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/test/config/default_config.ini') if test == True else os.path.join(os.environ['SRC_ROOT_PATH'], config_path) 
+    os.environ['CONFIG_PATH'] = os.path.join(os.environ['SRC_ROOT_PATH'], 'src/test/config/default_config.ini') if test == True else config_path
 
 """ Disable terminal output """
 def blockPrint():
