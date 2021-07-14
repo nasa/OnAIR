@@ -35,8 +35,8 @@ class POMDP:
         self.answer = 0
         try:
             self.load_model()
-        except:
-            print("WARNING!!! Failed to load model " + name + ".")
+        except FileNotFoundError:
+            print("WARNING!!! Failed to load model: \"" + name + "\".")
             print("Creating a new model.")
             self.states = []
             self.quality_values = []
@@ -96,6 +96,7 @@ class POMDP:
         self.rewards = data.rewards
         self.kappa = data.kappa
         self.confusion_matrix = data.confusion_matrix
+        #If you have no headers provided, extract headers from current config
         try:
             self.headers = data.headers
         except:
@@ -314,7 +315,7 @@ class POMDP:
             print("Reward:", my_reward)
         self.total_reward += my_reward
         if self.actions[action_index].find("report") != -1:
-            if my_reward == 100:
+            if my_reward == self.rewards[0]: #self.rewards[0] should always be the correct reward
                 self.correct = True
             else:
                 self.correct = False

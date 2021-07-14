@@ -121,31 +121,32 @@ def load_config_from_txt(config_path):
     #Config should be in the format {Header:[data, lower_thresh, upper_thresh, index associated with header]}
     #The index associated with the header will be set in the pomdp.py class
     config_dictionary = {}
-    config_path = os.path.join(os.environ['RUN_PATH'], config_path)
-    config = open(config_path,"r")
+    joined_config_path = os.path.join(os.environ['RUN_PATH'], config_path)
+    config = open(joined_config_path,"r")
     config_text = config.read().split("\n")
     for attribute in config_text:
         split_attribute = attribute.split(" ")
-        third_attribute = ast.literal_eval(split_attribute[2])
-        data_type = ''
-        lower_thresh = None
-        upper_thresh = None
-        if (len(third_attribute) == 2 and third_attribute[1] == "LABEL"):
-            data_type = 'label'
-            lower_thresh = 0
-            upper_thresh = 1
-        elif (len(third_attribute) == 2 and third_attribute[1] == "TIME"):
-            data_type = 'time'
-        elif (len(third_attribute) > 2 and third_attribute[0] == "FEASIBILITY"):
-            data_type = 'data'
-            lower_thresh = third_attribute[1]
-            upper_thresh = third_attribute[len(third_attribute)-1]
-        else:
-            data_type = 'ignore'
-        if upper_thresh != None and lower_thresh !=None:
-            config_dictionary[split_attribute[0]] = [data_type, lower_thresh, upper_thresh]
-        else:
-            config_dictionary[split_attribute[0]] = [data_type, '', '']
+        if(len(split_attribute) == 3):
+            third_attribute = ast.literal_eval(split_attribute[2])
+            data_type = ''
+            lower_thresh = None
+            upper_thresh = None
+            if (len(third_attribute) == 2 and third_attribute[1] == "LABEL"):
+                data_type = 'label'
+                lower_thresh = 0
+                upper_thresh = 1
+            elif (len(third_attribute) == 2 and third_attribute[1] == "TIME"):
+                data_type = 'time'
+            elif (len(third_attribute) > 2 and third_attribute[0] == "FEASIBILITY"):
+                data_type = 'data'
+                lower_thresh = third_attribute[1]
+                upper_thresh = third_attribute[len(third_attribute)-1]
+            else:
+                data_type = 'ignore'
+            if upper_thresh != None and lower_thresh !=None:
+                config_dictionary[split_attribute[0]] = [data_type, lower_thresh, upper_thresh]
+            else:
+                config_dictionary[split_attribute[0]] = [data_type, '', '']
     return config_dictionary
 
 def check_label(config):
@@ -154,7 +155,7 @@ def check_label(config):
         if config[key][0] == "label":
             label_key = key
             break
-    if label_key == "Colomar":
+    if label_key == "Colomar": #Implement using VAE as labeler
         print("Error: No label column found in config.csv!")
         exit()
     return label_key
