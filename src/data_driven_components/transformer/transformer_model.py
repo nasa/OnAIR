@@ -1,6 +1,7 @@
 from src.data_driven_components.vae.vae import TimeseriesDataset
 from src.data_driven_components.transformer.transformer import Transformer
 from src.data_driven_components.vae.vae_train import train
+from src.data_driven_components.vae.vae_diagnosis import VAEExplainer
 from src.data_driven_components.data_learners import DataLearner
 import os
 import torch
@@ -22,6 +23,9 @@ class TransformerModel(DataLearner):
         self.window_size = window_size
         self.model = Transformer(len(headers), window_size, z_units, hidden_units)
         self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
+        self.mask = self.model.generate_square_subsequent_mask(window_size)
+        self.tar_mask = self.model.generate_square_subsequent_mask(window_size+1)
+        self.has_baseline = False
 
     def apriori_training(self, data_train):
         """
@@ -39,18 +43,33 @@ class TransformerModel(DataLearner):
             train_dataset = TimeseriesDataset(data_train, transform)
             train_dataloader = DataLoader(train_dataset, batch_size=_batch_size)
 
-            train(self.model, {'train': train_dataloader}, phases=["train"], checkpoint=True)
+            train(self.model, {'train': train_dataloader}, phases=["train"], checkpoint=True, forward=lambda x: self.model(x, self.mask, self.tar_mask))
 
-    def update(self, frame):
+    def update(self, frame, status):
         """
         :param frame: (list of floats) input sequence of len (input_dim)
+        :param status: (int) 0 for red, 1 yellow, 2 green, 3 no data
         :return: None
         """
+        if status == 2:
+            self.baseline = frame
+            self.has_baseline = True
+
         self.frames.append(frame)
         self.frames.pop(0)
 
     def render_diagnosis(self):
         """
-        System should return its diagnosis
+        System should return its diagnosis, do not run unless model is loaded
         """
-        pass
+        self.explainer = VAEExplainer(lambda x: self.model(x, self.mask, self.tar_mask), self.headers, len(self.headers), self.window_size)
+        transformation = lambda x: torch.Tensor(x).float().unsqueeze(0)
+
+        data = transformation(self.frames)
+        if self.has_baseline:
+            baseline = transformation(self.baseline)
+        else:
+            baseline = transformation(torch.zeros_like(data))
+
+        self.explainer.shap(data, baseline)
+        return self.explainer.viz(True)
