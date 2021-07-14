@@ -23,7 +23,7 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
     checkpoint_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"runs")
     latest_model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"models")
     e = datetime.now()
-    run_dir = os.path.join(checkpoint_dir, "{}-{}-{}_{}:{}:{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second))
+    run_dir = os.path.join(checkpoint_dir, "{}-{}-{}_{}--{}--{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second))
 
     if logging or checkpoint:
         writer = SummaryWriter(run_dir)
