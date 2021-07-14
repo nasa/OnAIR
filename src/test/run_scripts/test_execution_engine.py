@@ -78,8 +78,8 @@ class TestExecutionEngine(unittest.TestCase):
     def test_parse_data(self):
         parser_name = 'FortyTwo'
         parser_file_name = 'forty_two_parser'
-        dataFilePath = '/data/raw_telemetry_data/'
-        metadataFilePath = '/data/telemetry_configs/'
+        dataFilePath = 'data/raw_telemetry_data/'
+        metadataFilePath = 'data/telemetry_configs/'
 
         self.E.telemetryFiles = "['42_TLM.txt']"
         self.E.metaFiles = "['42_TLM_CONFIG.txt']"
