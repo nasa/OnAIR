@@ -28,7 +28,7 @@ class POMDP:
     # Epsilon = exploratory rate, generally set between 0 and 1
         # 0.1 = 10% chance to take a random action during training
     def __init__(self, name="pomdp", path="models/", config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
-        self.name = name 
+        self.name = name
         self.path = os.path.join(os.path.dirname(os.path.realpath(__file__)), path, '')
         self.print_on = print_on
         self.save_me = save_me
@@ -36,7 +36,7 @@ class POMDP:
         try:
             self.load_model()
         except:
-            print("Error: Failed to load model " + name + ".")
+            print("WARNING!!! Failed to load model " + name + ".")
             print("Creating a new model.")
             self.states = []
             self.quality_values = []
@@ -103,7 +103,7 @@ class POMDP:
             for key in self.config:
                 if self.config[key][0] == "data":
                     self.headers.append(key)
-        
+
     def load_model(self):
         data = pickle.load(open(self.path + "pomdp_model_" + str(self.name) + ".pkl","rb"))
         self.load_with_save_data(data)
