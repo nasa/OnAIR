@@ -27,7 +27,7 @@ class POMDP:
         # = 0, agent will only learn about actions that yield an immediate my_reward
     # Epsilon = exploratory rate, generally set between 0 and 1
         # 0.1 = 10% chance to take a random action during training
-    def __init__(self, name="pomdp", path="models/", config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
+    def __init__(self, new_model=False, name="pomdp", path="models/", config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
         self.name = name
         base_path = ""
         if (os.path.dirname(__file__) != ""):
@@ -36,9 +36,7 @@ class POMDP:
         self.print_on = print_on
         self.save_me = save_me
         self.answer = 0
-        try:
-            self.load_model()
-        except:
+        if new_model:
             self.states = []
             self.quality_values = []
             self.actions = []
@@ -67,6 +65,13 @@ class POMDP:
             self.kappa = 0 # Cohen's Kappa
             self.confusion_matrix = [1, 1, 1, 1]
             self.save_model()
+        else:
+            try:
+                self.load_model()
+            except:
+                print("Error: Failed to load model " + name + ".")
+                print("If you're trying to create a new model, set new_model=True in the POMDP/PPO init() function.")
+                exit()
         self.current_state_index = self.get_starting_state()
         self.total_reward = 0
         self.correct = False
@@ -78,31 +83,33 @@ class POMDP:
             pickle.dump(self.get_save_data(),open(self.path + "pomdp_model_" + str(self.name) + ".pkl","wb"))
 
     def get_save_data(self):
-        return [self.states, self.quality_values, self.actions, self.alpha, self.discount, self.epsilon, self.config, self.reportable_states, self.run_limit, self.rewards, self.kappa, self.confusion_matrix, self.headers]
+        #return [self.states, self.quality_values, self.actions, self.alpha, self.discount, self.epsilon, self.config, self.reportable_states, self.run_limit, self.rewards, self.kappa, self.confusion_matrix, self.headers]
+        return self
 
     def get_current_state(self):
         return self.states[self.current_state_index]
 
     def load_with_save_data(self, data):
-        self.states = data[0]
-        self.quality_values = data[1]
-        self.actions = data[2]
-        self.alpha = data[3]
-        self.discount = data[4]
-        self.epsilon = data[5]
-        self.config = data[6]
-        self.reportable_states = data[7]
-        self.run_limit = data[8]
-        self.rewards = data[9]
-        self.kappa = data[10]
-        self.confusion_matrix = data[11]
-        try:
-            self.headers = data[12]
-        except:
-            self.headers = []
-            for key in self.config:
-                if self.config[key][0] == "data":
-                    self.headers.append(key)
+        self = data
+        #self.states = data[0]
+        #self.quality_values = data[1]
+        #self.actions = data[2]
+        #self.alpha = data[3]
+        #self.discount = data[4]
+        #self.epsilon = data[5]
+        #self.config = data[6]
+        #self.reportable_states = data[7]
+        #self.run_limit = data[8]
+        #self.rewards = data[9]
+        #self.kappa = data[10]
+        #self.confusion_matrix = data[11]
+        #try:
+        #    self.headers = data[12]
+        #except:
+        #    self.headers = []
+        #    for key in self.config:
+        #        if self.config[key][0] == "data":
+        #            self.headers.append(key)
 
     def load_model(self):
         data = pickle.load(open(self.path + "pomdp_model_" + str(self.name) + ".pkl","rb"))
