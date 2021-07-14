@@ -16,10 +16,12 @@ from src.test.reasoning.test_brain import TestBrain
 from src.test.systems.test_telemetry_test_suite import TestTelemetryTestSuite
 from src.test.run_scripts.test_sim import TestSimulator
 from src.test.data_driven_components.test_data_driven_learning import TestDataDrivenLearning
+from src.test.data_driven_components.pomdp.test_kalman_filter import TestKalmanFilter
+from src.test.data_driven_components.pomdp.test_observation import TestObservation
 from src.test.data_driven_components.test_vae import TestVAE
-from src.test.util.test_cleanup import TestCleanup
 from src.test.run_scripts.test_generalizability_engine import TestGeneralizabilityEngine
 from src.test.util.test_data_reformatting import TestDataReformatting
+from src.test.data_driven_components.pomdp.test_ppo_model import TestPPOModel
 
 def create_suite():
     suite = []
@@ -36,12 +38,13 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestBrain))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTelemetryTestSuite))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
-    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCleanup))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestKalmanFilter))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestObservation))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGeneralizabilityEngine))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestVAE))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataReformatting))
-    
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestPPOModel))
     return suite
 
 def run_tests(suite):
