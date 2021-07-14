@@ -1,3 +1,4 @@
+  
 """ Test Status Functionality """
 import os
 import unittest
@@ -90,6 +91,71 @@ class TestTelemetryTestSuite(unittest.TestCase):
         self.assertEquals(result[1], [({'GREEN', 'RED', 'YELLOW'}, 1.0)]) 
 
     def test_feasibility(self):
+        epsilon = 0.000001
+        #Test with param length of 2
+        params = [0, 10]        
+        #Test on lower boundary
+        val = 0
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'RED')
+        self.assertEquals(mass_assignments, [({'RED', 'GREEN'}, 1.0)])
+        #Test one above lower boundary
+        val = 1
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'GREEN')
+        self.assertEquals(mass_assignments, [({'GREEN'}, 1.0)])
+        #Test on upper boundary
+        val = 10
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'RED')
+        self.assertEquals(mass_assignments, [({'GREEN', 'RED'}, 1.0)])
+        #Test one below upper boundary
+        val = 9
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'GREEN')
+        self.assertEquals(mass_assignments, [({'GREEN'}, 1.0)])
+        #Test in middle of boundaries
+        val = 5
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'GREEN')
+        self.assertEquals(mass_assignments, [({'GREEN'}, 1.0)]) 
+        #Test below lower boundary
+        val = -5
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'RED')
+        self.assertEquals(mass_assignments, [({'RED'}, 1.0)]) 
+        #Test above upper boundary
+        val = 15
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'RED')
+        self.assertEquals(mass_assignments, [({'RED'}, 1.0)])
+        #Test with param length of 4
+        params = [0,10,20,30]
+        #Test in lower yellow range        
+        val = 5
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'YELLOW')
+        self.assertEquals(mass_assignments, [({'YELLOW'}, 1.0)])
+        #Test in lower green boundary        
+        val = 10
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'GREEN')
+        self.assertEquals(mass_assignments, [({'YELLOW', 'GREEN'}, 1.0)])
+        #Test in green range
+        val = 15
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'GREEN')
+        self.assertEquals(mass_assignments, [({'GREEN'}, 1.0)])
+        #Test in higher yellow range
+        val = 25
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'YELLOW')
+        self.assertEquals(mass_assignments, [({'YELLOW'}, 1.0)])
+        #Test in lower yellow boundary        
+        val = 20
+        state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
+        self.assertEquals(state, 'YELLOW')
+        self.assertEquals(mass_assignments, [({'GREEN','YELLOW'}, 1.0)])
         return
 
     def test_noop(self):
@@ -98,6 +164,38 @@ class TestTelemetryTestSuite(unittest.TestCase):
         self.assertEquals(result[1], [({'GREEN'}, 1.0)]) 
 
     def test_calc_single_status(self):
+        status_list = ['RED', 'RED', 'GREEN', 'YELLOW', 'GREEN', 'GREEN']
+        result, confidence = self.TTS.calc_single_status(status_list, mode='strict')
+        self.assertEquals(result, 'RED')
+        self.assertEquals(confidence, 0.3333333333333333)
+        result, confidence = self.TTS.calc_single_status(status_list, mode='distr')
+        self.assertEquals(result, 'GREEN')
+        self.assertEquals(confidence, 0.5)
+        result, confidence = self.TTS.calc_single_status(status_list, mode='max')
+        self.assertEquals(result, 'GREEN')
+        self.assertEquals(confidence, 1.0)
+
+        status_list = ['RED', 'RED', 'RED', 'YELLOW', 'GREEN', 'GREEN']
+        result, confidence = self.TTS.calc_single_status(status_list, mode='strict')
+        self.assertEquals(result, 'RED')
+        self.assertEquals(confidence, 0.5)
+        result, confidence = self.TTS.calc_single_status(status_list, mode='distr')
+        self.assertEquals(result, 'RED')
+        self.assertEquals(confidence, 0.5)
+        result, confidence = self.TTS.calc_single_status(status_list, mode='max')
+        self.assertEquals(result, 'RED')
+        self.assertEquals(confidence, 1.0)
+
+        status_list = ['YELLOW', 'GREEN', 'YELLOW', 'YELLOW', 'YELLOW', 'GREEN']
+        result, confidence = self.TTS.calc_single_status(status_list, mode='strict')
+        self.assertEquals(result, 'YELLOW')
+        self.assertEquals(confidence, 1.0)
+        result, confidence = self.TTS.calc_single_status(status_list, mode='distr')
+        self.assertEquals(result, 'YELLOW')
+        self.assertEquals(confidence, 0.6666666666666666)
+        result, confidence = self.TTS.calc_single_status(status_list, mode='max')
+        self.assertEquals(result, 'YELLOW')
+        self.assertEquals(confidence, 1.0)
         return
 
 

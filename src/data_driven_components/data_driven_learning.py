@@ -11,6 +11,7 @@ from src.util.data_reformatting import *
 
 from src.data_driven_components.associativity.associativity import Associativity
 from src.data_driven_components.vae.vae_model import VAEModel
+from src.data_driven_components.pomdp.ppo_model import PPOModel
 
 class DataDrivenLearning:
     def __init__(self, headers=[], window_size=10):
@@ -29,6 +30,7 @@ class DataDrivenLearning:
         self.window_size = window_size
         self.associations = Associativity(headers, self.window_size, True)
         self.vae = VAEModel(headers=headers, window_size=self.window_size)
+        self.ppo = PPOModel(headers=headers, window_size=self.window_size)
 
     def apriori_training(self, data):
         if not data == []:
@@ -37,14 +39,15 @@ class DataDrivenLearning:
             batch_data = []
         self.associations.apriori_training(batch_data)
         self.vae.apriori_training(batch_data)
+        self.ppo.apriori_training(batch_data)
 
     def update(self, curr_data, status):
         input_data = floatify_input(curr_data, self.window_size)
         output_data = self.status_to_oneHot(status)
 
-        self.associations.update(input_data)
+        #self.associations.update(input_data)
         self.vae.update(input_data)
-        
+        self.ppo.update(input_data)
         return input_data, output_data 
 
     def diagnose(self):
