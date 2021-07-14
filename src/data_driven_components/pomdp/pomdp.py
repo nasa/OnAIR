@@ -90,26 +90,25 @@ class POMDP:
         return self.states[self.current_state_index]
 
     def load_with_save_data(self, data):
-        self = data
-        #self.states = data[0]
-        #self.quality_values = data[1]
-        #self.actions = data[2]
-        #self.alpha = data[3]
-        #self.discount = data[4]
-        #self.epsilon = data[5]
-        #self.config = data[6]
-        #self.reportable_states = data[7]
-        #self.run_limit = data[8]
-        #self.rewards = data[9]
-        #self.kappa = data[10]
-        #self.confusion_matrix = data[11]
-        #try:
-        #    self.headers = data[12]
-        #except:
-        #    self.headers = []
-        #    for key in self.config:
-        #        if self.config[key][0] == "data":
-        #            self.headers.append(key)
+        self.states = data.states
+        self.quality_values = data.quality_values
+        self.actions = data.actions
+        self.alpha = data.alpha
+        self.discount = data.discount
+        self.epsilon = data.epsilon
+        self.config = data.config
+        self.reportable_states = data.reportable_states
+        self.run_limit = data.run_limit
+        self.rewards = data.rewards
+        self.kappa = data.kappa
+        self.confusion_matrix = data.confusion_matrix
+        try:
+            self.headers = data.headers
+        except:
+            self.headers = []
+            for key in self.config:
+                if self.config[key][0] == "data":
+                    self.headers.append(key)
 
     def load_model(self):
         data = pickle.load(open(self.path + "pomdp_model_" + str(self.name) + ".pkl","rb"))
