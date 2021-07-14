@@ -63,6 +63,6 @@ class VAEModel(DataLearner):
         self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
         data = torch.Tensor(self.frames).float().unsqueeze(0)
         self.explainer.shap(torch.randn_like(data), torch.ones_like(data)*2) # TODO switch to baseline
-        return self.explainer.viz()
+        return self.explainer.viz(True)
 
 
