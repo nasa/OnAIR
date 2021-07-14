@@ -88,7 +88,6 @@ def strip_view_prefix(action):
     action.upper()
     return action
 
-# TODO: Not implemented yet, setup configs for attributes, have a way when training to set data configs
 # Goes into specific run instances data configs and gets threshold of current attribute
 def get_attribute_threshold(attribute, config):
     lower_bound = config[attribute][1]
