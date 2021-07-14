@@ -73,7 +73,7 @@ class VAEModel(DataLearner):
         if self.has_baseline:
             baseline = transformation(self.baseline)
         else:
-            baseline = transformation(torch.zeros_like(data))
+            baseline = torch.zeros_like(data)
 
 
         self.explainer.shap(data, baseline)
