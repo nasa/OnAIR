@@ -21,8 +21,8 @@ from math import exp
 ########################
 
 class PPO(POMDP):
-    def __init__(self, new_model=False, name="ppo", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
-        super().__init__(new_model=new_model, name=name)
+    def __init__(self, name="ppo", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
+        super().__init__(name=name)
         self.epsilon = epsilon
         self.discount = discount
         self.epochs = epochs
