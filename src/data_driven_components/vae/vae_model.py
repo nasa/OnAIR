@@ -25,6 +25,7 @@ class VAEModel(DataLearner):
         self.model = VAE(headers, window_size, z_units, hidden_units)
         self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
         self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
+        self.has_baseline = False
 
 
 
@@ -56,6 +57,8 @@ class VAEModel(DataLearner):
         """
         if status == 2:
             self.baseline = frame
+            self.has_baseline = True
+
         self.frames.append(frame)
         self.frames.pop(0)
 
@@ -67,8 +70,12 @@ class VAEModel(DataLearner):
         transformation = lambda x: torch.Tensor(x).float().unsqueeze(0)
 
         data = transformation(self.frames)
-        baseline = transformation(self.baseline)
-        
+        if self.has_baseline:
+            baseline = transformation(self.baseline)
+        else:
+            baseline = transformation(torch.zeros_like(data))
+
+
         self.explainer.shap(data, baseline)
         return self.explainer.viz(True)
 
