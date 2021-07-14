@@ -21,11 +21,8 @@ from src.test.data_driven_components.pomdp.test_observation import TestObservati
 from src.test.data_driven_components.test_vae import TestVAE
 from src.test.run_scripts.test_generalizability_engine import TestGeneralizabilityEngine
 from src.test.util.test_data_reformatting import TestDataReformatting
-<<<<<<< HEAD
 from src.test.reasoning.test_diagnosis import TestDiagnosis
-=======
 from src.test.data_driven_components.pomdp.test_ppo_model import TestPPOModel
->>>>>>> main
 
 def create_suite():
     suite = []
