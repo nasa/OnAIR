@@ -192,12 +192,12 @@ class TestFortyTwoParser(unittest.TestCase):
         config_file = '42_TLM_CONFIG.txt'
         parsed_configs = self.P.parse_config_data(self.tlmConfigFilepath + config_file, True)
         
-        self.assertEquals(parsed_configs['subsystem_assignments']['42_TLM.txt'], [['CDH'], ['GNC'], ['GNC'], ['POWER'], ['POWER'], ['POWER'], ['THERMAL'], ['THERMAL'], ['THERMAL'], ['GNC'], ['GNC'], ['GNC'], ['GNC']])
-        self.assertEquals(parsed_configs['test_assignments']['42_TLM.txt'], [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['NOOP']]])
-        self.assertEquals(parsed_configs['description_assignments']['42_TLM.txt'], ['No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description'])
+        self.assertEquals(parsed_configs['subsystem_assignments'], [['CDH'], ['GNC'], ['GNC'], ['POWER'], ['POWER'], ['POWER'], ['THERMAL'], ['THERMAL'], ['THERMAL'], ['GNC'], ['GNC'], ['GNC'], ['GNC']])
+        self.assertEquals(parsed_configs['test_assignments'], [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['NOOP']]])
+        self.assertEquals(parsed_configs['description_assignments'], ['No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description'])
 
         parsed_configs = self.P.parse_config_data(self.tlmConfigFilepath + config_file, False)
-        self.assertEquals(parsed_configs['subsystem_assignments']['42_TLM.txt'], [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']])
+        self.assertEquals(parsed_configs['subsystem_assignments'], [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']])
 
     def test_time_ordering_not_occurring(self):
         dataFiles = 'time_ordering.txt'

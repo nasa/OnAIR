@@ -1,0 +1,80 @@
+700_crash_to_earth:
+	- Satellite starts at 2000 altitude.
+	- Satellite attempts a mission at the unsafe 700 altitude.
+	- The error begins when the satellite went below 1200, as below 1200 is unsafe.
+	- At 700, the satellite is too close to Earth, and thus, it starts to be pulled down by gravity.
+	- Satellite goes full thrust upward to try to get back to 700 altitude, but continues to accelerate downwards.
+	- Satellite crashes into Earth at 0 altitude, and temperature sensors are high and climbing due to fire.
+	- Diagnosis: Going below 1200 altitude is unsafe.
+
+1000_unsafe_altitude:
+	- Satellite starts at 2000 altitude.
+	- Satellite attempts a mission at the unsafe 1000 altitude.
+	- The error begins when the satellite went below 1200, as below 1200 is unsafe.
+	- 1000 is far lower than the safety threshold of 1200, so this is considered super dangerous and thus an error.
+	- After the satellite finishes collecting data, it heads back towards 2000.
+	- Once the satellite is over 1200 again, the error label switches back to being okay.
+	- Diagnosis: Going below 1200 altitude is unsafe.
+
+1600_current_jump:
+	- Satellite is attempting the no_error mission "1600_collection".
+	- The mission goes well, but once in a while the current jumps briefly for no known reason.
+	- For example, while voltage is steady at [13, 13, 13, 13, 13], the current might be [3, 3, 5, 3, 3].
+	- Diagnosis: Nothing seems to be breaking due to these measured blips in current, so perhaps the current is actually fine, and just the sensor for current is broken.
+
+1600_thruster_breakcap:
+	- Satellite is attempting the no_error mission "1600_collection".
+	- The mission goes well, but the thrusters are working at unsafe levels.
+	- Normally, the thrusters should not go above 200 or below -200. However, the thrusters think the limit is 500 and -500 in this mission.
+	- Diagnosis: The mission was "successful," but the lifespan of the thrusters & electronics has decreased due to over-exertion. The same mission could've been completed in a similar amount of time with the suggested threshold of [-200, 200] for the thrusters. Instead, the thrusters pulled way more power than they should be able to. Notice the Voltage (25) and Current (8) broke their top safety thresholds (18 and 5 respectively) at the same time as the thrusters went outside of their threshold of [-200, 200]. As a result, the wires experienced more power than they were approved for, and the thrusters exerted more firepower than they were approved for. Not safe!
+
+1600_voltage_jump:
+	- Satellite is attempting the no_error mission "1600_collection".
+	- The mission goes well, but once in a while the voltage jumps briefly for no known reason.
+	- For example, while current is steady at [4, 4, 4, 4, 4], the voltage might be [15, 15, 80, 80, 15].
+	- Diagnosis: Nothing seems to be breaking due to these measured blips in voltage, so perhaps the voltage is actually fine, and just the sensor for the voltage is broken.
+	
+
+2300_voltage_bad:
+	- Satellite is attempting the no_error mission "2300_collection".
+	- The mission goes well, but the voltage sensor is just outputting random crap the whole time.
+	- Diagnosis: Nothing seems to be breaking due to the voltage measurements, so perhaps the voltage is actually fine, and just the sensor for the voltage is broken.
+	
+
+2400_curvol_jump:
+	- Satellite is attempting the no_error mission "2400_collection".
+	- The mission goes well, but the voltage and current sensors are occasionally outputting something strange.
+	- Diagnosis: Either the sensor for voltage AND the sensor for current have broken, or there is actually a problem with the power system of the satellite that shows up sometimes, then seemingly fixes itself a few frames later.
+
+2400_thruster_breakcap:
+	- Satellite is attempting the no_error mission "2400_collection".
+	- The mission goes well, but the thrusters are working at unsafe levels.
+	- Normally, the thrusters should not go above 200 or below -200. However, the thrusters think the limit is 500 and -500 in this mission.
+	- Diagnosis: The mission was "successful," but the lifespan of the thrusters & electronics has decreased due to over-exertion. The same mission could've been completed in a similar amount of time with the suggested threshold of [-200, 200] for the thrusters. Instead, the thrusters pulled way more power than they should be able to. Notice the Voltage (25) and Current (8) broke their top safety thresholds (18 and 5 respectively) at the same time as the thrusters went outside of their threshold of [-200, 200]. As a result, the wires experienced more power than they were approved for, and the thrusters exerted more firepower than they were approved for. Not safe!
+
+3000_unsafe_altitude:
+	- Satellite starts at 2000 altitude.
+	- Satellite attempts a mission at the unsafe 3000 altitude.
+	- The error begins when the satellite went above 2800, as above 2800 is unsafe.
+	- 3000 is far higher than the safety threshold of 2800, so this is considered super dangerous and thus an error.
+	- After the satellite finishes collecting data, it heads back towards 2000.
+	- Once the satellite is under 2800 again, the error label switches back to being okay.
+	- Diagnosis: Going above 2800 altitude is unsafe.
+
+3300_float_into_space:
+	- Satellite starts at 2000 altitude.
+	- Satellite attempts a mission at the unsafe 3300 altitude.
+	- The error begins when the satellite went above 2800, as above 2800 is unsafe.
+	- Once the satellite reaches 3300, it tries to stop, but fails, and keeps moving. The satellite flies out into space.
+	- Diagnosis: The easy thing to blame for this error is the altitude measurement, as going above 2800 is unsafe. However, let's consider why it's unsafe. Notice the temperature measurements. The satellite gets super cold and literally freezes after going to altitude 3300. Thus, the thrusters froze, and failed to output anything. The thruster readings may imply that they've switched to -200 in an attempt to return to a safe altitude, but the acceleration measurement shows a different story. What actually happened is the thrusters are *saying* they're at -200, and it's true that they're drawing the voltage and current to do that, but they actually aren't able to change the momentum of the satellite, as the physical component that thrusts is completely frozen and unable to work.
+
+standby_catch_fire:
+	- Satellite is attempting the no_error mission "standby".
+	- The temperature steadily increases throughout the entire mission, even though the altitude isn't changing.
+	- This quickly gets out-of-hand, with the temperature breaking the safety thresholds and continuing to rise rapidly.
+	- Diagnosis: The altitude measurement shows that the satellite isn't crashing to Earth, and the voltage/current/thruster measurements don't show any problems with the power system. Something else, which we do not have sensors for, must have caused this increase in temperature, which is clearly a fire by the end of the mission (as it gets way too hot to not be a fire). Perhaps some oil spilled in the ship and caught fire, or some hot space object hit us, or something. It's hard to say what could have happened, since none of our sensors (besides temperature) are picking up anything. But, with a temperature this high, we can be certain that a fire started for some reason, even though the satellite was just standing by at the safe 2000 altitude.
+
+standby_communication_error:
+	- Satellite is attempting the no_error mission "standby".
+	- The mission goes well (as far as we can tell), but the data suddenly drops to zero sometimes.
+	- Diagnosis: This is a data flow problem. The sensors aren't outputting random crap like they do when they're broken - instead, they are outputting zero, so perhaps they all became detached, or the wires connecting them to our system snapped. For whatever reason, the system is getting zero from wires. ALTERNATIVELY, perhaps the problem is communication between the satellite and ground control. Just because ground control is reading a zero for the sensors doesn't mean those sensors broke - maybe the satellite just failed to communicate what the sensors are reading, so our systems are showing zero due to the lack of data.

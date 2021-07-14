@@ -26,8 +26,8 @@ class TestDataDrivenLearning(unittest.TestCase):
         return
 
     def test_update(self):
-        return
-
+        return 
+    
     def test_diagnose(self):
         return 
 

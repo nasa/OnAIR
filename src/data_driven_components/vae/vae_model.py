@@ -1,14 +1,17 @@
+import os
+
+import torch
+from src.data_driven_components.data_learners import DataLearner
 from src.data_driven_components.vae.vae import VAE, TimeseriesDataset
 from src.data_driven_components.vae.vae_train import train
-from src.data_driven_components.data_learners import DataLearner
-import os
-import torch
+from src.data_driven_components.vae.vae_diagnosis import VAEExplainer
 from torch.utils.data import DataLoader, Dataset
+
 
 class VAEModel(DataLearner):
 
     def __init__(self, headers, window_size, z_units=5, hidden_units=100, 
-            path='src/data_driven_components/vae/models/checkpoint_latest.pth.tar'):
+            path=os.path.join('src','data_driven_components','vae','models','checkpoint_latest.pth.tar')):
         """
         :param headers: (string list) list of headers for each input feature
         :param window_size: (int) number of data points in our data sequence
@@ -21,6 +24,9 @@ class VAEModel(DataLearner):
         self.window_size = window_size
         self.model = VAE(headers, window_size, z_units, hidden_units)
         self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
+        self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
+
+
 
     def apriori_training(self, data_train):
         """
@@ -40,6 +46,8 @@ class VAEModel(DataLearner):
 
             train(self.model, {'train': train_dataloader}, phases=["train"], checkpoint=True)
 
+        self.explainer.updateModel(self.model)
+
     def update(self, frame):
         """
         :param frame: (list of floats) input sequence of len (input_dim)
@@ -50,6 +58,11 @@ class VAEModel(DataLearner):
 
     def render_diagnosis(self):
         """
-        System should return its diagnosis
+        System should return its diagnosis, do not run unless model is loaded
         """
-        pass
+        self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
+        data = torch.Tensor(self.frames).float().unsqueeze(0)
+        self.explainer.shap(torch.randn_like(data), torch.ones_like(data)*2) # TODO switch to baseline
+        return self.explainer.viz(True)
+
+

@@ -1,0 +1,4 @@
+Time,TMP Data Flow,CUR Data Flow,VLT Data Flow,TMP External,TMP Internal,CUR Engine,CUR Wings,VLT Engine,VLT Wings,Battery Juice,Propulsion,Navigation,Power,Thermal,Communication,Safe Mode
+ignore,data,data,data,data,data,data,data,data,data,data,ignore,ignore,ignore,ignore,ignore,label
+,0,0,0,40,87,3,3,13,13,0.1,,,,,,
+,1,1,1,170,100,5,5,20,20,100,,,,,,

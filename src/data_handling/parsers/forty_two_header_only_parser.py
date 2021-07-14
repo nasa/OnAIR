@@ -1,5 +1,8 @@
 """
 42 Parser
+
+Only headers are parsed on init. This parser is used for the cFS adapter, which does not
+have real data upon start up.
 """
 
 import csv
@@ -28,21 +31,37 @@ class FortyTwo:
         self.binning_configs = ''
 
         if (dataFiles != '') and (configFiles != ''):
-            labels, data = self.parse_sim_data(str2lst(dataFiles)[0])
-            self.all_headers = labels
-            self.sim_data = data
-
-            configs = self.parse_config_data(str2lst(configFiles)[0], ss_breakdown)
-
+            # Setup binning config information
             self.binning_configs = {}
             self.binning_configs['subsystem_assignments'] = {}
             self.binning_configs['test_assignments'] = {}
             self.binning_configs['description_assignments'] = {}
 
-            for data_file in ast.literal_eval(dataFiles):
-                self.binning_configs['subsystem_assignments'][data_file] = configs['subsystem_assignments'][data_file]
-                self.binning_configs['test_assignments'][data_file] = configs['test_assignments'][data_file]
-                self.binning_configs['description_assignments'][data_file] = configs['description_assignments'][data_file]
+            config = self.parse_config_data(str2lst(configFiles)[0], ss_breakdown)
+            # Setup headers, data
+            headers_dict = {}
+            data_dict = {}
+
+            # Parse data across multiple files
+            for data_file in str2lst(dataFiles):
+                labels, data = self.parse_sim_data(data_file)
+                # Header format : { Filename : ['Header', 'Another Header', 'Etc.']}
+                headers_dict[data_file] = labels[data_file] #The key for labels is the file name, so we're able to add that to our "big" dictionary
+                # Data format : { 'index': { Filename : ['Data_Point', 'Another Data_Point', 'Etc.']}}
+                for key in data:
+                    # If the key does not exist in the data dictionary already, then data_dict[key][data_file] will give an error
+                    # In order to skirt this issue, if the key does not exist create an empty dictionary for it, then give it the data file
+                    if key in data_dict:
+                        data_dict[key][data_file] = data[key][data_file]
+                    else:
+                        data_dict[key] = {}
+                        data_dict[key][data_file] = data[key][data_file]
+                self.binning_configs['subsystem_assignments'][data_file] = config['subsystem_assignments']
+                self.binning_configs['test_assignments'][data_file]= config['test_assignments']
+                self.binning_configs['description_assignments'][data_file] = config['description_assignments']
+                        
+            self.all_headers = headers_dict
+            self.sim_data = data_dict
 
     ##### INITIAL PROCESSING ####
     def parse_sim_data(self, dataFile):
@@ -59,18 +78,10 @@ class FortyTwo:
         dataPts.remove('')
         headers = self.parse_headers(dataPts[0])
 
-        for dataPt in dataPts:
-            frames.append(self.parse_frame(dataPt))
-
         # Process into binning format
         all_headers = {}
-        all_data = {}
 
-        times = [frame[0] for frame in frames]
         all_headers[dataFile] = headers
-
-        for i in range(len(times)):
-            all_data[times[i]] = {dataFile : frames[i]}
 
         return all_headers, {}
 
@@ -89,27 +100,11 @@ class FortyTwo:
 
         return headers
 
-    def parse_frame(self, frame):
-        clean_frame = []
-        data = frame.split('\n')
-
-        # Parse out unique fields
-        time = data[0].split(' ')[1]
-        clean_frame.append(time)
-        data = data[1:] # remove time
-
-        spacecraft = data[0].split('.')[0] # Not doing anything with this for now.. may parse it out
-
-        for datum in data:
-            clean_frame.append(datum.split(' = ')[1])
-
-        return clean_frame
-
     def parse_config_data(self, configFile, ss_breakdown):
         parsed_configs = extract_configs(self.metadata_file_path, [configFile])
         if ss_breakdown == False:
-            num_elements = len(parsed_configs['subsystem_assignments'][process_filepath(configFile)])
-            parsed_configs['subsystem_assignments'][process_filepath(configFile)] = [['MISSION'] for elem in range(num_elements)]
+            num_elements = len(parsed_configs['subsystem_assignments'])
+            parsed_configs['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
         return parsed_configs
 
     ##### GETTERS ##################################
