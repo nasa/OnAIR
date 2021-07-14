@@ -133,7 +133,9 @@ class PPO(POMDP):
         value2 = torch.clamp(ratios, 1 - self.epsilon, 1 + self.epsilon) * advantage
         # Calculate actor and critic losses.
         #Loss^Clip(theta) - coefficient1(SquaredErrorValuesLoss(theta)) + coefficient2(EntropyBonus)
-        loss = -torch.min(value1, value2) + 0.5*self.MseLoss(state_values, rewards) - 0.01*dist_entropy
+        coefficient1 = 0.5
+        coefficient2 = 0.01
+        loss = -torch.min(value1, value2) + coefficient1*self.MseLoss(state_values, rewards) - coefficient2*dist_entropy
         return loss
 
     ###---### Training ###---###
