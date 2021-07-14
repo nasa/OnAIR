@@ -21,8 +21,8 @@ from math import exp
 ########################
 
 class PPO(POMDP):
-    def __init__(self, name="ppo", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
-        super().__init__(name=name)
+    def __init__(self, new_model=False, name="ppo", epsilon = 0.2, epochs = 30, learning_rate_actor = 0.0005, learning_rate_critic = 0.001, discount = 0.99):
+        super().__init__(new_model=new_model, name=name)
         self.epsilon = epsilon
         self.discount = discount
         self.epochs = epochs
@@ -121,7 +121,7 @@ class PPO(POMDP):
         for run_through_reward in reversed(rewards):
             discounted_reward = 0
             for reward in reversed(run_through_reward):
-                discounted_reward = reward + discounted_reward * self.discount 
+                discounted_reward = reward + discounted_reward * self.discount
                 discounted_rewards.insert(0, discounted_reward)
         return discounted_rewards
 
@@ -163,7 +163,7 @@ class PPO(POMDP):
         if (len(test_data)!=0):
             reward_accuracy, correct_accuracy = self.test(test_data)
             print("####### Accuracy " + str(correct_accuracy) +" ####### \n")
-    
+
     """Update actor and critic models"""
     def train_update_step(self, old_observed, old_actions, old_log_probs, disc_rewards):
         old_observed = torch.tensor(old_observed, dtype=torch.float)
@@ -181,7 +181,7 @@ class PPO(POMDP):
             self.optimizer.zero_grad()
             loss.mean().backward()
             self.optimizer.step()
-    
+
     """Simulate a run for each data point in the batch"""
     def walk_through_batch(self, data):
         '''
@@ -223,7 +223,7 @@ class PPO(POMDP):
 
 
     ###---### Testing ###---###
-    
+
     """Given a datapoint run through options and eventually report"""
     def test_instance(self, data_point):
         #Initializing running variables
