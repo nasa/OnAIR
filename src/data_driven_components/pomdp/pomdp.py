@@ -30,9 +30,7 @@ class POMDP:
     def __init__(self, name="pomdp", path="models/", config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
         self.name = name
         base_path = ""
-        if (os.path.dirname(__file__) != ""):
-            base_path = os.path.dirname(__file__) + "/"
-        self.path = base_path + path
+        self.path = os.path.join(os.path.dirname(os.path.realpath(__file__)), path, '')
         self.print_on = print_on
         self.save_me = save_me
         self.answer = 0
