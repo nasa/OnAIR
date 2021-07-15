@@ -6,7 +6,9 @@ import csv
 import random
 import copy
 import ast
+import torch
 from src.data_driven_components.vae_model import VAEModel
+
 
 ## Load All The Data
 def mass_load_data(folder, lookback, filetype=".csv"):
@@ -42,6 +44,24 @@ def dict_sort_data(dict_config, data):
             index_for_key += 1
         output_data.append(new_point)
     return output_data
+
+def dict_to_3d_tensor(data):
+    #Get window size
+    window_size = 0
+    for key in data[0]:
+        window_size = len(data[0][key])
+        break
+    list_of_all_data_frames = []
+    for i in range(len(data)):
+        inner_frame = []
+        for _ in range(window_size):
+            data = []
+            for key in data:
+                data.append(data[key][0])
+                data[key].pop(0)
+            inner_frame.append(data)
+        list_of_all_data_frames.append(inner_frame)
+    return list_of_all_data_frames, data[0].keys(), window_size
 
 ## Load data from a .csv file
 def load_data(file_path, delimiter=',', quotechar='\"'):
@@ -164,10 +184,11 @@ def load_config_from_txt(config_path):
 
 def check_label(config, data):
     ### STUB TODO: fill out
+    tensor_data, headers, window_size = dict_to_3d_tensor(data)
+    data_to_pass = torch.tensor(tensor_data)
     VAE = VAEModel(headers, window_size)
     VAE.apriori_training(data) # check for model first, if it doesnt exist break
     VAE.model(data_to_pass) # load in data
-
     label = False
     label_key = "Colomar"
     label_list = []
@@ -178,6 +199,7 @@ def check_label(config, data):
             break
     if label_key == "Colomar": #Implement using VAE as labeler
         #Use VAE to populate label_list
+        VAE.model(data_to_pass)
         pass
     return label, label_key, label_list
 
