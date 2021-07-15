@@ -103,6 +103,8 @@ def stratified_sampling(config, data):
     for i in range(min_len):
         output_data.append(error_data[i])
         output_data.append(no_error_data[i])
+    if(output_data == []):
+        output_data = data
     return output_data
 
 ## Load the config
