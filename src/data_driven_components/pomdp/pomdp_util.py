@@ -6,6 +6,7 @@ import csv
 import random
 import copy
 import ast
+from src.data_driven_components.vae_model import VAEModel
 
 ## Load All The Data
 def mass_load_data(folder, lookback, filetype=".csv"):
@@ -162,6 +163,11 @@ def load_config_from_txt(config_path):
     return config_dictionary
 
 def check_label(config, data):
+    ### STUB TODO: fill out
+    VAE = VAEModel(headers, window_size)
+    VAE.apriori_training(data) # check for model first, if it doesnt exist break
+    VAE.model(data_to_pass) # load in data
+
     label = False
     label_key = "Colomar"
     label_list = []
