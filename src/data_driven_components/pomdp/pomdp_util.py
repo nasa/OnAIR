@@ -81,17 +81,27 @@ def split_headers_helper(arrayed_headers, master_list, current_depth):
 def stratified_sampling(config, data):
     error_data = []
     no_error_data = []
-    label_key = check_label(config)
-    for i in range(len(data)):
-        error = False
-        for j in range(len(data[i][label_key])):
-            if data[i][label_key][j] == '1':
+    label, label_key, label_list = check_label(config, data)
+    if label:
+        for i in range(len(data)):
+            error = False
+            for j in range(len(data[i][label_key])):
+                if data[i][label_key][j] == '1':
+                    error = True
+                    break
+            if error:
+                error_data.append(data[i])
+            else:
+                no_error_data.append(data[i])
+    else:
+        for i in range(len(data)):
+            error = False
+            if label_list[i] == 1:
                 error = True
-                break
-        if error:
-            error_data.append(data[i])
-        else:
-            no_error_data.append(data[i])
+            if error:
+                error_data.append(data[i])
+            else:
+                no_error_data.append(data[i])
     random.shuffle(error_data)
     random.shuffle(no_error_data)
     min_len = len(error_data)
@@ -151,16 +161,19 @@ def load_config_from_txt(config_path):
                 config_dictionary[split_attribute[0]] = [data_type, '', '']
     return config_dictionary
 
-def check_label(config):
+def check_label(config, data):
+    label = False
     label_key = "Colomar"
+    label_list = []
     for key in config:
         if config[key][0] == "label":
+            label = True
             label_key = key
             break
     if label_key == "Colomar": #Implement using VAE as labeler
-        print("Error: No label column found in config.csv!")
-        exit()
-    return label_key
+        #Use VAE to populate label_list
+        pass
+    return label, label_key, label_list
 
 ## data_train = list of frames, with headers and labels as described in a POMDP's self.config
 def split_by_lookback(data_train, lookback):
