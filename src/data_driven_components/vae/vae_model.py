@@ -25,6 +25,7 @@ class VAEModel(DataLearner):
         self.model = VAE(headers, window_size, z_units, hidden_units)
         self.frames = [[0.0]*len(headers) for i in range(self.window_size)]
         self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
+        self.has_baseline = False
 
 
 
@@ -48,11 +49,16 @@ class VAEModel(DataLearner):
 
         self.explainer.updateModel(self.model)
 
-    def update(self, frame):
+    def update(self, frame, status):
         """
         :param frame: (list of floats) input sequence of len (input_dim)
+        :param status: (int) 0 for red, 1 yellow, 2 green, 3 no data
         :return: None
         """
+        if status == 2:
+            self.baseline = frame
+            self.has_baseline = True
+
         self.frames.append(frame)
         self.frames.pop(0)
 
@@ -61,8 +67,16 @@ class VAEModel(DataLearner):
         System should return its diagnosis, do not run unless model is loaded
         """
         self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
-        data = torch.Tensor(self.frames).float().unsqueeze(0)
-        self.explainer.shap(torch.randn_like(data), torch.ones_like(data)*2) # TODO switch to baseline
+        transformation = lambda x: torch.Tensor(x).float().unsqueeze(0)
+
+        data = transformation(self.frames)
+        if self.has_baseline:
+            baseline = transformation(self.baseline)
+        else:
+            baseline = torch.zeros_like(data)
+
+
+        self.explainer.shap(data, baseline)
         return self.explainer.viz(True)
 
 
