@@ -22,7 +22,7 @@ class TestObservation(unittest.TestCase):
     def test_update_by_threshold(self):
         state = [['?', '?'],['?', '?'],['?', '?']]
         action = "view_VOL"
-        data = {'VOL' : [0, 1, 2], 'CUR': [0,1,2], 'TMP': [86, 98, 21]}
+        data = {'VOL' : [1, 1, 2], 'CUR': [0,1,2], 'TMP': [86, 98, 21]}
         config = {'VOL' : ['data',0, 5, 0], 'CUR': ['data',0, 5, 1], 'TMP': ['data',60, 100, 2]}
         returned_state = [['VOL_THRESH_STABLE', '?'],['?', '?'],['?', '?']]
         self.assertEquals(observation.update_by_threshold(state, action, data, config), returned_state)
@@ -30,7 +30,7 @@ class TestObservation(unittest.TestCase):
     def test_update_by_kalman(self):
         state = [['?', '?'],['?', '?'],['?', '?']]
         action = "view_VOL"
-        data = {'VOL' : [0, 1, 2], 'CUR': [0,1,2], 'TMP': [86, 98, 21]}
+        data = {'VOL' : [1, 1, 2], 'CUR': [0,1,2], 'TMP': [86, 98, 21]}
         config = {'VOL' : ['data',0, 5, 0], 'CUR': ['data',0, 5, 1], 'TMP': ['data',60, 100, 2]}
         returned_state = [['?', 'VOL_KAL_STABLE'],['?', '?'],['?', '?']]
         self.assertEquals(observation.update_by_kalman(state, action, data, config), returned_state)
@@ -38,7 +38,7 @@ class TestObservation(unittest.TestCase):
     def test_update_by_kalman(self):
         state = [['?', '?'],['?', '?'],['?', '?']]
         action = "view_VOL"
-        data = {'VOL' : [0, 1, 2], 'CUR': [0,1,2], 'TMP': [86, 98, 21]}
+        data = {'VOL' : [1, 1, 2], 'CUR': [0,1,2], 'TMP': [86, 98, 21]}
         config = {'VOL' : ['data',0, 5, 0], 'CUR': ['data',0, 5, 1], 'TMP': ['data',60, 100, 2]}
         returned_state = [['VOL_THRESH_STABLE', 'VOL_KAL_STABLE'],['?', '?'],['?', '?']]
         self.assertEquals(observation.get_observation(state, action, data, config), returned_state)
