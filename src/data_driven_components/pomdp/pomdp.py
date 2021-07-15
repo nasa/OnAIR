@@ -28,49 +28,55 @@ class POMDP:
     # Epsilon = exploratory rate, generally set between 0 and 1
         # 0.1 = 10% chance to take a random action during training
     def __init__(self, name="pomdp", path="models/", config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
-        self.name = name
+        self.name = name + "_" + get_config()['DEFAULT']['ModelName']
         self.path = os.path.join(os.path.dirname(os.path.realpath(__file__)), path, '')
         self.print_on = print_on
         self.save_me = save_me
         self.answer = 0
-        try:
-            self.load_model()
-        except FileNotFoundError:
-            print("WARNING!!! Failed to load model: \"" + name + "\".")
-            print("Creating a new model.")
-            self.states = []
-            self.quality_values = []
-            self.actions = []
-            self.alpha = alpha
-            self.discount = discount
-            self.epsilon = epsilon
-            config_path = get_config()['DEFAULT']['TelemetryMetadataFilePath']
-            config_path = config_path + ast.literal_eval(get_config()['DEFAULT']['MetaFiles'])[0]
-            self.config = util.load_config_from_txt(config_path)
-            self.reportable_states = reportable_states
-            self.headers = []
-            index = 0
-            for key in self.config:
-                if self.config[key][0] == "data":
-                    self.headers.append(key)
-                    self.actions.append("view_" + key)
-                    self.config[key].append(index)
-                    index += 1
-            if run_limit == -1:
-                self.run_limit = len(self.actions)+1
-            else:
-                self.run_limit = run_limit
-            for r in self.reportable_states:
-                self.actions.append("report_" + r)
-            self.rewards = [reward_correct, reward_incorrect, reward_action]
-            self.kappa = 0 # Cohen's Kappa
-            self.confusion_matrix = [1, 1, 1, 1]
-            self.save_model()
+        if get_config()['TESTING']['RunModels'] == True:
+            self.create_new_model(reward_correct, reward_incorrect, reward_action)
+        else:
+            try:
+                self.load_model()
+            except FileNotFoundError:
+                print("WARNING!!! Failed to load model: \"" + name + "\".")
+                print("Creating a new model.")
+                self.create_new_model(reward_correct, reward_incorrect, reward_action)                
         self.current_state_index = self.get_starting_state()
         self.total_reward = 0
         self.correct = False
         self.run_time = 0
         self.states_examined = [] # This is just for the recursive examination filter method
+
+    def create_new_model(self, reward_correct, reward_incorrect, reward_action):
+        self.states = []
+        self.quality_values = []
+        self.actions = []
+        self.alpha = alpha
+        self.discount = discount
+        self.epsilon = epsilon
+        config_path = get_config()['DEFAULT']['TelemetryMetadataFilePath']
+        config_path = config_path + ast.literal_eval(get_config()['DEFAULT']['MetaFiles'])[0]
+        self.config = util.load_config_from_txt(config_path)
+        self.reportable_states = reportable_states
+        self.headers = []
+        index = 0
+        for key in self.config:
+            if self.config[key][0] == "data":
+                self.headers.append(key)
+                self.actions.append("view_" + key)
+                self.config[key].append(index)
+                index += 1
+        if run_limit == -1:
+            self.run_limit = len(self.actions)+1
+        else:
+            self.run_limit = run_limit
+        for r in self.reportable_states:
+            self.actions.append("report_" + r)
+        self.rewards = [reward_correct, reward_incorrect, reward_action]
+        self.kappa = 0 # Cohen's Kappa
+        self.confusion_matrix = [1, 1, 1, 1]
+        self.save_model()
 
     def save_model(self):
         if self.save_me:
