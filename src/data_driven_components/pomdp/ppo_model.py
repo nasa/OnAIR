@@ -26,7 +26,8 @@ class PPOModel(DataLearner):
         if use_stratified:
             data_train = stratified_sampling(self.agent.config, data_train)
         #Data should be in the format of { Time : [ 0, 1, 2] , Voltage : [5, 5, 5] } at this point
-        self.agent.train_ppo(data_train, batch_size=int(len(data_train)/50))
+        batch_size = int(len(data_train)/50) if int(len(data_train)/50) > 0 else 1
+        self.agent.train_ppo(data_train, batch_size=batch_size)
 
     def update(self, frame):
         """
