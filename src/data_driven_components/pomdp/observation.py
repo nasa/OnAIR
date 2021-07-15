@@ -57,7 +57,7 @@ def update_by_threshold(state, action, data, config):
     attribute = strip_view_prefix(action) # Take "view_" out of the action string to get specific attribute being viewed
     for i in range(len(data[attribute])): # Loop through the entire time chunk, and change answer to 1 if any errors are found
         lower_thresh_val, upper_thresh_val = get_attribute_threshold(attribute, config)
-        if float(data[attribute][i]) < lower_thresh_val or float(data[attribute][i]) > upper_thresh_val:
+        if float(data[attribute][i]) <= lower_thresh_val or float(data[attribute][i]) >= upper_thresh_val:
             answer = "BROKEN"
             break
     # Update the state with the new information
