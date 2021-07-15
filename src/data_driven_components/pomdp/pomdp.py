@@ -34,21 +34,21 @@ class POMDP:
         self.save_me = save_me
         self.answer = 0
         if get_config()['TESTING']['RunModels'] == True:
-            self.create_new_model(reward_correct, reward_incorrect, reward_action)
+            self.create_new_model(alpha, discount, epsilon, reportable_states, run_limit, reward_correct, reward_incorrect, reward_action)
         else:
             try:
                 self.load_model()
             except FileNotFoundError:
                 print("WARNING!!! Failed to load model: \"" + name + "\".")
                 print("Creating a new model.")
-                self.create_new_model(reward_correct, reward_incorrect, reward_action)                
+                self.create_new_model(alpha, discount, epsilon, reportable_states, run_limit, reward_correct, reward_incorrect, reward_action)                
         self.current_state_index = self.get_starting_state()
         self.total_reward = 0
         self.correct = False
         self.run_time = 0
         self.states_examined = [] # This is just for the recursive examination filter method
 
-    def create_new_model(self, reward_correct, reward_incorrect, reward_action):
+    def create_new_model(self, alpha, discount, epsilon, reportable_states, run_limit, reward_correct, reward_incorrect, reward_action):
         self.states = []
         self.quality_values = []
         self.actions = []
