@@ -135,6 +135,11 @@ class PPO(POMDP):
         #Loss^Clip(theta) - coefficient1(SquaredErrorValuesLoss(theta)) + coefficient2(EntropyBonus)
         coefficient1 = 0.5
         coefficient2 = 0.01
+
+        #In the case that there is only one state value for those very small data set scenarios
+        if(len(list(state_values.size())) == 0):
+            state_values = torch.reshape(state_values, (1,))
+
         loss = -torch.min(value1, value2) + coefficient1*self.MseLoss(state_values, rewards) - coefficient2*dist_entropy
         return loss
 
@@ -173,7 +178,8 @@ class PPO(POMDP):
         #Normalize rewards
         norm_rewards = (disc_rewards - disc_rewards.mean()) / (disc_rewards.std() + 1e-7)
         if(not torch.any(torch.isnan(norm_rewards))):
-            disc_rewards = norm_rewards 
+            disc_rewards = norm_rewards
+
         for k in range(self.epochs):
             state_values, curr_log_probs, dist_entropy = self.evaluate(old_observed, old_actions)
             A_k = disc_rewards - state_values.detach() # The advantage at this current step (what kind of reward does a state value associate with)
