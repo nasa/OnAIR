@@ -22,16 +22,12 @@ class PPOModel(DataLearner):
         :param data: (3D array) first dim data points, second time frames and third features so (batch_size, window_size, input_dim)
         """
         #split_data = split_by_lookback(data, self.window_size)
-        print(data[0])
-        print(len(data))
         data_train = dict_sort_data(self.agent.config, data)
-        print(data_train[0])
         if use_stratified:
             data_train = stratified_sampling(self.agent.config, data_train)
         #Data should be in the format of { Time : [ 0, 1, 2] , Voltage : [5, 5, 5] } at this point
         batch_size = int(len(data_train)/50) if int(len(data_train)/50) > 0 else 1
         self.agent.train_ppo(data_train, batch_size=batch_size)
-        exit()
 
     def update(self, frame):
         """
