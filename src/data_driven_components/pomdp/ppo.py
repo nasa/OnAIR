@@ -171,7 +171,9 @@ class PPO(POMDP):
         old_log_probs = torch.tensor(old_log_probs, dtype=torch.float)
         disc_rewards = torch.tensor(disc_rewards, dtype=torch.float)
         #Normalize rewards
-        disc_rewards = (disc_rewards - disc_rewards.mean()) / (disc_rewards.std() + 1e-7)
+        norm_rewards = (disc_rewards - disc_rewards.mean()) / (disc_rewards.std() + 1e-7)
+        if(not torch.any(torch.isnan(norm_rewards))):
+            disc_rewards = norm_rewards 
         for k in range(self.epochs):
             state_values, curr_log_probs, dist_entropy = self.evaluate(old_observed, old_actions)
             A_k = disc_rewards - state_values.detach() # The advantage at this current step (what kind of reward does a state value associate with)
