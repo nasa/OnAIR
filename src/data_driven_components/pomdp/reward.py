@@ -12,7 +12,7 @@ def get_reward(action, data, rewards, config):
         return rewards[2], -1
     # For report actions: Check if POMDP was correct or not, and reward accordingly
     answer = 0
-    label, label_key = util.check_label(config, data)
+    label, label_key = util.check_label(config)
     if label:
         for i in range(len(data[label_key])):
             if data[label_key][i] == '1': # If there is an error anywhere in this chunk of time
