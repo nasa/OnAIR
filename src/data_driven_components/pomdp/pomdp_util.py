@@ -130,6 +130,8 @@ def stratified_sampling(config, data):
         output_data.append(error_data[i])
         output_data.append(no_error_data[i])
     if(output_data == []):
+        print("WARNING!!! Not enough diverse data for stratified sampling, defaulting to unsampled data.")
+        print("This will lead to suboptimal training.")
         output_data = data
     return output_data
 
