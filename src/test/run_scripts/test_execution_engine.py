@@ -17,7 +17,7 @@ class TestExecutionEngine(unittest.TestCase):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
         self.config_fp = self.test_path + '/../config/default_config.ini'
         
-        self.E = ExecutionEngine('', 'test', False)
+        self.E = ExecutionEngine(True, 'test', False)
         self.save_path = os.environ['RESULTS_PATH']
         self.run_path = os.environ['RUN_PATH']
         # self.tmp_save_path = os.path.join(os.path.dirname(os.path.realpath(__file__)) + '/../../../', 'results/tmp')

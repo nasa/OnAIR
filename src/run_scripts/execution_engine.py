@@ -16,7 +16,10 @@ from src.run_scripts.sim import Simulator
 from src.util.config import get_config
 
 class ExecutionEngine:
-    def __init__(self, config_file='', run_name='', save_flag=False):
+    def __init__(self, testing=True, run_name='', save_flag=False):
+        """
+        :param testing: (optional bool) if true do not load config
+        """
         
         # Init Housekeeping 
         self.run_name = run_name
@@ -46,9 +49,9 @@ class ExecutionEngine:
         self.save_flag = save_flag
         self.save_name = run_name
 
-        if config_file != '':
+        if not testing:
             self.init_save_paths()
-            self.parse_configs(config_file)
+            self.parse_configs()
             self.parse_data(self.parser_name, self.parser_file_name, self.dataFilePath, self.metadataFilePath)
             self.setup_sim()
 
