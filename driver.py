@@ -51,7 +51,7 @@ def main():
         run_generalizability_tests(args.generalizability)
     else:
         save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
-        RAISR = ExecutionEngine(args.configfile, save_name, args.save)
+        RAISR = ExecutionEngine(False, save_name, args.save)
         RAISR.run_sim()
 
     clean_all(os.environ['SRC_ROOT_PATH']) 
