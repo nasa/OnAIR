@@ -52,8 +52,7 @@ class ExecutionEngine:
             self.parse_data(self.parser_name, self.parser_file_name, self.dataFilePath, self.metadataFilePath)
             self.setup_sim()
 
-    def parse_configs(self, config_file_path):
-        # print("Using config file: {}".format(config_file_path))
+    def parse_configs(self):
 
         config = get_config()
 
