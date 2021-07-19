@@ -55,7 +55,7 @@ class TestExecutionEngine(unittest.TestCase):
 
 
     def test_parse_configs(self):
-        self.E.parse_configs(self.config_fp)
+        self.E.parse_configs()
         self.assertEquals(self.E.dataFilePath, 'data/raw_telemetry_data/')
         self.assertEquals(self.E.metadataFilePath, 'data/telemetry_configs/')
         self.assertEquals(self.E.metaFiles, "['42_TLM_CONFIG.txt']")
