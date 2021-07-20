@@ -6,13 +6,16 @@ import numpy as np
 class TestPPOModel(unittest.TestCase):
 
     def setUp(self):
-        self.ppo = PPOModel([], 2)
+        self.window_size = 2
+        self.ppo = PPOModel([], self.window_size)
 
     def test_apriori_training(self):
-        self.ppo.config = {'Time': ['ignore', '', ''], 'VOLTAGE': ['data', '13', '18', 0], 'CURRENT': ['data', '3', '5', 1], 'THRUST': ['data', '-200', '200', 2], 'ALTITUDE': ['data', '1200', '2800', 3], 'ACCELERATION': ['data', '-20', '20', 4], 'TEMPERATURE': ['data', '10', '90', 5], 'SCIENCE_COLLECTION': ['data', '0', '1', 6], '[LABEL]: ERROR_STATE': ['label', '', '']}
-        self.ppo.apriori_training(np.random.rand(1,2,8))
+        attributes = len(self.ppo.agent.config.keys())
+        self.ppo.apriori_training(np.random.rand(1,self.window_size,attributes))
+
     def update(self):
-        self.ppo.update(np.random.rand(1,2,8))
+        attributes = len(self.ppo.agent.config.keys())
+        self.ppo.update(np.random.rand(1,self.window_size,attributes))
 
 if __name__ == '__main__':
     unittest.main()

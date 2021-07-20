@@ -42,12 +42,17 @@ class DataDrivenLearning:
         self.ppo.apriori_training(batch_data)
 
     def update(self, curr_data, status):
+        """
+        :param curr_data: (numpy array) 3d tensor (batch, window_size, input_dim)
+        :status: ('RED' | 'YELLOW' | 'GREEN' | '---')
+        """
         input_data = floatify_input(curr_data, self.window_size)
         output_data = self.status_to_oneHot(status)
 
         #self.associations.update(input_data)
-        self.vae.update(input_data)
         self.ppo.update(input_data)
+        self.vae.update(input_data, self.classes[status])
+        
         return input_data, output_data 
 
     def diagnose(self):

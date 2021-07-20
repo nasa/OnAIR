@@ -17,7 +17,7 @@ class TestExecutionEngine(unittest.TestCase):
         self.test_path = os.path.dirname(os.path.abspath(__file__))
         self.config_fp = self.test_path + '/../config/default_config.ini'
         
-        self.E = ExecutionEngine('', 'test', False)
+        self.E = ExecutionEngine(True, 'test', False)
         self.save_path = os.environ['RESULTS_PATH']
         self.run_path = os.environ['RUN_PATH']
         # self.tmp_save_path = os.path.join(os.path.dirname(os.path.realpath(__file__)) + '/../../../', 'results/tmp')
@@ -55,7 +55,7 @@ class TestExecutionEngine(unittest.TestCase):
 
 
     def test_parse_configs(self):
-        self.E.parse_configs(self.config_fp)
+        self.E.parse_configs()
         self.assertEquals(self.E.dataFilePath, 'data/raw_telemetry_data/')
         self.assertEquals(self.E.metadataFilePath, 'data/telemetry_configs/')
         self.assertEquals(self.E.metaFiles, "['42_TLM_CONFIG.txt']")

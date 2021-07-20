@@ -9,7 +9,7 @@ if isNotebook():
 else:
     from tqdm import tqdm
 
-def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, phases=["train", "val"]):
+def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, phases=["train", "val"], forward=None):
     """
     Training loop util
     :param loaders: {train: train_loader, val: val_loader} data loaders in dictionary
@@ -19,6 +19,7 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
     :param logging: (optional bool) whether to log run accuracy, defaults to True
     :param phases: (string list) phases in training, defaults to ["train", "val"],
                 each phase should have a corresponding data loader
+    :param forward: (optional function) forward function to call for vae
     """
     checkpoint_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"runs")
     latest_model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"models")
@@ -42,14 +43,20 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
 
             for x in loaders[phase]:
                 if phase == "train":
-                    vae(x)
+                    if forward:
+                        forward(x)
+                    else:
+                        vae(x)
                     loss = vae.loss()
                     optimizer.zero_grad()
                     loss.backward()
                     optimizer.step()
                 else:
                     with torch.no_grad():
-                        vae(x)
+                        if forward:
+                            forward(x)
+                        else:
+                            vae(x)
                         loss = vae.loss()
 
                 running_loss += loss

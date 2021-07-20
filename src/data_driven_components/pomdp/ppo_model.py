@@ -21,12 +21,13 @@ class PPOModel(DataLearner):
         """
         :param data: (3D array) first dim data points, second time frames and third features so (batch_size, window_size, input_dim)
         """
-        split_data = split_by_lookback(data, self.window_size)
-        data_train = dict_sort_data(self.agent.config, split_data)
+        #split_data = split_by_lookback(data, self.window_size)
+        data_train = dict_sort_data(self.agent.config, data)
         if use_stratified:
             data_train = stratified_sampling(self.agent.config, data_train)
         #Data should be in the format of { Time : [ 0, 1, 2] , Voltage : [5, 5, 5] } at this point
-        self.agent.train_ppo(data_train, batch_size=1090)
+        batch_size = int(len(data_train)/50) if int(len(data_train)/50) > 0 else 1
+        self.agent.train_ppo(data_train, batch_size=batch_size)
 
     def update(self, frame):
         """
@@ -41,7 +42,7 @@ class PPOModel(DataLearner):
         """
 
         #A stub for once ppo is fully integrated
-        #reward, correct, actions, states = self.agent.diagnose_frames(self.frames)
+        #reward, correct, actions, states[-1] = self.agent.diagnose_frames(self.frames)
         # potentially the the library-less runner?
         pass
     
