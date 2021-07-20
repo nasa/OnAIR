@@ -237,22 +237,10 @@ class TelemetryTestSuite:
 
     def get_suite_status(self):
         status_strings = [res.get_status() for res in self.latest_results]
-        # print(self.tests)
-        # print(self.dataFields)
-        # print(status_strings)
         return self.calc_single_status(status_strings) 
 
-# class TestResult:
-#     def __init__(self, stat, bayesian_conf):
-#         self.stat = stat
-#         self.bayesian_conf  = bayesian_conf
+    def get_status_specific_mnemonics(self, status='RED'):
+        names = [res.get_name() for res in self.latest_results if res.get_status() == status]
+        return names
 
-#     def get_all_test_results(self):
-#         return self.stat, self.bayesian_conf
-
-#     def get_stat(self):
-#         return self.stat
-
-#     def get_bayesian_conf(self):
-#         return self.bayesian_conf
 
