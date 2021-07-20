@@ -6,6 +6,9 @@ import csv
 import random
 import copy
 import ast
+import torch
+from src.data_driven_components.vae.vae_model import VAEModel
+
 
 ## Load All The Data
 def mass_load_data(folder, lookback, filetype=".csv"):
@@ -41,6 +44,26 @@ def dict_sort_data(dict_config, data):
             index_for_key += 1
         output_data.append(new_point)
     return output_data
+
+def dict_to_3d_tensor(data):
+    #Get window size
+    window_size = 0
+    for key in data[0]:
+        window_size = len(data[0][key])
+        break
+    headers = []
+    if len(data) > 0:
+        headers = list(data[0].keys())
+    list_of_all_data_frames = []
+    for i in range(len(data)):
+        inner_frame = []
+        for _ in range(window_size):
+            data_frame = []
+            for key in data[i]:
+                data_frame.append(data[i][key].pop(0))
+            inner_frame.append(data_frame)
+        list_of_all_data_frames.append(inner_frame)
+    return list_of_all_data_frames, headers, window_size
 
 ## Load data from a .csv file
 def load_data(file_path, delimiter=',', quotechar='\"'):
@@ -81,17 +104,25 @@ def split_headers_helper(arrayed_headers, master_list, current_depth):
 def stratified_sampling(config, data):
     error_data = []
     no_error_data = []
-    label_key = check_label(config)
-    for i in range(len(data)):
-        error = False
-        for j in range(len(data[i][label_key])):
-            if data[i][label_key][j] == '1':
-                error = True
-                break
-        if error:
-            error_data.append(data[i])
-        else:
-            no_error_data.append(data[i])
+    label, label_key = check_label(config)
+    if label:
+        for i in range(len(data)):
+            error = False
+            for j in range(len(data[i][label_key])):
+                if data[i][label_key][j] == '1':
+                    error = True
+                    break
+            if error:
+                error_data.append(data[i])
+            else:
+                no_error_data.append(data[i])
+    else:
+        label_list = get_vae_error_over_each_point(data)
+        for i in range(len(data)):
+            if label_list[i]:
+                error_data.append(data[i])
+            else:
+                no_error_data.append(data[i])
     random.shuffle(error_data)
     random.shuffle(no_error_data)
     min_len = len(error_data)
@@ -103,6 +134,10 @@ def stratified_sampling(config, data):
     for i in range(min_len):
         output_data.append(error_data[i])
         output_data.append(no_error_data[i])
+    if(output_data == []):
+        print("WARNING!!! Not enough diverse data for stratified sampling, defaulting to unsampled data.")
+        print("This will lead to suboptimal training.")
+        output_data = data
     return output_data
 
 ## Load the config
@@ -150,15 +185,43 @@ def load_config_from_txt(config_path):
     return config_dictionary
 
 def check_label(config):
+    label = False
     label_key = "Colomar"
     for key in config:
         if config[key][0] == "label":
+            label = True
             label_key = key
             break
-    if label_key == "Colomar": #Implement using VAE as labeler
-        print("Error: No label column found in config.csv!")
-        exit()
-    return label_key
+    return label, label_key
+
+def get_vae_error_over_all_data(data):
+    data = copy.deepcopy(data)
+    tensor_data, headers, window_size = dict_to_3d_tensor(data)
+    data_to_pass = torch.tensor(tensor_data, dtype=torch.float)
+    VAE = VAEModel(headers, window_size)
+    VAE.apriori_training(data_to_pass) # check for model first, if it doesnt exist break
+    error = VAE.model(data_to_pass)
+    if error.item() > 0.0000001:
+        return True
+    return False
+
+def get_vae_error_over_each_point(data):
+    data = copy.deepcopy(data)
+    tensor_data, headers, window_size = dict_to_3d_tensor(data)
+    data_to_pass = torch.tensor(tensor_data, dtype=torch.float)
+    VAE = VAEModel(headers, window_size)
+    VAE.apriori_training(data_to_pass) # check for model first, if it doesnt exist break
+    label_list = []
+    for data_point in tensor_data:
+        data_point = [data_point]   
+        data_point_to_pass = torch.tensor(data_point, dtype=torch.float)   
+        #Use VAE to populate label_list
+        error = VAE.model(data_point_to_pass)
+        if error.item() > 0.0000001:
+            label_list.append(True)
+        else:
+            label_list.append(False)
+    return label_list
 
 ## data_train = list of frames, with headers and labels as described in a POMDP's self.config
 def split_by_lookback(data_train, lookback):

@@ -28,7 +28,7 @@ class VAEModel(DataLearner):
         self.has_baseline = False
 
 
-
+        
     def apriori_training(self, data_train):
         """
         Given data, system should learn any priors necessary for realtime diagnosis.
