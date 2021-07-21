@@ -55,7 +55,7 @@ class VAEModel(DataLearner):
         :param status: (int) 0 for red, 1 yellow, 2 green, 3 no data
         :return: None
         """
-        if status == 2:
+        if status == 2 and not self.has_baseline:
             self.baseline = frame
             self.has_baseline = True
 
