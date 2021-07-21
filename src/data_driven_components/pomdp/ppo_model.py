@@ -36,6 +36,7 @@ class PPOModel(DataLearner):
         """
         self.frames = list_to_dictionary_with_headers(frame, self.headers, self.frames, self.window_size)
 
+    ####################################################################################
     def render_diagnosis(self):
         """
         System should return its diagnosis
@@ -45,4 +46,16 @@ class PPOModel(DataLearner):
         #reward, correct, actions, states[-1] = self.agent.diagnose_frames(self.frames)
         # potentially the the library-less runner?
         pass
+
+    # def render_diagnosis(self):
+    #     """
+    #     System should return its diagnosis
+    #     """
+    #     info = self.agent.diagnose_frames(self.frames) 
+    #     #A stub for once ppo is fully integrated
+    #     #reward, correct, actions, states = self.agent.diagnose_frames(self.frames)
+    #     # potentially the the library-less runner?
+    #     return info
+
+    ####################################################################################
     

@@ -73,8 +73,8 @@ class Simulator:
             diagnosis_list.append(self.brain.diagnose(time_step))
         
         final_diagnosis = diagnosis_list[-1]
-        print("**** FINAL DIAGNOSIS ****")
-        print(final_diagnosis)
+        print("**** FINAL DIAGNOSIS ****") if (IO_Flag == True) else ''
+        print(final_diagnosis) if (IO_Flag == True) else ''
         
         return final_diagnosis
 
