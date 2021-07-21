@@ -55,23 +55,33 @@ class DataDrivenLearning:
         
         return input_data, output_data 
 
+    ####################################################################################
+    # def diagnose(self):
+    #     diagnosis = {}
+
+    #     # diagnosis['associativity_diagnosis'] = self.associations.render_diagnosis()
+    #     diagnosis['associativity_diagnosis'] = None
+        
+    #     # VAE Processing
+    #     vae_diagnosis = self.vae.render_diagnosis()
+    #     shap = list(vae_diagnosis[0])
+    #     data_vals = list(vae_diagnosis[1])
+    #     hdrs = list(vae_diagnosis[2])
+    #     s, h = zip(*sorted(zip(shap, hdrs), reverse=True))
+
+    #     diagnosis['vae_diagnosis'] = h
+    #     diagnosis['pomdp_diagnosis'] = None
+    #     return diagnosis 
+
     def diagnose(self):
         diagnosis = {}
-
         # diagnosis['associativity_diagnosis'] = self.associations.render_diagnosis()
         diagnosis['associativity_diagnosis'] = None
-        
-        # VAE Processing
-        vae_diagnosis = self.vae.render_diagnosis()
-        shap = list(vae_diagnosis[0])
-        data_vals = list(vae_diagnosis[1])
-        hdrs = list(vae_diagnosis[2])
-        s, h = zip(*sorted(zip(shap, hdrs), reverse=True))
-
-        diagnosis['vae_diagnosis'] = h
-        diagnosis['pomdp_diagnosis'] = None
-        return diagnosis     
-
+        diagnosis['vae_diagnosis'] =  self.vae.render_diagnosis()
+        diagnosis['pomdp_diagnosis'] = self.ppo.render_diagnosis()
+        return diagnosis
+    ####################################################################################
+    
     ###### HELPER FUNCTIONS
     def status_to_oneHot(self, status):
         if isinstance(status, np.ndarray):

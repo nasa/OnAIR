@@ -62,21 +62,41 @@ class VAEModel(DataLearner):
         self.frames.append(frame)
         self.frames.pop(0)
 
+    ####################################################################################
+    # def render_diagnosis(self):
+    #     """
+    #     System should return its diagnosis, do not run unless model is loaded
+    #     """
+    #     self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
+    #     transformation = lambda x: torch.Tensor(x).float().unsqueeze(0)
+
+    #     data = transformation(self.frames)
+    #     if self.has_baseline:
+    #         baseline = transformation(self.baseline)
+    #     else:
+    #         baseline = torch.zeros_like(data)
+
+    #     self.explainer.shap(data, baseline)
+    #     return self.explainer.viz(True)
     def render_diagnosis(self):
         """
         System should return its diagnosis, do not run unless model is loaded
         """
+
         self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
         transformation = lambda x: torch.Tensor(x).float().unsqueeze(0)
 
         data = transformation(self.frames)
-        if self.has_baseline:
-            baseline = transformation(self.baseline)
-        else:
-            baseline = torch.zeros_like(data)
-
+        baseline = transformation(self.baseline)
 
         self.explainer.shap(data, baseline)
-        return self.explainer.viz(True)
+
+        vae_diagnosis = self.explainer.viz(True)
+        shap = list(vae_diagnosis[0])
+        data_vals = list(vae_diagnosis[1])
+        hdrs = list(vae_diagnosis[2])
+        ordered_shapleys, ordered_headers = zip(*sorted(zip(shap, hdrs), reverse=True))
+        return ordered_headers
+    ####################################################################################
 
 
