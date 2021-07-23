@@ -16,7 +16,6 @@ from src.util.cleanup import *
 import src.util.config
 
 from src.run_scripts.execution_engine import ExecutionEngine
-from src.run_scripts.generalizability_engine import GeneralizabilityEngine
 
 def main():
     """
