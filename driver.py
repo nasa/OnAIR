@@ -34,7 +34,6 @@ def main():
     arg_parser.add_argument('--save_name', '--name', '-n', help='Name of saved log files')
     arg_parser.add_argument('--mute', '-m', action='store_true', help='Mute all non-error output')
     arg_parser.add_argument('--test', '-t', action='store_true', help='Run tests')
-    arg_parser.add_argument('--generalizability', '-gen', '-g', help='Run generalizabilty test on specific component', choices=['Associativity', 'POMDP', 'VAE', 'CurveCharacterizer'])
     args = arg_parser.parse_args()
 
     if args.mute:
@@ -47,20 +46,12 @@ def main():
 
     if args.test:
         run_unit_tests()
-    elif args.generalizability:
-        run_generalizability_tests(args.generalizability)
     else:
         save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
         RAISR = ExecutionEngine(False, save_name, args.save)
         RAISR.run_sim()
 
     clean_all(os.environ['SRC_ROOT_PATH']) 
-
-""" Runs generalizability tests on specific component """
-def run_generalizability_tests(component):
-    assert(component in ['Associativity', 'POMDP', 'VAE', 'CurveCharacterizer'])
-    gen = GeneralizabilityEngine(os.environ['RUN_PATH'], component)
-    gen.run_integration_test()
 
 """ Runs all unit tests """
 def run_unit_tests():

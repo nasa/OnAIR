@@ -19,7 +19,6 @@ from src.test.data_driven_components.test_data_driven_learning import TestDataDr
 from src.test.data_driven_components.pomdp.test_kalman_filter import TestKalmanFilter
 from src.test.data_driven_components.pomdp.test_observation import TestObservation
 from src.test.data_driven_components.test_vae import TestVAE
-from src.test.run_scripts.test_generalizability_engine import TestGeneralizabilityEngine
 from src.test.data_driven_components.test_transformer import TestTransformer
 from src.test.util.test_data_reformatting import TestDataReformatting
 from src.test.reasoning.test_diagnosis import TestDiagnosis
@@ -42,7 +41,6 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestKalmanFilter))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestObservation))
-    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGeneralizabilityEngine))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTransformer))
 
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
