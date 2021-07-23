@@ -36,7 +36,7 @@ class TestVAE(unittest.TestCase):
 
         vae = VAE(headers=self.headers, window_size=1, z_units=5)
 
-        train(vae, {'train': train_dataloader}, phases=["train"], logging=False)
+        train(vae, {'train': train_dataloader}, phases=["train"], logging=False, print_on=False)
 
     def test_threshold_vae(self):
         data = range(30)
@@ -50,7 +50,7 @@ class TestVAE(unittest.TestCase):
 
         vae = VAE(headers=self.headers, window_size=1, z_units=5)
         findThreshold(vae, train_dataset, 0.2)
-    
+
     def test_shapley(self):
         vae = VAE(headers=self.headers, window_size=1, z_units=5)
         VAEExplainer(vae, [])

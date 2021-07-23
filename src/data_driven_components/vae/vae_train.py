@@ -1,5 +1,5 @@
 import os
-from datetime import datetime 
+from datetime import datetime
 import torch
 from src.data_driven_components.vae.viz import isNotebook
 from torch.utils.tensorboard import SummaryWriter
@@ -9,7 +9,7 @@ if isNotebook():
 else:
     from tqdm import tqdm
 
-def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, phases=["train", "val"], forward=None):
+def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, phases=["train", "val"], forward=None, print_on=True):
     """
     Training loop util
     :param loaders: {train: train_loader, val: val_loader} data loaders in dictionary
@@ -28,7 +28,8 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
 
     if logging or checkpoint:
         writer = SummaryWriter(run_dir)
-        print("Starting training, see run at", run_dir)
+        if print_on:
+            print("Starting training, see run at", run_dir)
 
     optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
 
