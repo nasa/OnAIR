@@ -106,10 +106,5 @@ class TestGenericParser(unittest.TestCase):
                                                   'description_assignments': {'generic_test_42.txt': description, 
                                                                                  'generic_test_42_double.txt' : description}})
 
-        
-        
-        
-
-
 if __name__ == '__main__':
     unittest.main()
