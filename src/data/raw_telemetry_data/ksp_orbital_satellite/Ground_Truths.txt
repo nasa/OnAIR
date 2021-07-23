@@ -1,0 +1,3 @@
+Orbiter_1A_07201022.csv, ['Time','AltitudeFromTerrain','Periapsis'], orbiter_fell_back_to_earth
+communication_data_losses.csv, ['Time'], communication_data_losses
+orbiter_fell_back_to_earth.csv, ['AltitudeFromTerrain','Periapsis'], orbiter_fell_back_to_earth

@@ -1,4 +1,4 @@
-Time,TMP Data Flow,CUR Data Flow,VLT Data Flow,TMP External,TMP Internal,CUR Engine,CUR Wings,VLT Engine,VLT Wings,Battery Juice,Propulsion,Navigation,Power,Thermal,Communication,Safe Mode
+Time,TMP_Data_Flow,CUR_Data_Flow,VLT_Data_Flow,TMP_External,TMP_Internal,CUR_Engine,CUR_Wings,VLT_Engine,VLT_Wings,Battery_Juice,Propulsion,Navigation,Power,Thermal,Communication,Safe_Mode
 0:00,0,0,0,0,0,0,0,0,0,0,1,1,1,1,2,1
 0:01,0,0,0,0,0,0,0,0,0,0,1,1,1,1,2,1
 0:02,0,0,0,0,0,0,0,0,0,0,1,1,1,1,2,1
