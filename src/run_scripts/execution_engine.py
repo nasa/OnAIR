@@ -14,6 +14,7 @@ from time import gmtime, strftime
 from src.data_handling.time_synchronizer import TimeSynchronizer
 from src.run_scripts.sim import Simulator
 from src.util.config import get_config
+from src.util.cleanup import setup_folders
 
 class ExecutionEngine:
     def __init__(self, testing=True, run_name='', save_flag=False):
@@ -129,9 +130,12 @@ class ExecutionEngine:
 
     def save_results(self, save_name):
         complete_time = strftime("%H-%M-%S", gmtime())
-        save_path = os.environ['RAISR_SAVE_PATH'] + '/saved/' + save_name + '_' + complete_time
+        results_save_path = os.environ['RAISR_SAVE_PATH'] + '/saved/'
+        setup_folders(results_save_path)
+        save_path = results_save_path + save_name + '_' + complete_time
         os.mkdir(save_path)
         copy_tree(os.environ['RAISR_TMP_SAVE_PATH'], save_path)
+        
         # move everything from temp into here
 
     #### SETTERS AND GETTERS 
