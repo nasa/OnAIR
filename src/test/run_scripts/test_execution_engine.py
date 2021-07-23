@@ -101,14 +101,14 @@ class TestExecutionEngine(unittest.TestCase):
         self.E.init_save_paths()
         sub_dirs = os.listdir(self.tmp_save_path)
         sub_dirs.sort() # Sorting alphabetically
-        self.assertEquals(sub_dirs, ['associativity', 'diagnosis', 'graphs', 'models', 'tensorboard', 'viz'])
+        self.assertEquals(sub_dirs, ['diagnosis', 'models'])
         
         # Try to init again now that tmp exits 
         self.E.init_save_paths()
 
         sub_dirs = os.listdir(self.tmp_save_path)
         sub_dirs.sort() # Sorting alphabetically
-        self.assertEquals(sub_dirs, ['associativity', 'diagnosis', 'graphs', 'models', 'tensorboard', 'viz'])
+        self.assertEquals(sub_dirs, ['diagnosis', 'models'])
         
     def test_delete_save_paths(self):
         self.E.delete_save_paths()

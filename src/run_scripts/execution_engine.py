@@ -110,20 +110,12 @@ class ExecutionEngine:
 
         self.delete_save_paths()
         os.mkdir(temp_save_path)
-        os.mkdir(os.path.join(temp_save_path, 'tensorboard'))
-        os.mkdir(os.path.join(temp_save_path, 'associativity'))
-        os.mkdir(os.path.join(temp_save_path, 'viz'))
         os.mkdir(os.path.join(temp_save_path, 'models'))
-        os.mkdir(os.path.join(temp_save_path, 'graphs'))
         os.mkdir(os.path.join(temp_save_path, 'diagnosis'))
     
         os.environ['RAISR_SAVE_PATH'] = save_path
         os.environ['RAISR_TMP_SAVE_PATH'] = temp_save_path
-        os.environ['RAISR_TENSORBOARD_SAVE_PATH'] = os.path.join(temp_save_path, 'tensorboard')
-        os.environ['RAISR_ASSOCIATIVITY_SAVE_PATH'] = os.path.join(temp_save_path, 'associativity')
-        os.environ['RAISR_VIZ_SAVE_PATH'] = os.path.join(temp_save_path, 'viz')
         os.environ['RAISR_MODELS_SAVE_PATH'] = os.path.join(temp_save_path, 'models')
-        os.environ['RAISR_GRAPHS_SAVE_PATH'] = os.path.join(temp_save_path, 'graphs')
         os.environ['RAISR_DIAGNOSIS_SAVE_PATH'] = os.path.join(temp_save_path, 'diagnosis')
 
     def delete_save_paths(self):
