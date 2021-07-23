@@ -14,6 +14,7 @@ from time import gmtime, strftime
 from src.data_handling.time_synchronizer import TimeSynchronizer
 from src.run_scripts.sim import Simulator
 from src.util.config import get_config
+from src.util.cleanup import setup_folders
 
 class ExecutionEngine:
     def __init__(self, testing=True, run_name='', save_flag=False):
@@ -110,20 +111,12 @@ class ExecutionEngine:
 
         self.delete_save_paths()
         os.mkdir(temp_save_path)
-        os.mkdir(os.path.join(temp_save_path, 'tensorboard'))
-        os.mkdir(os.path.join(temp_save_path, 'associativity'))
-        os.mkdir(os.path.join(temp_save_path, 'viz'))
         os.mkdir(os.path.join(temp_save_path, 'models'))
-        os.mkdir(os.path.join(temp_save_path, 'graphs'))
         os.mkdir(os.path.join(temp_save_path, 'diagnosis'))
     
         os.environ['RAISR_SAVE_PATH'] = save_path
         os.environ['RAISR_TMP_SAVE_PATH'] = temp_save_path
-        os.environ['RAISR_TENSORBOARD_SAVE_PATH'] = os.path.join(temp_save_path, 'tensorboard')
-        os.environ['RAISR_ASSOCIATIVITY_SAVE_PATH'] = os.path.join(temp_save_path, 'associativity')
-        os.environ['RAISR_VIZ_SAVE_PATH'] = os.path.join(temp_save_path, 'viz')
         os.environ['RAISR_MODELS_SAVE_PATH'] = os.path.join(temp_save_path, 'models')
-        os.environ['RAISR_GRAPHS_SAVE_PATH'] = os.path.join(temp_save_path, 'graphs')
         os.environ['RAISR_DIAGNOSIS_SAVE_PATH'] = os.path.join(temp_save_path, 'diagnosis')
 
     def delete_save_paths(self):
@@ -137,9 +130,12 @@ class ExecutionEngine:
 
     def save_results(self, save_name):
         complete_time = strftime("%H-%M-%S", gmtime())
-        save_path = os.environ['RAISR_SAVE_PATH'] + '/saved/' + save_name + '_' + complete_time
+        results_save_path = os.environ['RAISR_SAVE_PATH'] + '/saved/'
+        setup_folders(results_save_path)
+        save_path = results_save_path + save_name + '_' + complete_time
         os.mkdir(save_path)
         copy_tree(os.environ['RAISR_TMP_SAVE_PATH'], save_path)
+        
         # move everything from temp into here
 
     #### SETTERS AND GETTERS 
