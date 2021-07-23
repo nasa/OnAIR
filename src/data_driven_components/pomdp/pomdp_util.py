@@ -101,7 +101,7 @@ def split_headers_helper(arrayed_headers, master_list, current_depth):
     return new_headers
 
 # data should be split by lookback at this point
-def stratified_sampling(config, data):
+def stratified_sampling(config, data, print_on=True):
     error_data = []
     no_error_data = []
     label, label_key = check_label(config)
@@ -134,7 +134,7 @@ def stratified_sampling(config, data):
     for i in range(min_len):
         output_data.append(error_data[i])
         output_data.append(no_error_data[i])
-    if(output_data == []):
+    if ((print_on) and (output_data == [])):
         print("WARNING!!! Not enough diverse data for stratified sampling, defaulting to unsampled data.")
         print("This will lead to suboptimal training.")
         output_data = data
@@ -213,8 +213,8 @@ def get_vae_error_over_each_point(data):
     VAE.apriori_training(data_to_pass) # check for model first, if it doesnt exist break
     label_list = []
     for data_point in tensor_data:
-        data_point = [data_point]   
-        data_point_to_pass = torch.tensor(data_point, dtype=torch.float)   
+        data_point = [data_point]
+        data_point_to_pass = torch.tensor(data_point, dtype=torch.float)
         #Use VAE to populate label_list
         error = VAE.model(data_point_to_pass)
         if error.item() > 0.0000001:
@@ -235,9 +235,9 @@ def split_by_lookback(data_train, lookback):
 def list_to_dictionary_with_headers(list_of_numbers, headers, dictionary, window_size):
 
     for h in range(len(headers)):
-        #Example: If header = 'Time' and time is not in dictionary 
+        #Example: If header = 'Time' and time is not in dictionary
         if headers[h] in dictionary:
-            dictionary[headers[h]].append(list_of_numbers[h]) 
+            dictionary[headers[h]].append(list_of_numbers[h])
             if(len(dictionary[headers[h]])>window_size): # If the frame of data is greater than the window size, it pops the first element of the list
                 dictionary[headers[h]].pop(0)
         else:

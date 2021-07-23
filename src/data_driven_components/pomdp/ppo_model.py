@@ -7,11 +7,12 @@ import os
 
 class PPOModel(DataLearner):
 
-    def __init__(self, headers, window_size):
+    def __init__(self, headers, window_size, print_on=True):
         """
         :param headers: (int) length of time agent examines
         :param window_size: (int) size of time window to examine
         """
+        self.print_on = print_on
         self.frames = {}
         self.headers = headers
         self.window_size = window_size
@@ -24,10 +25,10 @@ class PPOModel(DataLearner):
         #split_data = split_by_lookback(data, self.window_size)
         data_train = dict_sort_data(self.agent.config, data)
         if use_stratified:
-            data_train = stratified_sampling(self.agent.config, data_train)
+            data_train = stratified_sampling(self.agent.config, data_train, self.print_on)
         #Data should be in the format of { Time : [ 0, 1, 2] , Voltage : [5, 5, 5] } at this point
         batch_size = int(len(data_train)/50) if int(len(data_train)/50) > 0 else 1
-        self.agent.train_ppo(data_train, batch_size=batch_size)
+        self.agent.train_ppo(data_train, batch_size=batch_size, print_on=False)
 
     def update(self, frame):
         """
@@ -51,11 +52,10 @@ class PPOModel(DataLearner):
     #     """
     #     System should return its diagnosis
     #     """
-    #     info = self.agent.diagnose_frames(self.frames) 
+    #     info = self.agent.diagnose_frames(self.frames)
     #     #A stub for once ppo is fully integrated
     #     #reward, correct, actions, states = self.agent.diagnose_frames(self.frames)
     #     # potentially the the library-less runner?
     #     return info
 
     ####################################################################################
-    

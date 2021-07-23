@@ -41,7 +41,7 @@ class POMDP:
             except FileNotFoundError:
                 print("WARNING!!! Failed to load model: \"" + name + "\".")
                 print("Creating a new model.")
-                self.create_new_model(alpha, discount, epsilon, reportable_states, run_limit, reward_correct, reward_incorrect, reward_action)                
+                self.create_new_model(alpha, discount, epsilon, reportable_states, run_limit, reward_correct, reward_incorrect, reward_action)
         self.current_state_index = self.get_starting_state()
         self.total_reward = 0
         self.correct = False
@@ -169,9 +169,8 @@ class POMDP:
 
         split_data_train = util.dict_sort_data(self.config, split_data_train)
         split_data_test = util.dict_sort_data(self.config, split_data_test)
-
         if use_stratified:
-            split_data_train = util.stratified_sampling(self.config, split_data_train)
+            split_data_train = util.stratified_sampling(self.config, split_data_train, print_on=self.print_on)
 
         avg_rewards = []
         avg_accuracies = []
