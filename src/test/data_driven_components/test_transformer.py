@@ -36,8 +36,8 @@ class TestTransformer(unittest.TestCase):
         self.mask = transformer.model.generate_square_subsequent_mask(1)
         self.tar_mask = transformer.model.generate_square_subsequent_mask(2)
 
-        train(transformer.model, {"train": train_dataloader}, 1, phases=["train"], logging=False,forward=lambda x: transformer.model(x, self.mask, self.tar_mask))
-    
+        train(transformer.model, {"train": train_dataloader}, 1, phases=["train"], logging=False,forward=lambda x: transformer.model(x, self.mask, self.tar_mask), print_on=False)
+
     def test_shapley(self):
         transformer = TransformerModel(list(range(30)), 2)
         VAEExplainer(transformer, [])

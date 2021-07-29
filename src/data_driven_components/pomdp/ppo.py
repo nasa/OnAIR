@@ -146,15 +146,16 @@ class PPO(POMDP):
     ###---### Training ###---###
 
     """Simulate a run for a batch, run train_update_step, and then move onto the next batch"""
-    def train_ppo(self, train_data, batch_size, test_data = []):
+    def train_ppo(self, train_data, batch_size, test_data = [], print_on=True):
         iterations = int(len(train_data)/batch_size)
         timestep = []
         accuracy = []
         rewards = []
         for iteration in range(iterations):
-            print("####### Batch " + str(iteration + 1) + "/" + str(iterations) +" ####### \n")
+            if print_on:
+                print("####### Batch " + str(iteration + 1) + "/" + str(iterations) +" ####### \n")
             # Walk through batch, get states, actions, log probabilites, and discounted rewards
-            old_observed, old_actions, old_log_probs, disc_rewards = self.walk_through_batch(train_data[(batch_size*iteration):(batch_size*(iteration+1))])
+            old_observed, old_actions, old_log_probs, disc_rewards = self.walk_through_batch(train_data[(batch_size*iteration):(batch_size*(iteration+1))], print_on=print_on)
             self.train_update_step(old_observed, old_actions, old_log_probs, disc_rewards)
             if (len(test_data)!=0):
                 random.shuffle(test_data)
@@ -167,7 +168,8 @@ class PPO(POMDP):
             self.save_PPO()
         if (len(test_data)!=0):
             reward_accuracy, correct_accuracy = self.test(test_data)
-            print("####### Accuracy " + str(correct_accuracy) +" ####### \n")
+            if print_on:
+                print("####### Accuracy " + str(correct_accuracy) +" ####### \n")
 
     """Update actor and critic models"""
     def train_update_step(self, old_observed, old_actions, old_log_probs, disc_rewards):
@@ -191,7 +193,7 @@ class PPO(POMDP):
             self.optimizer.step()
 
     """Simulate a run for each data point in the batch"""
-    def walk_through_batch(self, data):
+    def walk_through_batch(self, data, print_on=True):
         '''
         Takes in data and returns the states, actions, rewards, and probabilities taken for each data point in the data batch
         '''
@@ -200,7 +202,7 @@ class PPO(POMDP):
         total_rewards = []
         total_prob = []
 
-        for data_point in tqdm(range(len(data))):
+        for data_point in tqdm(range(len(data)), disable=(not print_on)):
             done = False
             run_time = 0 #Variable to keep track of how many decisions it's making
             run_through_rewards = []

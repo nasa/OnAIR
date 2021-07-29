@@ -7,7 +7,7 @@ class TestPPOModel(unittest.TestCase):
 
     def setUp(self):
         self.window_size = 2
-        self.ppo = PPOModel([], self.window_size)
+        self.ppo = PPOModel([], self.window_size, print_on=False)
 
     def test_apriori_training(self):
         attributes = len(self.ppo.agent.config.keys())

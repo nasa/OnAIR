@@ -15,6 +15,7 @@ class TestVAE(unittest.TestCase):
         self.headers = ['a','b','c','d','e','f','g','h','i','j',
                         'k','l','m','n','o','p','q','r','s','t',
                         'u','v','w','x','y','z','1','2','3','4']
+                        
     def test_init_vae(self):
         vae = VAE(headers=self.headers, z_units=5)
         self.assertEqual(vae.input_dim, 30)
@@ -36,7 +37,7 @@ class TestVAE(unittest.TestCase):
 
         vae = VAE(headers=self.headers, window_size=1, z_units=5)
 
-        train(vae, {'train': train_dataloader}, phases=["train"], logging=False)
+        train(vae, {'train': train_dataloader}, phases=["train"], logging=False, print_on=False)
 
     def test_threshold_vae(self):
         data = range(30)
@@ -50,7 +51,7 @@ class TestVAE(unittest.TestCase):
 
         vae = VAE(headers=self.headers, window_size=1, z_units=5)
         findThreshold(vae, train_dataset, 0.2)
-    
+
     def test_shapley(self):
         vae = VAE(headers=self.headers, window_size=1, z_units=5)
         VAEExplainer(vae, [])

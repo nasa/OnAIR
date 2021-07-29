@@ -1,6 +1,7 @@
 import os
 
 import torch
+import numpy as np
 from src.data_driven_components.data_learners import DataLearner
 from src.data_driven_components.vae.vae import VAE, TimeseriesDataset
 from src.data_driven_components.vae.vae_train import train
@@ -10,7 +11,7 @@ from torch.utils.data import DataLoader, Dataset
 
 class VAEModel(DataLearner):
 
-    def __init__(self, headers, window_size, z_units=5, hidden_units=100, 
+    def __init__(self, headers, window_size, z_units=5, hidden_units=100, print_on=True,
             path=os.path.join('src','data_driven_components','vae','models','checkpoint_latest.pth.tar')):
         """
         :param headers: (string list) list of headers for each input feature
@@ -19,6 +20,7 @@ class VAEModel(DataLearner):
         :param hidden_units: (int) dimension of our hidden_units
         :param path: (string) path of vae save relative to src directory
         """
+        self.print_on = print_on
         self.path = path
         self.headers = headers
         self.window_size = window_size
@@ -27,8 +29,6 @@ class VAEModel(DataLearner):
         self.explainer = VAEExplainer(self.model, self.headers, len(self.headers), self.window_size)
         self.has_baseline = False
 
-
-        
     def apriori_training(self, data_train):
         """
         Given data, system should learn any priors necessary for realtime diagnosis.
@@ -42,10 +42,12 @@ class VAEModel(DataLearner):
             _input_dim = len(data_train[0][0])
 
             transform = lambda x: torch.tensor(x).float()
+            #transform = lambda x: x if isinstance(x, np.ndarray) else x if isinstance(x, torch.Tensor) else x.clone().detach().float()
+
             train_dataset = TimeseriesDataset(data_train, transform)
             train_dataloader = DataLoader(train_dataset, batch_size=_batch_size)
 
-            train(self.model, {'train': train_dataloader}, phases=["train"], checkpoint=True)
+            train(self.model, {'train': train_dataloader}, phases=["train"], checkpoint=True, print_on=self.print_on)
 
         self.explainer.updateModel(self.model)
 
@@ -98,5 +100,3 @@ class VAEModel(DataLearner):
         ordered_shapleys, ordered_headers = zip(*sorted(zip(shap, hdrs), reverse=True))
         return ordered_headers
     ####################################################################################
-
-

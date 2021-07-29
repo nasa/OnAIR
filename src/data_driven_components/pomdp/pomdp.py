@@ -27,7 +27,7 @@ class POMDP:
         # = 0, agent will only learn about actions that yield an immediate my_reward
     # Epsilon = exploratory rate, generally set between 0 and 1
         # 0.1 = 10% chance to take a random action during training
-    def __init__(self, name="pomdp", path="models/", config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1):
+    def __init__(self, name="pomdp", path="models/", config_path="", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1, suppress_warnings=False):
         self.name = name + "_" + get_config()['DEFAULT']['ModelName']
         self.path = os.path.join(os.path.dirname(os.path.realpath(__file__)), path, '')
         self.print_on = print_on
@@ -39,9 +39,10 @@ class POMDP:
             try:
                 self.load_model()
             except FileNotFoundError:
-                print("WARNING!!! Failed to load model: \"" + name + "\".")
-                print("Creating a new model.")
-                self.create_new_model(alpha, discount, epsilon, reportable_states, run_limit, reward_correct, reward_incorrect, reward_action)                
+                if not suppress_warnings:
+                    print("WARNING!!! Failed to load model: \"" + name + "\".")
+                    print("Creating a new model.")
+                self.create_new_model(alpha, discount, epsilon, reportable_states, run_limit, reward_correct, reward_incorrect, reward_action)
         self.current_state_index = self.get_starting_state()
         self.total_reward = 0
         self.correct = False
@@ -169,9 +170,8 @@ class POMDP:
 
         split_data_train = util.dict_sort_data(self.config, split_data_train)
         split_data_test = util.dict_sort_data(self.config, split_data_test)
-
         if use_stratified:
-            split_data_train = util.stratified_sampling(self.config, split_data_train)
+            split_data_train = util.stratified_sampling(self.config, split_data_train, print_on=self.print_on)
 
         avg_rewards = []
         avg_accuracies = []
