@@ -12,7 +12,7 @@ class TestPOMDP(unittest.TestCase):
         self.data_path = os.path.dirname(__file__) + "/../../data/raw_telemetry_data/test_data/"
         if self.save_path[0] == "/":
             self.save_path = path[1:]
-        self.pomdp = POMDP("test", self.save_path, config_path=self.data_path + "config.csv", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1)
+        self.pomdp = POMDP("test", self.save_path, config_path=self.data_path + "config.csv", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1, suppress_warnings=True)
         self.true_data = [['A', 'B', 'C', 'D', 'E'], ['0', '3', '10', '-50', '0'], ['1', '3', '10', '-50', '0'], ['2', '4', '15', '0', '0'], ['3', '4', '15', '0', '0'], ['4', '5', '20', '50', '0'], ['5', '5', '20', '50', '0']]
         self.true_mass_data = [{'A': ['0', '1', '2'], 'B': ['3', '3', '4'], 'C': ['10', '10', '15'], 'D': ['-50', '-50', '0'], 'E': ['0', '0', '0']}, {'A': ['1', '2', '3'], 'B': ['3', '4', '4'], 'C': ['10', '15', '15'], 'D': ['-50', '0', '0'], 'E': ['0', '0', '0']}, {'A': ['2', '3', '4'], 'B': ['4', '4', '5'], 'C': ['15', '15', '20'], 'D': ['0', '0', '50'], 'E': ['0', '0', '0']}, {'A': ['0', '1', '2'], 'B': ['3', '7', '8'], 'C': ['10', '30', '40'], 'D': ['-50', '100', '200'], 'E': ['0', '1', '1']}, {'A': ['1', '2', '3'], 'B': ['7', '8', '8'], 'C': ['30', '40', '40'], 'D': ['100', '200', '200'], 'E': ['1', '1', '1']}, {'A': ['2', '3', '4'], 'B': ['8', '8', '7'], 'C': ['40', '40', '30'], 'D': ['200', '200', '100'], 'E': ['1', '1', '1']}]
 
@@ -20,11 +20,11 @@ class TestPOMDP(unittest.TestCase):
         file_path = self.save_path + "pomdp_model_test.pkl"
         os.system("rm " + file_path)
         self.assertTrue(not os.path.isfile(file_path))
-        self.pomdp = POMDP("test", self.save_path, config_path=self.data_path + "config.csv", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1)
+        self.pomdp = POMDP("test", self.save_path, config_path=self.data_path + "config.csv", print_on=False, save_me=True, reportable_states=['no_error', 'error'], alpha=0.01, discount=0.8, epsilon=0.2, run_limit=-1, reward_correct=100, reward_incorrect=-100, reward_action=-1, suppress_warnings=True)
         self.pomdp.save_model()
         self.assertTrue(os.path.isfile(file_path))
         data = self.pomdp.get_save_data()
-        self.pomdp = POMDP("test", self.save_path, config_path=self.data_path + "config.csv")
+        self.pomdp = POMDP("test", self.save_path, config_path=self.data_path + "config.csv", suppress_warnings=True)
         self.assertEquals(self.pomdp.get_save_data(), data)
 
     def test_current_state(self):

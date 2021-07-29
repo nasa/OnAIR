@@ -1,6 +1,7 @@
 import os
 
 import torch
+import numpy as np
 from src.data_driven_components.data_learners import DataLearner
 from src.data_driven_components.vae.vae import VAE, TimeseriesDataset
 from src.data_driven_components.vae.vae_train import train
@@ -40,17 +41,8 @@ class VAEModel(DataLearner):
             _batch_size = len(data_train[0])
             _input_dim = len(data_train[0][0])
 
-            #try:
-            #     transform = lambda x: x.clone().detach().float()
-            #except:
-            #    transform = lambda x: torch.tensor(x).float()
-
-            #if torch.is_tensor(x):
-            #    transform = lambda x: x
-            #else:
-            #    transform = lambda x: x.clone().detach().float()
-
             transform = lambda x: torch.tensor(x).float()
+            #transform = lambda x: x if isinstance(x, np.ndarray) else x if isinstance(x, torch.Tensor) else x.clone().detach().float()
 
             train_dataset = TimeseriesDataset(data_train, transform)
             train_dataloader = DataLoader(train_dataset, batch_size=_batch_size)
