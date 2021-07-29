@@ -117,7 +117,7 @@ def stratified_sampling(config, data, print_on=True):
             else:
                 no_error_data.append(data[i])
     else:
-        label_list = get_vae_error_over_each_point(data)
+        label_list = get_vae_error_over_each_point(data, print_on=print_on)
         for i in range(len(data)):
             if label_list[i]:
                 error_data.append(data[i])
@@ -205,11 +205,11 @@ def get_vae_error_over_all_data(data):
         return True
     return False
 
-def get_vae_error_over_each_point(data):
+def get_vae_error_over_each_point(data, print_on=True):
     data = copy.deepcopy(data)
     tensor_data, headers, window_size = dict_to_3d_tensor(data)
     data_to_pass = torch.tensor(tensor_data, dtype=torch.float)
-    VAE = VAEModel(headers, window_size)
+    VAE = VAEModel(headers, window_size, print_on=print_on)
     VAE.apriori_training(data_to_pass) # check for model first, if it doesnt exist break
     label_list = []
     for data_point in tensor_data:

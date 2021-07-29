@@ -25,7 +25,8 @@ class PPOModel(DataLearner):
         #split_data = split_by_lookback(data, self.window_size)
         data_train = dict_sort_data(self.agent.config, data)
         if use_stratified:
-            data_train = stratified_sampling(self.agent.config, data_train, self.print_on)
+            data_train = stratified_sampling(self.agent.config, data_train, print_on=self.print_on)
+            
         #Data should be in the format of { Time : [ 0, 1, 2] , Voltage : [5, 5, 5] } at this point
         batch_size = int(len(data_train)/50) if int(len(data_train)/50) > 0 else 1
         self.agent.train_ppo(data_train, batch_size=batch_size, print_on=False)

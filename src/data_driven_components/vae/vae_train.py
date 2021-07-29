@@ -25,14 +25,11 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
     latest_model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"models")
     e = datetime.now()
     run_dir = os.path.join(checkpoint_dir, "{}-{}-{}_{}--{}--{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second))
-
     if logging or checkpoint:
         writer = SummaryWriter(run_dir)
         if print_on:
             print("Starting training, see run at", run_dir)
-
     optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
-
     for epoch_counter in tqdm(range(epochs), disable=True):
         for phase in phases:
             if phase == "train":

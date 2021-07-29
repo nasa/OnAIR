@@ -15,6 +15,7 @@ class TestVAE(unittest.TestCase):
         self.headers = ['a','b','c','d','e','f','g','h','i','j',
                         'k','l','m','n','o','p','q','r','s','t',
                         'u','v','w','x','y','z','1','2','3','4']
+                        
     def test_init_vae(self):
         vae = VAE(headers=self.headers, z_units=5)
         self.assertEqual(vae.input_dim, 30)
