@@ -27,7 +27,7 @@ class Brain:
         self.learning_systems.update(frame, self.mission_status)
 
     def diagnose(self, time_step):
-        learning_systems_results = self.learning_systems.diagnose()
+        learning_systems_results = self.learning_systems.diagnose(self.spacecraft_rep.get_current_faulting_mnemonics())
         diagnosis = Diagnosis(time_step, 
                               learning_systems_results, 
                               self.bayesian_status,
