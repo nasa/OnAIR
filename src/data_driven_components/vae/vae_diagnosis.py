@@ -1,5 +1,5 @@
 from torch.utils.data import DataLoader, Dataset
-from captum.attr import KernelShap
+from captum.attr import KernelShap, GradientShap, DeepLiftShap, DeepLift
 from src.data_driven_components.vae.viz import isNotebook
 
 if isNotebook():
@@ -7,24 +7,24 @@ if isNotebook():
 else:
     from tqdm import tqdm
 
-def findThreshold(vae, dataset, error_margin):
+def findThreshold(vae, dataloader, error_margin):
     """
     Finds fault threshold based on upper bound for reconstruction error and a percent margin
     :param vae: (VAE) model to evaluate on
-    :param dataset: (Dataset) pytorch dataset containing normal data
+    :param dataset: (Dataset) pytorch dataloader containing normal data
     :param error_margin: (float) the error margin as a float, for example, to add 20% to the threshold
                         this should be set to 0.2
     """
-    dataloader = DataLoader(dataset, batch_size=1)
+    #dataloader = DataLoader(dataset, batch_size=1)
     reconstruction_error = 0
-    for d in tqdm(dataloader, disable=True):
-        if (x := vae(d)) > reconstruction_error:
+    for d in tqdm(dataloader, disable=False):
+        if (x := vae(d).sum()) > reconstruction_error:
             reconstruction_error = x
 
     return reconstruction_error * (1+error_margin)
 
 class VAEExplainer():
-    def __init__(self, vae, headers, n_features=7, seq_len=1, n_samples=200):
+    def __init__(self, vae, headers, n_features=7, seq_len=1, n_samples=5):
         """
         Takes in vae model to explain.
         :param vae: (VAE) vae model
@@ -33,20 +33,22 @@ class VAEExplainer():
         :param seq_len: (optional int) number of sequence components per input
         :param n_samples: (optional int) number of times to evaluate model, defaults to 200
         """
-        self.vae = vae
-        self.explainer = KernelShap(vae)
+        self.createExplainer(vae)
         self.headers = headers
         self.n_features = n_features
         self.seq_len = seq_len
         self.n_samples = n_samples
+
+    def createExplainer(self, vae):
+        self.vae = vae
+        self.explainer = DeepLiftShap(vae)
 
     def updateModel(self, vae):
         """
         Update Kernel model
         :param vae: (VAE model) new model to update to
         """
-        self.vae = vae
-        self.explainer = KernelShap(vae)
+        self.createExplainer(vae)
     
     def shap(self, input, baseline):
         """
@@ -54,9 +56,13 @@ class VAEExplainer():
         :param input: (Tensor) input shape (batch_size, seq_len, input_dim)
         :param baseline: (Tensor) baseline sample shape (batch_size, seq_len, input_dim)
         """
+        #print(input.shape, baseline.shape, self.vae(input), self.vae(baseline))
         self.input = input
-        self.shap_values = self.explainer.attribute(input, baseline, n_samples=self.n_samples)
-        return self.shap_values
+        self.shap_values = self.explainer.attribute(self.input, baseline)#, n_samples=self.n_samples)
+        if self.vae(input).sum() > self.vae(baseline).sum():
+            return self.shap_values
+        else:
+            return -self.shap_values
 
     def makeLongHeaders(self):
         """

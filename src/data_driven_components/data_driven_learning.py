@@ -33,21 +33,11 @@ class DataDrivenLearning:
         self.config = get_config()
 
         self.headers = headers
-        self.window_size = window_size
-
+        self.window_size = get_config()['DEFAULT'].getint('WindowSize', window_size)
         self.causal_graph = CausalGraph(headers=headers, window_size=self.window_size)
         self.vae = VAEModel(headers=headers, window_size=self.window_size)
         self.ppo = PPOModel(headers=headers, window_size=self.window_size)
         self.kalman = KalmanModel(headers=headers, window_size=self.window_size)
-
-
-    def apriori_training(self, data):
-        if not data == []:
-            batch_data = prep_apriori_training_data(data, self.window_size)
-        else:
-            batch_data = []
-        self.vae.apriori_training(batch_data)
-        self.ppo.apriori_training(batch_data)
 
     def load_models(self):
         # self.associations.apriori_training(batch_data) ## TODO: load model
@@ -69,12 +59,15 @@ class DataDrivenLearning:
         self.kalman.update(input_data)
         return input_data, output_data 
 
+    def apriori_training(self, x):
+        pass
+
     def diagnose(self, faulting_mnemonics):
         diagnosis = {}
         diagnosis['vae_diagnosis'] =  self.vae.render_diagnosis()
-        diagnosis['pomdp_diagnosis'] = self.ppo.render_diagnosis()
+        diagnosis['pomdp_diagnosis'] = []#self.ppo.render_diagnosis()
         diagnosis['kalman_diagnosis'] = self.kalman.render_diagnosis()
-        diagnosis['causality_diagnosis'] = self.causal_graph.render_diagnosis(faulting_mnemonics)
+        diagnosis['causality_diagnosis'] = self.causal_graph.render_diagnosis(self.headers)
         return diagnosis
         
     ####################################################################################

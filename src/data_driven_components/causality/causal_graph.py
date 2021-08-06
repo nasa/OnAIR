@@ -54,8 +54,15 @@ class CausalGraph:
             for mnemonic in faulting_mnemonic:
                 if mnemonic in self.formatted_output_matrix: ##if this is false then the self.faulty_mnemonic column is constant therefore not in the dataframe (see convert to df function below)
                     self.aggregate_formatted_output_matrix.append(self.formatted_output_matrix.sort_values(mnemonic)[mnemonic])
-            return self.aggregate_formatted_output_matrix
+            return self.series_to_vectors(self.aggregate_formatted_output_matrix)
 
+    def series_to_vectors(self, matrix):
+        ordered_results = {}
+        for result in matrix:
+            formatted_vector = tuple((list(result.index), result.tolist()))
+            ordered_results[result.name] = (formatted_vector[0], formatted_vector[1])
+        return ordered_results
+    
     def set_faulty_nuemonic(self, faulty):
         self.faulty_mnemonic = faulty
 

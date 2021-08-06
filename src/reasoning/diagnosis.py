@@ -27,7 +27,6 @@ class Diagnosis:
         self.ground_truth = ground_truth 
 
     def perform_diagnosis(self):
-        gt = self.ground_truth[0][0] #should always be just 1 value
 
         hdrs, list_of_vectors = self.generate_vectorized_values()
 
@@ -37,13 +36,13 @@ class Diagnosis:
         walkdown_abs = self.walkdown(abs_val_top, [])
         walkdown_non_abs = self.walkdown(non_abs_val_top, [])
 
-        diagnoses = {'abs_val_top' : (abs_val_top == gt), 
-                     'non_abs_val_top' : (non_abs_val_top == gt), 
-                     'walkdown_abs' : (walkdown_abs == gt),
-                     'walkdown_non_abs' : (walkdown_non_abs == gt),
-                     'vae_top1' : (gt in self.vae_diagnosis(1)),
-                     'vae_top2' : (gt in self.vae_diagnosis(2)),
-                     'pomdp_top1' : (gt in self.pomdp_diagnosis(1))}
+        diagnoses = {'abs_val_top' : abs_val_top, 
+                     'non_abs_val_top' : non_abs_val_top, 
+                     'walkdown_abs' : walkdown_abs,
+                     'walkdown_non_abs' : walkdown_non_abs,
+                     #'vae_top1' : self.vae_diagnosis(1),
+                     #'vae_top2' : self.vae_diagnosis(2),
+                     'pomdp_top1' : self.pomdp_diagnosis(1)}
 
               
         # print("Ground Truth:              " + str(gt))
