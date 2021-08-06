@@ -1,6 +1,7 @@
 import os
-from datetime import datetime
+from datetime import datetime 
 import torch
+from src.util.config import get_config
 from src.data_driven_components.vae.viz import isNotebook
 from torch.utils.tensorboard import SummaryWriter
 
@@ -9,7 +10,7 @@ if isNotebook():
 else:
     from tqdm import tqdm
 
-def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, phases=["train", "val"], forward=None, print_on=True):
+def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, phases=["train", "val"], forward=None):
     """
     Training loop util
     :param loaders: {train: train_loader, val: val_loader} data loaders in dictionary
@@ -21,16 +22,21 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
                 each phase should have a corresponding data loader
     :param forward: (optional function) forward function to call for vae
     """
+    epochs = get_config()['VAE'].getint('Epochs', epochs)
+    lr = get_config()['VAE'].getfloat('lr', lr)
+
     checkpoint_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"runs")
     latest_model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"models")
     e = datetime.now()
     run_dir = os.path.join(checkpoint_dir, "{}-{}-{}_{}--{}--{}".format(e.day, e.month, e.year, e.hour, e.minute, e.second))
+
     if logging or checkpoint:
         writer = SummaryWriter(run_dir)
-        if print_on:
-            print("Starting training, see run at", run_dir)
+        print("Starting training, see run at", run_dir)
+
     optimizer = torch.optim.Adam(vae.parameters(), lr=lr)
-    for epoch_counter in tqdm(range(epochs), disable=True):
+
+    for epoch_counter in tqdm(range(epochs), disable=(not logging)):
         for phase in phases:
             if phase == "train":
                 vae.train(True)
@@ -39,7 +45,7 @@ def train(vae, loaders, epochs=20, lr=1e-1, checkpoint=False, logging=False, pha
 
             running_loss = 0.0
 
-            for x in loaders[phase]:
+            for x in tqdm(loaders[phase], disable=(not logging)):
                 if phase == "train":
                     if forward:
                         forward(x)
