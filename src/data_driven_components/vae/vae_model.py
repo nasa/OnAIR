@@ -34,7 +34,7 @@ class VAEModel(DataLearner):
 
         #self.headers = headers
         self.window_size = window_size
-        if get_config()['VAE'].getboolean('Autoencoder', False):
+        if get_config()['VAE'].getboolean('Autoencoder', True):
             self.model = AE(self.headers, window_size, z_units, hidden_units)
         else:
             self.model = VAE(self.headers, window_size, z_units, hidden_units)
@@ -124,7 +124,6 @@ class VAEModel(DataLearner):
             hdrs = list(vae_diagnosis[2])
         else:
             baseline = torch.stack([torch.zeros_like(data)]*2).squeeze(1)
-            print(baseline.shape)
             self.explainer.shap(data, baseline)
             vae_diagnosis = self.explainer.viz(True)
             shap = vae_diagnosis[0]

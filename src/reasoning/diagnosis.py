@@ -40,9 +40,9 @@ class Diagnosis:
                      'non_abs_val_top' : non_abs_val_top, 
                      'walkdown_abs' : walkdown_abs,
                      'walkdown_non_abs' : walkdown_non_abs,
-                     #'vae_top1' : self.vae_diagnosis(1),
-                     #'vae_top2' : self.vae_diagnosis(2),
-                     'pomdp_top1' : self.pomdp_diagnosis(1)}
+                     'vae_top1' : self.vae_diagnosis(1),
+                     'vae_top2' : self.vae_diagnosis(2)}
+                     #'pomdp_top1' : self.pomdp_diagnosis(1)}
 
               
         # print("Ground Truth:              " + str(gt))
