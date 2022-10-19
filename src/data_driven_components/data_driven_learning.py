@@ -7,8 +7,6 @@ import os
 import numpy as np
 
 from src.util.print_io import *
-# from src.data_driven_components.lstm import LongShortTermMemory
-# from src.data_driven_components.associativity import Associativity
 
 class DataDrivenLearning:
     def __init__(self, headers=[], sample_input=[]):
@@ -28,70 +26,21 @@ class DataDrivenLearning:
     def init_learning_systems(self, headers, sample=[]):
         assert(len(headers)>0)
         self.headers = headers
-
         if sample == []:
             sample_input = [0.0]*len(headers)
         else:
             sample_input = self.floatify_input(sample)
-
         sample_output = self.status_to_oneHot('---')
-
-        # self.associations = Associativity(name, headers, sample_input)
-        # self.LSTM = LongShortTermMemory(name, sample_input, sample_output, 5)
-        # self.LSTM.setXLabels(headers)
-
         return sample_input, sample_output
 
     def update(self, curr_data, status):
         input_data = self.floatify_input(curr_data)
         output_data = self.status_to_oneHot(status)
         return input_data, output_data 
-        # self.associations.update(input_data)
+
 
     def apriori_training(self, batch_data):
-        # assert(self.LSTM is not None)
         return 
-
-    # def set_historical_data(self, input_samples, output_samples):
-    #     assert len(input_samples) == len(output_samples)
-    #     for system in self.ssNames:
-    #         input_hist = [sample[system]['data'] for sample in input_samples]
-    #         output_hist = [sample[system] for sample in output_samples]
-    #         processed_input = [self.floatify_input(elem) for elem in input_hist]
-    #         processed_output = [self.status_to_oneHot(elem) for elem in output_hist]
-    #         self.input_history[system] = processed_input
-    #         self.output_history[system] = processed_output
-
-    # def set_benchmark_data(self, filepath, files, indices):
-    #     self.associations.set_benchmark_data(filepath, files, indices)
-
-    # def train_all(self):
-    #     x = copy.deepcopy(self.input_history['MISSION'])
-    #     y = copy.deepcopy(self.output_history['MISSION'])
-    #     self.LSTM.bulkTrainModel(x, y)
-
-    #     # save files
-    #     if os.environ.get('RAISR_GRAPHS_SAVE_PATH'):
-    #         self.LSTM.saveGraphs(os.environ.get('RAISR_GRAPHS_SAVE_PATH'))
-    #     if os.environ.get('RAISR_MODELS_SAVE_PATH'):
-    #         self.LSTM.saveModel(os.environ.get('RAISR_MODELS_SAVE_PATH'))
-            
-    #     self.NNs['MISSION'].train(x, y)
-
-
-    # ###### HELPER FUNCTIONS
-    # def get_importance_sampling(self):
-    #     importance_sampling = copy.deepcopy(self.LSTM.getImportanceSampling())
-    #     return importance_sampling
-
-    # def get_associativity_graph(self):
-    #     return copy.deepcopy(self.associations.get_association_graph())
-
-    # def get_benchmark_graph(self):
-    #     return copy.deepcopy(self.associations.get_benchmark_graph())
-
-    # def get_associativity_metrics(self):
-    #     return copy.deepcopy(self.associations.compare_to_benchmark())        
 
     ###### HELPER FUNCTIONS
     def floatify_input(self, _input, remove_str=False):
