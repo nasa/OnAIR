@@ -1,4 +1,3 @@
-
 """
 Data driven learning class for managing all data driven AI components
 """
@@ -8,17 +7,11 @@ import os
 import numpy as np
 
 from src.util.print_io import *
-from src.util.data_reformatting import *
-from src.util.config import get_config
-
-
-from src.data_driven_components.causality.causal_graph import CausalGraph
-from src.data_driven_components.vae.vae_model import VAEModel
-from src.data_driven_components.pomdp.ppo_model import PPOModel
-from src.data_driven_components.kalman.kalman_model import KalmanModel
+# from src.data_driven_components.lstm import LongShortTermMemory
+# from src.data_driven_components.associativity import Associativity
 
 class DataDrivenLearning:
-    def __init__(self, headers=[], window_size=10):
+    def __init__(self, headers=[], sample_input=[]):
         self.classes = {'RED' : 0,
                      'YELLOW' : 1,
                       'GREEN' : 2,
@@ -27,55 +20,105 @@ class DataDrivenLearning:
                                  1 : 'YELLOW',
                                  2 : 'GREEN',
                                  3 : '---'}
+        try:
+            self.init_learning_systems(headers, sample_input)
+        except:
+            self.headers = []
 
+    def init_learning_systems(self, headers, sample=[]):
         assert(len(headers)>0)
-
-        self.config = get_config()
-
         self.headers = headers
-        self.window_size = get_config()['DEFAULT'].getint('WindowSize', window_size)
-        self.causal_graph = CausalGraph(headers=headers, window_size=self.window_size)
-        self.vae = VAEModel(headers=headers, window_size=self.window_size)
-        self.ppo = PPOModel(headers=headers, window_size=self.window_size)
-        self.kalman = KalmanModel(headers=headers, window_size=self.window_size)
 
-    def load_models(self):
-        # self.associations.apriori_training(batch_data) ## TODO: load model
-        self.vae.load_model(self.config['VAE']['Path'])
-        self.ppo.load_model()
+        if sample == []:
+            sample_input = [0.0]*len(headers)
+        else:
+            sample_input = self.floatify_input(sample)
+
+        sample_output = self.status_to_oneHot('---')
+
+        # self.associations = Associativity(name, headers, sample_input)
+        # self.LSTM = LongShortTermMemory(name, sample_input, sample_output, 5)
+        # self.LSTM.setXLabels(headers)
+
+        return sample_input, sample_output
 
     def update(self, curr_data, status):
-        """
-        :param curr_data: (numpy array) 3d tensor (batch, window_size, input_dim)
-        :status: ('RED' | 'YELLOW' | 'GREEN' | '---')
-        """
-        input_data = floatify_input(curr_data, self.window_size)
+        input_data = self.floatify_input(curr_data)
         output_data = self.status_to_oneHot(status)
-
-        #self.associations.update(input_data)
-        self.causal_graph.update(input_data)
-        self.ppo.update(input_data)
-        self.vae.update(input_data, self.classes[status])
-        self.kalman.update(input_data)
         return input_data, output_data 
+        # self.associations.update(input_data)
 
-    def apriori_training(self, x):
-        pass
+    def apriori_training(self, batch_data):
+        # assert(self.LSTM is not None)
+        return 
 
-    def diagnose(self, faulting_mnemonics):
-        diagnosis = {}
-        diagnosis['vae_diagnosis'] =  self.vae.render_diagnosis()
-        diagnosis['pomdp_diagnosis'] = []#self.ppo.render_diagnosis()
-        diagnosis['kalman_diagnosis'] = self.kalman.render_diagnosis()
-        diagnosis['causality_diagnosis'] = self.causal_graph.render_diagnosis(self.headers)
-        return diagnosis
-        
-    ####################################################################################
-    
+    # def set_historical_data(self, input_samples, output_samples):
+    #     assert len(input_samples) == len(output_samples)
+    #     for system in self.ssNames:
+    #         input_hist = [sample[system]['data'] for sample in input_samples]
+    #         output_hist = [sample[system] for sample in output_samples]
+    #         processed_input = [self.floatify_input(elem) for elem in input_hist]
+    #         processed_output = [self.status_to_oneHot(elem) for elem in output_hist]
+    #         self.input_history[system] = processed_input
+    #         self.output_history[system] = processed_output
+
+    # def set_benchmark_data(self, filepath, files, indices):
+    #     self.associations.set_benchmark_data(filepath, files, indices)
+
+    # def train_all(self):
+    #     x = copy.deepcopy(self.input_history['MISSION'])
+    #     y = copy.deepcopy(self.output_history['MISSION'])
+    #     self.LSTM.bulkTrainModel(x, y)
+
+    #     # save files
+    #     if os.environ.get('RAISR_GRAPHS_SAVE_PATH'):
+    #         self.LSTM.saveGraphs(os.environ.get('RAISR_GRAPHS_SAVE_PATH'))
+    #     if os.environ.get('RAISR_MODELS_SAVE_PATH'):
+    #         self.LSTM.saveModel(os.environ.get('RAISR_MODELS_SAVE_PATH'))
+            
+    #     self.NNs['MISSION'].train(x, y)
+
+
+    # ###### HELPER FUNCTIONS
+    # def get_importance_sampling(self):
+    #     importance_sampling = copy.deepcopy(self.LSTM.getImportanceSampling())
+    #     return importance_sampling
+
+    # def get_associativity_graph(self):
+    #     return copy.deepcopy(self.associations.get_association_graph())
+
+    # def get_benchmark_graph(self):
+    #     return copy.deepcopy(self.associations.get_benchmark_graph())
+
+    # def get_associativity_metrics(self):
+    #     return copy.deepcopy(self.associations.compare_to_benchmark())        
+
     ###### HELPER FUNCTIONS
+    def floatify_input(self, _input, remove_str=False):
+        floatified = []
+        for i in _input:
+            if type(i) is str:
+                try:
+                    x = float(i)
+                    floatified.append(x)
+                except:
+                    try:
+                        x = i.replace('-', '').replace(':', '').replace('.', '')
+                        floatified.append(float(x))
+                    except:
+                        if remove_str == False:
+                            floatified.append(0.0)
+                        else:
+                            continue
+                        continue
+            else:
+                floatified.append(float(i))
+        return floatified
+
     def status_to_oneHot(self, status):
         if isinstance(status, np.ndarray):
             return status
         one_hot = [0.0, 0.0, 0.0, 0.0]
         one_hot[self.classes[status]] = 1.0
         return list(one_hot)
+

@@ -13,8 +13,17 @@ from src.data_handling.parsers.parser_util import str2lst
 
 class TimeSynchronizer:
     def __init__(self, headers={}, dataFrames={}, test_configs={}):
-        self.init_sync_data(headers, test_configs) 
-        self.sort_data(dataFrames)
+        try:
+            # Both have side effects
+            self.init_sync_data(headers, test_configs) 
+            self.sort_data(dataFrames)
+        except:
+            self.ordered_sources = []
+            self.ordered_fused_headers = []
+            self.ordered_fused_tests = []
+            self.indices_to_remove = []
+            self.offsets = {}
+            self.sim_data =  []
 
     def init_sync_data(self, headers, configs):
         if headers == {} or configs == {}:

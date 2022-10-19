@@ -1,7 +1,0 @@
-Time jumps really fast between 20000 and 80000.
-That's a benign communication error.
-
-Everything at or after Time 896093 is an error of the satellite falling out of orbit.
-That's a catastrophic fault.
-
-Everything else is No_Error.

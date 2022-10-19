@@ -7,10 +7,10 @@ def extract_configs(configFilePath, configFiles, csv = False):
     desc_assigns = {}
 
     for cFile in configFiles:
-        subsystem_assignments, tests, descs = extract_config(configFilePath, cFile, csv=csv)
-        ss_assigns = subsystem_assignments
-        test_assigns = tests
-        desc_assigns = descs
+        filename, subsystem_assignments, tests, descs = extract_config(configFilePath, cFile, csv=csv)
+        ss_assigns[filename] = subsystem_assignments
+        test_assigns[filename] = tests
+        desc_assigns[filename] = descs
 
     configs = {'subsystem_assignments' : ss_assigns,
                'test_assignments' : test_assigns,
@@ -19,6 +19,8 @@ def extract_configs(configFilePath, configFiles, csv = False):
 
 ## Helper method for extract_configs
 def extract_config(configFilePath, configFile, csv = False):
+    data_source = process_filepath(configFile, csv=csv)
+
     subsystem_assignments = []
     mnemonic_tests = []
     descriptions = []
@@ -49,7 +51,7 @@ def extract_config(configFilePath, configFile, csv = False):
 
         mnemonic_tests.append(test_list)
 
-    return subsystem_assignments, mnemonic_tests, descriptions
+    return data_source, subsystem_assignments, mnemonic_tests, descriptions
 
 def str2lst(string):
     try:

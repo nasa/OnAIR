@@ -1,0 +1,4 @@
+TIME ['CDH'] ['SYNC','TIME']
+SAMPLE.sample_data_tlm_t.sample_data_counter ['GNC'] ['FEASIBILITY',-1.0,0.0,10.0,15.0]
+SAMPLE.sample_data_tlm_t.sample_data_value ['GNC'] ['NOOP']
+SAMPLE.sample_data_power_t.sample_data_counter ['POWER'] ['FEASIBILITY',-1.0,0.0,10.0,15.0]

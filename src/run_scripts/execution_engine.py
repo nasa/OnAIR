@@ -13,14 +13,10 @@ from time import gmtime, strftime
 
 from src.data_handling.time_synchronizer import TimeSynchronizer
 from src.run_scripts.sim import Simulator
-from src.util.config import get_config
-from src.util.cleanup import setup_folders
+from src.util.file_io import * 
 
 class ExecutionEngine:
-    def __init__(self, testing=True, run_name='', save_flag=False):
-        """
-        :param testing: (optional bool) if true do not load config
-        """
+    def __init__(self, config_file='', run_name='', save_flag=False):
         
         # Init Housekeeping 
         self.run_name = run_name
@@ -50,16 +46,17 @@ class ExecutionEngine:
         self.save_flag = save_flag
         self.save_name = run_name
 
-        if not testing:
+        if config_file != '':
             self.init_save_paths()
-            self.parse_configs()
+            self.parse_configs(config_file)
             self.parse_data(self.parser_name, self.parser_file_name, self.dataFilePath, self.metadataFilePath)
             self.setup_sim()
 
-    def parse_configs(self):
+    def parse_configs(self, config_file_path):
+        # print("Using config file: {}".format(config_file_path))
 
-        config = get_config()
-
+        config = configparser.ConfigParser()
+        config.read(config_file_path)
         ## Sort Data: Telementry Data & Configuration
         self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
         self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
@@ -130,15 +127,11 @@ class ExecutionEngine:
 
     def save_results(self, save_name):
         complete_time = strftime("%H-%M-%S", gmtime())
-        results_save_path = os.environ['RAISR_SAVE_PATH'] + '/saved/'
-        setup_folders(results_save_path)
-        save_path = results_save_path + save_name + '_' + complete_time
+        save_path = os.environ['RAISR_SAVE_PATH'] + '/saved/' + save_name + '_' + complete_time
         os.mkdir(save_path)
         copy_tree(os.environ['RAISR_TMP_SAVE_PATH'], save_path)
-        
-        # move everything from temp into here
 
-    #### SETTERS AND GETTERS 
+    """ Getters and setters """
     def set_run_param(self, name, val):
         setattr(self, name, val)
 
