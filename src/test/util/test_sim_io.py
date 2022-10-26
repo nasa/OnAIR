@@ -1,4 +1,3 @@
-import pytest
 from mock import patch
 import util.sim_io
 
