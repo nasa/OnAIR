@@ -1,5 +1,0 @@
-Time,Velocity,GForce,Acceleration,Thrust,TWR,Mass,AltitudeFromTerrain,DownrangeDistance,Latitude,Longitude,Apoapsis,Periapsis,Inclination,OrbitalVelocity,VesselDeltaV,Pressure,
-1,6,2.11,10.96,111.15,2.11,5.36,79.54,0,-0.1,-74.56,79,0,0.1,175,1523,100.17,
-2,17,2.11,12.8,111.19,2.13,5.31,90.01,0,-0.1,-74.56,101,0,0.1,180,1506,100.01,
-3,25,2.15,26.67,111.26,2.15,5.27,101.79,0.02,-0.1,-74.56,106,0,0.11,199,1484,99.79,
-4,40,2.2,30.61,111.27,2.17,5.22,95.56,0.05,-0.1,-74.55,116,0,0.11,211,1466,99.86,

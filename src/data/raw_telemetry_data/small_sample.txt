@@ -1,0 +1,34 @@
+
+
+TIME 2019-127-12:00:17.300006746
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
+[EOF]
+
+TIME 2019-127-12:00:17.300006747
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 1
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
+[EOF]
+
+TIME 2019-127-12:00:17.300006748
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 2
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
+[EOF]
+
+TIME 2019-127-12:00:17.300006790
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 3
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
+[EOF]
+
+TIME 2019-127-12:00:17.300006801
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 4
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
+[EOF]
+
+
+

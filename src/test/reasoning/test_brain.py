@@ -20,7 +20,6 @@ class TestBrain(unittest.TestCase):
     def test_reason(self):
         frame = [1, 1, 1]
         self.B.reason(frame)
-
         self.assertEquals(self.B.spacecraft_rep.get_current_data(), [1,1,1])
         self.assertEquals(self.B.mission_status, 'GREEN')
 

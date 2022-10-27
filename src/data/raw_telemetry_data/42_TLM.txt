@@ -1,7 +1,22 @@
 
 
-TIME 2019-127-12:00:17.300006747
+TIME 2019-127-12:00:17.300006746
 SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
+SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
+SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
+SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
+SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
+[EOF]
+
+TIME 2019-127-12:00:17.300006747
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 1
 SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
 SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
 SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
@@ -16,7 +31,7 @@ SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
 [EOF]
 
 TIME 2019-127-12:00:17.300006748
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 2
 SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
 SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
 SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
@@ -30,8 +45,8 @@ SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
 SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
 [EOF]
 
-TIME 2019-127-12:00:17.300006749
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
+TIME 2019-127-12:00:17.300006790
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 3
 SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
 SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
 SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
@@ -45,8 +60,8 @@ SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
 SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
 [EOF]
 
-TIME 2019-127-12:00:17.300006747
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
+TIME 2019-127-12:00:17.300006801
+SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 4
 SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
 SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
 SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
@@ -60,348 +75,5 @@ SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
 SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
 [EOF]
 
-TIME 2019-127-12:00:17.300006750
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
 
-TIME 2019-127-12:00:17.300006751
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006752
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006753
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006754
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006755
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006756
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006757
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006758
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006759
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006760
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006761
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006762
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006763
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006764
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006765
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006766
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006767
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006768
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006769
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006770
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006771
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
-
-TIME 2019-127-12:00:17.300006772
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_tlm_t.sample_data_value = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_power_t.sample_data_voltage = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_power_t.sample_data_current = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_internal_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_thermal_t.sample_data_external_temp = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_counter = 0
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lat = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_lng = 0.000000000000e+00
-SC[0].SAMPLE.sample_data_gps_t.sample_data_alt = 0.000000000000e+00
-[EOF]
 

@@ -43,5 +43,7 @@ class Spacecraft:
     def get_bayesian_status(self):
         return self.status.get_bayesian_status()
 
+    def get_batch_status_reports(self, batch_data):
+        return
 
 

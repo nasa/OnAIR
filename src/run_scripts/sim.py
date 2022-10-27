@@ -15,11 +15,10 @@ import random
 
 from src.reasoning.brain import Brain
 from src.systems.spacecraft import Spacecraft
+from src.util.file_io import *
 from src.util.print_io import *
 from src.util.sim_io import *
 from src.data_handling.data_source import DataSource
-
-from src.util.config import get_config
 
 class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):
@@ -39,16 +38,7 @@ class Simulator:
             self.simData = DataSource(parsedData.get_sim_data())
         self.brain = Brain(spaceCraft)
 
-        self.Run_Model_Flag = get_config().getboolean('TESTING', 'RunModels', fallback=True)
-
-
-    #####################################################
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
-        """
-        :param Run_Model_Flag: (bool) whether to run models, false for testing purposes
-        """
-        if self.Run_Model_Flag:
-            self.apriori_training()
 
         print_sim_header() if (IO_Flag == True) else ''
         print_msg('Please wait...\n') if (IO_Flag == 'strict') else ''
@@ -58,28 +48,32 @@ class Simulator:
         last_fault = time_step
 
         while self.simData.has_more() and time_step < 2050:
-            _next = self.simData.get_next()
-            self.brain.reason(_next)
+
+            next = self.simData.get_next()
+            self.brain.reason(next)
             self.IO_check(time_step, IO_Flag)
             
             ### Stop when a fault is reached  
             if self.brain.mission_status == 'RED':
-                diagnosis_list.append(self.brain.diagnose(time_step))
-                break 
+                if last_fault == time_step - 1: #if they are consecutive
+                    if (time_step - last_diagnosis) % 100 == 0:
+                        diagnosis_list.append(self.brain.diagnose(time_step))
+                        last_diagnosis = time_step
+                else:
+                    diagnosis_list.append(self.brain.diagnose(time_step))
+                    last_diagnosis = time_step
+                last_fault = time_step
             time_step += 1
             
         # Final diagnosis processing
         if len(diagnosis_list) == 0:
             diagnosis_list.append(self.brain.diagnose(time_step))
-        
         final_diagnosis = diagnosis_list[-1]
-        print("**** FINAL DIAGNOSIS ****") if (IO_Flag == True) else ''
-        print(final_diagnosis) if (IO_Flag == True) else ''
-        
         return final_diagnosis
 
-    def apriori_training(self):
-        self.brain.learning_systems.apriori_training(self.simData.data)
+
+    def set_benchmark_data(self, filepath, files, indices):
+        self.brain.supervised_learning.set_benchmark_data(filepath, files, indices)
 
     def IO_check(self, time_step, IO_Flag):
         if IO_Flag == True:
