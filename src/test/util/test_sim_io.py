@@ -30,6 +30,7 @@ def test_render_viz_does_only_stattest_render_viz_does_status_sensor_and_diagnos
   util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name)
 
   # Assert
+  assert open.call_count == 2
   assert util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
   assert util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
   assert open.call_args_list[0].args == (fake_full_path, 'w')
@@ -38,7 +39,6 @@ def test_render_viz_does_only_stattest_render_viz_does_status_sensor_and_diagnos
   assert util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
   assert open.call_args_list[1].args == (fake_full_path, 'w')
   assert util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
-  assert open.call_count == 2 
   
 def test_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_as_None(mocker):
   # Arrange
@@ -70,6 +70,7 @@ def test_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_
   util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name, arg_diagnosis)
 
   # Assert
+  assert open.call_count == 2
   assert util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
   assert util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
   assert open.call_args_list[0].args == (fake_full_path, 'w')
@@ -78,7 +79,6 @@ def test_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_
   assert util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
   assert open.call_args_list[1].args == (fake_full_path, 'w')
   assert util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
-  assert open.call_count == 2 
   
 def test_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_given(mocker):
   # Arrange
@@ -112,6 +112,7 @@ def test_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_g
   util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name, arg_diagnosis)
 
   # Assert
+  assert open.call_count == 3
   assert util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
   assert util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
   assert open.call_args_list[0].args == (fake_full_path, 'w')
@@ -125,7 +126,6 @@ def test_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_g
   assert util.sim_io.os.path.join.call_args_list[2].args == (fake_system_filename, 'results.json')
   assert open.call_args_list[2].args == (fake_full_path, 'w')
   assert util.sim_io.json.dump.call_args_list[2].args == (fake_results, fake_iterator)
-  assert open.call_count == 3
 
 def test_print_dots_uses_mod_10_plus_one_dots_when_ts_mod_20_is_less_than_10(mocker):
   # Arrange
