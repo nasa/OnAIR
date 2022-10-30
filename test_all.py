@@ -16,8 +16,12 @@ from src.test.reasoning.test_brain import TestBrain
 from src.test.systems.test_telemetry_test_suite import TestTelemetryTestSuite
 from src.test.run_scripts.test_sim import TestSimulator
 from src.test.data_driven_components.test_data_driven_learning import TestDataDrivenLearning
+from src.test.data_driven_components.test_generic_intelligence_construct import TestGenericIntelligenceConstruct
+from src.test.data_driven_components.generic_component.test_core import TestCore
 from src.test.util.test_cleanup import TestCleanup
 from src.test.util.test_data_conversion import TestDataConversion
+
+
 
 def create_suite():
     suite = []
@@ -35,6 +39,8 @@ def create_suite():
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestTelemetryTestSuite))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestSimulator))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataDrivenLearning))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestGenericIntelligenceConstruct))
+    suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCore))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestCleanup))
     suite.append(unittest.TestLoader().loadTestsFromTestCase(TestDataConversion))
 
