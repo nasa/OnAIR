@@ -22,6 +22,21 @@ def test_DataDrivenLearning__init__asserts_when_given_headers_is_empty(mocker):
     assert e_info.match('')
     assert hasattr(cut, 'headers') == False
 
+def test_DataDrivenLearning__init__asserts_when_given_ai_plugins_is_empty(mocker):
+    # Arrange
+    arg_headers = [MagicMock()]
+    arg__ai_plugins = []
+
+    cut = DataDrivenLearning.__new__(DataDrivenLearning)
+
+    # Act
+    with pytest.raises(AssertionError) as e_info:
+        cut.__init__(arg_headers, arg__ai_plugins)
+
+    # Assert
+    assert e_info.match('')
+    assert hasattr(cut, 'ai_constructs') == False
+
 def test_DataDrivenLearning__init__asserts_when_no_arguments_are_given_because_default_headers_is_empty_list(mocker):
     # Arrange
 
@@ -35,24 +50,7 @@ def test_DataDrivenLearning__init__asserts_when_no_arguments_are_given_because_d
     assert e_info.match('')
     assert hasattr(cut, 'headers') == False
 
-def test_DataDrivenLearning__init__sets_instance_headers_to_given_headers_and_does_nothing_else_when_given__ai_plugins_is_empty(mocker):
-    # Arrange
-    arg_headers = []
-    arg__ai_plugins = []
-
-    num_fake_headers = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 headers (0 has own test)
-    for i in range(num_fake_headers):
-        arg_headers.append(MagicMock())
-
-    cut = DataDrivenLearning.__new__(DataDrivenLearning)
-
-    # Act
-    cut.__init__(arg_headers, arg__ai_plugins)
-
-    # Assert
-    assert cut.headers == arg_headers
-
-def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
+def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_given_headers_for_each_item_in_given__ai_plugins(mocker):
     # Arrange
     arg_headers = []
     arg__ai_plugins = []

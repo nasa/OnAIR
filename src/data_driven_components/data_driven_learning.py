@@ -8,8 +8,11 @@ from src.util.data_conversion import *
 class DataDrivenLearning:
     def __init__(self, headers=[], _ai_plugins:list=['generic_component']):
         assert(len(headers)>0)
+        assert(len(_ai_plugins)>0)
         self.headers = headers
-        self.ai_constructs = [importlib.import_module('src.data_driven_components.' + plugin + '.core').AIPlugIn(headers) for plugin in _ai_plugins]
+        self.ai_constructs = [
+            importlib.import_module('src.data_driven_components.' + plugin + '.core').AIPlugIn(headers) for plugin in _ai_plugins
+        ]
 
     def update(self, curr_data, status):
         input_data = floatify_input(curr_data)
