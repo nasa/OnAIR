@@ -319,3 +319,233 @@ def test_print_mission_status_only_prints_brain_formatted_status_when_data_given
   assert util.print_io.print.call_count == 2
   for i in range(util.print_io.print.call_count):
     assert util.print_io.print.call_args_list[i].args == (expected_print[i], )
+
+
+# print_diagnosis tests
+def test_print_diagnosis_only_prints_separators_and_headers_when_status_list_and_activations_are_empty_tree_traversal_unused(mocker):
+  # Arrange
+  arg_diagnosis = MagicMock()
+
+  arg_diagnosis.configure_mock(**{'get_status_list.return_value': []})
+  arg_diagnosis.configure_mock(**{'current_activations.return_value': []})
+
+  mocker.patch('util.print_io.print_seperator')
+  mocker.patch('util.print_io.print')
+
+  # Act
+  util.print_io.print_diagnosis(arg_diagnosis)
+
+  # Assert
+  assert util.print_io.print_seperator.call_count == 2
+  assert util.print_io.print.call_count == 2
+  assert util.print_io.print.call_args_list[0].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "DIAGNOSIS INFO: \n" + util.print_io.bcolors.ENDC, )
+  assert util.print_io.print.call_args_list[1].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "\nCURRENT ACTIVATIONS: \n" + util.print_io.bcolors.ENDC, )
+
+def test_print_diagnosis_prints_separators_headers_status_and_activations_when_status_list_and_activations_have_items_tree_traversal_unused(mocker):
+  # Arrange
+  arg_diagnosis = MagicMock()
+
+  num_status = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
+  fake_status = []
+  fake_format = MagicMock()
+  num_activations = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
+  fake_activations = []
+  fake_str = MagicMock()
+
+  for i in range(num_status):
+    fake_status.append([MagicMock(), MagicMock()])
+
+  for i in range(num_activations):
+    fake_activations.append(MagicMock())
+
+  arg_diagnosis.configure_mock(**{'get_status_list.return_value': fake_status})
+  arg_diagnosis.current_activations = fake_activations
+
+  mocker.patch('util.print_io.print_seperator')
+  mocker.patch('util.print_io.print')
+  mocker.patch('util.print_io.format_status', return_value=fake_format)
+  mocker.patch('util.print_io.str', return_value=fake_str)
+
+  # Act
+  util.print_io.print_diagnosis(arg_diagnosis)
+
+  # Assert
+  assert util.print_io.print_seperator.call_count == 2
+  assert util.print_io.print.call_count == 2 + num_status + num_activations
+  assert util.print_io.print.call_args_list[0].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "DIAGNOSIS INFO: \n" + util.print_io.bcolors.ENDC, )
+  for i in range(num_status):
+    assert util.print_io.print.call_args_list[1 + i].args == (fake_status[i][0] + ': ' + fake_format, )
+    assert util.print_io.format_status.call_args_list[i].args == (fake_status[i][1], )
+  assert util.print_io.print.call_args_list[1 + num_status].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "\nCURRENT ACTIVATIONS: \n" + util.print_io.bcolors.ENDC, )
+  for i in range(num_activations):
+    assert util.print_io.print.call_args_list[2 + num_status + i].args == ('---' + fake_str, )
+    assert util.print_io.str.call_args_list[i].args == (fake_activations[i], )
+
+
+# subsystem_status_str tests
+def test_subsystem_status_str_returns_expected_string_when_stat_exists_as_key_in_status_colors(mocker):
+  # Arrange
+  arg_ss = MagicMock()
+
+  fake_type = MagicMock()
+  fake_stat = pytest.gen.choice(list(util.print_io.status_colors.keys()))
+  fake_uncertainty = MagicMock()
+  fake_str = MagicMock()
+
+  expected_s = util.print_io.bcolors.BOLD + '[' + fake_str + '] : ' + util.print_io.bcolors.ENDC
+  expected_s = expected_s + '\n' + util.print_io.status_colors[fake_stat] + ' ---- ' + fake_str + util.print_io.bcolors.ENDC + ' (' + fake_str + ')'
+  expected_s = expected_s + '\n'
+
+  arg_ss.type = fake_type
+  arg_ss.configure_mock(**{'get_status.return_value':fake_stat})
+  arg_ss.uncertainty = fake_uncertainty
+
+  mocker.patch('util.print_io.str', return_value=fake_str)
+
+  # Act
+  result = util.print_io.subsystem_status_str(arg_ss)
+
+  # Assert
+  assert util.print_io.str.call_count == 3
+  assert util.print_io.str.call_args_list[0].args == (fake_type, )
+  assert util.print_io.str.call_args_list[1].args == (fake_stat, )
+  assert util.print_io.str.call_args_list[2].args == (fake_uncertainty, )
+  assert result == expected_s
+  
+
+# subsystem_str tests
+def test_subsystem_str_returns_string_without_any_data_when_headers_tests_and_test_data_empty(mocker):
+  # Arrange
+  arg_ss = MagicMock()
+
+  arg_ss.type = str(MagicMock())
+  arg_ss.headers = []
+  arg_ss.tests = []
+  arg_ss.test_data = []
+
+  expected_result = util.print_io.bcolors.BOLD + arg_ss.type + '\n' + util.print_io.bcolors.ENDC
+  expected_result = expected_result + '--[headers] \n--[tests] \n--[test data] '
+
+  # Act
+  result = util.print_io.subsystem_str(arg_ss)
+
+  # Assert
+  assert result == expected_result
+
+def test_subsystem_str_returns_string_all_data_when_headers_tests_and_test_data_occupied(mocker):
+  # Arrange
+  arg_ss = MagicMock()
+
+  arg_ss.type = str(MagicMock())
+  num_headers = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
+  arg_ss.headers = []
+  num_tests = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
+  arg_ss.tests = []
+  num_test_data = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
+  arg_ss.test_data = []
+
+  expected_result = util.print_io.bcolors.BOLD + arg_ss.type + '\n' + util.print_io.bcolors.ENDC
+  expected_result = expected_result + '--[headers] '
+  for i in range(num_headers):
+    arg_ss.headers.append(MagicMock())
+    expected_result = expected_result + '\n---' + str(arg_ss.headers[i])
+  expected_result = expected_result + '\n--[tests] '
+  for i in range(num_tests):
+    arg_ss.tests.append(MagicMock())
+    expected_result = expected_result + '\n---' + str(arg_ss.tests[i])
+  expected_result = expected_result + '\n--[test data] '
+  for i in range(num_test_data):
+    arg_ss.test_data.append(MagicMock())
+    expected_result = expected_result + '\n---' + str(arg_ss.test_data[i])
+
+  # Act
+  result = util.print_io.subsystem_str(arg_ss)
+
+  # Assert
+  assert result == expected_result
+
+
+# headers_string tests
+def test_format_status_returns_empty_string_when_headers_is_vacant():
+  # Arrange
+  arg_headers = []
+
+  # Act
+  result = util.print_io.headers_string(arg_headers)
+
+  # Assert
+  assert result == str()
+
+def test_format_status_returns_all_headers_in_formatted_string_when_occupied():
+  # Arrange
+  num_headers = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
+  arg_headers = []
+  
+  expected_result = ''
+
+  for i in range(num_headers):
+    arg_headers.append(str(MagicMock()))
+    expected_result = expected_result + '\n  -- ' + arg_headers[i]
+  
+  # Act
+  result = util.print_io.headers_string(arg_headers)
+
+  # Assert
+  assert result == expected_result
+
+
+# format_status tests
+
+def test_format_status_raises_KeyError_when_stat_is_string_and_not_in_status_color_keys():
+  # Arrange
+  arg_stat = str(MagicMock())
+
+  # Act
+  with pytest.raises(KeyError) as e_info:
+    result = util.print_io.format_status(arg_stat)
+
+  # Assert
+  assert str(e_info.value) == '"' + arg_stat + '"'
+
+def test_format_status_returns_stat_in_its_status_color_when_stat_is_string_and_a_key():
+  # Arrange
+  arg_stat = pytest.gen.choice(list(util.print_io.status_colors.keys()))
+
+  expected_result = util.print_io.status_colors[arg_stat] + arg_stat + util.print_io.scolors['ENDC']
+
+  # Act
+  result = util.print_io.format_status(arg_stat)
+
+  # Assert
+  assert result == expected_result
+
+def test_format_status_returns_only_a_right_parenthesis_in_string_when_stat_is_an_empty_list():
+  # Arrange
+  arg_stat = []
+
+  expected_result = ')'
+
+  # Act
+  result = util.print_io.format_status(arg_stat)
+
+  # Assert
+  assert result == expected_result
+
+def test_format_status_returns_all_status_in_stat_formatted_into_string_when_stat_is_a_list_of_status(mocker):
+  # Arrange
+  num_stat = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
+  arg_stat = []
+
+  expected_result = '('
+  for i in range(num_stat):
+    arg_stat.append(pytest.gen.choice(list(util.print_io.status_colors.keys())))
+    expected_result += util.print_io.status_colors[arg_stat[i]] + arg_stat[i] + util.print_io.scolors['ENDC']
+    if i != (num_stat - 1):
+      expected_result += ', '
+  expected_result += ')'
+
+  # Act
+  result = util.print_io.format_status(arg_stat)
+
+  # Assert
+  assert result == expected_result
