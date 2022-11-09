@@ -14,4 +14,4 @@ def clean_all(run_path):
 
 def setup_folders(results_path):
     if not os.path.isdir(results_path):
-        os.system('mkdir ' + results_path)
+        os.mkdir(results_path)

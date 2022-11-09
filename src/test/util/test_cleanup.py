@@ -1,35 +1,83 @@
-""" Test Cleanup Functionality """
-import os
-import unittest
+import pytest
+from mock import MagicMock
+import util.cleanup
 
-from src.util.cleanup import *
+# clean_all tests
+def test_clean_all_removes_provided_file_types_back_two_directories_from_file_location_when_given_run_path_is_empty_string(mocker):
+  # Arrange
+  arg_run_path = ''
 
-class TestCleanup(unittest.TestCase):
+  fake_path = MagicMock()
+  fake_run_path = str(MagicMock())
 
-    def setUp(self):
-        self.run_path = os.environ['RUN_PATH']
-        self.test_path = os.path.dirname(os.path.abspath(__file__))
+  mocker.patch('util.cleanup.os.path.realpath', return_value=fake_path)
+  mocker.patch('util.cleanup.os.path.dirname', return_value=fake_run_path)
+  mocker.patch('util.cleanup.os.chdir')
+  mocker.patch('util.cleanup.os.system')
 
-    def test_pre_run_setup(self):
+  # Act
+  util.cleanup.clean_all(arg_run_path)
 
-        return
+  # Assert
+  assert util.cleanup.os.path.realpath.call_count == 1
+  assert util.cleanup.os.path.dirname.call_count == 1
+  assert util.cleanup.os.chdir.call_count == 1
+  assert util.cleanup.os.chdir.call_args_list[0].args == (fake_run_path + '/../../',)
+  assert util.cleanup.os.system.call_count == 2
+  assert util.cleanup.os.system.call_args_list[0].args == ('find . | grep -E \"(__pycache__|\.pyc|\.pyo$)\" | xargs rm -rf', )
+  assert util.cleanup.os.system.call_args_list[1].args == ('find . | grep -E \"\.DS_Store\" | xargs rm -rf', )
 
-        # clean_all('') # PreRun Cleanup
-        # self.assertTrue(not os.path.isfile(basePath + ".DS_Store")) # Junk file to clean no longer exists
-        # self.assertTrue(os.path.isdir(basePath + "results")) # Results dir has been made
+def test_clean_all_removes_provided_file_types_from_given_run_path_when_it_is_not_empty(mocker):
+  # Arrange
+  arg_run_path = str(MagicMock())
 
-        # clean_all(run_path='src/test/') # PreRun Cleanup (using path variable)
-        # self.assertTrue(os.path.isdir(basePath + "src/test/results")) # Results dir has been made (using path variable)
+  fake_path = MagicMock()
+  fake_run_path = str(MagicMock())
 
-    def test_post_run_cleanup(self):
-        file = open(self.test_path + ".DS_Store", "w")
-        file.write("hello world")
-        file.flush()
-        file.close()
+  mocker.patch('util.cleanup.os.path.realpath', return_value=fake_path)
+  mocker.patch('util.cleanup.os.path.dirname', return_value=fake_run_path)
+  mocker.patch('util.cleanup.os.chdir')
+  mocker.patch('util.cleanup.os.system')
 
-        self.assertTrue(os.path.isfile(self.test_path + ".DS_Store")) # Junk file to clean exists
-        clean_all(self.run_path) # PostRun Cleanup
-        self.assertFalse(os.path.isfile(self.test_path + ".DS_Store")) 
+  # Act
+  util.cleanup.clean_all(arg_run_path)
 
-if __name__ == '__main__':
-    unittest.main()
+  # Assert
+  assert util.cleanup.os.path.realpath.call_count == 0
+  assert util.cleanup.os.path.dirname.call_count == 0
+  assert util.cleanup.os.chdir.call_count == 1
+  assert util.cleanup.os.chdir.call_args_list[0].args == (arg_run_path, )
+  assert util.cleanup.os.system.call_count == 2
+  assert util.cleanup.os.system.call_args_list[0].args == ('find . | grep -E \"(__pycache__|\.pyc|\.pyo$)\" | xargs rm -rf', )
+  assert util.cleanup.os.system.call_args_list[1].args == ('find . | grep -E \"\.DS_Store\" | xargs rm -rf', )
+
+
+# test_setup_folders
+def test_setup_folders_creates_dir_when_given_results_path_does_not_exist(mocker):
+  # Arrange
+  arg_results_path = str(MagicMock())
+
+  mocker.patch('util.cleanup.os.path.isdir', return_value=False)
+  mocker.patch('util.cleanup.os.mkdir')
+
+  # Act
+  util.cleanup.setup_folders(arg_results_path)
+  
+  # Assert
+  assert util.cleanup.os.path.isdir.call_count == 1
+  assert util.cleanup.os.mkdir.call_count == 1
+  assert util.cleanup.os.mkdir.call_args_list[0].args == (arg_results_path, )
+
+def test_setup_folders_does_not_create_dir_when_it_already_exists(mocker):
+  # Arrange
+  arg_results_path = str(MagicMock())
+
+  mocker.patch('util.cleanup.os.path.isdir', return_value=True)
+  mocker.patch('util.cleanup.os.mkdir')
+
+  # Act
+  util.cleanup.setup_folders(arg_results_path)
+  
+  # Assert
+  assert util.cleanup.os.path.isdir.call_count == 1
+  assert util.cleanup.os.mkdir.call_count == 0
