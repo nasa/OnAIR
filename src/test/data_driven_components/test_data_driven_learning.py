@@ -7,48 +7,22 @@ from src.data_driven_components.data_driven_learning import DataDrivenLearning
 import importlib
 
 # __init__ tests
-def test_DataDrivenLearning__init__asserts_when_given_headers_is_empty(mocker):
+def test_DataDrivenLearning__init__sets_instance_headers_to_given_headers_and_does_nothing_else_when_given__ai_plugins_is_empty(mocker):
     # Arrange
     arg_headers = []
-    arg__ai_plugins = MagicMock()
-
-    cut = DataDrivenLearning.__new__(DataDrivenLearning)
-
-    # Act
-    with pytest.raises(AssertionError) as e_info:
-        cut.__init__(arg_headers, arg__ai_plugins)
-
-    # Assert
-    assert e_info.match('')
-    assert hasattr(cut, 'headers') == False
-
-def test_DataDrivenLearning__init__asserts_when_given_ai_plugins_is_empty(mocker):
-    # Arrange
-    arg_headers = [MagicMock()]
     arg__ai_plugins = []
 
-    cut = DataDrivenLearning.__new__(DataDrivenLearning)
-
-    # Act
-    with pytest.raises(AssertionError) as e_info:
-        cut.__init__(arg_headers, arg__ai_plugins)
-
-    # Assert
-    assert e_info.match('')
-    assert hasattr(cut, 'ai_constructs') == False
-
-def test_DataDrivenLearning__init__asserts_when_no_arguments_are_given_because_default_headers_is_empty_list(mocker):
-    # Arrange
+    num_fake_headers = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 headers (0 has own test)
+    for i in range(num_fake_headers):
+        arg_headers.append(MagicMock())
 
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
 
     # Act
-    with pytest.raises(AssertionError) as e_info:
-        cut.__init__()
+    cut.__init__(arg_headers, arg__ai_plugins)
 
     # Assert
-    assert e_info.match('')
-    assert hasattr(cut, 'headers') == False
+    assert cut.headers == arg_headers
 
 def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_given_headers_for_each_item_in_given__ai_plugins(mocker):
     # Arrange
@@ -106,7 +80,7 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
         assert importlib.import_module.call_args_list[i].args == ('src.data_driven_components.' + arg__ai_plugins[i] + '.core',)
     assert fake_imported_module.AIPlugIn.call_count == num_fake_ai_plugins
     for i in range(num_fake_ai_plugins):
-        assert fake_imported_module.AIPlugIn.call_args_list[i].args == (arg_headers,)
+        assert fake_imported_module.AIPlugIn.call_args_list[i].args == (arg__ai_plugins[i], arg_headers)
     assert cut.ai_constructs == expected_ai_constructs
     
 # update tests
@@ -222,7 +196,8 @@ def test_DataDrivenLearning_render_diagnosis_returns_dict_of_each_ai_construct_a
         forced_return_ai_construct_render_diagnosis = MagicMock()
         cut.ai_constructs.append(fake_ai_construct)
         mocker.patch.object(fake_ai_construct, 'render_diagnosis', return_value=forced_return_ai_construct_render_diagnosis)
-        expected_result[fake_ai_construct] = forced_return_ai_construct_render_diagnosis
+        fake_ai_construct.component_name = MagicMock()
+        expected_result[fake_ai_construct.component_name] = forced_return_ai_construct_render_diagnosis
 
     # Act
     result = cut.render_diagnosis()

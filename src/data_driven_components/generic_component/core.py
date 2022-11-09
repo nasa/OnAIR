@@ -3,8 +3,9 @@ from src.data_driven_components.generic_intelligence_construct import GenericInt
 
 class AIPlugIn(GenericIntelligenceConstruct):
 
-    def __init__(self, _headers):
+    def __init__(self, _name, _headers):
         assert(len(_headers)>0)
+        self.component_name = _name
         self.headers = _headers
 
     def apriori_training(self, batch_data): 

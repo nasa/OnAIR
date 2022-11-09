@@ -7,16 +7,16 @@ from src.data_driven_components.generic_component.core import AIPlugIn
 class TestCore(unittest.TestCase):
 
     def setUp(self):
-        construct = AIPlugIn(['test_A','test_B','test_C'])
+        construct = AIPlugIn('test_component', ['test_A','test_B','test_C'])
 
     def test_init_empty_headers(self):
-        self.assertRaises(AssertionError, AIPlugIn, [])
+        self.assertRaises(AssertionError, AIPlugIn, 'test', [])
 
     def test_init_non_empty_headers(self):
-        plugin = AIPlugIn(['A'])
+        plugin = AIPlugIn('test_component', ['A'])
         self.assertEquals(plugin.headers, ['A'])
 
-        plugin = AIPlugIn(['A', 'B'])
+        plugin = AIPlugIn('test_component', ['A', 'B'])
         self.assertEquals(plugin.headers, ['A', 'B'])
 
     def apriori_training_empty_batch(self):

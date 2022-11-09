@@ -6,12 +6,11 @@ import importlib
 from src.util.data_conversion import *
 
 class DataDrivenLearning:
-    def __init__(self, headers=[], _ai_plugins:list=['generic_component']):
+    def __init__(self, headers, _ai_plugins:list=[]):
         assert(len(headers)>0)
-        assert(len(_ai_plugins)>0)
         self.headers = headers
         self.ai_constructs = [
-            importlib.import_module('src.data_driven_components.' + plugin + '.core').AIPlugIn(headers) for plugin in _ai_plugins
+            importlib.import_module('src.data_driven_components.' + plugin + '.core').AIPlugIn(plugin, headers) for plugin in _ai_plugins
         ]
 
     def update(self, curr_data, status):
@@ -27,7 +26,7 @@ class DataDrivenLearning:
     def render_diagnosis(self):
         diagnoses = {}
         for plugin in self.ai_constructs:
-            diagnoses[plugin] = plugin.render_diagnosis()
+            diagnoses[plugin.component_name] = plugin.render_diagnosis()
         return diagnoses
 
 
