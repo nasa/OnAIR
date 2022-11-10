@@ -1,0 +1,18 @@
+variables:
+  GIT_CONFIG_PARAMETERS: "'url.https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/.insteadof=git@${CI_SERVER_HOST}:' 'url.https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/.insteadof=ssh://git@${CI_SERVER_HOST}/'"
+  GIT_SUBMODULE_STRATEGY: recursive
+  PYTHONPATH: src
+  RUN_PATH: src/test
+  RESULTS_PATH: results
+
+test-raisr:
+  tags:
+    - app-builder
+  image: aetd-dockerlab.gsfc.nasa.gov/cfs_lab/dsm/dsm-meta
+  stage: test
+  script:
+    - mkdir results
+    - coverage run --omit="src/test/*" -m pytest ./src/test
+  #artifacts:
+  #  paths:
+  #    - cfs_fsw/build-sim/*
