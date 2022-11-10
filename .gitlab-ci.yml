@@ -3,7 +3,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
   PYTHONPATH: src
   RUN_PATH: src/test
-  RESULTS_PATH: results
+  RESULTS_PATH: src/test/results
 
 test-raisr:
   tags:
@@ -11,7 +11,8 @@ test-raisr:
   image: aetd-dockerlab.gsfc.nasa.gov/cfs_lab/dsm/dsm-meta
   stage: test
   script:
-    - mkdir results
+    - mkdir ./src/test/results
+    - pwd
     - coverage run --omit="src/test/*" -m pytest ./src/test
   #artifacts:
   #  paths:
