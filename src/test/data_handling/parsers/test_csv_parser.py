@@ -15,11 +15,11 @@ class TestCSVParser(unittest.TestCase):
         self.tlmConfigFilepath = self.run_path + '/data/telemetry_configs/'
 
     def test_init_empty_parser(self):
-        self.assertEquals(self.P.raw_data_file_path, '')
-        self.assertEquals(self.P.metadata_file_path, '')
-        self.assertEquals(self.P.all_headers, '')
-        self.assertEquals(self.P.sim_data, '')
-        self.assertEquals(self.P.binning_configs, '')
+        self.assertEqual(self.P.raw_data_file_path, '')
+        self.assertEqual(self.P.metadata_file_path, '')
+        self.assertEqual(self.P.all_headers, '')
+        self.assertEqual(self.P.sim_data, '')
+        self.assertEqual(self.P.binning_configs, '')
 
     def test_init_nonempty_parser(self):
         P = CSV(self.run_path + '/data/raw_telemetry_data/', 
@@ -27,8 +27,8 @@ class TestCSVParser(unittest.TestCase):
                             str(['data1.csv']),
                             str(['data1_CONFIG.txt']))
 
-        self.assertEquals(P.raw_data_file_path, self.run_path + '/data/raw_telemetry_data/')
-        self.assertEquals(P.metadata_file_path, self.run_path + '/data/telemetry_configs/')
+        self.assertEqual(P.raw_data_file_path, self.run_path + '/data/raw_telemetry_data/')
+        self.assertEqual(P.metadata_file_path, self.run_path + '/data/telemetry_configs/')
                       
 if __name__ == '__main__':
     unittest.main()

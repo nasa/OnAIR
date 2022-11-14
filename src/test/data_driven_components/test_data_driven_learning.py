@@ -11,18 +11,18 @@ class TestDataDrivenLearning(unittest.TestCase):
 
     def test_init_empty_ddl(self):
         L = DataDrivenLearning()
-        self.assertEquals(L.headers, [])
+        self.assertEqual(L.headers, [])
 
     def test_init_nonempty_ddl(self):
         L = DataDrivenLearning(['A'])
-        self.assertEquals(L.headers, ['A'])
-        self.assertEquals(L.init_learning_systems(['A'])[0], [0.0])
-        self.assertEquals(L.init_learning_systems(['A'])[1], [0.0, 0.0, 0.0, 1.0])
+        self.assertEqual(L.headers, ['A'])
+        self.assertEqual(L.init_learning_systems(['A'])[0], [0.0])
+        self.assertEqual(L.init_learning_systems(['A'])[1], [0.0, 0.0, 0.0, 1.0])
 
         L2 = DataDrivenLearning(['A'], [1])
-        self.assertEquals(L2.headers, ['A'])
-        self.assertEquals(L2.init_learning_systems(['A'], [1])[0], [1.0])
-        self.assertEquals(L2.init_learning_systems(['A'], [1])[1], [0.0, 0.0, 0.0, 1.0])
+        self.assertEqual(L2.headers, ['A'])
+        self.assertEqual(L2.init_learning_systems(['A'], [1])[0], [1.0])
+        self.assertEqual(L2.init_learning_systems(['A'], [1])[1], [0.0, 0.0, 0.0, 1.0])
 
     def test_update(self):
         headers = ['TIME', 'A', 'B']
@@ -31,8 +31,8 @@ class TestDataDrivenLearning(unittest.TestCase):
         L = DataDrivenLearning(headers, sample)
         _in, _out = L.update([5,6,7], '---')
 
-        self.assertEquals(_in, [5.0, 6.0, 7.0])
-        self.assertEquals(_out, [0.0, 0.0, 0.0, 1.0])
+        self.assertEqual(_in, [5.0, 6.0, 7.0])
+        self.assertEqual(_out, [0.0, 0.0, 0.0, 1.0])
 
     def test_apriori_training(self):
         return

@@ -39,12 +39,12 @@ class TestGenericParser(unittest.TestCase):
             headers, sim_data, configs = P.get_sim_data()
 
             fileName = ast.literal_eval(self.data_files[i])[0]
-            self.assertEquals(P.all_headers, { fileName : ['TIME', 'A', 'B', 'C']})
-            self.assertEquals(P.sim_data, {'1000': { fileName : ['1000', '0', '0.000000000000e+00', '0.0']}, 
+            self.assertEqual(P.all_headers, { fileName : ['TIME', 'A', 'B', 'C']})
+            self.assertEqual(P.sim_data, {'1000': { fileName : ['1000', '0', '0.000000000000e+00', '0.0']}, 
                                            '1001': { fileName : ['1001', '1', '1.000000000000e+00', '1.0']}, 
                                            '1002': { fileName : ['1002', '2', '2.000000000000e+00', '2']}, 
                                            '1003': { fileName : ['1003', '3', '3.000000000000e+00', '3']}})
-            self.assertEquals(P.binning_configs, {'subsystem_assignments': {fileName: [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']]}, 
+            self.assertEqual(P.binning_configs, {'subsystem_assignments': {fileName: [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']]}, 
                                                   'test_assignments': {fileName: [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]]]}, 
                                                   'description_assignments': {fileName: ['No description', 'No description', 'No description', 'No description']}})        
 

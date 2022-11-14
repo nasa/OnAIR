@@ -23,54 +23,54 @@ class TestExecutionEngine(unittest.TestCase):
     def test_init_execution_engine(self):
 
         # Init Housekeeping 
-        self.assertEquals(self.E.run_name,'test')
+        self.assertEqual(self.E.run_name,'test')
 
         # Init Flags 
-        self.assertEquals(self.E.IO_Flag, False)
-        self.assertEquals(self.E.Dev_Flag, False)
-        self.assertEquals(self.E.SBN_Flag, False)
-        self.assertEquals(self.E.Viz_Flag, False)
+        self.assertEqual(self.E.IO_Flag, False)
+        self.assertEqual(self.E.Dev_Flag, False)
+        self.assertEqual(self.E.SBN_Flag, False)
+        self.assertEqual(self.E.Viz_Flag, False)
         
         # Init Paths 
-        self.assertEquals(self.E.dataFilePath, '')
-        self.assertEquals(self.E.metadataFilePath, '')
-        self.assertEquals(self.E.benchmarkFilePath, '')
-        self.assertEquals(self.E.metaFiles, '')
-        self.assertEquals(self.E.telemetryFiles, '')
-        self.assertEquals(self.E.benchmarkFiles, '')
+        self.assertEqual(self.E.dataFilePath, '')
+        self.assertEqual(self.E.metadataFilePath, '')
+        self.assertEqual(self.E.benchmarkFilePath, '')
+        self.assertEqual(self.E.metaFiles, '')
+        self.assertEqual(self.E.telemetryFiles, '')
+        self.assertEqual(self.E.benchmarkFiles, '')
 
         # Init parsing/sim info
-        self.assertEquals(self.E.parser_file_name, '')
-        self.assertEquals(self.E.parser_name, '')
-        self.assertEquals(self.E.sim_name, '')
-        self.assertEquals(self.E.processedSimData, None)
-        self.assertEquals(self.E.sim, None)
+        self.assertEqual(self.E.parser_file_name, '')
+        self.assertEqual(self.E.parser_name, '')
+        self.assertEqual(self.E.sim_name, '')
+        self.assertEqual(self.E.processedSimData, None)
+        self.assertEqual(self.E.sim, None)
 
-        self.assertEquals(self.E.save_flag, False)
-        self.assertEquals(self.E.save_name, 'test')
+        self.assertEqual(self.E.save_flag, False)
+        self.assertEqual(self.E.save_name, 'test')
 
 
 
     def test_parse_configs(self):
         self.E.parse_configs(self.config_fp)
-        self.assertEquals(self.E.dataFilePath, '/src/data/raw_telemetry_data/')
-        self.assertEquals(self.E.metadataFilePath, '/src/data/telemetry_configs/')
-        self.assertEquals(self.E.metaFiles, "['42_TLM_CONFIG.txt']")
-        self.assertEquals(self.E.telemetryFiles, "['42_TLM.txt']")
+        self.assertEqual(self.E.dataFilePath, '/src/data/raw_telemetry_data/')
+        self.assertEqual(self.E.metadataFilePath, '/src/data/telemetry_configs/')
+        self.assertEqual(self.E.metaFiles, "['42_TLM_CONFIG.txt']")
+        self.assertEqual(self.E.telemetryFiles, "['42_TLM.txt']")
 
         # No benchmarks passed in this case 
-        self.assertEquals(self.E.benchmarkFilePath, '')
-        self.assertEquals(self.E.benchmarkFiles, '')
-        self.assertEquals(self.E.benchmarkIndices, '')
+        self.assertEqual(self.E.benchmarkFilePath, '')
+        self.assertEqual(self.E.benchmarkFiles, '')
+        self.assertEqual(self.E.benchmarkIndices, '')
 
-        self.assertEquals(self.E.parser_file_name, 'forty_two_parser')
-        self.assertEquals(self.E.parser_name, 'FortyTwo')
-        self.assertEquals(self.E.sim_name, 'FortyTwo')
+        self.assertEqual(self.E.parser_file_name, 'forty_two_parser')
+        self.assertEqual(self.E.parser_name, 'FortyTwo')
+        self.assertEqual(self.E.sim_name, 'FortyTwo')
         
-        self.assertEquals(self.E.IO_Flag, False)
-        self.assertEquals(self.E.Dev_Flag, False)
-        self.assertEquals(self.E.SBN_Flag, False)
-        self.assertEquals(self.E.Viz_Flag, False)
+        self.assertEqual(self.E.IO_Flag, False)
+        self.assertEqual(self.E.Dev_Flag, False)
+        self.assertEqual(self.E.SBN_Flag, False)
+        self.assertEqual(self.E.Viz_Flag, False)
 
     def test_parse_data(self):
         parser_name = 'FortyTwo'
@@ -83,7 +83,7 @@ class TestExecutionEngine(unittest.TestCase):
 
         self.E.parse_data(parser_name, parser_file_name, dataFilePath, metadataFilePath)
         
-        self.assertEquals(type(self.E.processedSimData), TimeSynchronizer)
+        self.assertEqual(type(self.E.processedSimData), TimeSynchronizer)
 
 
     # def test_setup_sim(self):
@@ -110,19 +110,19 @@ class TestExecutionEngine(unittest.TestCase):
         self.E.init_save_paths()
         sub_dirs = os.listdir(self.tmp_save_path)
         sub_dirs.sort() # Sorting alphabetically
-        self.assertEquals(sub_dirs, ['diagnosis', 'models'])
+        self.assertEqual(sub_dirs, ['diagnosis', 'models'])
         
         # Try to init again now that tmp exits 
         self.E.init_save_paths()
 
         sub_dirs = os.listdir(self.tmp_save_path)
         sub_dirs.sort() # Sorting alphabetically
-        self.assertEquals(sub_dirs, ['diagnosis', 'models'])
+        self.assertEqual(sub_dirs, ['diagnosis', 'models'])
         
     def test_delete_save_paths(self):
         self.E.delete_save_paths()
         sub_dirs = os.listdir(self.save_path)
-        self.assertEquals(sub_dirs, [])
+        self.assertEqual(sub_dirs, [])
 
     def test_save_results(self):
         return 

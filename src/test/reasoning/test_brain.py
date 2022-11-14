@@ -13,15 +13,15 @@ class TestBrain(unittest.TestCase):
         self.B = Brain(SC)
 
     def test_init_nonempty_brain(self):
-        self.assertEquals(type(self.B.spacecraft_rep), Spacecraft)
-        self.assertEquals(self.B.mission_status, '---')
-        self.assertEquals(self.B.bayesian_status, ('---', -1.0))
+        self.assertEqual(type(self.B.spacecraft_rep), Spacecraft)
+        self.assertEqual(self.B.mission_status, '---')
+        self.assertEqual(self.B.bayesian_status, ('---', -1.0))
 
     def test_reason(self):
         frame = [1, 1, 1]
         self.B.reason(frame)
-        self.assertEquals(self.B.spacecraft_rep.get_current_data(), [1,1,1])
-        self.assertEquals(self.B.mission_status, 'GREEN')
+        self.assertEqual(self.B.spacecraft_rep.get_current_data(), [1,1,1])
+        self.assertEqual(self.B.mission_status, 'GREEN')
 
     def test_diagnose(self):
         return

@@ -15,11 +15,11 @@ class TestFortyTwoParser(unittest.TestCase):
         self.tlmConfigFilepath = self.run_path + '/data/telemetry_configs/'
 
     def test_init_empty_parser(self):
-        self.assertEquals(self.P.raw_data_file_path, '')
-        self.assertEquals(self.P.metadata_file_path, '')
-        self.assertEquals(self.P.all_headers, '')
-        self.assertEquals(self.P.sim_data, '')
-        self.assertEquals(self.P.binning_configs, '')
+        self.assertEqual(self.P.raw_data_file_path, '')
+        self.assertEqual(self.P.metadata_file_path, '')
+        self.assertEqual(self.P.all_headers, '')
+        self.assertEqual(self.P.sim_data, '')
+        self.assertEqual(self.P.binning_configs, '')
 
     def test_init_nonempty_parser(self):
         P = FortyTwo(self.run_path + '/data/raw_telemetry_data/',
@@ -27,10 +27,10 @@ class TestFortyTwoParser(unittest.TestCase):
                           str(['42_TLM.txt']),
                           str(['42_TLM_CONFIG.txt']))
 
-        self.assertEquals(P.raw_data_file_path, self.run_path + '/data/raw_telemetry_data/')
-        self.assertEquals(P.metadata_file_path, self.run_path + '/data/telemetry_configs/')
+        self.assertEqual(P.raw_data_file_path, self.run_path + '/data/raw_telemetry_data/')
+        self.assertEqual(P.metadata_file_path, self.run_path + '/data/telemetry_configs/')
         
-        self.assertEquals(P.all_headers, {'42_TLM.txt': ['TIME', 
+        self.assertEqual(P.all_headers, {'42_TLM.txt': ['TIME', 
                                                          'SAMPLE.sample_data_tlm_t.sample_data_counter', 
                                                          'SAMPLE.sample_data_tlm_t.sample_data_value', 
                                                          'SAMPLE.sample_data_power_t.sample_data_counter', 
@@ -43,7 +43,7 @@ class TestFortyTwoParser(unittest.TestCase):
                                                          'SAMPLE.sample_data_gps_t.sample_data_lat', 
                                                          'SAMPLE.sample_data_gps_t.sample_data_lng', 
                                                          'SAMPLE.sample_data_gps_t.sample_data_alt']})
-        self.assertEquals(P.sim_data, {'2019-127-12:00:17.300006746': {'42_TLM.txt': ['2019-127-12:00:17.300006746', 
+        self.assertEqual(P.sim_data, {'2019-127-12:00:17.300006746': {'42_TLM.txt': ['2019-127-12:00:17.300006746', 
                                                                                       '0', 
                                                                                       '0.000000000000e+00', 
                                                                                       '0', 
@@ -108,7 +108,7 @@ class TestFortyTwoParser(unittest.TestCase):
                                                                                       '0.000000000000e+00', 
                                                                                       '0.000000000000e+00', 
                                                                                       '0.000000000000e+00']}})
-        self.assertEquals(P.binning_configs, {'subsystem_assignments': {'42_TLM.txt': [['MISSION'], 
+        self.assertEqual(P.binning_configs, {'subsystem_assignments': {'42_TLM.txt': [['MISSION'], 
                                                                                        ['MISSION'], 
                                                                                        ['MISSION'], 
                                                                                        ['MISSION'], 
@@ -155,18 +155,18 @@ class TestFortyTwoParser(unittest.TestCase):
 
         # Test 'hdrs'
         parsed_filenames = list(hdrs.keys())                       # Just one file parsed
-        self.assertEquals(len(parsed_filenames), 1)                # .
-        self.assertEquals(parsed_filenames[0], '42_TLM.txt')       # ..
-        self.assertEquals(len(hdrs['42_TLM.txt']), 13)             # 13 TLM points (data fields) 
+        self.assertEqual(len(parsed_filenames), 1)                # .
+        self.assertEqual(parsed_filenames[0], '42_TLM.txt')       # ..
+        self.assertEqual(len(hdrs['42_TLM.txt']), 13)             # 13 TLM points (data fields) 
 
         # Test 'data'
-        self.assertEquals(len(data.values()), 5)                   # 5 time steps 
+        self.assertEqual(len(data.values()), 5)                   # 5 time steps 
         for frame in data.values():                                # Parsing for timesteps formatted correctly
-            self.assertEquals(list(frame.keys())[0], '42_TLM.txt') # 13 tlm points in each frame 
-            self.assertEquals(len(frame['42_TLM.txt']), 13)        # .
+            self.assertEqual(list(frame.keys())[0], '42_TLM.txt') # 13 tlm points in each frame 
+            self.assertEqual(len(frame['42_TLM.txt']), 13)        # .
 
         # Test time ordering
-        self.assertEquals(list(data.keys()), ['2019-127-12:00:17.300006746', 
+        self.assertEqual(list(data.keys()), ['2019-127-12:00:17.300006746', 
                                               '2019-127-12:00:17.300006747', 
                                               '2019-127-12:00:17.300006748', 
                                               '2019-127-12:00:17.300006790', 
@@ -178,26 +178,26 @@ class TestFortyTwoParser(unittest.TestCase):
         data_str = txt_file.read().split('\n[EOF]')[0]
         txt_file.close()
         hdrs = self.P.parse_headers(data_str)
-        self.assertEquals(len(hdrs), 13)
-        self.assertEquals(hdrs, ['TIME', 'SAMPLE.sample_data_tlm_t.sample_data_counter', 'SAMPLE.sample_data_tlm_t.sample_data_value', 'SAMPLE.sample_data_power_t.sample_data_counter', 'SAMPLE.sample_data_power_t.sample_data_voltage', 'SAMPLE.sample_data_power_t.sample_data_current', 'SAMPLE.sample_data_thermal_t.sample_data_counter', 'SAMPLE.sample_data_thermal_t.sample_data_internal_temp', 'SAMPLE.sample_data_thermal_t.sample_data_external_temp', 'SAMPLE.sample_data_gps_t.sample_data_counter', 'SAMPLE.sample_data_gps_t.sample_data_lat', 'SAMPLE.sample_data_gps_t.sample_data_lng', 'SAMPLE.sample_data_gps_t.sample_data_alt'])
+        self.assertEqual(len(hdrs), 13)
+        self.assertEqual(hdrs, ['TIME', 'SAMPLE.sample_data_tlm_t.sample_data_counter', 'SAMPLE.sample_data_tlm_t.sample_data_value', 'SAMPLE.sample_data_power_t.sample_data_counter', 'SAMPLE.sample_data_power_t.sample_data_voltage', 'SAMPLE.sample_data_power_t.sample_data_current', 'SAMPLE.sample_data_thermal_t.sample_data_counter', 'SAMPLE.sample_data_thermal_t.sample_data_internal_temp', 'SAMPLE.sample_data_thermal_t.sample_data_external_temp', 'SAMPLE.sample_data_gps_t.sample_data_counter', 'SAMPLE.sample_data_gps_t.sample_data_lat', 'SAMPLE.sample_data_gps_t.sample_data_lng', 'SAMPLE.sample_data_gps_t.sample_data_alt'])
 
     def test_parse_frame(self):
         txt_file = open(self.rawDataFilepath + 'single_frame.txt',"r+")
         data_str = txt_file.read().split('\n[EOF]')[0]
         txt_file.close()
         clean_frame = self.P.parse_frame(data_str) 
-        self.assertEquals(clean_frame, ['2019-127-12:00:17.300006801', '4', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0.000000000000e+00'])
+        self.assertEqual(clean_frame, ['2019-127-12:00:17.300006801', '4', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0.000000000000e+00'])
 
     def test_parse_config_data(self):
         config_file = '42_TLM_CONFIG.txt'
         parsed_configs = self.P.parse_config_data(self.tlmConfigFilepath + config_file, True)
         
-        self.assertEquals(parsed_configs['subsystem_assignments']['42_TLM.txt'], [['CDH'], ['GNC'], ['GNC'], ['POWER'], ['POWER'], ['POWER'], ['THERMAL'], ['THERMAL'], ['THERMAL'], ['GNC'], ['GNC'], ['GNC'], ['GNC']])
-        self.assertEquals(parsed_configs['test_assignments']['42_TLM.txt'], [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['NOOP']]])
-        self.assertEquals(parsed_configs['description_assignments']['42_TLM.txt'], ['No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description'])
+        self.assertEqual(parsed_configs['subsystem_assignments']['42_TLM.txt'], [['CDH'], ['GNC'], ['GNC'], ['POWER'], ['POWER'], ['POWER'], ['THERMAL'], ['THERMAL'], ['THERMAL'], ['GNC'], ['GNC'], ['GNC'], ['GNC']])
+        self.assertEqual(parsed_configs['test_assignments']['42_TLM.txt'], [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['NOOP']]])
+        self.assertEqual(parsed_configs['description_assignments']['42_TLM.txt'], ['No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description'])
 
         parsed_configs = self.P.parse_config_data(self.tlmConfigFilepath + config_file, False)
-        self.assertEquals(parsed_configs['subsystem_assignments']['42_TLM.txt'], [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']])
+        self.assertEqual(parsed_configs['subsystem_assignments']['42_TLM.txt'], [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']])
 
     def test_time_ordering_not_occurring(self):
         dataFiles = 'time_ordering.txt'
@@ -206,17 +206,17 @@ class TestFortyTwoParser(unittest.TestCase):
 
         # Test 'hdrs'
         parsed_filenames = list(hdrs.keys())                       # Just one file parsed
-        self.assertEquals(len(parsed_filenames), 1)                # .
-        self.assertEquals(parsed_filenames[0], 'time_ordering.txt')       # ..
-        self.assertEquals(len(hdrs['time_ordering.txt']), 13)             # 13 TLM points (data fields) 
+        self.assertEqual(len(parsed_filenames), 1)                # .
+        self.assertEqual(parsed_filenames[0], 'time_ordering.txt')       # ..
+        self.assertEqual(len(hdrs['time_ordering.txt']), 13)             # 13 TLM points (data fields) 
 
         # Test 'data'
-        self.assertEquals(len(data.values()), 5)                   # 5 time steps 
+        self.assertEqual(len(data.values()), 5)                   # 5 time steps 
         for frame in data.values():                                # Parsing for timesteps formatted correctly
-            self.assertEquals(list(frame.keys())[0], 'time_ordering.txt') # 13 tlm points in each frame 
-            self.assertEquals(len(frame['time_ordering.txt']), 13)        # .
+            self.assertEqual(list(frame.keys())[0], 'time_ordering.txt') # 13 tlm points in each frame 
+            self.assertEqual(len(frame['time_ordering.txt']), 13)        # .
 
-        self.assertNotEquals(list(data.keys()), ['2019-127-12:00:17.300006746', 
+        self.assertNotEqual(list(data.keys()), ['2019-127-12:00:17.300006746', 
                                                  '2019-127-12:00:17.300006747', 
                                                  '2019-127-12:00:17.300006748', 
                                                  '2019-127-12:00:17.300006790', 
@@ -224,9 +224,9 @@ class TestFortyTwoParser(unittest.TestCase):
         
     def test_get_sim_data(self):
         hdrs, data, configs = self.P.get_sim_data()
-        self.assertEquals(hdrs, '')
-        self.assertEquals(data, '')
-        self.assertEquals(configs, '')
+        self.assertEqual(hdrs, '')
+        self.assertEqual(data, '')
+        self.assertEqual(configs, '')
 
 
 if __name__ == '__main__':
