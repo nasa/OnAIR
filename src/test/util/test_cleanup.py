@@ -24,8 +24,8 @@ def test_clean_all_removes_provided_file_types_back_two_directories_from_file_lo
   assert util.cleanup.os.chdir.call_count == 1
   assert util.cleanup.os.chdir.call_args_list[0].args == (fake_run_path + '/../../',)
   assert util.cleanup.os.system.call_count == 2
-  assert util.cleanup.os.system.call_args_list[0].args == ('find . | grep -E \"(__pycache__|\.pyc|\.pyo$)\" | xargs rm -rf', )
-  assert util.cleanup.os.system.call_args_list[1].args == ('find . | grep -E \"\.DS_Store\" | xargs rm -rf', )
+  assert util.cleanup.os.system.call_args_list[0].args == ('find . | grep -E "(__pycache__|.pyc|.pyo$)" | xargs rm -rf', )
+  assert util.cleanup.os.system.call_args_list[1].args == ('find . | grep -E ".DS_Store" | xargs rm -rf', )
 
 def test_clean_all_removes_provided_file_types_from_given_run_path_when_it_is_not_empty(mocker):
   # Arrange
@@ -48,8 +48,8 @@ def test_clean_all_removes_provided_file_types_from_given_run_path_when_it_is_no
   assert util.cleanup.os.chdir.call_count == 1
   assert util.cleanup.os.chdir.call_args_list[0].args == (arg_run_path, )
   assert util.cleanup.os.system.call_count == 2
-  assert util.cleanup.os.system.call_args_list[0].args == ('find . | grep -E \"(__pycache__|\.pyc|\.pyo$)\" | xargs rm -rf', )
-  assert util.cleanup.os.system.call_args_list[1].args == ('find . | grep -E \"\.DS_Store\" | xargs rm -rf', )
+  assert util.cleanup.os.system.call_args_list[0].args == ('find . | grep -E "(__pycache__|.pyc|.pyo$)" | xargs rm -rf', )
+  assert util.cleanup.os.system.call_args_list[1].args == ('find . | grep -E ".DS_Store" | xargs rm -rf', )
 
 
 # test_setup_folders
