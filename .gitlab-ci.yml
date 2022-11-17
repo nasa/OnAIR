@@ -13,7 +13,7 @@ test-raisr:
   script:
     - mkdir ./src/test/results
     - pwd
-    - coverage run --omit="src/test/*" -m pytest ./src/test -p no:randomly
+    - coverage run --omit="src/test/*" -m pytest ./src/test
   #artifacts:
   #  paths:
   #    - cfs_fsw/build-sim/*
