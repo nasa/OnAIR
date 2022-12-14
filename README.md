@@ -34,15 +34,15 @@ coverage
 pytest-randomly
 
 ### Command used to run the tests:
-```
-PYTHONPATH=src RUN_PATH=./src/test coverage run --omit="src/test/*" -m pytest ./src/test/
-```
+`PYTHONPATH=src RUN_PATH=./src/test RESULTS_PATH=./src/test/results coverage run --omit="src/test/*" -m pytest ./src/test/`
 
-### Command breakdown:
+# Command breakdown:
 
 `PYTHONPATH=src` - sets env variable so tests can find src
 
-`RUN_PATH=./src/test` - sets env variable; otherwise, several tests will fail
+`RUN_PATH=./src/test` - sets env variable otherwise several tests will fail because production code needs this set
+
+`RESULTS_PATH=./src/test/results` - Used in production code, MUST create this directory prior to use (see note above) but good to go thereafter
 
 `coverage run` - runs coverage data collection during test wrapping pytest
 
