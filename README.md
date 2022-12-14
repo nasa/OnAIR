@@ -27,7 +27,7 @@ How to run unit tests for RAISR
 
 ### Required python installs:
 pytest,
-pytest-mock, 
+pytest-mock,
 coverage
 
 ### Optional python install:
