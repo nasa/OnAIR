@@ -3,7 +3,6 @@ Execution Engine, which sets configs and sets up the simulation
 """
 
 import os
-import sys
 import configparser
 import importlib
 import ast
@@ -13,7 +12,6 @@ from time import gmtime, strftime
 
 from src.data_handling.time_synchronizer import TimeSynchronizer
 from src.run_scripts.sim import Simulator
-from src.util.file_io import * 
 
 class ExecutionEngine:
     def __init__(self, config_file='', run_name='', save_flag=False):
@@ -105,16 +103,18 @@ class ExecutionEngine:
     def init_save_paths(self):
         save_path = os.environ['RESULTS_PATH']
         temp_save_path = os.path.join(save_path, 'tmp')
+        temp_models_path = os.path.join(temp_save_path, 'models')
+        temp_diagnosis_path = os.path.join(temp_save_path, 'diagnosis')
 
         self.delete_save_paths()
         os.mkdir(temp_save_path)
-        os.mkdir(os.path.join(temp_save_path, 'models'))
-        os.mkdir(os.path.join(temp_save_path, 'diagnosis'))
+        os.mkdir(temp_models_path)
+        os.mkdir(temp_diagnosis_path)
     
         os.environ['RAISR_SAVE_PATH'] = save_path
         os.environ['RAISR_TMP_SAVE_PATH'] = temp_save_path
-        os.environ['RAISR_MODELS_SAVE_PATH'] = os.path.join(temp_save_path, 'models')
-        os.environ['RAISR_DIAGNOSIS_SAVE_PATH'] = os.path.join(temp_save_path, 'diagnosis')
+        os.environ['RAISR_MODELS_SAVE_PATH'] = temp_models_path
+        os.environ['RAISR_DIAGNOSIS_SAVE_PATH'] = temp_diagnosis_path
 
     def delete_save_paths(self):
         save_path = os.environ['RESULTS_PATH']
