@@ -327,7 +327,7 @@ def test_get_latest_results_returns_None_when_latest_results_is_None(mocker):
     # Assert
     assert result == None
 
-def test_get_latest_results_returns_None_when_latest_results_is_None(mocker):
+def test_get_latest_results_returns_None_when_latest_results_is_filled(mocker):
     # Arrange
     arg_field_name = MagicMock()
 
