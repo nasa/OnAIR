@@ -362,6 +362,21 @@ def test_sync_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str
     # Assert
     assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
+# rotational test
+def test_rotational_returns_tuple_of_str_YELLOW_and_empty_list():
+    # Arrange
+    arg_val = MagicMock()
+    arg_test_params = MagicMock()
+    arg_epsilon = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.rotational(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('YELLOW', [])
+
 # class TestTelemetryTestSuite(unittest.TestCase):
 
 #     def setUp(self):
