@@ -51,6 +51,58 @@ def test__init__default_arg_headers_is_empty_list(mocker):
     # Assert
     assert cut.dataFields == []
 
+# execute_suite tests
+def test_execute_suite_sets_the_latest_results_to_empty_list_when_updated_frame_len_is_0(mocker):
+    # Arrange
+    arg_update_frame = '' # empty string for len of 0
+    arg_sync_data = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    cut.execute_suite(arg_update_frame, arg_sync_data)
+
+    # Assert
+    assert cut.latest_results == []
+
+def test_execute_suite_sets_latests_results_to_list_of_run_tests_for_each_item_in_given_updated_frame(mocker):
+    # Arrange
+    arg_update_frame = []
+    arg_sync_data = MagicMock()
+
+    num_items_in_update = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    expected_results = []
+
+    for i in range(num_items_in_update):
+        arg_update_frame.append(MagicMock())
+        expected_results.append(MagicMock())
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    mocker.patch.object(cut, 'run_tests', side_effect=expected_results)
+
+    # Act
+    cut.execute_suite(arg_update_frame, arg_sync_data)
+
+    # Assert
+    assert cut.run_tests.call_count == num_items_in_update
+    for i in range(num_items_in_update):
+        assert cut.run_tests.call_args_list[i].args == (i, arg_update_frame[i], arg_sync_data, )
+    assert cut.latest_results == expected_results
+
+def test_execute_suite_default_arg_sync_data_is_empty_map(mocker):
+    # Arrange
+    arg_update_frame = [MagicMock()]
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    mocker.patch.object(cut, 'run_tests', return_value=86) # arbitrary 86
+
+    # Act
+    cut.execute_suite(arg_update_frame)
+
+    # Assert
+    assert cut.run_tests.call_args_list[0].args == (0, arg_update_frame[0], {})
 
 # class TestTelemetryTestSuite(unittest.TestCase):
 
