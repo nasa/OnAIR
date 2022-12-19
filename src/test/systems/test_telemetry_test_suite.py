@@ -313,6 +313,40 @@ def test_run_tests_return_Status_object_based_upon_given_header_index_appends_st
     assert telemetry_test_suite.Status.call_args_list[0].args == (expected_datafield, fake_bayesian[0], fake_bayesian[1])
     assert result == expected_result
   
+# get_latest_result tests
+def test_get_latest_results_returns_None_when_latest_results_is_None(mocker):
+    # Arrange
+    arg_field_name = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = None
+
+    # Act
+    result = cut.get_latest_result(arg_field_name)
+
+    # Assert
+    assert result == None
+
+def test_get_latest_results_returns_None_when_latest_results_is_None(mocker):
+    # Arrange
+    arg_field_name = MagicMock()
+
+    fake_hdr_index = MagicMock()
+
+    expected_result = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = {fake_hdr_index:expected_result}
+    cut.dataFields = MagicMock()
+
+    mocker.patch.object(cut.dataFields, 'index', return_value=fake_hdr_index)
+
+    # Act
+    result = cut.get_latest_result(arg_field_name)
+
+    # Assert
+    assert result == expected_result
+
 # class TestTelemetryTestSuite(unittest.TestCase):
 
 #     def setUp(self):
