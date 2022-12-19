@@ -347,6 +347,21 @@ def test_get_latest_results_returns_None_when_latest_results_is_None(mocker):
     # Assert
     assert result == expected_result
 
+# sync test
+def test_sync_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
+    # Arrange
+    arg_val = MagicMock()
+    arg_test_params = MagicMock()
+    arg_epsilon = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.sync(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('GREEN', [({'GREEN'}, 1.0)])
+
 # class TestTelemetryTestSuite(unittest.TestCase):
 
 #     def setUp(self):
