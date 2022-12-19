@@ -347,7 +347,7 @@ def test_get_latest_results_returns_None_when_latest_results_is_None(mocker):
     # Assert
     assert result == expected_result
 
-# sync test
+# sync tests
 def test_sync_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
     # Arrange
     arg_val = MagicMock()
@@ -362,7 +362,7 @@ def test_sync_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str
     # Assert
     assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
-# rotational test
+# rotational tests
 def test_rotational_returns_tuple_of_str_YELLOW_and_empty_list():
     # Arrange
     arg_val = MagicMock()
@@ -377,6 +377,141 @@ def test_rotational_returns_tuple_of_str_YELLOW_and_empty_list():
     # Assert
     assert result == ('YELLOW', [])
 
+# state tests
+def test_state_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0_when_int_val_is_in_range_test_params_0():
+    # Arrange
+    arg_test_params = []
+    arg_epsilon = MagicMock()
+
+    factor = 1
+    if pytest.gen.randint(0,1) == 1:
+        factor *= -1
+     # arbitrary, from 0 to 200 with 50/50 change of negative 
+    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative 
+    fake_green_tol = pytest.gen.randint(1, 50) # arbitrary, from 1 to 50 allowance in both directions from fake_mid_point
+
+    arg_test_params.append(range((fake_mid_point - fake_green_tol), (fake_mid_point + fake_green_tol)))
+    arg_test_params.append(MagicMock())
+    arg_test_params.append(MagicMock())
+
+    arg_val = pytest.gen.randint(0 - fake_green_tol, fake_green_tol - 1) + fake_mid_point # random val within green range
+    if arg_val > 0:
+        arg_val += pytest.gen.random() # make float by adding some random decimal
+    else:
+        arg_val -= pytest.gen.random() # make float by adding some random decimal
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.state(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('GREEN', [({'GREEN'}, 1.0)])
+
+def test_state_returns_tuple_of_str_YELLOW_and_list_containing_tuple_of_set_of_str_YELLOW_and_1_pt_0_when_int_val_is_in_range_test_params_1_and_not_in_0():
+    # Arrange
+    arg_test_params = []
+    arg_epsilon = MagicMock()
+
+    factor = 1
+    if pytest.gen.randint(0,1) == 1:
+        factor *= -1
+     # arbitrary, from 0 to 200 with 50/50 change of negative 
+    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative 
+    fake_green_tol = pytest.gen.randint(1, 50) # arbitrary, from 1 to 50 allowance in both directions from fake_mid_point
+    fake_yellow_tol = pytest.gen.randint(1, 20) + fake_green_tol # arbitrary, from 1 to 20 allowance in both directions from fake_mid_point + fake_green_tol
+
+    arg_test_params.append(range((fake_mid_point - fake_green_tol), (fake_mid_point + fake_green_tol)))
+    arg_test_params.append(range((fake_mid_point - fake_yellow_tol), (fake_mid_point + fake_yellow_tol)))
+    arg_test_params.append(MagicMock())
+
+    if pytest.gen.randint(0,1) == 1: 
+        arg_val = pytest.gen.randint(fake_green_tol, fake_yellow_tol - 1) + fake_mid_point # random val within upper yellow range
+    else:
+        arg_val = pytest.gen.randint(0 - fake_yellow_tol, 0 - fake_green_tol - 1) + fake_mid_point # sometimes flip to lower yellow range   
+    if arg_val > 0:
+        arg_val += pytest.gen.random() # make float by adding some random decimal
+    else:
+        arg_val -= pytest.gen.random() # make float by adding some random decimal
+    
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.state(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('YELLOW', [({'YELLOW'}, 1.0)])
+    
+def test_state_returns_tuple_of_str_RED_and_list_containing_tuple_of_set_of_str_RED_and_1_pt_0_when_int_val_is_in_range_test_params_2_and_not_in_0_or_1():
+    # Arrange
+    arg_test_params = []
+    arg_epsilon = MagicMock()
+
+    factor = 1
+    if pytest.gen.randint(0,1) == 1:
+        factor *= -1
+     # arbitrary, from 0 to 200 with 50/50 change of negative 
+    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative 
+    fake_green_tol = pytest.gen.randint(1, 50) # arbitrary, from 1 to 50 allowance in both directions from fake_mid_point
+    fake_yellow_tol = pytest.gen.randint(1, 20) + fake_green_tol # arbitrary, from 1 to 20 allowance in both directions from fake_mid_point + fake_green_tol
+    fake_red_tol = pytest.gen.randint(1, 10) + fake_yellow_tol # arbitrary, from 1 to 10 allowance in both directions from fake_mid_point + fake_yellow_tol
+
+    arg_test_params.append(range((fake_mid_point - fake_green_tol), (fake_mid_point + fake_green_tol)))
+    arg_test_params.append(range((fake_mid_point - fake_yellow_tol), (fake_mid_point + fake_yellow_tol)))
+    arg_test_params.append(range((fake_mid_point - fake_red_tol), (fake_mid_point + fake_red_tol)))
+
+    if pytest.gen.randint(0,1) == 1: 
+        arg_val = pytest.gen.randint(fake_yellow_tol, fake_red_tol - 1) + fake_mid_point # random val within upper red range
+    else:
+        arg_val = pytest.gen.randint(0 - fake_red_tol, 0 - fake_yellow_tol - 1) + fake_mid_point # sometimes flip to lower red range   
+    if arg_val > 0:
+        arg_val += pytest.gen.random() # make float by adding some random decimal
+    else:
+        arg_val -= pytest.gen.random() # make float by adding some random decimal
+    
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.state(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, 1.0)])
+     
+def test_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of_str_RED_YELLOW_and_GREEN_and_1_pt_0_when_int_val_is_in_not_in_any_range():
+    # Arrange
+    arg_test_params = []
+    arg_epsilon = MagicMock()
+
+    factor = 1
+    if pytest.gen.randint(0,1) == 1:
+        factor *= -1
+     # arbitrary, from 0 to 200 with 50/50 change of negative 
+    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative 
+    fake_green_tol = pytest.gen.randint(1, 50) # arbitrary, from 1 to 50 allowance in both directions from fake_mid_point
+    fake_yellow_tol = pytest.gen.randint(1, 20) + fake_green_tol # arbitrary, from 1 to 20 allowance in both directions from fake_mid_point + fake_green_tol
+    fake_red_tol = pytest.gen.randint(1, 10) + fake_yellow_tol # arbitrary, from 1 to 10 allowance in both directions from fake_mid_point + fake_yellow_tol
+
+    arg_test_params.append(range((fake_mid_point - fake_green_tol), (fake_mid_point + fake_green_tol)))
+    arg_test_params.append(range((fake_mid_point - fake_yellow_tol), (fake_mid_point + fake_yellow_tol)))
+    arg_test_params.append(range((fake_mid_point - fake_red_tol), (fake_mid_point + fake_red_tol)))
+
+    if pytest.gen.randint(0,1) == 1: 
+        arg_val = fake_red_tol + fake_mid_point + 1 # random val outside upper red
+    else:
+        arg_val = 0 - fake_red_tol + fake_mid_point - 1 # random val outside lower red  
+    if arg_val > 0:
+        arg_val += pytest.gen.random() # make float by adding some random decimal
+    else:
+        arg_val -= pytest.gen.random() # make float by adding some random decimal
+    
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.state(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('---', [({'RED', 'YELLOW', 'GREEN'}, 1.0)])
+    
 # class TestTelemetryTestSuite(unittest.TestCase):
 
 #     def setUp(self):
