@@ -5,7 +5,6 @@ from mock import MagicMock
 import src.systems.telemetry_test_suite as telemetry_test_suite
 from src.systems.telemetry_test_suite import TelemetryTestSuite
 
-
 # __init__ tests
 def test__init__sets_the_expected_values_with_given_headers_and_tests(mocker):
     # Arrange
@@ -314,7 +313,7 @@ def test_run_tests_return_Status_object_based_upon_given_header_index_appends_st
     assert result == expected_result
   
 # get_latest_result tests
-def test_get_latest_results_returns_None_when_latest_results_is_None(mocker):
+def test_get_latest_results_returns_None_when_latest_results_is_None():
     # Arrange
     arg_field_name = MagicMock()
 
@@ -513,6 +512,401 @@ def test_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of
     assert result == ('---', [({'RED', 'YELLOW', 'GREEN'}, 1.0)])
     
 # feasibility tests
+def test_feasibility_asserts_len_given_test_params_is_not_2_or_4(mocker):
+    # Arrange
+    arg_val = MagicMock()
+    arg_test_params = []
+    arg_epsilon = MagicMock()
+
+    num_test_params = pytest.gen.sample([1,3,5], 1)
+
+    for i in range(num_test_params[0]):
+        arg_test_params.append(MagicMock())
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    with pytest.raises(AssertionError) as e_info:
+        result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert e_info.match('')
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_val_eq_to_lowest_bound_when_given_test_params_length_2(mocker):
+    # Arrange
+    arg_epsilon = MagicMock()
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, fake_highest_bound]    
+    arg_val = fake_lowest_bound    
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED', 'GREEN'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_eq_to_lowest_bound_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = MagicMock()
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, 
+                       fake_lowest_bound + 1, 
+                       fake_highest_bound - 1, 
+                       fake_highest_bound]    
+    
+    arg_val = fake_lowest_bound    
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED', 'YELLOW'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_2(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_highest_bound]    
+    
+    arg_val = fake_lowest_bound - fake_delta - 1 # -1 for less than low minus delta  
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_highest_bound]    
+    
+    arg_val = fake_lowest_bound - fake_delta - 1 # -1 for less than low minus delta  
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_2(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_highest_bound]    
+    arg_val = fake_lowest_bound - 1   
+
+    expected_mass = abs(fake_lowest_bound - arg_val)/fake_delta
+    expected_red_yellow_mass = 1.0 - expected_mass
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, expected_mass), ({'GREEN', 'RED'}, expected_red_yellow_mass)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    fake_delta = arg_epsilon * abs(fake_highest_bound - fake_highest_bound - 2)
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_lowest_bound + 2,
+                       fake_highest_bound - 2,
+                       fake_highest_bound]    
+    arg_val = fake_lowest_bound - 1   
+
+    expected_mass = abs(fake_lowest_bound - arg_val)/fake_delta
+    expected_red_yellow_mass = 1.0 - expected_mass
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, expected_mass), ({'YELLOW', 'RED'}, expected_red_yellow_mass)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_val_eq_to_lowest_bound_when_given_test_params_length_2(mocker):
+    # Arrange
+    arg_epsilon = MagicMock()
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, fake_highest_bound]    
+    arg_val = fake_highest_bound    
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED', 'GREEN'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_eq_to_lowest_bound_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = MagicMock()
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, 
+                       fake_lowest_bound + 1, 
+                       fake_highest_bound - 1, 
+                       fake_highest_bound]    
+    
+    arg_val = fake_highest_bound    
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED', 'YELLOW'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_2(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_highest_bound]    
+    
+    arg_val = fake_highest_bound + fake_delta + 1 # +1 for more than high plus delta  
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_highest_bound]    
+    
+    arg_val = fake_highest_bound + fake_delta + 1 # +1 for more than high plus delta  
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_2(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_highest_bound]    
+    arg_val = fake_highest_bound + 1   
+
+    expected_mass = abs(fake_highest_bound - arg_val)/fake_delta
+    expected_red_yellow_mass = 1.0 - expected_mass
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, expected_mass), ({'RED', 'GREEN'}, expected_red_yellow_mass)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    fake_delta = arg_epsilon * abs(fake_highest_bound - fake_highest_bound - 2)
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_lowest_bound + 2,
+                       fake_highest_bound - 2,
+                       fake_highest_bound]    
+    arg_val = fake_highest_bound + 1   
+
+    expected_mass = abs(fake_highest_bound - arg_val)/fake_delta
+    expected_red_yellow_mass = 1.0 - expected_mass
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('RED', [({'RED'}, expected_mass), ({'YELLOW', 'RED'}, expected_red_yellow_mass)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_green_zone_when_given_test_params_length_2(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, fake_highest_bound]    
+    arg_val = int(fake_highest_bound - (abs(fake_highest_bound - fake_lowest_bound) / 2))  
+
+    fake_delta = arg_epsilon * (abs(fake_highest_bound-fake_lowest_bound))
+    expected_mass = abs(fake_lowest_bound - arg_val)/fake_delta
+    print(fake_lowest_bound, arg_val, fake_highest_bound)
+    
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('GREEN', [({'GREEN'}, expected_mass), ({'GREEN', 'RED'}, 1.0 - expected_mass)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_green_zone_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 3 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, 
+                       fake_lowest_bound + 1,
+                       fake_highest_bound - 1,
+                       fake_highest_bound]    
+
+    fake_delta = arg_epsilon * (abs(fake_highest_bound-fake_lowest_bound))
+     
+    arg_val = int(fake_highest_bound - (abs(fake_highest_bound - fake_lowest_bound) / 2))  
+    print(fake_lowest_bound, arg_val, fake_lowest_bound + 2, fake_highest_bound -2, fake_highest_bound)
+    
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('GREEN', [({'GREEN'}, 1.0)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_yellow_low_zone_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = 1.0
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, 
+                       fake_lowest_bound + 2,
+                       fake_highest_bound - 2,
+                       fake_highest_bound]    
+
+    fake_delta = arg_epsilon * (abs(fake_highest_bound-fake_lowest_bound))
+     
+    arg_val = fake_lowest_bound + 1
+    print(fake_lowest_bound, arg_val, fake_lowest_bound + 2, fake_highest_bound -2, fake_highest_bound)
+    
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('YELLOW', [({'YELLOW'}, 0.5), ({'RED', 'YELLOW'}, 0.5)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_yellow_high_zone_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = 0.5
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(20, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, 
+                       fake_lowest_bound + 4,
+                       fake_highest_bound - 4,
+                       fake_highest_bound]    
+
+    arg_val = fake_highest_bound - 1
+    print(fake_lowest_bound, fake_lowest_bound + 4, fake_highest_bound -4, arg_val, fake_highest_bound)
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('YELLOW', [({'YELLOW'}, 0.5), ({'YELLOW', 'RED'}, 0.5)])
+
+def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_on_yellow_high_mark_when_given_test_params_length_4(mocker):
+    # Arrange
+    arg_epsilon = 0.5
+
+    fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
+    fake_highest_bound = fake_lowest_bound + pytest.gen.randint(20, 100) # arbitrary, from 10 to 100 higher than lowest bound
+    
+    arg_test_params = [fake_lowest_bound, 
+                       fake_lowest_bound + 4,
+                       fake_highest_bound - 4,
+                       fake_highest_bound]    
+
+    arg_val = fake_highest_bound - 4
+    print(fake_lowest_bound, fake_lowest_bound + 4, fake_highest_bound -4, arg_val, fake_highest_bound)
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.feasibility(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('YELLOW', [({'YELLOW', 'GREEN'}, 1.0)])
 
 # noop tests
 def test_noop_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
@@ -887,199 +1281,3 @@ def test_get_status_specific_mnemonics_default_given_status_is_str_RED(mocker):
 
     # Assert
     assert result == [expected_name]
-
-# class TestTelemetryTestSuite(unittest.TestCase):
-
-#     def setUp(self):
-#         self.test_path = os.path.dirname(os.path.abspath(__file__))
-#         self.TTS = TelemetryTestSuite(['TIME', 'A', 'B'], [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]])
-
-#     def test_init_empty_testsuite(self):
-#         TTS = TelemetryTestSuite()
-#         self.assertEqual(TTS.dataFields, [])
-#         self.assertEqual(TTS.tests, [])
-#         self.assertEqual(TTS.epsilon, 0.00001)
-#         self.assertEqual(TTS.latest_results, None)
-
-#     def test_init_nonempty_testsuite(self):
-#         self.assertEqual(self.TTS.dataFields, ['TIME', 'A', 'B'])
-#         self.assertEqual(self.TTS.tests, [[['SYNC', 'TIME']], [['NOOP']], [['NOOP']]])
-#         self.assertEqual(self.TTS.epsilon, 0.00001)
-#         self.assertEqual(self.TTS.latest_results, None)
-
-#     def test_execute(self):
-#         frame = [1, 2, 3]
-#         self.assertEqual(self.TTS.latest_results, None)
-#         self.TTS.execute_suite(frame)
-#         self.assertEqual(len(self.TTS.latest_results), 3)
-
-#     def test_run_tests(self):
-#         i = 0
-#         val = 1
-#         sync_data = {}
-#         result = self.TTS.run_tests(i, val, sync_data)
-
-#         self.assertEqual(type(result), Status)
-
-#     def test_get_latest_result(self):
-#         self.assertEqual(self.TTS.get_latest_result('TIME'), None)
-#         self.assertEqual(self.TTS.get_latest_result('A'), None)
-#         self.assertEqual(self.TTS.get_latest_result('B'), None)
-
-#         self.TTS.execute_suite([1, 2, 3])
-#         self.assertEqual(type(self.TTS.get_latest_result('TIME')), Status)
-#         self.assertEqual(type(self.TTS.get_latest_result('A')), Status)
-#         self.assertEqual(type(self.TTS.get_latest_result('B')), Status)
-
-#     def test_sync(self):
-#         val = 1
-#         params = [1] # this is fed to the test suite... Should re-implement
-#         epsilon = 0.000001
-
-#         result = self.TTS.sync(val, params, epsilon)
-#         self.assertEqual(result[0], 'GREEN')
-#         self.assertEqual(result[1], [({'GREEN'}, 1.0)]) # Rethink this
-
-#     def test_rotational(self):
-#         val = 1
-#         params = [1] 
-#         epsilon = 0.000001
-
-#         result = self.TTS.rotational(val, params, epsilon)
-
-#         self.assertEqual(result[0], 'YELLOW')
-#         self.assertEqual(result[1], []) 
-
-#     def test_state(self):
-#                 # Gr,  Ylw,   Rd
-#         params = [[1], [0,2], [3]]
-#         epsilon = 0.000001
-#                               # val
-#         result = self.TTS.state(1, params, epsilon)
-#         self.assertEqual(result[0], 'GREEN')
-#         self.assertEqual(result[1], [({'GREEN'}, 1.0)]) 
-
-#         result = self.TTS.state(0, params, epsilon)
-#         self.assertEqual(result[0], 'YELLOW')
-#         self.assertEqual(result[1], [({'YELLOW'}, 1.0)]) 
-
-#         result = self.TTS.state(3, params, epsilon)
-#         self.assertEqual(result[0], 'RED')
-#         self.assertEqual(result[1], [({'RED'}, 1.0)]) 
-
-
-#         result = self.TTS.state(4, params, epsilon)
-#         self.assertEqual(result[0], '---')
-#         self.assertEqual(result[1], [({'GREEN', 'RED', 'YELLOW'}, 1.0)]) 
-
-#     def test_feasibility(self):
-#         epsilon = 0.000001
-#         #Test with param length of 2
-#         params = [0, 10]        
-#         #Test on lower boundary
-#         val = 0
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'RED')
-#         self.assertEqual(mass_assignments, [({'RED', 'GREEN'}, 1.0)])
-#         #Test one above lower boundary
-#         val = 1
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'GREEN')
-#         self.assertEqual(mass_assignments, [({'GREEN'}, 1.0)])
-#         #Test on upper boundary
-#         val = 10
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'RED')
-#         self.assertEqual(mass_assignments, [({'GREEN', 'RED'}, 1.0)])
-#         #Test one below upper boundary
-#         val = 9
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'GREEN')
-#         self.assertEqual(mass_assignments, [({'GREEN'}, 1.0)])
-#         #Test in middle of boundaries
-#         val = 5
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'GREEN')
-#         self.assertEqual(mass_assignments, [({'GREEN'}, 1.0)]) 
-#         #Test below lower boundary
-#         val = -5
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'RED')
-#         self.assertEqual(mass_assignments, [({'RED'}, 1.0)]) 
-#         #Test above upper boundary
-#         val = 15
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'RED')
-#         self.assertEqual(mass_assignments, [({'RED'}, 1.0)])
-#         #Test with param length of 4
-#         params = [0,10,20,30]
-#         #Test in lower yellow range        
-#         val = 5
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'YELLOW')
-#         self.assertEqual(mass_assignments, [({'YELLOW'}, 1.0)])
-#         #Test in lower green boundary        
-#         val = 10
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'GREEN')
-#         self.assertEqual(mass_assignments, [({'YELLOW', 'GREEN'}, 1.0)])
-#         #Test in green range
-#         val = 15
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'GREEN')
-#         self.assertEqual(mass_assignments, [({'GREEN'}, 1.0)])
-#         #Test in higher yellow range
-#         val = 25
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'YELLOW')
-#         self.assertEqual(mass_assignments, [({'YELLOW'}, 1.0)])
-#         #Test in lower yellow boundary        
-#         val = 20
-#         state, mass_assignments = self.TTS.feasibility(val, params, epsilon)
-#         self.assertEqual(state, 'YELLOW')
-#         self.assertEqual(mass_assignments, [({'GREEN','YELLOW'}, 1.0)])
-#         return
-
-#     def test_noop(self):
-#         result = self.TTS.noop(1, [], 0.001)
-#         self.assertEqual(result[0], 'GREEN')
-#         self.assertEqual(result[1], [({'GREEN'}, 1.0)]) 
-
-#     def test_calc_single_status(self):
-#         status_list = ['RED', 'RED', 'GREEN', 'YELLOW', 'GREEN', 'GREEN']
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='strict')
-#         self.assertEqual(result, 'RED')
-#         self.assertEqual(confidence, 0.3333333333333333)
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='distr')
-#         self.assertEqual(result, 'GREEN')
-#         self.assertEqual(confidence, 0.5)
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='max')
-#         self.assertEqual(result, 'GREEN')
-#         self.assertEqual(confidence, 1.0)
-
-#         status_list = ['RED', 'RED', 'RED', 'YELLOW', 'GREEN', 'GREEN']
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='strict')
-#         self.assertEqual(result, 'RED')
-#         self.assertEqual(confidence, 0.5)
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='distr')
-#         self.assertEqual(result, 'RED')
-#         self.assertEqual(confidence, 0.5)
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='max')
-#         self.assertEqual(result, 'RED')
-#         self.assertEqual(confidence, 1.0)
-
-#         status_list = ['YELLOW', 'GREEN', 'YELLOW', 'YELLOW', 'YELLOW', 'GREEN']
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='strict')
-#         self.assertEqual(result, 'YELLOW')
-#         self.assertEqual(confidence, 1.0)
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='distr')
-#         self.assertEqual(result, 'YELLOW')
-#         self.assertEqual(confidence, 0.6666666666666666)
-#         result, confidence = self.TTS.calc_single_status(status_list, mode='max')
-#         self.assertEqual(result, 'YELLOW')
-#         self.assertEqual(confidence, 1.0)
-#         return
-
-
-# if __name__ == '__main__':
-#     unittest.main()
