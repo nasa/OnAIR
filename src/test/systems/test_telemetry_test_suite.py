@@ -519,6 +519,64 @@ def test_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of
 # calc_single_status tests
 
 # get_suite_status
+def test_get_suite_status_raises_TypeError_when_latest_results_is_None():
+    # Arrange
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = None
+
+    # Act
+    with pytest.raises(TypeError) as e_info:
+        result = cut.get_suite_status()
+
+    # Assert
+    assert e_info.match("'NoneType' object is not iterable")
+
+def test_get_suite_status_returns_value_from_call_to_calc_single_status_when_it_is_given_empty_list_because_latest_results_are_empty(mocker):
+    # Arrange
+    expected_result = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = []
+
+    mocker.patch.object(cut, 'calc_single_status', return_value=expected_result)
+
+    # Act
+    result = cut.get_suite_status()
+
+    # Assert
+    assert cut.calc_single_status.call_count == 1
+    assert cut.calc_single_status.call_args_list[0].args == ([], )
+    assert result == expected_result
+
+def test_get_suite_status_returns_value_from_call_to_calc_single_status_when_it_is_given_list_of_all_statuses_in_latest_results(mocker):
+    # Arrange
+    num_fake_results = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has its own test)
+    fake_latest_results = []
+    fake_statuses = []
+
+    for i in range(num_fake_results):
+        fake_res = MagicMock()
+        fake_status = MagicMock()
+
+        mocker.patch.object(fake_res, 'get_status', return_value=fake_status)
+        
+        fake_latest_results.append(fake_res)
+        fake_statuses.append(fake_status)
+
+    expected_result = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = fake_latest_results
+
+    mocker.patch.object(cut, 'calc_single_status', return_value=expected_result)
+
+    # Act
+    result = cut.get_suite_status()
+
+    # Assert
+    assert cut.calc_single_status.call_count == 1
+    assert cut.calc_single_status.call_args_list[0].args == (fake_statuses, )
+    assert result == expected_result
 
 # get_status_specific_mnemonics
 # test_get_status_specific_mnemonics_raises_TypeError_when_latest_results_is_None was written because None is the init value for latest_results
