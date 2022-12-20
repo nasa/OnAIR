@@ -1,6 +1,6 @@
 import pytest
 from mock import MagicMock
-import util.cleanup
+import src.util.cleanup
 
 # clean_all tests
 def test_clean_all_removes_provided_file_types_back_two_directories_from_file_location_when_given_run_path_is_empty_string(mocker):

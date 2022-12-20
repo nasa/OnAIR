@@ -2,21 +2,21 @@ from abc import ABC, abstractmethod
 
 class GenericIntelligenceConstruct(ABC):
     @abstractmethod
-    def __init__(self, headers):
+    def __init__(self):
         """
         Abstract superclass for data driven components: VAE, PPO, etc. Allows for easier modularity.
         """
         pass
 
     @abstractmethod
-    def apriori_training(self, batch_data):
+    def apriori_training(self):
         """
         Given data, system should learn any priors necessary for realtime diagnosis.
         """
         pass
         
     @abstractmethod
-    def update(self, frame):
+    def update(self):
         """
         Given streamed data point, system should update internally
         """
