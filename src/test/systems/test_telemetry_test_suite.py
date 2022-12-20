@@ -530,6 +530,158 @@ def test_noop_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str
     assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
 # calc_single_status tests
+def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_not_str_max_or_str_distr_or_str_strict(mocker):
+    # Arrange
+    arg_status_list = MagicMock()
+    arg_mode = MagicMock()
+
+    fake_occurrences = MagicMock()
+    fake_max_occurrence = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    mocker.patch('src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
+    
+    # Act
+    result = cut.calc_single_status(arg_status_list, arg_mode)
+
+    # Assert
+    assert telemetry_test_suite.Counter.call_count == 1
+    assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
+    assert result == (fake_max_occurrence, 1.0)
+
+def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_str_max(mocker):
+    # Arrange
+    arg_status_list = MagicMock()
+    arg_mode = 'max'
+
+    fake_occurrences = MagicMock()
+    fake_max_occurrence = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    mocker.patch('src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
+    
+    # Act
+    result = cut.calc_single_status(arg_status_list, arg_mode)
+
+    # Assert
+    assert telemetry_test_suite.Counter.call_count == 1
+    assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
+    assert result == (fake_max_occurrence, 1.0)
+
+def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_ratio_of_max_occurrence_over_len_given_status_list_when_mode_is_str_distr(mocker):
+    # Arrange
+    arg_status_list = []
+    arg_mode = 'distr'
+
+    num_fake_statuses = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 not allowed, div by 0 error)
+    fake_max_occurrence = MagicMock()
+    
+    for i in range(num_fake_statuses):
+        arg_status_list.append(MagicMock())
+    fake_occurrences = telemetry_test_suite.Counter.__new__(telemetry_test_suite.Counter)
+
+    expected_float = fake_occurrences[fake_max_occurrence]/num_fake_statuses
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    mocker.patch('src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
+    
+    # Act
+    result = cut.calc_single_status(arg_status_list, arg_mode)
+
+    # Assert
+    assert telemetry_test_suite.Counter.call_count == 1
+    assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
+    assert result == (fake_max_occurrence, expected_float)
+
+def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_str_strict_and_no_occurrences_of_str_RED(mocker):
+    # Arrange
+    arg_status_list = []
+    arg_mode = 'strict'
+
+    num_fake_statuses = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 not allowed, div by 0 error)
+    fake_max_occurrence = MagicMock()
+    
+    for i in range(num_fake_statuses):
+        arg_status_list.append(MagicMock())
+    fake_occurrences = telemetry_test_suite.Counter.__new__(telemetry_test_suite.Counter)
+
+    expected_float = fake_occurrences[fake_max_occurrence]/num_fake_statuses
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    mocker.patch('src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
+    
+    # Act
+    result = cut.calc_single_status(arg_status_list, arg_mode)
+
+    # Assert
+    assert telemetry_test_suite.Counter.call_count == 1
+    assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
+    assert result == (fake_max_occurrence, 1.0)
+
+def test_calc_single_status_returns_tuple_of_str_RED_and_1_pt_0_when_mode_is_str_strict_and_ratio_of_RED_occurrence_over_len_given_status_list_with_occurrences_of_str_RED(mocker):
+    # Arrange
+    arg_status_list = []
+    arg_mode = 'strict'
+
+    num_fake_statuses = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 not allowed, div by 0 error)
+    num_red_statuses = pytest.gen.randint(1, num_fake_statuses) # arbitrary, from 1 to total statuses
+    fake_max_occurrence = MagicMock()
+    
+    for i in range(num_fake_statuses):
+        arg_status_list.append(MagicMock())
+
+    fake_occurrences = telemetry_test_suite.Counter(['RED'] * num_red_statuses)
+
+    expected_float = fake_occurrences['RED']/num_fake_statuses
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    mocker.patch('src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
+    
+    # Act
+    result = cut.calc_single_status(arg_status_list, arg_mode)
+
+    # Assert
+    assert telemetry_test_suite.Counter.call_count == 1
+    assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
+    assert result == ('RED', expected_float)
+
+def test_calc_single_status_default_given_mode_is_str_strict(mocker):
+    # Arrange
+    arg_status_list = []
+
+    num_fake_statuses = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 not allowed, div by 0 error)
+    num_red_statuses = pytest.gen.randint(1, num_fake_statuses) # arbitrary, from 1 to total statuses
+    fake_max_occurrence = MagicMock()
+    
+    for i in range(num_fake_statuses):
+        arg_status_list.append(MagicMock())
+
+    fake_occurrences = telemetry_test_suite.Counter(['RED'] * num_red_statuses)
+
+    expected_float = fake_occurrences['RED']/num_fake_statuses
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    mocker.patch('src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
+    
+    # Act
+    result = cut.calc_single_status(arg_status_list)
+
+    # Assert
+    assert telemetry_test_suite.Counter.call_count == 1
+    assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
+    assert result == ('RED', expected_float)
 
 # get_suite_status
 def test_get_suite_status_raises_TypeError_when_latest_results_is_None():
