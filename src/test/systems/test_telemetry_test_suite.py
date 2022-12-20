@@ -512,6 +512,159 @@ def test_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of
     # Assert
     assert result == ('---', [({'RED', 'YELLOW', 'GREEN'}, 1.0)])
     
+# feasibility tests
+
+# noop tests
+
+# calc_single_status tests
+
+# get_suite_status
+
+# get_status_specific_mnemonics
+# test_get_status_specific_mnemonics_raises_TypeError_when_latest_results_is_None was written because None is the init value for latest_results
+def test_get_status_specific_mnemonics_raises_TypeError_when_latest_results_is_None(mocker):
+     # Arrange
+    arg_status = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = None
+
+    # Act
+    with pytest.raises(TypeError) as e_info:
+        result = cut.get_status_specific_mnemonics(arg_status)
+
+    # Assert
+    assert e_info.match("'NoneType' object is not iterable")
+
+def test_get_status_specific_mnemonics_returns_empty_list_when_latest_results_is_empty(mocker):
+    # Arrange
+    arg_status = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = []
+
+    # Act
+    result = cut.get_status_specific_mnemonics(arg_status)
+
+    # Assert
+    assert result == []
+
+def test_get_status_specific_mnemonics_returns_the_only_name_in_latest_results_because_its_status_eq_given_status(mocker):
+    # Arrange
+    arg_status = MagicMock()
+
+    fake_res = MagicMock()
+
+    expected_name = str(MagicMock())
+
+    mocker.patch.object(fake_res, 'get_status', return_value=arg_status)
+    mocker.patch.object(fake_res, 'get_name', return_value=expected_name)
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = [fake_res]
+
+    # Act
+    result = cut.get_status_specific_mnemonics(arg_status)
+
+    # Assert
+    assert result == [expected_name]
+
+def test_get_status_specific_mnemonics_returns_empty_list_latest_results_because_its_status_not_eq_given_status(mocker):
+    # Arrange
+    arg_status = MagicMock()
+
+    fake_res = MagicMock()
+
+    mocker.patch.object(fake_res, 'get_status', return_value=MagicMock())
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = [fake_res]
+
+    # Act
+    result = cut.get_status_specific_mnemonics(arg_status)
+
+    # Assert
+    assert result == []
+
+def test_get_status_specific_mnemonics_returns_only_names_in_latest_results_where_status_matches_given_status(mocker):
+    # Arrange
+    arg_status = MagicMock()
+
+    num_fake_results = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 both have own test)
+    num_fake_status_matches = pytest.gen.randint(1, num_fake_results - 1) # at least 1 match up to 1 less than all
+    fake_latest_results = [False] * num_fake_results
+
+    expected_names = []
+
+    for i in pytest.gen.sample(range(len(fake_latest_results)), num_fake_status_matches):
+        fake_latest_results[i] = True
+
+    for i in range(len(fake_latest_results)):
+        fake_res = MagicMock()
+        if fake_latest_results[i] == True:
+            fake_name = str(MagicMock())
+            mocker.patch.object(fake_res, 'get_status', return_value=arg_status)
+            mocker.patch.object(fake_res, 'get_name', return_value=fake_name)
+            expected_names.append(fake_name)
+        else:
+            mocker.patch.object(fake_res, 'get_status', return_value=MagicMock())
+        fake_latest_results[i] = fake_res
+            
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = fake_latest_results
+
+    # Act
+    result = cut.get_status_specific_mnemonics(arg_status)
+
+    # Assert
+    assert result == expected_names
+    assert len(result) != len(fake_latest_results)
+
+def test_get_status_specific_mnemonics_returns_all_names_in_latest_results_when_all_statuses_matches_given_status(mocker):
+    # Arrange
+    arg_status = MagicMock()
+
+    num_fake_results = pytest.gen.randint(1, 10) # arbitrary, from 2 to 10 (0 and 1 both have own test)
+    fake_latest_results = []
+
+    expected_names = []
+
+    for i in range(num_fake_results):
+        fake_res = MagicMock()
+        fake_name = str(MagicMock())
+        mocker.patch.object(fake_res, 'get_status', return_value=arg_status)
+        mocker.patch.object(fake_res, 'get_name', return_value=fake_name)
+        fake_latest_results.append(fake_res)
+        expected_names.append(fake_name)
+            
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = fake_latest_results
+
+    # Act
+    result = cut.get_status_specific_mnemonics(arg_status)
+
+    # Assert
+    assert result == expected_names
+    assert len(result) == len(fake_latest_results)
+
+def test_get_status_specific_mnemonics_default_given_status_is_str_RED(mocker):
+    # Arrange
+    fake_res = MagicMock()
+
+    expected_name = str(MagicMock())
+
+    mocker.patch.object(fake_res, 'get_status', return_value='RED')
+    mocker.patch.object(fake_res, 'get_name', return_value=expected_name)
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+    cut.latest_results = [fake_res]
+
+    # Act
+    result = cut.get_status_specific_mnemonics()
+
+    # Assert
+    assert result == [expected_name]
+
 # class TestTelemetryTestSuite(unittest.TestCase):
 
 #     def setUp(self):
