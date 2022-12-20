@@ -515,6 +515,19 @@ def test_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of
 # feasibility tests
 
 # noop tests
+def test_noop_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
+    # Arrange
+    arg_val = MagicMock()
+    arg_test_params = MagicMock()
+    arg_epsilon = MagicMock()
+
+    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
+
+    # Act
+    result = cut.noop(arg_val, arg_test_params, arg_epsilon)
+
+    # Assert
+    assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
 # calc_single_status tests
 
