@@ -1,6 +1,11 @@
 
 from src.data_driven_components.generic_intelligence_construct import GenericIntelligenceConstruct
 
+"""This object serves as a proxy for all plug-ins.
+   Therefore, the AIPlugIn object is meant to induce 
+   standards and structures of compliance for user-created 
+   and/or imported plug-ins/libraries
+"""
 class AIPlugIn(GenericIntelligenceConstruct):
 
     def __init__(self, _name, _headers):
