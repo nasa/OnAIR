@@ -88,6 +88,30 @@ def test_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_c
         assert parser_util.extract_config.call_args_list[i].kwargs == {'csv':arg_csv}
     assert result == expected_result
 
+def test_extract_configs_default_given_csv_is_False(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
+    arg_configFiles = [MagicMock()]
+
+    fake_filename = MagicMock()
+    fake_subsystem_assignments = MagicMock()
+    fake_tests = MagicMock()
+    fake_descs = MagicMock()
+
+    forced_return_extract_config = [fake_filename, fake_subsystem_assignments, fake_tests, fake_descs]
+
+    mocker.patch('src.data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
+
+    expected_result = {'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
+                       'test_assignments' : {fake_filename:fake_tests},
+                       'description_assignments' : {fake_filename:fake_descs}}
+
+    # Act
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles)
+
+    # Assert
+    assert parser_util.extract_config.call_args_list[0].kwargs == {'csv':False}
+    
 # extract_config tests
 
 # str2lst tests
@@ -124,8 +148,6 @@ def test_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_
     assert parser_util.print.call_args_list[0].args == ("Unable to process string representation of list", )
 
 # process_filepath
-
-
 
 # class TestParserUtil(unittest.TestCase):
 
