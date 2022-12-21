@@ -91,6 +91,37 @@ def test_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_c
 # extract_config tests
 
 # str2lst tests
+def test_str2lst_returns_call_to_ast_literal_eval_which_receive_given_string(mocker):
+    # Arrange
+    arg_string = str(MagicMock())
+
+    expected_result = MagicMock()
+    
+    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', return_value=expected_result)
+
+    # Act
+    result = parser_util.str2lst(arg_string)
+
+    # Assert
+    assert parser_util.ast.literal_eval.call_count == 1
+    assert parser_util.ast.literal_eval.call_args_list[0].args == (arg_string, )
+    assert result == expected_result
+
+def test_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_raises_exception(mocker):
+    # Arrange
+    arg_string = str(MagicMock())
+    
+    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', side_effect=Exception)
+    mocker.patch('src.data_handling.parsers.parser_util.print')
+    
+    # Act
+    result = parser_util.str2lst(arg_string)
+
+    # Assert
+    assert parser_util.ast.literal_eval.call_count == 1
+    assert parser_util.ast.literal_eval.call_args_list[0].args == (arg_string, )
+    assert parser_util.print.call_count == 1
+    assert parser_util.print.call_args_list[0].args == ("Unable to process string representation of list", )
 
 # process_filepath
 
