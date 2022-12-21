@@ -146,8 +146,113 @@ def test_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_
     assert parser_util.ast.literal_eval.call_args_list[0].args == (arg_string, )
     assert parser_util.print.call_count == 1
     assert parser_util.print.call_args_list[0].args == ("Unable to process string representation of list", )
+    assert result == None
 
 # process_filepath
+def test_process_filepath_returns_filename_from_path_with_txt_replaced_by_csv_when_given_csv_resolves_to_True_and_given_return_config_is_not_True(mocker):
+    # Arrange
+    fake_filename = str(MagicMock())
+
+    arg_path = ""
+    arg_return_config = False if pytest.gen.randint(0, 1) == 1 else 0
+    arg_csv = True if pytest.gen.randint(0, 1) == 1 else MagicMock()
+
+    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
+        arg_path += str(MagicMock()) + '/'
+    arg_path += fake_filename + '.txt'
+    print(arg_path)
+    # Act
+    result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
+
+    # Assert
+    assert result == fake_filename + '.csv'
+
+def test_process_filepath_returns_filename_from_path_with_txt_replaced_by__CONFIG_dot_txt_when_given_csv_resolves_to_True_and_given_return_config_is_True(mocker):
+    # Arrange
+    fake_filename = str(MagicMock())
+
+    arg_path = ""
+    arg_return_config = True
+    arg_csv = True if pytest.gen.randint(0, 1) == 1 else MagicMock()
+
+    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
+        arg_path += str(MagicMock()) + '/'
+    arg_path += fake_filename + '.txt'
+    print(arg_path)
+    # Act
+    result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
+
+    # Assert
+    assert result == fake_filename + '_CONFIG.txt'
+
+def test_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_not_True(mocker):
+    # Arrange
+    fake_filename = str(MagicMock())
+
+    arg_path = ""
+    arg_return_config = False if pytest.gen.randint(0, 1) == 1 else 0
+    arg_csv = False if pytest.gen.randint(0, 1) == 1 else 0
+
+    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
+        arg_path += str(MagicMock()) + '/'
+    arg_path += fake_filename + '.txt'
+    print(arg_path)
+    # Act
+    result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
+
+    # Assert
+    assert result == fake_filename + '.txt'
+
+def test_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_True(mocker):
+    # Arrange
+    fake_filename = str(MagicMock())
+
+    arg_path = ""
+    arg_return_config = True
+    arg_csv = False if pytest.gen.randint(0, 1) == 1 else 0
+
+    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
+        arg_path += str(MagicMock()) + '/'
+    arg_path += fake_filename + '.txt'
+    print(arg_path)
+    # Act
+    result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
+
+    # Assert
+    assert result == fake_filename + '_CONFIG.txt'
+
+def test_process_filepath_default_given_csv_is_False(mocker):
+    # Arrange
+    fake_filename = str(MagicMock())
+
+    arg_path = ""
+    arg_return_config = True
+
+    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
+        arg_path += str(MagicMock()) + '/'
+    arg_path += fake_filename + '.txt'
+    print(arg_path)
+    # Act
+    result = parser_util.process_filepath(arg_path, arg_return_config)
+
+    # Assert
+    assert result == fake_filename + '_CONFIG.txt'
+
+def test_process_filepath_default_given_return_config_is_False(mocker):
+    # Arrange
+    fake_filename = str(MagicMock())
+
+    arg_path = ""
+
+    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
+        arg_path += str(MagicMock()) + '/'
+    arg_path += fake_filename + '.txt'
+    print(arg_path)
+    # Act
+    result = parser_util.process_filepath(arg_path)
+
+    # Assert
+    assert result == fake_filename + '.txt'
 
 # class TestParserUtil(unittest.TestCase):
 
