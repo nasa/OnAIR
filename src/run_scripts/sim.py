@@ -3,15 +3,7 @@ Sim class
 Helper class to create and run a simulation
 """
 
-import csv
-import time
-import os
-import sys
 import importlib
-import copy
-import webbrowser
-import json
-import random
 
 from src.reasoning.brain import Brain
 from src.systems.spacecraft import Spacecraft
@@ -22,7 +14,6 @@ from src.data_handling.data_source import DataSource
 
 class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):
-
         self.simulator = simType
         spaceCraft = Spacecraft(*parsedData.get_spacecraft_metadata())
 
@@ -39,9 +30,8 @@ class Simulator:
         self.brain = Brain(spaceCraft)
 
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
-
-        print_sim_header() if (IO_Flag == True) else ''
-        print_msg('Please wait...\n') if (IO_Flag == 'strict') else ''
+        if IO_Flag == True: print_sim_header()
+        if IO_Flag == 'strict': print_msg('Please wait...\n')
         diagnosis_list = []
         time_step = 0
         last_diagnosis = time_step
