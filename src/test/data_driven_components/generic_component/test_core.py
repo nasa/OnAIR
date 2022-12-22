@@ -14,10 +14,10 @@ class TestCore(unittest.TestCase):
 
     def test_init_non_empty_headers(self):
         plugin = AIPlugIn('test_component', ['A'])
-        self.assertEquals(plugin.headers, ['A'])
+        self.assertEqual(plugin.headers, ['A'])
 
         plugin = AIPlugIn('test_component', ['A', 'B'])
-        self.assertEquals(plugin.headers, ['A', 'B'])
+        self.assertEqual(plugin.headers, ['A', 'B'])
 
     def apriori_training_empty_batch(self):
         construct.apriori_training([])
@@ -39,7 +39,7 @@ class TestCore(unittest.TestCase):
             for tlm in diagnosis:
                 self.assertIn(tlm, construct.headers)
         else:
-            self.assertEquals(diagnosis, [])
+            self.assertEqual(diagnosis, [])
 
 if __name__ == '__main__':
     unittest.main()
