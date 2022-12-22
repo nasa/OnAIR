@@ -24,7 +24,7 @@ def test_DataDrivenLearning__init__sets_instance_headers_to_given_headers_and_do
     # Assert
     assert cut.headers == arg_headers
 
-def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_given_headers_for_each_item_in_given__ai_plugins(mocker):
+def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins(mocker):
     # Arrange
     arg_headers = []
     arg__ai_plugins = []
@@ -49,7 +49,7 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
     for i in range(num_fake_ai_plugins):
         assert importlib.import_module.call_args_list[i].args == ('src.data_driven_components.' + arg__ai_plugins[i] + '.core',)
 
-def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
+def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
     # Arrange
     arg_headers = []
     arg__ai_plugins = []
@@ -82,7 +82,7 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
     for i in range(num_fake_ai_plugins):
         assert fake_imported_module.AIPlugIn.call_args_list[i].args == (arg__ai_plugins[i], arg_headers)
     assert cut.ai_constructs == expected_ai_constructs
-    
+
 # update tests
 def test_DataDrivenLearning_update_only_calls_flotify_input_with_given_curr_data_and_status_to_oneHot_with_given_status_when_instance_ai_constructs_is_empty(mocker):
     # Arrange
