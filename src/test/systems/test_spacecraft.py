@@ -318,18 +318,116 @@ def test_Spacecraft_update_does_not_raise_IndexError_when_frame_location_size_wi
     assert e_info.match(fake_non_IndexError_message)
 
 # get_headers
+def test_Spacecraft_get_headers_returns_headers():
+    # Arrange
+    expected_result = MagicMock()
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.headers = expected_result
+
+    # Act
+    result = cut.get_headers()
+
+    # Assert
+    assert result == expected_result
 
 # get_current_faulting_mnemonics tests, return_value=fake_suite_status
+def test_Spacecraft_get_current_faulting_mnemonics_returns_test_suite_call_get_status_specific_mnemonics(mocker):
+    # Arrange
+    expected_result = MagicMock()
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.test_suite = MagicMock()
+
+    mocker.patch.object(cut.test_suite, 'get_status_specific_mnemonics', return_value=expected_result)
+
+    # Act
+    result = cut.get_current_faulting_mnemonics()
+
+    # Assert
+    assert cut.test_suite.get_status_specific_mnemonics.call_count == 1
+    assert cut.test_suite.get_status_specific_mnemonics.call_args_list[0].args == ()
+    assert result == expected_result
 
 # get_current_data tests
+def test_Spacecraft_get_current_data_returns_curr_data():
+    # Arrange
+    expected_result = MagicMock()
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.curr_data = expected_result
+
+    # Act
+    result = cut.get_current_data()
+
+    # Assert
+    assert result == expected_result
 
 # get_current_time tests
+def test_Spacecraft_get_current_time_returns_curr_data_item_0():
+    # Arrange
+    expected_result = MagicMock()
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.curr_data = []
+    cut.curr_data.append(expected_result)
+
+    # Act
+    result = cut.get_current_time()
+
+    # Assert
+    assert result == expected_result
 
 # get_status tests
+def test_Spacecraft_get_status_returns_status_call_to_get_status(mocker):
+    # Arrange
+    expected_result = MagicMock()
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.status = MagicMock()
+
+    mocker.patch.object(cut.status, 'get_status', return_value=expected_result)
+
+    # Act
+    result = cut.get_status()
+
+    # Assert
+    assert cut.status.get_status.call_count == 1
+    assert cut.status.get_status.call_args_list[0].args == ()
+    assert result == expected_result
 
 # get_bayesian_status tests
+def test_Spacecraft_get_bayesian_status_returns_status_call_to_get_bayesian_status(mocker):
+    # Arrange
+    expected_result = MagicMock()
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.status = MagicMock()
+
+    mocker.patch.object(cut.status, 'get_bayesian_status', return_value=expected_result)
+
+    # Act
+    result = cut.get_bayesian_status()
+
+    # Assert
+    assert cut.status.get_bayesian_status.call_count == 1
+    assert cut.status.get_bayesian_status.call_args_list[0].args == ()
+    assert result == expected_result
 
 # get_batch_status_reports tests
+def test_Spacecraft_get_batch_status_reports_returngets_None():
+    # Arrange
+    arg_batch_data = MagicMock()
+
+    expected_result = None
+
+    cut = Spacecraft.__new__(Spacecraft)
+
+    # Act
+    result = cut.get_batch_status_reports(arg_batch_data)
+
+    # Assert
+    assert result == expected_result
 
 # class TestSpacecraft(unittest.TestCase):
 
