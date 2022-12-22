@@ -395,7 +395,6 @@ def test_flotify_input_returns_expected_values_for_given__input_that_is_multi_ty
         rand_type_of_item = pytest.gen.sample(['str', 'str_need_replace', 'str_fail_replace', 'other'], 1)[0]
 
         if rand_type_of_item == 'str':
-            print(1)
             arg__input.append(MagicMock())
             side_effects_for_type.append(str)
             resultant_float = MagicMock()
