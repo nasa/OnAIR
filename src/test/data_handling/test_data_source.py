@@ -76,6 +76,63 @@ def test__init__DataSource_default_given_data_is_empty_list():
     assert cut.data_dimension == 0
 
 # get_next tests
+def test_get_next_DataSource_increments_index_and_returns_data_at_index_minus_1_when_index_minus_1_is_less_than_len_data():
+    # Arrange
+    initial_index = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+
+    cut = DataSource.__new__(DataSource)
+    cut.index = initial_index
+    cut.data = []
+
+    fake_num_data = cut.index + pytest.gen.randint(1, 5) # arbitrary, from 1 to 5 more data than index
+
+    for i in range(fake_num_data):
+        cut.data.append(MagicMock())
+
+    # Act
+    result = cut.get_next()
+
+    # Assert
+    assert cut.index == initial_index + 1
+    assert result == cut.data[initial_index]
+
+def test_get_next_DataSource_raises_Exception_when_data_is_vacant_but_still_increments_index():
+    # Arrange
+    initial_index = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+
+    cut = DataSource.__new__(DataSource)
+    cut.index = initial_index
+    cut.data = []
+
+    # Act
+    with pytest.raises(Exception) as e_info:
+        cut.get_next()
+
+    # Assert
+    assert cut.index == initial_index + 1
+    assert e_info.match('list index out of range')
+
+def test_get_next_DataSource_raises_Exception_when_index_is_incremented_beyond_data_size():
+    # Arrange
+    initial_index = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+
+    cut = DataSource.__new__(DataSource)
+    cut.index = initial_index
+    cut.data = []
+
+    fake_num_data = initial_index
+
+    for i in range(fake_num_data):
+        cut.data.append(MagicMock())
+
+    # Act
+    with pytest.raises(Exception) as e_info:
+        cut.get_next()
+
+    # Assert
+    assert cut.index == initial_index + 1
+    assert len(cut.data) == cut.index - 1
+    assert e_info.match('list index out of range')
 
 # has_more tests
 
