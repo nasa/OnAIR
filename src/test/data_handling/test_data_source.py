@@ -184,6 +184,75 @@ def test_DataSource_has_more_returns_False_when_index_greater_than_data_len(mock
     assert result == False
 
 # has_data tests
+def test_DataSource_has_data_returns_False_when_data_is_empty_list():
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.data = []
+
+    # Act
+    result = cut.has_data()
+
+    # Assert
+    assert result == False
+
+def test_DataSource_has_data_returns_False_when_all_data_points_items_after_timestamp_are_empty_steps():
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.data_dimension = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 data size, 2 accounts for 1 as timestamp
+    cut.data = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 data points
+        fake_data_pt = ['-'] * cut.data_dimension
+        fake_timestamp = MagicMock()
+        fake_data_pt[0] = fake_timestamp
+        cut.data.append(fake_data_pt)
+
+    # Act
+    result = cut.has_data()
+
+    # Assert
+    assert result == False
+
+def test_DataSource_has_data_returns_True_when_at_least_one_data_point_has_non_empty_step_after_timestamp():
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.data_dimension = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 data size, 2 accounts for 1 as timestamp
+    cut.data = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 data points
+        fake_data_pt = ['-'] * cut.data_dimension
+        fake_timestamp = MagicMock()
+        fake_data_pt[0] = fake_timestamp
+        cut.data.append(fake_data_pt)
+
+    cut.data[pytest.gen.randint(0, len(cut.data) - 1)][pytest.gen.randint(1, cut.data_dimension - 1)] = MagicMock() # [from 0th data pt up to last data pt][from first item after timestamp to last item]
+
+    # Act
+    result = cut.has_data()
+
+    # Assert
+    assert result == True
+
+def test_DataSource_has_data_returns_True_when_at_least_one_data_point_has_different_size_data_than_size_dimension():
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.data_dimension = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 data size, 2 accounts for 1 as timestamp
+    cut.data = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 data points
+        fake_data_pt = ['-'] * cut.data_dimension
+        fake_timestamp = MagicMock()
+        fake_data_pt[0] = fake_timestamp
+        cut.data.append(fake_data_pt)
+
+    if pytest.gen.randint(0, 1):
+        random_non_dimension_size = pytest.gen.randint(0, cut.data_dimension - 2) # less than
+    else:
+        random_non_dimension_size = pytest.gen.randint(cut.data_dimension, cut.data_dimension + 10) # greater than
+    cut.data[pytest.gen.randint(0, len(cut.data) - 1)] = [MagicMock()] + ['-'] * random_non_dimension_size # [from 0th data pt up to last data pt], replace random data pt with greater or less than expected dimension
+
+    # Act
+    result = cut.has_data()
+
+    # Assert
+    assert result == True
 
 
 # class TestDataSource(unittest.TestCase):
