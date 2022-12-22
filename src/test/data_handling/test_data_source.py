@@ -6,7 +6,7 @@ import src.data_handling.data_source as data_source
 from src.data_handling.data_source import DataSource
 
 # __init__ tests
-def test__init__DataSource_sets_index_to_0_and_data_to_given_data_and_data_dimension_to_len_of_first_data_in_data_when_given_data_occupied_and_first_data_has_len_more_than_0():
+def test_DataSource__init__sets_index_to_0_and_data_to_given_data_and_data_dimension_to_len_of_first_data_in_data_when_given_data_occupied_and_first_data_has_len_more_than_0():
     # Arrange
     arg_data = []
 
@@ -29,7 +29,7 @@ def test__init__DataSource_sets_index_to_0_and_data_to_given_data_and_data_dimen
     assert cut.data == arg_data
     assert cut.data_dimension == num_fake_first_data
 
-def test__init__DataSource_sets_index_to_0_and_data_to_given_data_and_data_dimension_to_0_when_given_data_is_occupied_and_first_data_has_len_0():
+def test_DataSource__init__sets_index_to_0_and_data_to_given_data_and_data_dimension_to_0_when_given_data_is_occupied_and_first_data_has_len_0():
     # Arrange
     arg_data = []
 
@@ -49,7 +49,7 @@ def test__init__DataSource_sets_index_to_0_and_data_to_given_data_and_data_dimen
     assert cut.data == arg_data
     assert cut.data_dimension == 0
 
-def test__init__DataSource_sets_index_to_0_and_data_to_given_data_and_data_dimension_to_0_when_given_data_is_vacant():
+def test_DataSource__init__sets_index_to_0_and_data_to_given_data_and_data_dimension_to_0_when_given_data_is_vacant():
     # Arrange
     arg_data = []
     
@@ -63,7 +63,7 @@ def test__init__DataSource_sets_index_to_0_and_data_to_given_data_and_data_dimen
     assert cut.data == arg_data
     assert cut.data_dimension == 0
 
-def test__init__DataSource_default_given_data_is_empty_list():
+def test_DataSource__init__default_given_data_is_empty_list():
     # Arrange
     cut = DataSource.__new__(DataSource)
 
@@ -76,7 +76,7 @@ def test__init__DataSource_default_given_data_is_empty_list():
     assert cut.data_dimension == 0
 
 # get_next tests
-def test_get_next_DataSource_increments_index_and_returns_data_at_index_minus_1_when_index_minus_1_is_less_than_len_data():
+def test_DataSource_get_next_increments_index_and_returns_data_at_index_minus_1_when_index_minus_1_is_less_than_len_data():
     # Arrange
     initial_index = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
 
@@ -96,7 +96,7 @@ def test_get_next_DataSource_increments_index_and_returns_data_at_index_minus_1_
     assert cut.index == initial_index + 1
     assert result == cut.data[initial_index]
 
-def test_get_next_DataSource_raises_Exception_when_data_is_vacant_but_still_increments_index():
+def test_DataSource_get_next_raises_Exception_when_data_is_vacant_but_still_increments_index():
     # Arrange
     initial_index = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
 
@@ -112,7 +112,7 @@ def test_get_next_DataSource_raises_Exception_when_data_is_vacant_but_still_incr
     assert cut.index == initial_index + 1
     assert e_info.match('list index out of range')
 
-def test_get_next_DataSource_raises_Exception_when_index_is_incremented_beyond_data_size():
+def test_DataSource_get_next_raises_Exception_when_index_is_incremented_beyond_data_size():
     # Arrange
     initial_index = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
 
