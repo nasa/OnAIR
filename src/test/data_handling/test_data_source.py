@@ -135,6 +135,53 @@ def test_get_next_DataSource_raises_Exception_when_index_is_incremented_beyond_d
     assert e_info.match('list index out of range')
 
 # has_more tests
+def test_DataSource_has_more_returns_True_when_index_is_less_than_data_len(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.index = pytest.gen.randint(0, 5) # arbitrary, from 0 to 5
+    cut.data = MagicMock()
+
+    mocker.patch('src.data_handling.data_source.len', return_value=cut.index+pytest.gen.randint(1, 100)) # arbitrary, from 1 to 100 more data than index
+
+    # Act
+    result = cut.has_more()
+
+    # Assert
+    assert data_source.len.call_count == 1
+    assert data_source.len.call_args_list[0].args == (cut.data, )
+    assert result == True
+
+def test_DataSource_has_more_returns_False_when_index_eq_data_len(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.index = pytest.gen.randint(0, 5) # arbitrary, from 0 to 5
+    cut.data = MagicMock()
+
+    mocker.patch('src.data_handling.data_source.len', return_value=cut.index)
+
+    # Act
+    result = cut.has_more()
+
+    # Assert
+    assert data_source.len.call_count == 1
+    assert data_source.len.call_args_list[0].args == (cut.data, )
+    assert result == False
+
+def test_DataSource_has_more_returns_False_when_index_greater_than_data_len(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.index = pytest.gen.randint(1, 5) # arbitrary, from 1 to 5 (min 1 to be able to subtract)
+    cut.data = MagicMock()
+
+    mocker.patch('src.data_handling.data_source.len', return_value=cut.index-1)
+
+    # Act
+    result = cut.has_more()
+
+    # Assert
+    assert data_source.len.call_count == 1
+    assert data_source.len.call_args_list[0].args == (cut.data, )
+    assert result == False
 
 # has_data tests
 
