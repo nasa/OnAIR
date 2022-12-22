@@ -76,6 +76,246 @@ def test_Spacecraft__init__default_given_headers_and_tests_are_both_empty_list(m
     assert cut.curr_data == ['-'] * 0
 
 # update tests
+def test_Spacecraft_update_does_not_set_any_curr_data_when_given_frame_is_vacant_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+    # Arrange
+    arg_frame = []
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.test_suite = MagicMock()
+    cut.status = MagicMock()
+
+    fake_suite_status = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+        fake_suite_status.append(MagicMock())
+
+    mocker.patch.object(cut.test_suite, 'execute_suite')
+    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
+    mocker.patch.object(cut.status, 'set_status')
+    
+    # Act
+    cut.update(arg_frame)
+
+    # Assert
+    assert cut.test_suite.execute_suite.call_count == 1
+    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
+    assert cut.test_suite.get_suite_status.call_count == 1
+    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
+    assert cut.status.set_status.call_count == 1
+    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
+    
+def test_Spacecraft_update_does_not_set_any_curr_data_when_given_frame_is_all_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+    # Arrange
+    arg_frame = []
+
+    num_fake_empty_steps = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    for i in range(num_fake_empty_steps):
+        arg_frame.append('-')
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.test_suite = MagicMock()
+    cut.status = MagicMock()
+    cut.curr_data = []
+
+    fake_suite_status = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+        fake_suite_status.append(MagicMock())
+
+    mocker.patch.object(cut.test_suite, 'execute_suite')
+    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
+    mocker.patch.object(cut.status, 'set_status')
+    
+    # Act
+    cut.update(arg_frame)
+
+    # Assert
+    assert len(arg_frame) == num_fake_empty_steps
+    assert cut.curr_data == []
+    assert cut.test_suite.execute_suite.call_count == 1
+    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
+    assert cut.test_suite.get_suite_status.call_count == 1
+    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
+    assert cut.status.set_status.call_count == 1
+    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
+    
+def test_Spacecraft_update_does_puts_all_frame_data_into_curr_data_when_none_are_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+    # Arrange
+    arg_frame = []
+
+    num_fake_full_steps = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    for i in range(num_fake_full_steps):
+        arg_frame.append(MagicMock())
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.test_suite = MagicMock()
+    cut.status = MagicMock()
+    cut.curr_data = [MagicMock()] * num_fake_full_steps
+
+    fake_suite_status = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+        fake_suite_status.append(MagicMock())
+
+    mocker.patch.object(cut.test_suite, 'execute_suite')
+    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
+    mocker.patch.object(cut.status, 'set_status')
+    
+    # Act
+    cut.update(arg_frame)
+
+    # Assert
+    assert len(arg_frame) == num_fake_full_steps
+    assert cut.curr_data == arg_frame
+    assert cut.test_suite.execute_suite.call_count == 1
+    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
+    assert cut.test_suite.get_suite_status.call_count == 1
+    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
+    assert cut.status.set_status.call_count == 1
+    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
+    
+def test_Spacecraft_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+    # Arrange
+    arg_frame = []
+
+    num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
+    for i in range(num_fake_total_steps):
+        arg_frame.append(MagicMock())
+    location_fake_empty_steps = pytest.gen.sample(list(range(num_fake_total_steps)), pytest.gen.randint(1, num_fake_total_steps - 1)) # sample from a list of all numbers up to total then take from 1 to up to 1 less than total
+    for i in location_fake_empty_steps:
+        arg_frame[i] = '-'
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.test_suite = MagicMock()
+    cut.status = MagicMock()
+    unchanged_data = MagicMock()
+    cut.curr_data = [unchanged_data] * num_fake_total_steps
+
+    fake_suite_status = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+        fake_suite_status.append(MagicMock())
+
+    mocker.patch.object(cut.test_suite, 'execute_suite')
+    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
+    mocker.patch.object(cut.status, 'set_status')
+    
+    # Act
+    cut.update(arg_frame)
+
+    # Assert
+    assert len(arg_frame) == num_fake_total_steps
+    for i in range(len(cut.curr_data)):
+        if location_fake_empty_steps.count(i):
+            assert cut.curr_data[i] == unchanged_data
+        else:
+            assert cut.curr_data[i] == arg_frame[i]
+    assert cut.test_suite.execute_suite.call_count == 1
+    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
+    assert cut.test_suite.get_suite_status.call_count == 1
+    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
+    assert cut.status.set_status.call_count == 1
+    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
+    
+def test_Spacecraft_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_including_locations_in_curr_data_that_do_not_exist_in_frame_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+    # Arrange
+    arg_frame = []
+
+    num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
+    for i in range(num_fake_total_steps):
+        arg_frame.append(MagicMock())
+    location_fake_empty_steps = pytest.gen.sample(list(range(num_fake_total_steps)), pytest.gen.randint(1, num_fake_total_steps - 1)) # sample from a list of all numbers up to total then take from 1 to up to 1 less than total
+    for i in location_fake_empty_steps:
+        arg_frame[i] = '-'
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.test_suite = MagicMock()
+    cut.status = MagicMock()
+    unchanged_data = MagicMock()
+    cut.curr_data = [unchanged_data] * (num_fake_total_steps + pytest.gen.randint(1, 10)) # arbitrary, from 1 to 10 extra items over frame
+
+    fake_suite_status = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+        fake_suite_status.append(MagicMock())
+
+    mocker.patch.object(cut.test_suite, 'execute_suite')
+    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
+    mocker.patch.object(cut.status, 'set_status')
+    
+    # Act
+    cut.update(arg_frame)
+
+    # Assert
+    assert len(arg_frame) == num_fake_total_steps
+    assert len(cut.curr_data) > len(arg_frame)
+    for i in range(len(cut.curr_data)):
+        if i >= len(arg_frame) or location_fake_empty_steps.count(i):
+            assert cut.curr_data[i] == unchanged_data
+        else:
+            assert cut.curr_data[i] == arg_frame[i]
+    assert cut.test_suite.execute_suite.call_count == 1
+    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
+    assert cut.test_suite.get_suite_status.call_count == 1
+    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
+    assert cut.status.set_status.call_count == 1
+    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
+    
+def test_Spacecraft_update_raises_IndexError_when_frame_location_size_with_relevant_data_extends_beyond_curr_data_size(mocker):
+    # Arrange
+    arg_frame = []
+
+    num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
+    for i in range(num_fake_total_steps):
+        arg_frame.append(MagicMock())
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.test_suite = MagicMock()
+    cut.status = MagicMock()
+    unchanged_data = MagicMock()
+    cut.curr_data = [unchanged_data] * (num_fake_total_steps - 1) # - 1 ensures less than with min of 1
+
+    fake_suite_status = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+        fake_suite_status.append(MagicMock())
+
+    mocker.patch.object(cut.test_suite, 'execute_suite')
+    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
+    mocker.patch.object(cut.status, 'set_status')
+    
+    # Act
+    with pytest.raises(IndexError) as e_info:
+        cut.update(arg_frame)
+
+    # Assert
+    assert e_info.match('list assignment index out of range')
+    
+def test_Spacecraft_update_does_not_raise_IndexError_when_frame_location_size_with_only_empty_steps_extends_beyond_curr_data_size(mocker):
+    # Arrange
+    arg_frame = []
+
+    num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
+    for i in range(num_fake_total_steps):
+        arg_frame.append(MagicMock())
+
+    cut = Spacecraft.__new__(Spacecraft)
+    cut.test_suite = MagicMock()
+    cut.status = MagicMock()
+    unchanged_data = MagicMock()
+    fake_curr_data_size = pytest.gen.randint(1, num_fake_total_steps - 1) # from 1 to 1 less than total
+    cut.curr_data = [unchanged_data] * fake_curr_data_size
+
+    for i in range(fake_curr_data_size, len(arg_frame)):
+        arg_frame[i] = '-'
+
+    fake_suite_status = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+        fake_suite_status.append(MagicMock())
+    fake_non_IndexError_message = str(MagicMock())
+
+    mocker.patch.object(cut.test_suite, 'execute_suite', side_effect=Exception(fake_non_IndexError_message)) # testing short circuit that is provable to not be the IndexError
+
+    # Act
+    with pytest.raises(Exception) as e_info:
+        cut.update(arg_frame)
+
+    # Assert
+    assert e_info.match(fake_non_IndexError_message)
 
 # get_headers
 
