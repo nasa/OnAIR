@@ -1,12 +1,7 @@
 """
 Data driven learning class for managing all data driven AI components
 """
-
-import copy
-import os
 import numpy as np
-
-from src.util.print_io import *
 
 class DataDrivenLearning:
     def __init__(self, headers=[], sample_input=[]):
@@ -57,9 +52,6 @@ class DataDrivenLearning:
                     except:
                         if remove_str == False:
                             floatified.append(0.0)
-                        else:
-                            continue
-                        continue
             else:
                 floatified.append(float(i))
         return floatified
