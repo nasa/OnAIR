@@ -20,7 +20,7 @@ class TelemetryTestSuite:
                     'ROTATIONAL' : self.rotational, 
                          'STATE' : self.state,
                    'FEASIBILITY' : self.feasibility, 
-                           'NOOP': self.noop}
+                          'NOOP' : self.noop}
 
     ################################################
     ################  Running Tests  ############### 
@@ -46,7 +46,7 @@ class TelemetryTestSuite:
             status.append(stat) # tuple
 
         bayesian = self.calc_single_status(status)
-        # Add all mass assignments?
+        # TODO: Add all mass assignments?
         return Status(self.dataFields[header_index], bayesian[0], bayesian[1])
 
 
@@ -61,17 +61,17 @@ class TelemetryTestSuite:
 
     def sync(self, val, test_params, epsilon):
         return 'GREEN', [({'GREEN'}, 1.0)]
-        mass_assignments = [] # list of tuples
-        if len(test_params) == 0:
-            stat = 'RED'
-            mass_assignments.append(({stat}, 1.0))
-            return stat, mass_assignments
-        if val == test_params[0]:
-            stat = 'GREEN'
-            mass_assignments.append(({stat}, 1.0))
-            return stat, mass_assignments
+        # mass_assignments = [] # list of tuples
+        # if len(test_params) == 0:
+        #     stat = 'RED'
+        #     mass_assignments.append(({stat}, 1.0))
+        #     return stat, mass_assignments
+        # if val == test_params[0]:
+        #     stat = 'GREEN'
+        #     mass_assignments.append(({stat}, 1.0))
+        #     return stat, mass_assignments
 
-        return '---', mass_assignments
+        # return '---', mass_assignments
 
     def rotational(self, val, test_params, epsilon):
         stat = 'YELLOW'
@@ -110,7 +110,7 @@ class TelemetryTestSuite:
         # between [0] - [1] is yellow
         # between [1] - [2] is green 
         # between [2] - [3] is yellow
-        # after [3] is green
+        # after [3] is red
 
         # if len(test_params == 2) then the thresholds are as follows:
         # before [0] is red
@@ -216,24 +216,24 @@ class TelemetryTestSuite:
     ################################################
     ############## Combining statuses ############## 
     def calc_single_status(self, status_list, mode='strict'):
-        occurences = Counter(status_list)
-        max_occurence = occurences.most_common(1)[0][0]
+        occurrences = Counter(status_list)
+        max_occurrence = occurrences.most_common(1)[0][0]
 
         if mode == 'strict':
-            if occurences['RED'] > 0:
-                conf = occurences['RED']/len(status_list)
+            if occurrences['RED'] > 0:
+                conf = occurrences['RED']/len(status_list)
                 return 'RED', conf
             else:
-                return max_occurence, 1.0 # return max 
+                return max_occurrence, 1.0 # return max 
 
         if mode == 'distr':
-            conf = occurences[max_occurence]/len(status_list)
-            return max_occurence, conf
+            conf = occurrences[max_occurrence]/len(status_list)
+            return max_occurrence, conf
 
         elif mode == 'max':
-            return max_occurence, 1.0
+            return max_occurrence, 1.0
         else: 
-            return max_occurence, 1.0 # return max 
+            return max_occurrence, 1.0 # return max 
 
     def get_suite_status(self):
         status_strings = [res.get_status() for res in self.latest_results]
