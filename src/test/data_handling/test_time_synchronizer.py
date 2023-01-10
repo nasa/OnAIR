@@ -84,6 +84,20 @@ def test_TimeSynchronizer_init_sets_instance_default_values_when_call_to_sort_da
     assert cut.offsets == {}
     assert cut.sim_data == []
 
+# get_sim_data tests
+def test_TimeSynchronizer_get_sim_data():
+    # Arrange
+    fake_sim_data = MagicMock()
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+    cut.sim_data = fake_sim_data
+
+    # Act
+    result = cut.get_sim_data()
+
+    # Assert
+    assert result == fake_sim_data
+
 class TestTimeSynchronizer(unittest.TestCase):
 
     def setUp(self):
