@@ -84,8 +84,24 @@ def test_TimeSynchronizer_init_sets_instance_default_values_when_call_to_sort_da
     assert cut.offsets == {}
     assert cut.sim_data == []
 
+# get_spacecraft_metadata tests
+def test_TimeSynchronizer_get_spacecraft_metadata_returns_tuple_of_instance_values_ordered_fused_headers_and_ordered_fused_tests():
+    # Arrange
+    fake_ordered_fused_headers = MagicMock()
+    fake_ordered_fused_tests = MagicMock()
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+    cut.ordered_fused_headers = fake_ordered_fused_headers
+    cut.ordered_fused_tests = fake_ordered_fused_tests
+
+    # Act
+    result = cut.get_spacecraft_metadata()
+
+    # Assert
+    assert result == (fake_ordered_fused_headers, fake_ordered_fused_tests)
+
 # get_sim_data tests
-def test_TimeSynchronizer_get_sim_data():
+def test_TimeSynchronizer_get_sim_data_returns_instance_value_of_sim_data():
     # Arrange
     fake_sim_data = MagicMock()
 
