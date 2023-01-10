@@ -7,7 +7,7 @@ import src.data_handling.time_synchronizer as time_synchronizer
 from src.data_handling.time_synchronizer import TimeSynchronizer
 
 # __init__ tests
-def test_init_does_not_set_instance_default_values_when_calls_to_init_sync_data_and_sort_data_do_not_raise_exceptions(mocker):
+def test_TimeSynchronizer_init_does_not_set_instance_default_values_when_calls_to_init_sync_data_and_sort_data_do_not_raise_exceptions(mocker):
     # Arrange
     arg_headers = MagicMock()
     arg_dataFrames = MagicMock()
@@ -33,7 +33,7 @@ def test_init_does_not_set_instance_default_values_when_calls_to_init_sync_data_
     assert hasattr(cut, 'offsets') == False
     assert hasattr(cut, 'sim_data') == False
 
-def test_init_sets_instance_default_values_when_call_to_init_sync_data_raises_exception(mocker):
+def test_TimeSynchronizer_init_sets_instance_default_values_when_call_to_init_sync_data_raises_exception(mocker):
     # Arrange
     arg_headers = MagicMock()
     arg_dataFrames = MagicMock()
@@ -58,7 +58,7 @@ def test_init_sets_instance_default_values_when_call_to_init_sync_data_raises_ex
     assert cut.offsets == {}
     assert cut.sim_data == []
 
-def test_init_sets_instance_default_values_when_call_to_sort_data_raises_exception(mocker):
+def test_TimeSynchronizer_init_sets_instance_default_values_when_call_to_sort_data_raises_exception(mocker):
     # Arrange
     arg_headers = MagicMock()
     arg_dataFrames = MagicMock()
