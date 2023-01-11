@@ -85,6 +85,92 @@ def test_TimeSynchronizer_init_sets_instance_default_values_when_call_to_sort_da
     assert cut.offsets == {}
     assert cut.sim_data == []
 
+# remove_time_headers tests
+def test_TimeSynchronizer_remove_time_headers_retuns_tuple_of_empty_list_and_empty_list_when_given_hdrs_list_is_vacant():
+    # Arrange
+    arg_hdrs_list = []
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    result = cut.remove_time_headers(arg_hdrs_list)
+
+    # Assert
+    assert result == ([], [])
+
+def test_TimeSynchronizer_remove_time_headers_retuns_tuple_of_empty_list_and_copy_of_given_hdrs_list_when_given_hdrs_list_has_no_str_TIME_or_str_time():
+    # Arrange
+    arg_hdrs_list = []
+
+    expected_clean_hdrs_list = []
+    num_fake_hdrs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    for i in range(num_fake_hdrs):
+        fake_hdr = MagicMock()
+        arg_hdrs_list.append(fake_hdr)
+        expected_clean_hdrs_list.append(fake_hdr)
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    result = cut.remove_time_headers(arg_hdrs_list)
+
+    # Assert
+    assert result == ([], expected_clean_hdrs_list)
+    assert result[1] is not arg_hdrs_list
+
+def test_TimeSynchronizer_remove_time_headers_retuns_tuple_of_list_of_single_location_and_and_copy_of_given_hdrs_list_with_time_hdr_removed_when_given_hdrs_list_has_single_time_hdr():
+    # Arrange
+    arg_hdrs_list = []
+
+    expected_clean_hdrs_list = []
+    num_fake_hdrs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    fake_time_index = pytest.gen.randint(0, num_fake_hdrs-1)
+    fake_time_hdr = 'TIME' if pytest.gen.randint(0,1) else 'time'
+    for i in range(num_fake_hdrs):
+        fake_hdr = MagicMock()
+        if i != fake_time_index:
+            arg_hdrs_list.append(fake_hdr)
+            expected_clean_hdrs_list.append(fake_hdr)
+        else:
+            arg_hdrs_list.append(fake_time_hdr)
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    result = cut.remove_time_headers(arg_hdrs_list)
+
+    # Assert
+    assert result == ([fake_time_index], expected_clean_hdrs_list)
+    assert result[1] is not arg_hdrs_list
+    assert result[1] == [hdr for hdr in arg_hdrs_list if hdr != fake_time_hdr]
+
+def test_TimeSynchronizer_remove_time_headers_retuns_tuple_of_sorted_list_of_all_indices_of_time_hdr_and_and_copy_of_given_hdrs_list_with_time_hdrs_removed_when_given_hdrs_list_has_any_number_of_time_headers():
+    # Arrange
+    arg_hdrs_list = []
+
+    expected_clean_hdrs_list = []
+    num_fake_hdrs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    fake_time_indices = pytest.gen.sample(list(range(num_fake_hdrs)), pytest.gen.randint(0, num_fake_hdrs)) # list of indices from none up to all of them
+    fake_time_indices.sort()
+    for i in range(num_fake_hdrs):
+        fake_hdr = MagicMock()
+        if not fake_time_indices.count(i):
+            arg_hdrs_list.append(fake_hdr)
+            expected_clean_hdrs_list.append(fake_hdr)
+        else:
+            arg_hdrs_list.append('TIME' if pytest.gen.randint(0,1) else 'time')
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    result = cut.remove_time_headers(arg_hdrs_list)
+
+    # Assert
+    assert result == (fake_time_indices, expected_clean_hdrs_list)
+    assert result[0] is not fake_time_indices
+    assert result[1] is not arg_hdrs_list
+    assert result[1] is not expected_clean_hdrs_list
+    assert result[1] == [hdr for hdr in arg_hdrs_list if hdr != 'TIME' and hdr != 'time']
 
 # remove_time_datapoints tests
 def test_TimeSynchronizer_remove_time_datapoints_returns_given_data_when_given_indices_to_remove_is_vacant():
