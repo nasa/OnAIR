@@ -1,6 +1,7 @@
 """ Test Time Sync Functionality """
 import os
 import unittest
+import pytest
 
 from mock import MagicMock
 import src.data_handling.time_synchronizer as time_synchronizer
@@ -83,6 +84,109 @@ def test_TimeSynchronizer_init_sets_instance_default_values_when_call_to_sort_da
     assert cut.indices_to_remove == []
     assert cut.offsets == {}
     assert cut.sim_data == []
+
+
+# remove_time_datapoints tests
+def test_TimeSynchronizer_remove_time_datapoints_returns_given_data_when_given_indices_to_remove_is_vacant():
+    # Arrange
+    arg_data = []
+    arg_indices_to_remove = []
+
+    expected_result = []
+    num_fake_data = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+
+    for i in range(num_fake_data):
+        fake_data = MagicMock()
+        arg_data.append(fake_data)
+        expected_result.append(fake_data)
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    result = cut.remove_time_datapoints(arg_data, arg_indices_to_remove)
+
+    # Assert
+    assert result == expected_result
+
+def test_TimeSynchronizer_remove_time_datapoints_returns_empty_list_when_given_data_is_size_of_1_and_given_indices_to_remove_is_list_with_0_as_only_item():
+    # Arrange
+    arg_data = [MagicMock()]
+    arg_indices_to_remove = [0]
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    result = cut.remove_time_datapoints(arg_data, arg_indices_to_remove)
+
+    # Assert
+    assert result == []
+
+def test_TimeSynchronizer_remove_time_datapoints_raises_IndexError_when_given_data_does_not_have_an_index_in_given_indices_to_remove():
+    # Arrange
+    arg_data = []
+    arg_indices_to_remove = [1]
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    with pytest.raises(IndexError) as e_info:  
+        cut.remove_time_datapoints(arg_data, arg_indices_to_remove)
+
+    # Assert
+    assert e_info.match("list assignment index out of range")
+
+def test_TimeSynchronizer_remove_time_datapoints_raises_IndexError_when_given_indices_to_remove_are_in_reverse_canonical_order():
+    # Arrange
+    arg_data = []
+    arg_indices_to_remove = []
+
+    expected_result = []
+    num_fake_data = pytest.gen.randint(3, 10) # arbitrary, from 3 to 10 because must have at least 3 to error in this fashion because with two you get `del data[1]` and `del data[-1]` which actually works 
+    print(num_fake_data)
+    for i in range(num_fake_data):
+        fake_data = MagicMock()
+        arg_data.append(fake_data)
+        arg_indices_to_remove.insert(0, i)
+        if not arg_indices_to_remove.count(i):
+            expected_result.append(fake_data)
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    with pytest.raises(IndexError) as e_info:  
+        cut.remove_time_datapoints(arg_data, arg_indices_to_remove)
+        
+    # Assert
+    assert e_info.match("list assignment index out of range")
+
+def test_TimeSynchronizer_remove_time_datapoints_returns_data_with_indices_removed_that_exist_in_given_indices_to_remove():
+    # Arrange
+    arg_data = []
+    arg_indices_to_remove = []
+
+    expected_result = []
+    num_fake_data = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    fake_indices_to_remove = pytest.gen.sample(list(range(num_fake_data)), pytest.gen.randint(1, num_fake_data)) # make a randomized list from 1 index up to all the data indices (0 has own test)
+
+    for i in range(num_fake_data):
+        fake_data = MagicMock()
+        arg_data.append(fake_data)
+        if fake_indices_to_remove.count(i):
+            arg_indices_to_remove.append(i)
+        else:
+            expected_result.append(fake_data)
+
+    print(arg_data)
+    print(arg_indices_to_remove)
+    print(expected_result)
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    result = cut.remove_time_datapoints(arg_data, arg_indices_to_remove)
+    print(result)
+    # Assert
+    assert result == expected_result
 
 # get_spacecraft_metadata tests
 def test_TimeSynchronizer_get_spacecraft_metadata_returns_tuple_of_instance_values_ordered_fused_headers_and_ordered_fused_tests():
