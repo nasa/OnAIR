@@ -7,7 +7,6 @@ import csv
 import copy 
 
 from src.systems.status import Status
-# from src.reasoning.diagnosis import Diagnosis
 from src.data_driven_components.data_driven_learning import DataDrivenLearning
 from src.systems.spacecraft import Spacecraft
 

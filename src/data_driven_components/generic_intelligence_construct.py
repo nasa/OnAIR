@@ -14,12 +14,14 @@ class GenericIntelligenceConstruct(ABC):
         Given data, system should learn any priors necessary for realtime diagnosis.
         """
         pass
+        
     @abstractmethod
     def update(self):
         """
         Given streamed data point, system should update internally
         """
         pass
+
     @abstractmethod
     def render_diagnosis(self):
         """
