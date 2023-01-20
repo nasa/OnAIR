@@ -85,6 +85,96 @@ def test_TimeSynchronizer_init_sets_instance_default_values_when_call_to_sort_da
     assert cut.offsets == {}
     assert cut.sim_data == []
 
+# init_sync_data tests
+def test_TimeSynchronizer_init_sync_data_raises_Exception_when_given_headers_is_empty_dict():
+    # Arrange
+    arg_headers = {}
+    arg_configs = MagicMock()
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    with pytest.raises(Exception) as e_info:
+        cut.init_sync_data(arg_headers, arg_configs)
+
+    # Assert
+    assert e_info.match('Unable to initialize sync data: Empty Dataset')
+
+def test_TimeSynchronizer_init_sync_data_raises_Exception_when_given_configs_is_empty_dict():
+    # Arrange
+    arg_headers = MagicMock()
+    arg_configs = {}
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    with pytest.raises(Exception) as e_info:
+        cut.init_sync_data(arg_headers, arg_configs)
+
+    # Assert
+    assert e_info.match('Unable to initialize sync data: Empty Dataset')
+    
+def test_TimeSynchronizer_init_sync_data_raises_Exception_when_given_headers_or_configs_is_empty_dict():
+    # Arrange
+    arg_headers = {} if pytest.gen.randint(0, 1) else MagicMock()
+    arg_configs = {} if arg_headers != {} else MagicMock()
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    with pytest.raises(Exception) as e_info:
+        cut.init_sync_data(arg_headers, arg_configs)
+
+    # Assert
+    if arg_headers == {}:
+        assert arg_configs != {}
+    else:
+        assert arg_configs == {}
+    assert e_info.match('Unable to initialize sync data: Empty Dataset')
+
+# NOTE: test_TimeSynchronizer_init_sync_data_sets_instance_variables_to_the_expected_values is not my favorite name because it isn't very descriptive, but had I described everything happening in this function the name would be ENORMOUS
+def test_TimeSynchronizer_init_sync_data_sets_instance_variables_to_the_expected_values(mocker):
+    # Arrange
+    arg_headers = {}
+    arg_configs = {}
+    arg_configs['test_assignments'] = {}
+
+    num_fake_headers = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 header dict entries (0 has own test)
+    fake_time_indices_for_removal = MagicMock()
+    fake_ordered_fused_headers = [MagicMock()]
+    fake_ordered_fused_tests = [MagicMock()]
+    fake_unclean_fused_tests = list(range(num_fake_headers)) + list(range(num_fake_headers))
+    fake_unclean_fused_tests.sort()
+
+    expected_ordered_fused_tests = [[['SYNC', 'TIME']], fake_ordered_fused_tests[0]]
+    expected_ordered_fused_headers = ['TIME', fake_ordered_fused_headers[0]]
+    expected_start_indices = {}
+
+    for i in range(num_fake_headers):
+        fake_source = MagicMock()
+        arg_headers[fake_source] = [i, i]
+        arg_configs['test_assignments'][fake_source] = [i, i]
+        expected_start_indices[fake_source] = i * 2 # to show offsets change by length of arg_headers[fake_source]
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    mocker.patch.object(cut, 'remove_time_headers', return_value=(fake_time_indices_for_removal, fake_ordered_fused_headers))
+    mocker.patch.object(cut, 'remove_time_datapoints', return_value=(fake_ordered_fused_tests))
+
+    # Act
+    cut.init_sync_data(arg_headers, arg_configs)
+
+    # Assert
+    assert cut.remove_time_headers.call_count == 1
+    assert cut.remove_time_headers.call_args_list[0].args == (fake_unclean_fused_tests, )
+    assert cut.remove_time_datapoints.call_count == 1
+    assert cut.remove_time_datapoints.call_args_list[0].args == (fake_unclean_fused_tests, fake_time_indices_for_removal)
+    assert cut.ordered_sources == list(arg_headers.keys())
+    assert cut.ordered_fused_tests == expected_ordered_fused_tests
+    assert cut.ordered_fused_headers == expected_ordered_fused_headers
+    assert cut.indices_to_remove == fake_time_indices_for_removal
+    assert cut.offsets == expected_start_indices
+
 # sort_data tests
 def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_empty_list_when_given_dataFrames_is_empty_dict():
     # Arrange
