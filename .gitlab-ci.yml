@@ -11,6 +11,7 @@ test-raisr:
   image: aetd-dockerlab.gsfc.nasa.gov/cfs_lab/dsm/dsm-meta
   stage: test
   script:
+    - python3.9 -m pip install -r requirements_pip.txt
     - mkdir ./src/test/results
     - pwd
     - coverage run --omit="src/test/*" -m pytest ./src/test
