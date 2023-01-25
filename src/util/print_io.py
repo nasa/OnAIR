@@ -43,7 +43,7 @@ def print_sim_step(step_num):
     print(bcolors.HEADER + bcolors.BOLD + "\n--------------------- STEP " + str(step_num) + " ---------------------\n" + bcolors.ENDC)
 
 # Print a line to separate things
-def print_seperator(color=bcolors.HEADER):
+def print_separator(color=bcolors.HEADER):
     print(color + bcolors.BOLD + "\n------------------------------------------------\n" + bcolors.ENDC)
 
 # Print header update
