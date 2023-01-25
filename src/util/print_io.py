@@ -75,12 +75,6 @@ def print_diagnosis(diagnosis):
         stat = status[1]
         print(status[0] + ': ' + format_status(stat))
 
-    # print(bcolors.HEADER + bcolors.BOLD + "\nFAULT PATHS: \n" + bcolors.ENDC)
-    # for path in tree_traversal:
-    #     for level in range(len(path)):
-    #         print('  ' + '-'*3*level + bcolors.FAIL + path[level] + bcolors.ENDC)
-    #     print('\n')
-
     print(bcolors.HEADER + bcolors.BOLD + "\nCURRENT ACTIVATIONS: \n" + bcolors.ENDC)
     if len(activations) > 0:
         for activation in activations:
