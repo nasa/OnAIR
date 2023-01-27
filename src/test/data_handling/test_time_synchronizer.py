@@ -372,7 +372,7 @@ def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_l
     cut.ordered_fused_headers = []
     for i in range(num_fake_order_fused_headers):
         cut.ordered_fused_headers.append(MagicMock())
-    num_fake_source_data = pytest.gen.randint(1, num_fake_total) - 1 # arbitrary, from 1 to total items expected (0 has own test)
+    num_fake_source_data = pytest.gen.randint(2, num_fake_total) - 1 # arbitrary, from 1 to total items expected (0 has own test)
     for i in range(num_fake_source_data):
         fake_source_data.append(MagicMock())
     fake_offset = pytest.gen.randint(0, (num_fake_total - num_fake_source_data - 1)) # slightly arbitrary, allowing room for all source data between 0 and total items minus 1 for proper indexing
