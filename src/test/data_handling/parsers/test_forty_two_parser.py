@@ -1,233 +1,402 @@
 """ Test 42 Parser Functionality """
-import os
-import sys
-import unittest
-import shutil
-
+import pytest
+from mock import MagicMock
+import src.data_handling.parsers.forty_two_parser as forty_two_parser
 from src.data_handling.parsers.forty_two_parser import FortyTwo
 
-class TestFortyTwoParser(unittest.TestCase):
+# test for get_sim_data
+def test_forty_two_get_sim_data_returns_tuple_of_all_headers_and_sim_data_and_binning_configs_without_modifying_values():
+    # Arrange
+    fake_all_headers = MagicMock()
+    fake_sim_data = MagicMock()
+    fake_binning_configs = MagicMock()
+    
+    cut = FortyTwo.__new__(FortyTwo)
+    cut.all_headers = fake_all_headers
+    cut.sim_data = fake_sim_data
+    cut.binning_configs = fake_binning_configs
 
-    def setUp(self):
-        self.P = FortyTwo()
-        self.run_path = os.environ['RUN_PATH']
-        self.rawDataFilepath = self.run_path + '/data/raw_telemetry_data/'
-        self.tlmConfigFilepath = self.run_path + '/data/telemetry_configs/'
+    # Act
+    sim_data = cut.get_sim_data()
 
-    def test_init_empty_parser(self):
-        self.assertEqual(self.P.raw_data_file_path, '')
-        self.assertEqual(self.P.metadata_file_path, '')
-        self.assertEqual(self.P.all_headers, '')
-        self.assertEqual(self.P.sim_data, '')
-        self.assertEqual(self.P.binning_configs, '')
+    # Assert
+    assert sim_data == (fake_all_headers, fake_sim_data, fake_binning_configs)
 
-    def test_init_nonempty_parser(self):
-        P = FortyTwo(self.run_path + '/data/raw_telemetry_data/',
-                          self.run_path + '/data/telemetry_configs/',
-                          str(['42_TLM.txt']),
-                          str(['42_TLM_CONFIG.txt']))
+# tests for parse config data
+def test_forty_two_parse_config_data_if_ss_breakdown_is_false_and_only_one_ss_assignment(mocker):
+    # Arrange
+    arg_config_file = MagicMock()
+    fake_metadata_file_path = MagicMock()
 
-        self.assertEqual(P.raw_data_file_path, self.run_path + '/data/raw_telemetry_data/')
-        self.assertEqual(P.metadata_file_path, self.run_path + '/data/telemetry_configs/')
+    fake_filename = MagicMock()
+    fake_subsystem_assignments = [MagicMock()]
+    fake_tests = MagicMock()
+    fake_descs = MagicMock()
+
+    cut = FortyTwo.__new__(FortyTwo)
+    cut.metadata_file_path = fake_metadata_file_path
+
+    forced_return_extract_configs = { 'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
+                                        'test_assignments' : {fake_filename:fake_tests},
+                                        'description_assignments' : {fake_filename:fake_descs}}
+    mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
+    mocker.patch('src.data_handling.parsers.forty_two_parser.process_filepath', return_value=fake_filename)
+
+    expected_result = { 'subsystem_assignments' : {fake_filename:[['MISSION']]},
+                        'test_assignments' : {fake_filename:fake_tests},
+                        'description_assignments' : {fake_filename:fake_descs}}
+
+    # Act
+    result = cut.parse_config_data(arg_config_file, False)
         
-        self.assertEqual(P.all_headers, {'42_TLM.txt': ['TIME', 
-                                                         'SAMPLE.sample_data_tlm_t.sample_data_counter', 
-                                                         'SAMPLE.sample_data_tlm_t.sample_data_value', 
-                                                         'SAMPLE.sample_data_power_t.sample_data_counter', 
-                                                         'SAMPLE.sample_data_power_t.sample_data_voltage', 
-                                                         'SAMPLE.sample_data_power_t.sample_data_current', 
-                                                         'SAMPLE.sample_data_thermal_t.sample_data_counter', 
-                                                         'SAMPLE.sample_data_thermal_t.sample_data_internal_temp', 
-                                                         'SAMPLE.sample_data_thermal_t.sample_data_external_temp', 
-                                                         'SAMPLE.sample_data_gps_t.sample_data_counter', 
-                                                         'SAMPLE.sample_data_gps_t.sample_data_lat', 
-                                                         'SAMPLE.sample_data_gps_t.sample_data_lng', 
-                                                         'SAMPLE.sample_data_gps_t.sample_data_alt']})
-        self.assertEqual(P.sim_data, {'2019-127-12:00:17.300006746': {'42_TLM.txt': ['2019-127-12:00:17.300006746', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00']}, 
-                                       '2019-127-12:00:17.300006747': {'42_TLM.txt': ['2019-127-12:00:17.300006747', 
-                                                                                      '1', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00']}, 
-                                       '2019-127-12:00:17.300006748': {'42_TLM.txt': ['2019-127-12:00:17.300006748', 
-                                                                                      '2', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00']}, 
-                                       '2019-127-12:00:17.300006790': {'42_TLM.txt': ['2019-127-12:00:17.300006790', 
-                                                                                      '3', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00']},
-                                       '2019-127-12:00:17.300006801': {'42_TLM.txt': ['2019-127-12:00:17.300006801', 
-                                                                                      '4', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00', 
-                                                                                      '0.000000000000e+00']}})
-        self.assertEqual(P.binning_configs, {'subsystem_assignments': {'42_TLM.txt': [['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION'], 
-                                                                                       ['MISSION']]}, 
-                                              'test_assignments': {'42_TLM.txt': [[['SYNC', 'TIME']], 
-                                                                                  [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], 
-                                                                                  [['NOOP']], 
-                                                                                  [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], 
-                                                                                  [['NOOP']], 
-                                                                                  [['NOOP']], 
-                                                                                  [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], 
-                                                                                  [['NOOP']], 
-                                                                                  [['NOOP']], 
-                                                                                  [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]],
-                                                                                  [['NOOP']], 
-                                                                                  [['NOOP']], 
-                                                                                  [['NOOP']]]}, 
-                                              'description_assignments': {'42_TLM.txt': ['No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description', 
-                                                                                         'No description']}})
+    # Assert
+    assert result == expected_result
+    assert forty_two_parser.extract_configs.call_count == 1
+    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_file_path, [arg_config_file])
+    assert forty_two_parser.process_filepath.call_count == 2
+    assert forty_two_parser.process_filepath.call_args_list[0].args == (arg_config_file,)
+    assert forty_two_parser.process_filepath.call_args_list[1].args == (arg_config_file,)
 
-    def test_parse_sim_data(self):
-        dataFiles = '42_TLM.txt'
-        self.P.raw_data_file_path = self.rawDataFilepath
-        hdrs, data = self.P.parse_sim_data(dataFiles) # Can only parse one datafile!  
+def test_forty_two_parse_config_data_if_ss_breakdown_is_false_and_number_of_subsystem_assignments_greater_than_one(mocker):
+    # Arrange
+    arg_config_file = MagicMock()
+    fake_metadata_file_path = MagicMock()
 
-        # Test 'hdrs'
-        parsed_filenames = list(hdrs.keys())                       # Just one file parsed
-        self.assertEqual(len(parsed_filenames), 1)                # .
-        self.assertEqual(parsed_filenames[0], '42_TLM.txt')       # ..
-        self.assertEqual(len(hdrs['42_TLM.txt']), 13)             # 13 TLM points (data fields) 
+    fake_filename = MagicMock()
+    num_ss_assignments = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_subsystem_assignments = [MagicMock()] * num_ss_assignments
+    fake_tests = MagicMock()
+    fake_descs = MagicMock()
 
-        # Test 'data'
-        self.assertEqual(len(data.values()), 5)                   # 5 time steps 
-        for frame in data.values():                                # Parsing for timesteps formatted correctly
-            self.assertEqual(list(frame.keys())[0], '42_TLM.txt') # 13 tlm points in each frame 
-            self.assertEqual(len(frame['42_TLM.txt']), 13)        # .
+    cut = FortyTwo.__new__(FortyTwo)
+    cut.metadata_file_path = fake_metadata_file_path
 
-        # Test time ordering
-        self.assertEqual(list(data.keys()), ['2019-127-12:00:17.300006746', 
-                                              '2019-127-12:00:17.300006747', 
-                                              '2019-127-12:00:17.300006748', 
-                                              '2019-127-12:00:17.300006790', 
-                                              '2019-127-12:00:17.300006801'])
-        # TODO: Need more time sync testing 
+    forced_return_extract_configs = { 'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
+                                        'test_assignments' : {fake_filename:fake_tests},
+                                        'description_assignments' : {fake_filename:fake_descs}}
+    mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
+    forced_return_process_filepath = fake_filename
+    mocker.patch('src.data_handling.parsers.forty_two_parser.process_filepath', return_value=forced_return_process_filepath)
 
-    def test_parse_headers(self):
-        txt_file = open(self.rawDataFilepath + 'single_frame.txt',"r+")
-        data_str = txt_file.read().split('\n[EOF]')[0]
-        txt_file.close()
-        hdrs = self.P.parse_headers(data_str)
-        self.assertEqual(len(hdrs), 13)
-        self.assertEqual(hdrs, ['TIME', 'SAMPLE.sample_data_tlm_t.sample_data_counter', 'SAMPLE.sample_data_tlm_t.sample_data_value', 'SAMPLE.sample_data_power_t.sample_data_counter', 'SAMPLE.sample_data_power_t.sample_data_voltage', 'SAMPLE.sample_data_power_t.sample_data_current', 'SAMPLE.sample_data_thermal_t.sample_data_counter', 'SAMPLE.sample_data_thermal_t.sample_data_internal_temp', 'SAMPLE.sample_data_thermal_t.sample_data_external_temp', 'SAMPLE.sample_data_gps_t.sample_data_counter', 'SAMPLE.sample_data_gps_t.sample_data_lat', 'SAMPLE.sample_data_gps_t.sample_data_lng', 'SAMPLE.sample_data_gps_t.sample_data_alt'])
+    expected_result = { 'subsystem_assignments' : {fake_filename:[['MISSION']] * num_ss_assignments},
+                        'test_assignments' : {fake_filename:fake_tests},
+                        'description_assignments' : {fake_filename:fake_descs}}
 
-    def test_parse_frame(self):
-        txt_file = open(self.rawDataFilepath + 'single_frame.txt',"r+")
-        data_str = txt_file.read().split('\n[EOF]')[0]
-        txt_file.close()
-        clean_frame = self.P.parse_frame(data_str) 
-        self.assertEqual(clean_frame, ['2019-127-12:00:17.300006801', '4', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0', '0.000000000000e+00', '0.000000000000e+00', '0.000000000000e+00'])
-
-    def test_parse_config_data(self):
-        config_file = '42_TLM_CONFIG.txt'
-        parsed_configs = self.P.parse_config_data(self.tlmConfigFilepath + config_file, True)
+    # Act
+    result = cut.parse_config_data(arg_config_file, False)
         
-        self.assertEqual(parsed_configs['subsystem_assignments']['42_TLM.txt'], [['CDH'], ['GNC'], ['GNC'], ['POWER'], ['POWER'], ['POWER'], ['THERMAL'], ['THERMAL'], ['THERMAL'], ['GNC'], ['GNC'], ['GNC'], ['GNC']])
-        self.assertEqual(parsed_configs['test_assignments']['42_TLM.txt'], [[['SYNC', 'TIME']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['FEASIBILITY', -1.0, 0.0, 10.0, 15.0]], [['NOOP']], [['NOOP']], [['NOOP']]])
-        self.assertEqual(parsed_configs['description_assignments']['42_TLM.txt'], ['No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description', 'No description'])
+    # Assert
+    assert result == expected_result
+    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_file_path, [arg_config_file])
+    assert forty_two_parser.process_filepath.call_count == 2
+    assert forty_two_parser.process_filepath.call_args_list[0].args == (arg_config_file,)
+    assert forty_two_parser.process_filepath.call_args_list[1].args == (arg_config_file,)
 
-        parsed_configs = self.P.parse_config_data(self.tlmConfigFilepath + config_file, False)
-        self.assertEqual(parsed_configs['subsystem_assignments']['42_TLM.txt'], [['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION'], ['MISSION']])
+def test_forty_two_parse_config_data_if_ss_breakdown_is_true(mocker):
+    # Arrange
+    arg_config_file = MagicMock()
+    fake_metadata_file_path = MagicMock()
 
-    def test_time_ordering_not_occurring(self):
-        dataFiles = 'time_ordering.txt'
-        self.P.raw_data_file_path = self.rawDataFilepath
-        hdrs, data = self.P.parse_sim_data(dataFiles) # Can only parse one datafile!  
+    fake_filename = MagicMock()
+    fake_subsystem_assignments = MagicMock()
+    fake_tests = MagicMock()
+    fake_descs = MagicMock()
 
-        # Test 'hdrs'
-        parsed_filenames = list(hdrs.keys())                       # Just one file parsed
-        self.assertEqual(len(parsed_filenames), 1)                # .
-        self.assertEqual(parsed_filenames[0], 'time_ordering.txt')       # ..
-        self.assertEqual(len(hdrs['time_ordering.txt']), 13)             # 13 TLM points (data fields) 
+    cut = FortyTwo.__new__(FortyTwo)
+    cut.metadata_file_path = fake_metadata_file_path
 
-        # Test 'data'
-        self.assertEqual(len(data.values()), 5)                   # 5 time steps 
-        for frame in data.values():                                # Parsing for timesteps formatted correctly
-            self.assertEqual(list(frame.keys())[0], 'time_ordering.txt') # 13 tlm points in each frame 
-            self.assertEqual(len(frame['time_ordering.txt']), 13)        # .
-
-        self.assertNotEqual(list(data.keys()), ['2019-127-12:00:17.300006746', 
-                                                 '2019-127-12:00:17.300006747', 
-                                                 '2019-127-12:00:17.300006748', 
-                                                 '2019-127-12:00:17.300006790', 
-                                                 '2019-127-12:00:17.300006801'])
+    forced_return_extract_configs = { 'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
+                                        'test_assignments' : {fake_filename:fake_tests},
+                                        'description_assignments' : {fake_filename:fake_descs}}
+    mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
+    
+    # Act
+    result = cut.parse_config_data(arg_config_file, True)
         
-    def test_get_sim_data(self):
-        hdrs, data, configs = self.P.get_sim_data()
-        self.assertEqual(hdrs, '')
-        self.assertEqual(data, '')
-        self.assertEqual(configs, '')
+    # Assert
+    assert result == forced_return_extract_configs
+    assert forty_two_parser.extract_configs.call_count == 1
+    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_file_path, [arg_config_file])
+
+# tests for parse frame
+def test_forty_two_parse_frame_raises_error_because_of_frame_with_no_data():
+    # Arrange
+    cut = FortyTwo.__new__(FortyTwo)
+    
+    # Act
+    with pytest.raises(IndexError) as e_info:
+        cut.parse_frame('')
+
+    # Assert
+    assert e_info.match('list index out of range')
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_forty_two_parse_frame_for_frame_with_data():
+    # Arrange
+    num_lines = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    
+    fake_time = MagicMock()
+    fake_data = [MagicMock()] * num_lines
+
+    expected_result = [str(fake_time).removeprefix('<MagicMock ')]
+
+    arg_frame = str(fake_time)
+    for fake_datum in fake_data:
+        expected_result.append(str(fake_datum))
+        arg_frame += '\n = ' + str(fake_datum)
+    
+    cut = FortyTwo.__new__(FortyTwo)
+
+    # Act
+    result = cut.parse_frame(arg_frame)
+
+    # Assert
+    assert result == expected_result
+
+# tests for parse headers
+def test_forty_two_parse_header_returns_list_with_a_single_empty_string_for_frame_with_no_data():
+    # Arrange
+    cut = FortyTwo.__new__(FortyTwo)
+    
+    # Act
+    result = cut.parse_headers('')
+
+    # Assert
+    assert result == ['']
+
+def test_forty_two_parse_headers_for_frame_with_data():
+    # Arrange
+    num_lines = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_time = MagicMock()
+    fake_headers = [MagicMock()] * num_lines
+
+    expected_result = ['<MagicMock']
+    arg_frame = str(fake_time)
+    for fake_header in fake_headers:
+        expected_result.append(str(fake_header))
+        arg_frame += '\n' + str(fake_header) + ' = '
+    cut = FortyTwo.__new__(FortyTwo)
+
+    # Act
+    result = cut.parse_headers(arg_frame)
+
+    # Assert
+    assert result == expected_result
+
+# tests for parse sim data
+def test_forty_two_parse_sim_data_raises_error_because_empty_data_file(mocker):
+    # Arrange
+    arg_data_file = MagicMock()
+    fake_txt_file = MagicMock()
+    fake_file_path = MagicMock()
+    
+    fake_data_str = ''
+    
+    fake_headers = []
+    fake_frames = []
+
+    cut = FortyTwo.__new__(FortyTwo)
+    cut.raw_data_file_path = fake_file_path
+
+    mocker.patch('src.data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
+    mocker.patch.object(fake_txt_file, 'read',return_value=fake_data_str)
+    mocker.patch.object(fake_txt_file, 'close')
+    mocker.patch.object(cut, 'parse_headers', return_value=fake_headers)
+    mocker.patch.object(cut, 'parse_frame', return_value=fake_frames)
+
+    # Act
+    with pytest.raises(IndexError) as e_info:
+        cut.parse_sim_data(arg_data_file)
+
+    # Assert
+    assert e_info.match('list index out of range')
+
+def test_forty_two_parse_sim_data_with_only_one_data_pt(mocker):
+    # Arrange
+    arg_data_file = MagicMock()
+    fake_txt_file = MagicMock()
+    fake_file_path = MagicMock()
+    
+    data_pt = str(MagicMock())
+    fake_data_str = data_pt + '[EOF]\n\n'
+    data_pts = [data_pt]
+    
+    fake_headers = MagicMock()
+    num_frame_data = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_frames = []
+    for i in range(num_frame_data):
+        fake_frames.append(MagicMock())
+
+    cut = FortyTwo.__new__(FortyTwo)
+    cut.raw_data_file_path = fake_file_path
+
+    mocker.patch('src.data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
+    mocker.patch.object(fake_txt_file, 'read',return_value=fake_data_str)
+    mocker.patch.object(fake_txt_file, 'close')
+    mocker.patch.object(cut, 'parse_headers', return_value=fake_headers)
+    mocker.patch.object(cut, 'parse_frame', return_value=fake_frames)
+
+    # Act
+    headers_result, data_result = cut.parse_sim_data(arg_data_file)
+
+    # Assert
+    assert headers_result == {arg_data_file : fake_headers}
+    assert data_result == {fake_frames[0] : {arg_data_file : fake_frames}}
+    assert forty_two_parser.open.call_count == 1
+    assert forty_two_parser.open.call_args_list[0].args == (fake_file_path + arg_data_file, "r+")
+
+    assert fake_txt_file.read.call_count == 1
+    assert fake_txt_file.read.call_args_list[0].args == ()
+    assert fake_txt_file.close.call_count == 1
+    assert fake_txt_file.close.call_args_list[0].args == ()
+
+    assert cut.parse_headers.call_count == 1
+    assert cut.parse_headers.call_args_list[0].args == (data_pts[0],)
+    assert cut.parse_headers.call_args_list[0].kwargs == {}
+    assert cut.parse_frame.call_count == 1
+    assert cut.parse_frame.call_args_list[0].args == (data_pts[0],)
+    assert cut.parse_frame.call_args_list[0].kwargs == {}
+
+def test_forty_two_parse_sim_data_with_more_than_one_data_pt(mocker):
+    # Arrange
+    arg_data_file = MagicMock()
+    fake_txt_file = MagicMock()
+    fake_file_path = MagicMock()
+    
+    num_data_pts = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_data_str = ''
+    data_pts = []
+    for i in range(num_data_pts):
+        data_pt = str(MagicMock())
+        fake_data_str += data_pt + '[EOF]\n\n'
+        data_pts.append(data_pt)
+    
+    fake_headers = MagicMock()
+    num_frame_data = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_frames = []
+    for i in range(num_frame_data):
+        fake_frames.append(MagicMock())
+
+    cut = FortyTwo.__new__(FortyTwo)
+    cut.raw_data_file_path = fake_file_path
+
+    mocker.patch('src.data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
+    mocker.patch.object(fake_txt_file, 'read',return_value=fake_data_str)
+    mocker.patch.object(fake_txt_file, 'close')
+    mocker.patch.object(cut, 'parse_headers', return_value=fake_headers)
+    mocker.patch.object(cut, 'parse_frame', return_value=fake_frames)
+
+    # Act
+    headers_result, data_result = cut.parse_sim_data(arg_data_file)
+
+    # Assert
+    assert headers_result == {arg_data_file : fake_headers}
+    assert data_result == {fake_frames[0] : {arg_data_file : fake_frames}}
+    assert forty_two_parser.open.call_count == 1
+    assert forty_two_parser.open.call_args_list[0].args == (fake_file_path + arg_data_file, "r+")
+    
+    assert fake_txt_file.read.call_count == 1
+    assert fake_txt_file.read.call_args_list[0].args == ()
+    assert fake_txt_file.close.call_count == 1
+    assert fake_txt_file.close.call_args_list[0].args == ()
+    
+    assert cut.parse_headers.call_count == 1
+    assert cut.parse_headers.call_args_list[0].args == (data_pts[0],)
+    assert cut.parse_headers.call_args_list[0].kwargs == {}
+    assert cut.parse_frame.call_count == num_data_pts
+    for i in range(num_data_pts):
+        assert cut.parse_frame.call_args_list[i].args == (data_pts[i],)
+        assert cut.parse_frame.call_args_list[i].kwargs == {}
+
+# tests for init
+def test_forty_two_init_default_constructor(mocker):
+    # Arrange
+    cut = FortyTwo.__new__(FortyTwo)
+
+    # Act
+    cut.__init__()
+
+    # Assert
+    assert cut.raw_data_file_path == ''
+    assert cut.metadata_file_path == ''
+    assert cut.all_headers == ''
+    assert cut.sim_data == ''
+    assert cut.binning_configs == ''
+
+def test_forty_two_init_when_not_default_and_ss_breakdown_is_true(mocker):
+    # Arrange
+    fake_data_file_path = str(MagicMock())
+    fake_data_file_name = str(MagicMock())
+    fake_metadata_file_path = str(MagicMock())
+    fake_data_files = str([fake_data_file_name])
+    fake_config_files = str(MagicMock())
+    fake_headers = MagicMock()
+    fake_sim_data = MagicMock()
+
+    cut = FortyTwo.__new__(FortyTwo)
+    fake_list_len = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_list = [MagicMock()] * fake_list_len
+    forced_parse_sim_data_return_value = fake_headers, fake_sim_data
+    forced_parse_config_data_return_value = { 'subsystem_assignments' : {fake_data_file_name:MagicMock()},
+                                                'test_assignments' : {fake_data_file_name:MagicMock()},
+                                                'description_assignments' : {fake_data_file_name:MagicMock()}}
+
+    
+    mocker.patch('src.data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
+    mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
+    mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
+    
+    # Act
+    cut.__init__(fake_data_file_path, fake_metadata_file_path, fake_data_files, fake_config_files, True)
+
+    # Assert
+    assert cut.raw_data_file_path == fake_data_file_path
+    assert cut.metadata_file_path == fake_metadata_file_path
+    assert cut.all_headers == fake_headers
+    assert cut.sim_data == fake_sim_data
+    assert cut.binning_configs == forced_parse_config_data_return_value
+    assert cut.binning_configs == forced_parse_config_data_return_value
+    assert cut.binning_configs == forced_parse_config_data_return_value
+    assert cut.parse_sim_data.call_count == 1
+    assert cut.parse_sim_data.call_args_list[0].args == (fake_list[0],)
+    assert cut.parse_config_data.call_count == 1
+    assert cut.parse_config_data.call_args_list[0].args == (fake_list[0], True)
+
+def test_forty_two_init_when_not_default_and_ss_breakdown_is_false(mocker):
+    # Arrange
+    arg_data_file_path = str(MagicMock())
+    fake_data_file_name = str(MagicMock())
+    arg_metadata_file_path = str(MagicMock())
+    arg_data_files = str([fake_data_file_name])
+    arg_config_files = str(MagicMock())
+    fake_headers = MagicMock()
+    fake_sim_data = MagicMock()
+
+    cut = FortyTwo.__new__(FortyTwo)
+
+    fake_list_len = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_list = [MagicMock()] * fake_list_len
+    forced_parse_sim_data_return_value = fake_headers, fake_sim_data
+    forced_parse_config_data_return_value = { 'subsystem_assignments' : {fake_data_file_name:MagicMock()},
+                                                'test_assignments' : {fake_data_file_name:MagicMock()},
+                                                'description_assignments' : {fake_data_file_name:MagicMock()}}
+    
+    mocker.patch('src.data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
+    mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
+    mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
+    
+    # Act
+    cut.__init__(arg_data_file_path, arg_metadata_file_path, arg_data_files, arg_config_files, False)
+
+    # Assert
+    assert cut.raw_data_file_path == arg_data_file_path
+    assert cut.metadata_file_path == arg_metadata_file_path
+    assert cut.all_headers == fake_headers
+    assert cut.sim_data == fake_sim_data
+    assert cut.binning_configs == forced_parse_config_data_return_value
+    assert cut.binning_configs == forced_parse_config_data_return_value
+    assert cut.binning_configs == forced_parse_config_data_return_value
+    assert cut.parse_sim_data.call_count == 1
+    assert cut.parse_sim_data.call_args_list[0].args == (fake_list[0],)
+    assert cut.parse_config_data.call_count == 1
+    assert cut.parse_config_data.call_args_list[0].args == (fake_list[0], False)
