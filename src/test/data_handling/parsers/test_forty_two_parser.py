@@ -5,7 +5,7 @@ import src.data_handling.parsers.forty_two_parser as forty_two_parser
 from src.data_handling.parsers.forty_two_parser import FortyTwo
 
 # tests for init
-def test_forty_two_init_default_constructor(mocker):
+def test_forty_two_init_default_constructor_initializes_variables_to_empty_strings():
     # Arrange
     cut = FortyTwo.__new__(FortyTwo)
 
@@ -19,35 +19,80 @@ def test_forty_two_init_default_constructor(mocker):
     assert cut.sim_data == ''
     assert cut.binning_configs == ''
 
-def test_forty_two_init_when_not_default_and_ss_breakdown_is_true(mocker):
-    # Arrange
-    fake_data_file_path = str(MagicMock())
-    fake_data_file_name = str(MagicMock())
-    fake_metadata_file_path = str(MagicMock())
-    fake_data_files = str([fake_data_file_name])
-    fake_config_files = str(MagicMock())
-    fake_headers = MagicMock()
-    fake_sim_data = MagicMock()
+def test_forty_two_init_initializes_variables_correctly_when_dataFiles_arg_is_empty_string(mocker):
+    # Arrange    
+    arg_data_file_path = str(MagicMock())
+    arg_metadata_file_path = str(MagicMock())
+    arg_data_files = ''
+    arg_config_files = str(MagicMock())
 
     cut = FortyTwo.__new__(FortyTwo)
+
+    mocker.patch.object(cut, 'parse_sim_data')
+
+    # Act
+    cut.__init__(arg_data_file_path, arg_metadata_file_path, arg_data_files, arg_config_files)
+
+    # Assert
+    assert cut.raw_data_file_path == arg_data_file_path
+    assert cut.metadata_file_path == arg_metadata_file_path
+    assert cut.all_headers == ''
+    assert cut.sim_data == ''
+    assert cut.binning_configs == ''
+    assert cut.parse_sim_data.call_count == 0
+
+def test_forty_two_init_initializes_variables_correctly_when_configFiles_arg_is_empty_string(mocker):
+    # Arrange    
+    arg_data_file_path = str(MagicMock())
+    arg_metadata_file_path = str(MagicMock())
+    arg_data_files = str(MagicMock())
+    arg_config_files = ''
+
+    cut = FortyTwo.__new__(FortyTwo)
+    
+    mocker.patch.object(cut, 'parse_sim_data')
+
+    # Act
+    cut.__init__(arg_data_file_path, arg_metadata_file_path, arg_data_files, arg_config_files)
+
+    # Assert
+    assert cut.raw_data_file_path == arg_data_file_path
+    assert cut.metadata_file_path == arg_metadata_file_path
+    assert cut.all_headers == ''
+    assert cut.sim_data == ''
+    assert cut.binning_configs == ''
+    assert cut.parse_sim_data.call_count == 0
+
+def test_forty_two_init_initializes_values_correctly_when_given_non_empty_arguments_and_ss_breakdown_is_true(mocker):
+    # Arrange
+    fake_data_file_name = str(MagicMock())
+    fake_headers = MagicMock()
+    fake_sim_data = MagicMock()
     fake_list_len = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
     fake_list = [MagicMock()] * fake_list_len
+    
+    arg_data_file_path = str(MagicMock())
+    arg_metadata_file_path = str(MagicMock())
+    arg_data_files = str([fake_data_file_name])
+    arg_config_files = str(MagicMock())
+
     forced_parse_sim_data_return_value = fake_headers, fake_sim_data
     forced_parse_config_data_return_value = { 'subsystem_assignments' : {fake_data_file_name:MagicMock()},
                                                 'test_assignments' : {fake_data_file_name:MagicMock()},
                                                 'description_assignments' : {fake_data_file_name:MagicMock()}}
 
-    
+    cut = FortyTwo.__new__(FortyTwo)
+
     mocker.patch('src.data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
     mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
     mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
     
     # Act
-    cut.__init__(fake_data_file_path, fake_metadata_file_path, fake_data_files, fake_config_files, True)
+    cut.__init__(arg_data_file_path, arg_metadata_file_path, arg_data_files, arg_config_files, True)
 
     # Assert
-    assert cut.raw_data_file_path == fake_data_file_path
-    assert cut.metadata_file_path == fake_metadata_file_path
+    assert cut.raw_data_file_path == arg_data_file_path
+    assert cut.metadata_file_path == arg_metadata_file_path
     assert cut.all_headers == fake_headers
     assert cut.sim_data == fake_sim_data
     assert cut.binning_configs == forced_parse_config_data_return_value
@@ -58,25 +103,26 @@ def test_forty_two_init_when_not_default_and_ss_breakdown_is_true(mocker):
     assert cut.parse_config_data.call_count == 1
     assert cut.parse_config_data.call_args_list[0].args == (fake_list[0], True)
 
-def test_forty_two_init_when_not_default_and_ss_breakdown_is_false(mocker):
+def test_forty_two_init_initializes_variables_correctly_when_given_arguments_and_ss_breakdown_is_false(mocker):
     # Arrange
-    arg_data_file_path = str(MagicMock())
     fake_data_file_name = str(MagicMock())
+    fake_headers = MagicMock()
+    fake_sim_data = MagicMock()
+    fake_list_len = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_list = [MagicMock()] * fake_list_len
+
+    arg_data_file_path = str(MagicMock())
     arg_metadata_file_path = str(MagicMock())
     arg_data_files = str([fake_data_file_name])
     arg_config_files = str(MagicMock())
-    fake_headers = MagicMock()
-    fake_sim_data = MagicMock()
 
-    cut = FortyTwo.__new__(FortyTwo)
-
-    fake_list_len = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
-    fake_list = [MagicMock()] * fake_list_len
     forced_parse_sim_data_return_value = fake_headers, fake_sim_data
     forced_parse_config_data_return_value = { 'subsystem_assignments' : {fake_data_file_name:MagicMock()},
                                                 'test_assignments' : {fake_data_file_name:MagicMock()},
                                                 'description_assignments' : {fake_data_file_name:MagicMock()}}
     
+    cut = FortyTwo.__new__(FortyTwo)
+
     mocker.patch('src.data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
     mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
     mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
@@ -98,16 +144,14 @@ def test_forty_two_init_when_not_default_and_ss_breakdown_is_false(mocker):
     assert cut.parse_config_data.call_args_list[0].args == (fake_list[0], False)
 
 # tests for parse sim data
-def test_forty_two_parse_sim_data_raises_error_because_empty_data_file(mocker):
+def test_forty_two_parse_sim_data_raises_index_error_when_given_empty_data_file(mocker):
     # Arrange
     arg_data_file = MagicMock()
+
     fake_txt_file = MagicMock()
     fake_file_path = MagicMock()
-    
     fake_data_str = ''
-    
     fake_headers = []
-    fake_frames = []
 
     cut = FortyTwo.__new__(FortyTwo)
     cut.raw_data_file_path = fake_file_path
@@ -116,7 +160,6 @@ def test_forty_two_parse_sim_data_raises_error_because_empty_data_file(mocker):
     mocker.patch.object(fake_txt_file, 'read',return_value=fake_data_str)
     mocker.patch.object(fake_txt_file, 'close')
     mocker.patch.object(cut, 'parse_headers', return_value=fake_headers)
-    mocker.patch.object(cut, 'parse_frame', return_value=fake_frames)
 
     # Act
     with pytest.raises(IndexError) as e_info:
@@ -124,17 +167,22 @@ def test_forty_two_parse_sim_data_raises_error_because_empty_data_file(mocker):
 
     # Assert
     assert e_info.match('list index out of range')
+    assert forty_two_parser.open.call_count == 1
+    assert fake_txt_file.read.call_count == 1
+    assert fake_txt_file.close.call_count == 1
+    assert cut.parse_headers.call_count == 0
 
 def test_forty_two_parse_sim_data_with_only_one_data_pt(mocker):
     # Arrange
     arg_data_file = MagicMock()
+
     fake_txt_file = MagicMock()
     fake_file_path = MagicMock()
-    
     data_pt = str(MagicMock())
     fake_data_str = data_pt + '[EOF]\n\n'
     data_pts = [data_pt]
     
+    # fake headers and frames
     fake_headers = MagicMock()
     num_frame_data = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
     fake_frames = []
@@ -166,25 +214,26 @@ def test_forty_two_parse_sim_data_with_only_one_data_pt(mocker):
 
     assert cut.parse_headers.call_count == 1
     assert cut.parse_headers.call_args_list[0].args == (data_pts[0],)
-    assert cut.parse_headers.call_args_list[0].kwargs == {}
     assert cut.parse_frame.call_count == 1
     assert cut.parse_frame.call_args_list[0].args == (data_pts[0],)
-    assert cut.parse_frame.call_args_list[0].kwargs == {}
 
 def test_forty_two_parse_sim_data_with_more_than_one_data_pt(mocker):
     # Arrange
     arg_data_file = MagicMock()
+
     fake_txt_file = MagicMock()
     fake_file_path = MagicMock()
     
+    # fake data pts and str
     num_data_pts = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
-    fake_data_str = ''
     data_pts = []
+    fake_data_str = ''
     for i in range(num_data_pts):
         data_pt = str(MagicMock())
         fake_data_str += data_pt + '[EOF]\n\n'
         data_pts.append(data_pt)
     
+    # fake headers and frames
     fake_headers = MagicMock()
     num_frame_data = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
     fake_frames = []
@@ -216,11 +265,9 @@ def test_forty_two_parse_sim_data_with_more_than_one_data_pt(mocker):
     
     assert cut.parse_headers.call_count == 1
     assert cut.parse_headers.call_args_list[0].args == (data_pts[0],)
-    assert cut.parse_headers.call_args_list[0].kwargs == {}
     assert cut.parse_frame.call_count == num_data_pts
     for i in range(num_data_pts):
         assert cut.parse_frame.call_args_list[i].args == (data_pts[i],)
-        assert cut.parse_frame.call_args_list[i].kwargs == {}
 
 def test_forty_two_parse_headers_for_frame_with_data():
     # Arrange
