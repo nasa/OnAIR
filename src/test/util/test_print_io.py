@@ -107,8 +107,8 @@ def test_print_sim_step_inserts_given_step_num_into_text(mocker):
   assert util.print_io.print.call_args_list[0].args == (expected_print, )
 
 
-# print_seperator tests
-def test_print_seperator_uses_bcolors_HEADER_as_default_color_value(mocker):
+# print_separator tests
+def test_print_separator_uses_bcolors_HEADER_as_default_color_value(mocker):
   # Arrange
   expected_color = util.print_io.bcolors.HEADER
   expected_print = expected_color + \
@@ -119,12 +119,12 @@ def test_print_seperator_uses_bcolors_HEADER_as_default_color_value(mocker):
   mocker.patch('util.print_io.print')
 
   # Act
-  util.print_io.print_seperator()
+  util.print_io.print_separator()
   
   # Assert
   assert util.print_io.print.call_args_list[0].args == (expected_print, )
 
-def test_print_seperator_prints_whatever_is_passed_in_as_color_at_start_of_line(mocker):
+def test_print_separator_prints_whatever_is_passed_in_as_color_at_start_of_line(mocker):
   # Arrange
   arg_color = MagicMock()
 
@@ -136,7 +136,7 @@ def test_print_seperator_prints_whatever_is_passed_in_as_color_at_start_of_line(
   mocker.patch('util.print_io.print')
 
   # Act
-  util.print_io.print_seperator(arg_color)
+  util.print_io.print_separator(arg_color)
   
   # Assert
   assert util.print_io.print.call_count == 1
@@ -329,14 +329,14 @@ def test_print_diagnosis_only_prints_separators_and_headers_when_status_list_and
   arg_diagnosis.configure_mock(**{'get_status_list.return_value': []})
   arg_diagnosis.configure_mock(**{'current_activations.return_value': []})
 
-  mocker.patch('util.print_io.print_seperator')
+  mocker.patch('util.print_io.print_separator')
   mocker.patch('util.print_io.print')
 
   # Act
   util.print_io.print_diagnosis(arg_diagnosis)
 
   # Assert
-  assert util.print_io.print_seperator.call_count == 2
+  assert util.print_io.print_separator.call_count == 2
   assert util.print_io.print.call_count == 2
   assert util.print_io.print.call_args_list[0].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "DIAGNOSIS INFO: \n" + util.print_io.bcolors.ENDC, )
   assert util.print_io.print.call_args_list[1].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "\nCURRENT ACTIVATIONS: \n" + util.print_io.bcolors.ENDC, )
@@ -361,7 +361,7 @@ def test_print_diagnosis_prints_separators_headers_status_and_activations_when_s
   arg_diagnosis.configure_mock(**{'get_status_list.return_value': fake_status})
   arg_diagnosis.current_activations = fake_activations
 
-  mocker.patch('util.print_io.print_seperator')
+  mocker.patch('util.print_io.print_separator')
   mocker.patch('util.print_io.print')
   mocker.patch('util.print_io.format_status', return_value=fake_format)
   mocker.patch('util.print_io.str', return_value=fake_str)
@@ -370,7 +370,7 @@ def test_print_diagnosis_prints_separators_headers_status_and_activations_when_s
   util.print_io.print_diagnosis(arg_diagnosis)
 
   # Assert
-  assert util.print_io.print_seperator.call_count == 2
+  assert util.print_io.print_separator.call_count == 2
   assert util.print_io.print.call_count == 2 + num_status + num_activations
   assert util.print_io.print.call_args_list[0].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "DIAGNOSIS INFO: \n" + util.print_io.bcolors.ENDC, )
   for i in range(num_status):

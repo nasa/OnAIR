@@ -58,18 +58,18 @@ def print_msg(msg, clrs=['HEADER']):
 
 # Print interpreted mission status
 def print_mission_status(brain, data = None):
-    # print_seperator(bcolors.OKBLUE)
+    # print_separator(bcolors.OKBLUE)
     if data != None:
         print("CURRENT TLM: " + str(data)) 
     print("INTERPRETED MISSION STATUS: " + str(format_status(brain.mission_status)))
-    # print_seperator(bcolors.OKBLUE)
+    # print_separator(bcolors.OKBLUE)
 
 # Print diagnosis info
 def print_diagnosis(diagnosis):
     status_list = diagnosis.get_status_list()
     tree_traversal = diagnosis.fault_tree
     activations = diagnosis.current_activations
-    print_seperator()
+    print_separator()
     print(bcolors.HEADER + bcolors.BOLD + "DIAGNOSIS INFO: \n" + bcolors.ENDC)
     for status in status_list:
         stat = status[1]
@@ -79,7 +79,7 @@ def print_diagnosis(diagnosis):
     if len(activations) > 0:
         for activation in activations:
             print('---' + str(activation))
-    print_seperator()
+    print_separator()
 
 # Print subsystem status
 def subsystem_status_str(ss):
