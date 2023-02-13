@@ -8,7 +8,7 @@ variables:
 test-raisr:
   tags:
     - app-builder
-  image: aetd-dockerlab.gsfc.nasa.gov/cfs_lab/dsm/dsm-meta
+  image: aetd-dockerlab.gsfc.nasa.gov/cfs_lab/onair/onair-meta
   stage: test
   script:
     - python3.9 -m pip install -r requirements_pip.txt
