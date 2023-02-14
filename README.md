@@ -1,10 +1,10 @@
-# RAISR-2.0
+# The On-board Artificial Intelligence Research (OnAIR) Platform
 
 ## Generating environment
 
 Create a conda environment with the necessary packages
 
-    conda create --name raisr --file requirements.txt
+    conda create --name onair --file requirements.txt
 
 ## Running driver file test
 
@@ -23,7 +23,7 @@ Then you can just run the driver
     python driver.py -t
 
 ## Running pytest
-How to run unit tests for RAISR
+How to run unit tests for OnAIR
 
 ### Required python installs:
 pytest,

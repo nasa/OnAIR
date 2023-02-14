@@ -1,6 +1,6 @@
 """
 Driver
-Source of the main function for the RAISR repo
+Source of the main function for the OnAIR repo
 """
 
 import os
@@ -20,8 +20,8 @@ def main():
     This is the standard naming format, for now.
     filename.txt and filename_CONFIG.txt
     Additional (for now), the files need to live in the following locations:
-     filename.txt: RAISR/src/data/raw_telemetry_data/
-     filename_CONFIG.txt: RAISR/src/data/telemetry_configs/
+     filename.txt: OnAIR/src/data/raw_telemetry_data/
+     filename_CONFIG.txt: OnAIR/src/data/telemetry_configs/
     Check the .ini file for the filenames used
     """
 
@@ -43,8 +43,8 @@ def main():
         run_unit_tests()
     else:
         save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
-        RAISR = ExecutionEngine(args.configfile, save_name, args.save)
-        RAISR.run_sim()
+        OnAIR = ExecutionEngine(args.configfile, save_name, args.save)
+        OnAIR.run_sim()
 
     clean_all(os.environ['BASE_PATH']) 
 
