@@ -3,7 +3,7 @@ import util.sim_io
 
 def test_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empty(mocker):
   # Arrange
-  SAVE_PATH = 'RAISR_DIAGNOSIS_SAVE_PATH'
+  SAVE_PATH = 'ONAIR_DIAGNOSIS_SAVE_PATH'
   diag1 = MagicMock()
   arg_diagnosis_list = []
   fake_system_filename = MagicMock()
@@ -37,7 +37,7 @@ def test_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empty(mocke
   
 def test_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_given_diagnosis_in_list(mocker):
   # Arrange
-  SAVE_PATH = 'RAISR_DIAGNOSIS_SAVE_PATH'
+  SAVE_PATH = 'ONAIR_DIAGNOSIS_SAVE_PATH'
   diag1 = MagicMock()
   arg_diagnosis_list = []
   fake_system_filename = MagicMock()
@@ -91,7 +91,7 @@ def test_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_given_dia
     
 def test_render_viz_does_only_stattest_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_givenus_and_sensor_reports_when_diagnosis_is_not_given(mocker):
   # Arrange
-  SAVE_PATH = 'RAISR_VIZ_SAVE_PATH'
+  SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'
   arg_status_data = MagicMock()
   arg_sensor_data = MagicMock()
   arg_sim_name = MagicMock()
@@ -130,7 +130,7 @@ def test_render_viz_does_only_stattest_render_viz_does_status_sensor_and_diagnos
   
 def test_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_as_None(mocker):
   # Arrange
-  SAVE_PATH = 'RAISR_VIZ_SAVE_PATH'
+  SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'
   arg_status_data = MagicMock()
   arg_sensor_data = MagicMock()
   arg_sim_name = MagicMock()
@@ -170,7 +170,7 @@ def test_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_
   
 def test_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_given(mocker):
   # Arrange
-  SAVE_PATH = 'RAISR_VIZ_SAVE_PATH'
+  SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'
   arg_status_data = MagicMock()
   arg_sensor_data = MagicMock()
   arg_sim_name = MagicMock()

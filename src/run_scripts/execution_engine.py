@@ -111,10 +111,10 @@ class ExecutionEngine:
         os.mkdir(temp_models_path)
         os.mkdir(temp_diagnosis_path)
     
-        os.environ['RAISR_SAVE_PATH'] = save_path
-        os.environ['RAISR_TMP_SAVE_PATH'] = temp_save_path
-        os.environ['RAISR_MODELS_SAVE_PATH'] = temp_models_path
-        os.environ['RAISR_DIAGNOSIS_SAVE_PATH'] = temp_diagnosis_path
+        os.environ['ONAIR_SAVE_PATH'] = save_path
+        os.environ['ONAIR_TMP_SAVE_PATH'] = temp_save_path
+        os.environ['ONAIR_MODELS_SAVE_PATH'] = temp_models_path
+        os.environ['ONAIR_DIAGNOSIS_SAVE_PATH'] = temp_diagnosis_path
 
     def delete_save_paths(self):
         save_path = os.environ['RESULTS_PATH']
@@ -127,9 +127,9 @@ class ExecutionEngine:
 
     def save_results(self, save_name):
         complete_time = strftime("%H-%M-%S", gmtime())
-        save_path = os.environ['RAISR_SAVE_PATH'] + '/saved/' + save_name + '_' + complete_time
+        save_path = os.environ['ONAIR_SAVE_PATH'] + '/saved/' + save_name + '_' + complete_time
         os.mkdir(save_path)
-        copy_tree(os.environ['RAISR_TMP_SAVE_PATH'], save_path)
+        copy_tree(os.environ['ONAIR_TMP_SAVE_PATH'], save_path)
 
     """ Getters and setters """
     def set_run_param(self, name, val):

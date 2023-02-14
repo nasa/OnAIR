@@ -434,10 +434,10 @@ def test_init_save_paths_makes_tmp_and_models_and_diagnosis_directories_and_adds
     assert execution_engine.os.path.join.call_args_list[1].args == (fake_tmp_save_path, 'models')
     assert execution_engine.os.path.join.call_args_list[2].args == (fake_tmp_save_path, 'diagnosis')
     # NOTE: apparently the problem persists to other failures because these asserts have the same problem, bad values error, but not correct outputs, good values pass
-    assert execution_engine.os.environ['RAISR_SAVE_PATH'] == fake_save_path
-    assert execution_engine.os.environ['RAISR_TMP_SAVE_PATH'] == fake_tmp_save_path
-    assert execution_engine.os.environ['RAISR_MODELS_SAVE_PATH'] == fake_tmp_models_path
-    assert execution_engine.os.environ['RAISR_DIAGNOSIS_SAVE_PATH'] == fake_tmp_diagnosis_path
+    assert execution_engine.os.environ['ONAIR_SAVE_PATH'] == fake_save_path
+    assert execution_engine.os.environ['ONAIR_TMP_SAVE_PATH'] == fake_tmp_save_path
+    assert execution_engine.os.environ['ONAIR_MODELS_SAVE_PATH'] == fake_tmp_models_path
+    assert execution_engine.os.environ['ONAIR_DIAGNOSIS_SAVE_PATH'] == fake_tmp_diagnosis_path
 
 # delete_save_path tests
 def test_delete_save_paths_does_nothing_when_save_path_has_no_tmp_dir(mocker):
@@ -530,10 +530,10 @@ def test_save_results_creates_expected_save_path_and_copies_proper_tree_to_it(mo
 
     fake_gmtime = str(MagicMock())
     fake_complete_time = str(MagicMock())
-    fake_raisr_save_path = str(MagicMock())
-    fake_raisr_tmp_save_path = str(MagicMock())
-    fake_environ = {'RAISR_SAVE_PATH':fake_raisr_save_path, 'RAISR_TMP_SAVE_PATH':fake_raisr_tmp_save_path}
-    fake_save_path = fake_raisr_save_path + '/saved/' + arg_save_name + '_' + fake_complete_time
+    fake_onair_save_path = str(MagicMock())
+    fake_onair_tmp_save_path = str(MagicMock())
+    fake_environ = {'ONAIR_SAVE_PATH':fake_onair_save_path, 'ONAIR_TMP_SAVE_PATH':fake_onair_tmp_save_path}
+    fake_save_path = fake_onair_save_path + '/saved/' + arg_save_name + '_' + fake_complete_time
     
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
@@ -554,7 +554,7 @@ def test_save_results_creates_expected_save_path_and_copies_proper_tree_to_it(mo
     assert execution_engine.os.mkdir.call_count == 1
     assert execution_engine.os.mkdir.call_args_list[0].args == (fake_save_path, )
     assert execution_engine.copy_tree.call_count == 1
-    assert execution_engine.copy_tree.call_args_list[0].args == (fake_raisr_tmp_save_path, fake_save_path, )
+    assert execution_engine.copy_tree.call_args_list[0].args == (fake_onair_tmp_save_path, fake_save_path, )
     
 # set_run_param tests
 def test_set_run_param_passes_given_arguments_to_setattr(mocker):
