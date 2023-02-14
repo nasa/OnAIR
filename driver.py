@@ -10,7 +10,6 @@ import configparser
 import argparse
 import pathlib
 from datetime import datetime
-from test_all import *
 from src.util.cleanup import *
 
 from src.run_scripts.execution_engine import ExecutionEngine
@@ -51,8 +50,8 @@ def main():
 
 """ Runs all unit tests """
 def run_unit_tests():
-    suite = create_suite()
-    run_tests(suite)
+    # placeholder. Body was deleted with test_all.py file
+    return -1
 
 """ Initializes global paths, used throughout execution """
 def init_global_paths(test=False):
