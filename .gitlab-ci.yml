@@ -5,7 +5,7 @@ variables:
   RUN_PATH: src/test
   RESULTS_PATH: src/test/results
 
-test-raisr:
+test-onair:
   tags:
     - app-builder
   image: aetd-dockerlab.gsfc.nasa.gov/cfs_lab/onair/onair-meta
