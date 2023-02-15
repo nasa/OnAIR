@@ -6,7 +6,7 @@ import importlib
 from src.util.data_conversion import *
 
 class DataDrivenLearning:
-    def __init__(self, headers, _ai_plugins:list=[]):
+    def __init__(self, headers, _ai_plugins:list=['kalman']):
         assert(len(headers)>0)
         self.headers = headers
         self.ai_constructs = [

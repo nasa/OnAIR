@@ -24,5 +24,5 @@ class Brain:
         self.learning_systems.update(frame, self.mission_status)
 
     def diagnose(self, time_step):
-        return None
+        None
 
