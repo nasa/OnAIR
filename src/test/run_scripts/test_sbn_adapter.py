@@ -6,13 +6,50 @@ from src.run_scripts.sbn_adapter import AdapterDataSource
 # add_time function is not tested because it can not be accessed outside of the message_listener_thread function
 
 # tests for message_listener_thread
+# incomplete. Fails on run
 def test_sbn_adapter_message_listener_thread_(mocker):
     # Arrange
+    fake_contents = MagicMock()
+
+    class Fake_pointer_class:
+        def __init__(self):
+            self.contents = fake_contents
+
+    fake_TlmHeader = MagicMock()
+    fake_primary_var = MagicMock()
+    fake_streamId = 0x0885
+    fake_secondary_var = MagicMock()
+    fake_seconds = MagicMock()
+    fake_subseconds = MagicMock()
+
+    fake_contents.configure_mock(TlmHeader=fake_TlmHeader)
+    fake_TlmHeader.configure_mock(Primary=fake_primary_var)
+    fake_TlmHeader.configure_mock(Secondary=fake_secondary_var)
+    fake_primary_var.configure_mock(StreamId=fake_streamId)
+    fake_secondary_var.configure_mock(Seconds=fake_seconds)
+    fake_secondary_var.configure_mock(Subseconds=fake_subseconds)
+
+    assert Fake_pointer_class().contents.TlmHeader.Primary.StreamId == 0x0885
+    print (Fake_pointer_class().contents.TlmHeader.Primary.StreamId)
+
+    # this exception will be used to forcefully exit the message_listener_thread function's loop
+    exception_message = 'forced loop exit'
+    exit_exception = Exception(exception_message)
+    
+    # sets return value of POINTER function to return fake_pointer an arbitrary number of times, then return exit_exception
+    num_loop_iterations = pytest.gen.randint(1, 10) # arbitrary, 1 to 10
+    side_effect_list = ([Fake_pointer_class] * num_loop_iterations).append(exit_exception)
+    forced_pointer_return_value = PropertyMock(side_effect=side_effect_list)
+    
+    mocker.patch('src.run_scripts.sbn_adapter.POINTER', return_value=forced_pointer_return_value)
+    mocker.patch.object(sbn_adapter.sbn, 'recv_msg')
 
     # Act
+    with pytest.raises(Exception) as e_info:
+        sbn_adapter.message_listener_thread()
 
     # Assert
-    assert True
+    assert e_info.match(exception_message)
 
 # ---------- Tests for AdapterDataSource class ---------
 
