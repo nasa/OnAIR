@@ -12,6 +12,8 @@ from src.util.print_io import *
 from src.util.sim_io import *
 from data_handling.data_source import DataSource
 
+MAX_STEPS = 2050
+
 class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):
         self.simulator = simType
@@ -37,7 +39,7 @@ class Simulator:
         last_diagnosis = time_step
         last_fault = time_step
 
-        while self.simData.has_more() and time_step < 2050:
+        while self.simData.has_more() and time_step < MAX_STEPS:
 
             next = self.simData.get_next()
             self.agent.reason(next)
