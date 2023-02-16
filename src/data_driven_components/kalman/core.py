@@ -1,5 +1,5 @@
 from src.data_driven_components.generic_intelligence_construct import GenericIntelligenceConstruct
-from src.data_driven_components.kalman.kalman import Kalman
+from src.data_driven_components.kalman.kalman_plugin import Kalman
 
 class AIPlugIn(GenericIntelligenceConstruct):
     def __init__(self, name, headers, window_size=3):
