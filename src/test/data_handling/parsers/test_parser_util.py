@@ -433,7 +433,7 @@ def test_parser_util_str2lst_prints_message_when_ast_literal_eval_receives_given
 def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replaced_by_csv_when_given_csv_resolves_to_True_and_given_return_config_is_not_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice('\/')
+    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
 
     arg_path = ""
     arg_return_config = False if pytest.gen.randint(0, 1) == 1 else 0
@@ -454,7 +454,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replac
 def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replaced_by__CONFIG_dot_txt_when_given_csv_resolves_to_True_and_given_return_config_is_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice('\/')
+    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
 
     arg_path = ""
     arg_return_config = True
@@ -475,7 +475,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replac
 def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_not_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice('\\')
+    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
 
     arg_path = ""
     arg_return_config = False if pytest.gen.randint(0, 1) == 1 else 0
@@ -496,7 +496,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_
 def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice('\\')
+    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
 
     arg_path = ""
     arg_return_config = True
@@ -517,7 +517,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_
 def test_parser_util_process_filepath_default_given_csv_is_False(mocker):
     # Arrange
     fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice('\\')
+    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
 
     arg_path = ""
     arg_return_config = True
@@ -537,7 +537,7 @@ def test_parser_util_process_filepath_default_given_csv_is_False(mocker):
 def test_parser_util_process_filepath_default_given_return_config_is_False(mocker):
     # Arrange
     fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice('\\')
+    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
 
     arg_path = ""
 
