@@ -3,7 +3,7 @@ import numpy as np
 from src.data_driven_components.generic_component import AIPlugIn
 
 class Kalman(AIPlugIn):
-    def __init__(elf, name, headers, window_size=3):
+    def __init__(self, name, headers, window_size=3):
 
         """
         :param headers: (int) length of time agent examines
