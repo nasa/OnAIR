@@ -91,7 +91,7 @@ def test_ExecutionEngine__init__accepts_no_arguments_using_defaults_instead_with
 # parse_configs tests
 def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     # Arrange
-    arg_config_file_path = MagicMock()
+    arg_config_filepath = MagicMock()
 
     fake_default = {'TelemetryDataFilePath':MagicMock(),
                     'TelemetryMetadataFilePath':MagicMock(),
@@ -120,7 +120,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
 
     # Act
-    cut.parse_configs(arg_config_file_path)
+    cut.parse_configs(arg_config_filepath)
 
     # Assert
     assert execution_engine.configparser.ConfigParser.call_count == 1
@@ -147,7 +147,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
 
 def test_ExecutionEngine_parse_configs_bypasses_benmarks_when_access_raises_error(mocker):
     # Arrange
-    arg_config_file_path = MagicMock()
+    arg_config_filepath = MagicMock()
 
     # NOTE: not including the benchmark strings causes the exception
     fake_default = {'TelemetryDataFilePath':MagicMock(),
@@ -174,7 +174,7 @@ def test_ExecutionEngine_parse_configs_bypasses_benmarks_when_access_raises_erro
     mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
 
     # Act
-    cut.parse_configs(arg_config_file_path)
+    cut.parse_configs(arg_config_filepath)
 
     # Assert
     assert hasattr(cut, 'benchmarkFilePath') == False

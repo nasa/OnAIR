@@ -22,8 +22,8 @@ class FortyTwo:
            This means that, if you want to use this class to parse in real time, 
            it needs to at least have seen one sample of the anticipated format """
         
-        self.raw_data_file_path = rawDataFilepath
-        self.metadata_file_path = metadataFilepath
+        self.raw_data_filepath = rawDataFilepath
+        self.metadata_filepath = metadataFilepath
         self.all_headers = ''
         self.sim_data = ''
         self.binning_configs = ''
@@ -50,7 +50,7 @@ class FortyTwo:
         headers = []
         frames = []
 
-        txt_file = open(self.raw_data_file_path + dataFile,"r+")
+        txt_file = open(self.raw_data_filepath + dataFile,"r+")
 
         data_str = txt_file.read()
         txt_file.close()
@@ -107,7 +107,7 @@ class FortyTwo:
         return clean_frame
 
     def parse_config_data(self, configFile, ss_breakdown):
-        parsed_configs = extract_configs(self.metadata_file_path, [configFile])
+        parsed_configs = extract_configs(self.metadata_filepath, [configFile])
         if ss_breakdown == False:
             num_elements = len(parsed_configs['subsystem_assignments'][process_filepath(configFile)])
             parsed_configs['subsystem_assignments'][process_filepath(configFile)] = [['MISSION'] for elem in range(num_elements)]
