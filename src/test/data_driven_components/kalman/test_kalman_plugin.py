@@ -211,7 +211,7 @@ def test_Kalman_update_pops_first_index_of_frames_data_points_when_window_size_i
     assert cut.frames == expected_result
 
 # test render diagnosis
-def test_Kalman_render_diagnosis_returns_value_returned_by_agent_frame_diagnose_function(mocker):
+def test_Kalman_render_diagnosis_returns_value_returned_by_frame_diagnosis_function(mocker):
     # Arrange
     fake_frames = MagicMock()
     fake_headers = MagicMock()
@@ -228,3 +228,66 @@ def test_Kalman_render_diagnosis_returns_value_returned_by_agent_frame_diagnose_
 
     # Assert
     assert result == forced_frame_diagnose_return
+
+# test mean
+def test_Kalman_():
+    # Arrange
+
+    # Act
+
+    # Assert
+    assert True
+
+# test residual
+def test_Kalman_():
+    # Arrange
+
+    # Act
+
+    # Assert
+    assert True
+
+# test std_dev
+def test_Kalman_():
+    # Arrange
+
+    # Act
+
+    # Assert
+    assert True
+    
+# test predict
+def test_Kalman_():
+    # Arrange
+
+    # Act
+
+    # Assert
+    assert True
+    
+# test predictions_for_given_data
+def test_Kalman_():
+    # Arrange
+
+    # Act
+
+    # Assert
+    assert True
+    
+# test generate_residuals_for_given_data
+def test_Kalman_():
+    # Arrange
+
+    # Act
+
+    # Assert
+    assert True
+    
+# test current_attribute_chunk_get_error
+def test_Kalman_():
+    # Arrange
+
+    # Act
+
+    # Assert
+    assert True
