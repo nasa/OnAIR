@@ -30,6 +30,7 @@ def test_AIPlugIn__init__initializes_variables_to_expected_values_when_given_all
     assert cut.component_name == arg_name
     assert cut.headers == arg_headers
     assert cut.window_size == 3
+    assert isinstance(cut.agent, Fake_kalman)
     assert cut.agent.test_var == fake_var
   
 def test_AIPlugIn__init__initializes_variables_to_expected_values_when_given_all_args(mocker):
@@ -55,6 +56,7 @@ def test_AIPlugIn__init__initializes_variables_to_expected_values_when_given_all
     assert cut.component_name == arg_name
     assert cut.headers == arg_headers
     assert cut.window_size == arg_window_size
+    assert isinstance(cut.agent, Fake_kalman)
     assert cut.agent.test_var == fake_var
     
 # test apiori training
