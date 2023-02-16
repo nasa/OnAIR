@@ -8,7 +8,7 @@ from src.data_driven_components.generic_component import AIPlugIn
 
 
 class DataDrivenLearning:
-    def __init__(self, headers, _ai_plugins:list=['kalman']):
+    def __init__(self, headers, _ai_plugins:list=[]):
         assert(len(headers)>0)
         self.headers = headers
         self.ai_constructs = [
