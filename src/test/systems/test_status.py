@@ -5,111 +5,36 @@ from mock import MagicMock
 from src.systems.status import Status
 
 # tests for init
-def test_Status__init__with_empty_args_initializes_variables_to_default_values():
+def test_Status__init__with_empty_args_initializes_name_and_calls_set_status_with_default_values(mocker):
     # Arrange
     cut = Status.__new__(Status)
+
+    mocker.patch.object(cut, 'set_status')
 
     # Act
     cut.__init__()
 
     # Assert
     assert cut.name == 'MISSION'
-    assert cut.bayesian_conf == -1.0
-    assert cut.status == '---'
+    assert cut.set_status.call_count == 1
+    assert cut.set_status.call_args_list[0].args == ('---', -1.0)
 
-def test_Status__init__with_valid_args_initializes_variables_to_expected_values():
+def test_Status__init__with_valid_args_initializes_name_and_calls_set_status_with_expected_values(mocker):
     # Arrange
     cut = Status.__new__(Status)
     arg_name = MagicMock()
-    
-    rand_index = pytest.gen.randint(0, 3) # index, from 0 to 3
-    valid_statuses = ['---', 'RED', 'YELLOW', 'GREEN']
-    arg_status = valid_statuses[rand_index]
-    arg_bayesian_conf = pytest.gen.uniform(-1.0, 1.0) # float in accepted range from -1.0 to 1.0
+    arg_status = MagicMock()
+    arg_bayesian_conf = MagicMock()
+
+    mocker.patch.object(cut, 'set_status')
 
     # Act
     cut.__init__(arg_name, arg_status, arg_bayesian_conf)
 
     # Assert
     assert cut.name == arg_name
-    assert cut.bayesian_conf == arg_bayesian_conf
-    assert cut.status == arg_status
-
-def test_Status__init__accepts_bayesian_conf_arg_equal_to_1():
-    # Arrange
-    cut = Status.__new__(Status)
-    arg_name = MagicMock()
-    
-    arg_status = '---'
-    arg_bayesian_conf = 1.0
-
-    # Act
-    cut.__init__(arg_name, arg_status, arg_bayesian_conf)
-
-    # Assert
-    assert cut.name == arg_name
-    assert cut.bayesian_conf == arg_bayesian_conf
-    assert cut.status == arg_status
-
-def test_Status__init__accepts_bayesian_conf_arg_equal_to_negative_1():
-    # Arrange
-    cut = Status.__new__(Status)
-    arg_name = MagicMock()
-    
-    arg_status = '---'
-    arg_bayesian_conf = -1.0
-
-    # Act
-    cut.__init__(arg_name, arg_status, arg_bayesian_conf)
-
-    # Assert
-    assert cut.name == arg_name
-    assert cut.bayesian_conf == arg_bayesian_conf
-    assert cut.status == arg_status
-
-def test_Status__init__raises_error_because_bayesian_conf_greater_than_1():
-    # Arrange
-    cut = Status.__new__(Status)
-    arg_name = MagicMock()
-    
-    arg_status = '---'
-    arg_bayesian_conf = pytest.gen.uniform(1.01, 10.0) # arbitrary float greater than 1.0 (top of accepted range) 
-
-    # Act
-    with pytest.raises(AssertionError) as e_info:
-        cut.__init__(arg_name, arg_status, arg_bayesian_conf)
-
-    # Assert
-    assert e_info.match('')
-
-def test_Status__init__raises_error_because_bayesian_conf_less_than_neg_1():
-    # Arrange
-    cut = Status.__new__(Status)
-    arg_name = MagicMock()
-    
-    arg_status = '---'
-    arg_bayesian_conf = pytest.gen.uniform(-10.0, -1.01) # arbitrary float less than -1.0 (bottom of accepted range)
-
-    # Act
-    with pytest.raises(AssertionError) as e_info:
-        cut.__init__(arg_name, arg_status, arg_bayesian_conf)
-
-    # Assert
-    assert e_info.match('')
-
-def test_Status__init__raises_error_because_invalid_status_arg():
-    # Arrange
-    cut = Status.__new__(Status)
-    arg_name = MagicMock()
-    arg_status = str(MagicMock())
-    arg_bayesian_conf = 0
-
-    # Act
-    with pytest.raises(AssertionError) as e_info:
-        cut.__init__(arg_name, arg_status, arg_bayesian_conf)
-
-    # Assert
-    assert e_info.match('')
+    assert cut.set_status.call_count == 1
+    assert cut.set_status.call_args_list[0].args == (arg_status, arg_bayesian_conf)
 
 # tests for set status
 def test_Status_set_status_when_both_args_are_provided_and_valid_sets_variables_to_expected_values():
