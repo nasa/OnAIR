@@ -102,32 +102,87 @@ def test_AIPlugIn_update_mutates_frames_attribute_as_expected_when_frames_is_emp
     # Assert
     assert cut.frames == expected_result
 
-# def test_AIPlugIn_update_mutates_frames_attribute_as_expected_when_both_frames_and_arg_frame_are_not_empty_and_len_arg_frame_greater_than_len_frames():
-#     # Arrange
-#     len_fake_frames = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
-#     fake_frames = [MagicMock()] * len_fake_frames
-#     fake_window_size = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+def test_AIPlugIn_update_mutates_frames_attribute_as_expected_when_both_frames_and_arg_frame_are_not_empty_and_len_arg_frame_greater_than_len_frames():
+    # Arrange
+    len_fake_frames = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
+    fake_frames = [[MagicMock()]] * len_fake_frames
+    fake_window_size = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
     
-#     len_arg_frame = pytest.gen.randint(6, 10) # arbitrary, random int from 6 to 10
-#     arg_frame = [MagicMock()] * len_arg_frame
+    len_arg_frame = pytest.gen.randint(6, 10) # arbitrary int greater than max len of fake_frames, from 6 to 10
+    arg_frame = [MagicMock()] * len_arg_frame
 
-#     cut = AIPlugIn.__new__(AIPlugIn)
-#     cut.frames = fake_frames
-#     cut.window_size = fake_window_size
+    cut = AIPlugIn.__new__(AIPlugIn)
+    cut.frames = fake_frames
+    cut.window_size = fake_window_size
 
-#     len_dif = len_fake_frames - len_arg_frame
-#     expected_result = fake_frames.copy()
+    len_dif = len_arg_frame - len_fake_frames
+    expected_result = fake_frames.copy()
 
-#     for i in range(len_dif):
-#         expected_result.append([arg_frame[i]])
+    for i in range(len_dif):
+        expected_result.append([arg_frame[i]])
 
-#     # WIP
+    for i in range(len_dif, len_arg_frame):
+        expected_result[i].append(arg_frame[i])
+        if len(expected_result[i]) > fake_window_size:
+            expected_result[i].pop(0)
 
-#     # Act
-#     cut.update(arg_frame)
+    # Act
+    cut.update(arg_frame)
 
-#     # Assert
-#     assert cut.frames == expected_result
+    # Assert
+    assert cut.frames == expected_result
+
+def test_AIPlugIn_update_mutates_frames_attribute_as_expected_when_both_frames_and_arg_frame_are_not_empty_and_len_arg_frame_less_than_len_frames():
+    # Arrange
+    len_fake_frames = pytest.gen.randint(6, 10) # arbitrary int greater than max len of arg_frame, from 6 to 10
+    fake_frames = [[MagicMock()]] * len_fake_frames
+    fake_window_size = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    
+    len_arg_frame = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
+    arg_frame = [MagicMock()] * len_arg_frame
+
+    cut = AIPlugIn.__new__(AIPlugIn)
+    cut.frames = fake_frames
+    cut.window_size = fake_window_size
+
+    expected_result = fake_frames.copy()
+    for i in range(len_arg_frame):
+        expected_result[i].append(arg_frame[i])
+        if len(expected_result[i]) > fake_window_size:
+            expected_result[i].pop(0)
+
+    # Act
+    cut.update(arg_frame)
+
+    # Assert
+    assert cut.frames == expected_result
+
+
+def test_AIPlugIn_update_pops_first_index_of_frames_data_points_when_window_size_is_exceeded():
+    # Arrange
+    len_fake_frames = pytest.gen.randint(6, 10) # arbitrary int greater than max len of arg_frame, from 6 to 10
+                                                # choosing to keep len of fake_frames greater than arg_frame in order to guarantee 'popping'
+    fake_frames = [[MagicMock()]] * len_fake_frames
+    fake_window_size = 1 # arbitrary, chosen to guarantee 'popping'
+
+    len_arg_frame = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
+    arg_frame = [MagicMock()] * len_arg_frame
+
+    cut = AIPlugIn.__new__(AIPlugIn)
+    cut.frames = fake_frames
+    cut.window_size = fake_window_size
+
+    expected_result = fake_frames.copy()
+
+    for i in range(len_arg_frame):
+        expected_result[i].append(arg_frame[i])
+        expected_result[i].pop(0)
+
+    # Act
+    cut.update(arg_frame)
+
+    # Assert
+    assert cut.frames == expected_result
 
 # test render diagnosis
 def test_AIPlugIn_render_diagnosis_returns_value_returned_by_agent_frame_diagnose_function(mocker):
