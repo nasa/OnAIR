@@ -1,7 +1,7 @@
 from mock import MagicMock
 import util.sim_io
 
-def test_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empty(mocker):
+def test_sim_io_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empty(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_DIAGNOSIS_SAVE_PATH'
   diag1 = MagicMock()
@@ -35,7 +35,7 @@ def test_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empty(mocke
   assert open.call_args_list[1].kwargs == {'mode':'a'}
   assert fake_file_iterator.write.call_args_list[3].args == ('time_step, cohens_kappa, faults, subgraph\n',)
   
-def test_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_given_diagnosis_in_list(mocker):
+def test_sim_io_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_given_diagnosis_in_list(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_DIAGNOSIS_SAVE_PATH'
   diag1 = MagicMock()
@@ -89,7 +89,7 @@ def test_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_given_dia
   for j in range(5):
     assert fake_file_iterator.write.call_args_list[j + i*4 + 8].args == (fake_results_csv,)
     
-def test_render_viz_does_only_stattest_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_givenus_and_sensor_reports_when_diagnosis_is_not_given(mocker):
+def test_sim_io_render_viz_does_only_stattest_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_givenus_and_sensor_reports_when_diagnosis_is_not_given(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'
   arg_status_data = MagicMock()
@@ -128,7 +128,7 @@ def test_render_viz_does_only_stattest_render_viz_does_status_sensor_and_diagnos
   assert open.call_args_list[1].args == (fake_full_path, 'w')
   assert util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
   
-def test_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_as_None(mocker):
+def test_sim_io_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_as_None(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'
   arg_status_data = MagicMock()
@@ -168,7 +168,7 @@ def test_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_
   assert open.call_args_list[1].args == (fake_full_path, 'w')
   assert util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
   
-def test_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_given(mocker):
+def test_sim_io_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_given(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'
   arg_status_data = MagicMock()
@@ -215,7 +215,7 @@ def test_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_g
   assert open.call_args_list[2].args == (fake_full_path, 'w')
   assert util.sim_io.json.dump.call_args_list[2].args == (fake_results, fake_iterator)
 
-def test_print_dots_uses_mod_10_plus_one_dots_when_ts_mod_20_is_less_than_10(mocker):
+def test_sim_io_print_dots_uses_mod_10_plus_one_dots_when_ts_mod_20_is_less_than_10(mocker):
   # Arrange
   arg_ts = 20 # really want 0-9 + 20 * (arbitrary random 0 to some number)
   expected_num_dots = (arg_ts % 10) + 1
@@ -232,7 +232,7 @@ def test_print_dots_uses_mod_10_plus_one_dots_when_ts_mod_20_is_less_than_10(moc
   # Assert
   print.assert_called_with('\033[95m' + dots_string + '\033[0m')
 
-def test_print_dots_uses_10_minus_mod_10_plus_one_dots_when_ts_mod_20_is_10(mocker):
+def test_sim_io_print_dots_uses_10_minus_mod_10_plus_one_dots_when_ts_mod_20_is_10(mocker):
   # Arrange
   arg_ts = 10 # 10 is a static value by design but should still add 20 * 0 to some number
   expected_num_dots = 10 - (arg_ts % 10) + 1
@@ -249,7 +249,7 @@ def test_print_dots_uses_10_minus_mod_10_plus_one_dots_when_ts_mod_20_is_10(mock
   # Assert
   print.assert_called_with('\033[95m' + dots_string + '\033[0m')
 
-def test_print_dots_uses_10_minus_mod_10_plus_one_dots_when_ts_mod_20_is_greater_than_10(mocker):
+def test_sim_io_print_dots_uses_10_minus_mod_10_plus_one_dots_when_ts_mod_20_is_greater_than_10(mocker):
   # Arrange
   arg_ts = 19 # really should be 11 to 19 + 20 * 0 to some random number
   expected_num_dots = 10 - (arg_ts % 10) + 1

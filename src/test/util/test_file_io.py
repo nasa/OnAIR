@@ -6,7 +6,7 @@ import util.file_io
 
 # parse_associations_from_json tests
 
-def test_parse_associations_raises_KeyError_when_loaded_data_does_not_have_keyword_children(mocker):
+def test_file_io_parse_associations_raises_KeyError_when_loaded_data_does_not_have_keyword_children(mocker):
   # Arrange
   arg_filepath = MagicMock()
 
@@ -31,7 +31,7 @@ def test_parse_associations_raises_KeyError_when_loaded_data_does_not_have_keywo
   assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
   assert util.file_io.print.call_count == 0
 
-def test_parse_associations_does_not_print_when_loaded_data_children_is_empty(mocker):
+def test_file_io_parse_associations_does_not_print_when_loaded_data_children_is_empty(mocker):
   # Arrange
   arg_filepath = MagicMock()
 
@@ -54,7 +54,7 @@ def test_parse_associations_does_not_print_when_loaded_data_children_is_empty(mo
   assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
   assert util.file_io.print.call_count == 0
 
-def test_parse_associations_raises_KeyError_when_loaded_data_child_missing_name(mocker):
+def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_missing_name(mocker):
   # Arrange
   arg_filepath = MagicMock()
 
@@ -79,7 +79,7 @@ def test_parse_associations_raises_KeyError_when_loaded_data_child_missing_name(
   assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
   assert util.file_io.print.call_count == 0
 
-def test_parse_associations_raises_KeyError_when_loaded_data_child_missing_connections(mocker):
+def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_missing_connections(mocker):
   # Arrange
   arg_filepath = MagicMock()
 
@@ -104,7 +104,7 @@ def test_parse_associations_raises_KeyError_when_loaded_data_child_missing_conne
   assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
   assert util.file_io.print.call_count == 0
 
-def test_parse_associations_does_not_print_when_loaded_data_child_conections_are_empty(mocker):
+def test_file_io_parse_associations_does_not_print_when_loaded_data_child_conections_are_empty(mocker):
   # Arrange
   arg_filepath = MagicMock()
 
@@ -127,7 +127,7 @@ def test_parse_associations_does_not_print_when_loaded_data_child_conections_are
   assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
   assert util.file_io.print.call_count == 0
 
-def test_parse_associations_raises_KeyError_when_loaded_data_child_connections_missing_target(mocker):
+def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_connections_missing_target(mocker):
   # Arrange
   arg_filepath = MagicMock()
 
@@ -152,7 +152,7 @@ def test_parse_associations_raises_KeyError_when_loaded_data_child_connections_m
   assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
   assert util.file_io.print.call_count == 0
 
-def test_parse_associations_raises_KeyError_when_loaded_data_child_connections_missing_weight(mocker):
+def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_connections_missing_weight(mocker):
   # Arrange
   arg_filepath = MagicMock()
 
@@ -177,7 +177,7 @@ def test_parse_associations_raises_KeyError_when_loaded_data_child_connections_m
   assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
   assert util.file_io.print.call_count == 0
 
-def test_parse_associations_prints_associations_in_reverse_sort_by_weight_when_data_is_properly_formed(mocker):
+def test_file_io_parse_associations_prints_associations_in_reverse_sort_by_weight_when_data_is_properly_formed(mocker):
   # Arrange
   arg_filepath = MagicMock()
 
@@ -224,7 +224,7 @@ def test_parse_associations_prints_associations_in_reverse_sort_by_weight_when_d
 
 # aggregate_results tests
 
-def test_aggregate_results_does_nothing_then_returns_None():
+def test_file_io_aggregate_results_does_nothing_then_returns_None():
   # Arrange
   expected_result = None
 

@@ -4,71 +4,71 @@ import util.print_io
 
 
 # bcolors tests
-def test_bcolors_HEADER_is_expected_value():
+def test_print_io_bcolors_HEADER_is_expected_value():
   assert util.print_io.bcolors.HEADER == '\033[95m'
 
-def test_bcolors_OKBLUE_is_expected_value():
+def test_print_io_bcolors_OKBLUE_is_expected_value():
   assert util.print_io.bcolors.OKBLUE == '\033[94m'
 
-def test_bcolors_OKGREEN_is_expected_value():
+def test_print_io_bcolors_OKGREEN_is_expected_value():
   assert util.print_io.bcolors.OKGREEN == '\033[92m'
   
-def test_bcolors_WARNING_is_expected_value():
+def test_print_io_bcolors_WARNING_is_expected_value():
   assert util.print_io.bcolors.WARNING == '\033[93m'
 
-def test_bcolors_FAIL_is_expected_value():
+def test_print_io_bcolors_FAIL_is_expected_value():
   assert util.print_io.bcolors.FAIL == '\033[91m'
 
-def test_bcolors_ENDC_is_expected_value():
+def test_print_io_bcolors_ENDC_is_expected_value():
   assert util.print_io.bcolors.ENDC == '\033[0m'
 
-def test_bcolors_BOLD_is_expected_value():
+def test_print_io_bcolors_BOLD_is_expected_value():
   assert util.print_io.bcolors.BOLD == '\033[1m'
   
-def test_bcolors_UNDERLINE_is_expected_value():
+def test_print_io_bcolors_UNDERLINE_is_expected_value():
   assert util.print_io.bcolors.UNDERLINE == '\033[4m'
 
 
 # Globals tests
-def test_scolors_HEADER_is_set_to_bcolors_HEADER():
+def test_print_io_scolors_HEADER_is_set_to_bcolors_HEADER():
   assert util.print_io.scolors['HEADER'] == util.print_io.bcolors.HEADER
 
-def test_scolors_OKBLUE_is_set_to_bcolors_OKBLUE():
+def test_print_io_scolors_OKBLUE_is_set_to_bcolors_OKBLUE():
   assert util.print_io.scolors['OKBLUE'] == util.print_io.bcolors.OKBLUE
 
-def test_scolors_OKGREEN_is_set_to_bcolors_OKGREEN():
+def test_print_io_scolors_OKGREEN_is_set_to_bcolors_OKGREEN():
   assert util.print_io.scolors['OKGREEN'] == util.print_io.bcolors.OKGREEN
   
-def test_scolors_WARNING_is_set_to_bcolors_WARNING():
+def test_print_io_scolors_WARNING_is_set_to_bcolors_WARNING():
   assert util.print_io.scolors['WARNING'] == util.print_io.bcolors.WARNING
 
-def test_scolors_FAIL_is_set_to_bcolors_FAIL():
+def test_print_io_scolors_FAIL_is_set_to_bcolors_FAIL():
   assert util.print_io.scolors['FAIL'] == util.print_io.bcolors.FAIL
 
-def test_scolors_ENDC_is_set_to_bcolors_ENDC():
+def test_print_io_scolors_ENDC_is_set_to_bcolors_ENDC():
   assert util.print_io.scolors['ENDC'] == util.print_io.bcolors.ENDC
 
-def test_scolors_BOLD_is_set_to_bcolors_BOLD():
+def test_print_io_scolors_BOLD_is_set_to_bcolors_BOLD():
   assert util.print_io.scolors['BOLD'] == util.print_io.bcolors.BOLD
   
-def test_scolors_UNDERLINE_is_set_to_bcolors_UNDERLINE():
+def test_print_io_scolors_UNDERLINE_is_set_to_bcolors_UNDERLINE():
   assert util.print_io.scolors['UNDERLINE'] == util.print_io.bcolors.UNDERLINE
 
-def test_status_colors_GREEN_is_set_to_bcolors_OKGREEN():
+def test_print_io_status_colors_GREEN_is_set_to_bcolors_OKGREEN():
   assert util.print_io.status_colors['GREEN'] == util.print_io.bcolors.OKGREEN
 
-def test_status_colors_YELLOW_is_set_to_bcolors_WARNING():
+def test_print_io_status_colors_YELLOW_is_set_to_bcolors_WARNING():
   assert util.print_io.status_colors['YELLOW'] == util.print_io.bcolors.WARNING
 
-def test_status_colors_RED_is_set_to_bcolors_FAIL():
+def test_print_io_status_colors_RED_is_set_to_bcolors_FAIL():
   assert util.print_io.status_colors['RED'] == util.print_io.bcolors.FAIL
 
-def test_status_colors_3_dashes_is_set_to_bcolors_OKBLUE():
+def test_print_io_status_colors_3_dashes_is_set_to_bcolors_OKBLUE():
   assert util.print_io.status_colors['---'] == util.print_io.bcolors.OKBLUE
 
 
 # print_sim_header tests
-def test_print_sim_header_prints_expected_strings(mocker):
+def test_print_io_print_sim_header_prints_expected_strings(mocker):
   # Arrange
   expected_print = []
   expected_print.append(util.print_io.bcolors.HEADER + \
@@ -89,7 +89,7 @@ def test_print_sim_header_prints_expected_strings(mocker):
 
 
 # print_sim_step tests
-def test_print_sim_step_inserts_given_step_num_into_text(mocker):
+def test_print_io_print_sim_step_inserts_given_step_num_into_text(mocker):
   # Arrange
   arg_step_num = pytest.gen.randint(1, 100) # arbitrary from 1 to 100
   expected_print = util.print_io.bcolors.HEADER + \
@@ -108,7 +108,7 @@ def test_print_sim_step_inserts_given_step_num_into_text(mocker):
 
 
 # print_separator tests
-def test_print_separator_uses_bcolors_HEADER_as_default_color_value(mocker):
+def test_print_io_print_separator_uses_bcolors_HEADER_as_default_color_value(mocker):
   # Arrange
   expected_color = util.print_io.bcolors.HEADER
   expected_print = expected_color + \
@@ -124,7 +124,7 @@ def test_print_separator_uses_bcolors_HEADER_as_default_color_value(mocker):
   # Assert
   assert util.print_io.print.call_args_list[0].args == (expected_print, )
 
-def test_print_separator_prints_whatever_is_passed_in_as_color_at_start_of_line(mocker):
+def test_print_io_print_separator_prints_whatever_is_passed_in_as_color_at_start_of_line(mocker):
   # Arrange
   arg_color = MagicMock()
 
@@ -144,7 +144,7 @@ def test_print_separator_prints_whatever_is_passed_in_as_color_at_start_of_line(
 
 
 # update_header tests
-def test_update_header_prints_message_with_bcolors_BOLD_at_start_when_no_clr_arg_given(mocker):
+def test_print_io_update_header_prints_message_with_bcolors_BOLD_at_start_when_no_clr_arg_given(mocker):
   # Arrange
   arg_msg = MagicMock()
 
@@ -162,7 +162,7 @@ def test_update_header_prints_message_with_bcolors_BOLD_at_start_when_no_clr_arg
   assert util.print_io.print.call_count == 1
   assert util.print_io.print.call_args_list[0].args == (expected_print, )
 
-def test_update_header_prints_message_starting_with_whatever_is_given_as_clr(mocker):
+def test_print_io_update_header_prints_message_starting_with_whatever_is_given_as_clr(mocker):
   # Arrange
   arg_msg = MagicMock()
   arg_clr = MagicMock()
@@ -182,7 +182,7 @@ def test_update_header_prints_message_starting_with_whatever_is_given_as_clr(moc
 
 
 # print_msg tests
-def test_print_msg_prints_message_starting_only_with_scolor_HEADER_when_no_clrs_arg_given(mocker):
+def test_print_io_print_msg_prints_message_starting_only_with_scolor_HEADER_when_no_clrs_arg_given(mocker):
     # Arrange
   arg_msg = MagicMock()
   
@@ -201,7 +201,7 @@ def test_print_msg_prints_message_starting_only_with_scolor_HEADER_when_no_clrs_
   for i in range(2):
    assert util.print_io.print.call_args_list[i].args == (expected_print[i], )
 
-def test_print_msg_raises_KeyError_when_given_clrs_item_not_in_scolors(mocker):
+def test_print_io_print_msg_raises_KeyError_when_given_clrs_item_not_in_scolors(mocker):
     # Arrange
   arg_msg = MagicMock()
   arg_clrs = ['THIS-WILL-THROW-KEYERROR']
@@ -216,7 +216,7 @@ def test_print_msg_raises_KeyError_when_given_clrs_item_not_in_scolors(mocker):
   assert str(e_info.value) == "'THIS-WILL-THROW-KEYERROR'"
   assert util.print_io.print.call_count == 0
 
-def test_print_msg_prints_only_given_msg_when_given_clrs_is_empty(mocker):
+def test_print_io_print_msg_prints_only_given_msg_when_given_clrs_is_empty(mocker):
     # Arrange
   arg_msg = MagicMock()
   arg_clrs = []
@@ -230,7 +230,7 @@ def test_print_msg_prints_only_given_msg_when_given_clrs_is_empty(mocker):
   assert util.print_io.print.call_count == 1
   assert util.print_io.print.call_args_list[0].args == ("---- " + arg_msg + util.print_io.bcolors.ENDC, )
 
-def test_print_msg_prints_all_scolors_given_in_clrs(mocker):
+def test_print_io_print_msg_prints_all_scolors_given_in_clrs(mocker):
     # Arrange
   arg_msg = MagicMock()
   arg_clrs = list(util.print_io.scolors.keys())
@@ -249,7 +249,7 @@ def test_print_msg_prints_all_scolors_given_in_clrs(mocker):
 
 
 #print_mission_status
-def test_print_mission_status_only_prints_brain_formatted_status_when_data_not_given(mocker):
+def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_data_not_given(mocker):
   # Arrange
   arg_brain = MagicMock()
   
@@ -271,7 +271,7 @@ def test_print_mission_status_only_prints_brain_formatted_status_when_data_not_g
   assert util.print_io.print.call_count == 1
   assert util.print_io.print.call_args_list[0].args == (expected_print, )
 
-def test_print_mission_status_only_prints_brain_formatted_status_when_data_given_is_None(mocker):
+def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_data_given_is_None(mocker):
   # Arrange
   arg_brain = MagicMock()
   arg_data = None
@@ -294,7 +294,7 @@ def test_print_mission_status_only_prints_brain_formatted_status_when_data_given
   assert util.print_io.print.call_count == 1
   assert util.print_io.print.call_args_list[0].args == (expected_print, )
 
-def test_print_mission_status_only_prints_brain_formatted_status_when_data_given_is_None(mocker):
+def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_data_given_is_None(mocker):
   # Arrange
   arg_brain = MagicMock()
   arg_data = MagicMock()
@@ -322,7 +322,7 @@ def test_print_mission_status_only_prints_brain_formatted_status_when_data_given
 
 
 # print_diagnosis tests
-def test_print_diagnosis_only_prints_separators_and_headers_when_status_list_and_activations_are_empty_tree_traversal_unused(mocker):
+def test_print_io_print_diagnosis_only_prints_separators_and_headers_when_status_list_and_activations_are_empty_tree_traversal_unused(mocker):
   # Arrange
   arg_diagnosis = MagicMock()
 
@@ -341,7 +341,7 @@ def test_print_diagnosis_only_prints_separators_and_headers_when_status_list_and
   assert util.print_io.print.call_args_list[0].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "DIAGNOSIS INFO: \n" + util.print_io.bcolors.ENDC, )
   assert util.print_io.print.call_args_list[1].args == (util.print_io.bcolors.HEADER + util.print_io.bcolors.BOLD + "\nCURRENT ACTIVATIONS: \n" + util.print_io.bcolors.ENDC, )
 
-def test_print_diagnosis_prints_separators_headers_status_and_activations_when_status_list_and_activations_have_items_tree_traversal_unused(mocker):
+def test_print_io_print_diagnosis_prints_separators_headers_status_and_activations_when_status_list_and_activations_have_items_tree_traversal_unused(mocker):
   # Arrange
   arg_diagnosis = MagicMock()
 
@@ -383,7 +383,7 @@ def test_print_diagnosis_prints_separators_headers_status_and_activations_when_s
 
 
 # subsystem_status_str tests
-def test_subsystem_status_str_returns_expected_string_when_stat_exists_as_key_in_status_colors(mocker):
+def test_print_io_subsystem_status_str_returns_expected_string_when_stat_exists_as_key_in_status_colors(mocker):
   # Arrange
   arg_ss = MagicMock()
 
@@ -414,7 +414,7 @@ def test_subsystem_status_str_returns_expected_string_when_stat_exists_as_key_in
   
 
 # subsystem_str tests
-def test_subsystem_str_returns_string_without_any_data_when_headers_tests_and_test_data_empty(mocker):
+def test_print_io_subsystem_str_returns_string_without_any_data_when_headers_tests_and_test_data_empty(mocker):
   # Arrange
   arg_ss = MagicMock()
 
@@ -432,7 +432,7 @@ def test_subsystem_str_returns_string_without_any_data_when_headers_tests_and_te
   # Assert
   assert result == expected_result
 
-def test_subsystem_str_returns_string_all_data_when_headers_tests_and_test_data_occupied(mocker):
+def test_print_io_subsystem_str_returns_string_all_data_when_headers_tests_and_test_data_occupied(mocker):
   # Arrange
   arg_ss = MagicMock()
 
@@ -466,7 +466,7 @@ def test_subsystem_str_returns_string_all_data_when_headers_tests_and_test_data_
 
 
 # headers_string tests
-def test_format_status_returns_empty_string_when_headers_is_vacant():
+def test_print_io_format_status_returns_empty_string_when_headers_is_vacant():
   # Arrange
   arg_headers = []
 
@@ -476,7 +476,7 @@ def test_format_status_returns_empty_string_when_headers_is_vacant():
   # Assert
   assert result == str()
 
-def test_format_status_returns_all_headers_in_formatted_string_when_occupied():
+def test_print_io_format_status_returns_all_headers_in_formatted_string_when_occupied():
   # Arrange
   num_headers = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
   arg_headers = []
@@ -496,7 +496,7 @@ def test_format_status_returns_all_headers_in_formatted_string_when_occupied():
 
 # format_status tests
 
-def test_format_status_raises_KeyError_when_stat_is_string_and_not_in_status_color_keys():
+def test_print_io_format_status_raises_KeyError_when_stat_is_string_and_not_in_status_color_keys():
   # Arrange
   arg_stat = str(MagicMock())
 
@@ -507,7 +507,7 @@ def test_format_status_raises_KeyError_when_stat_is_string_and_not_in_status_col
   # Assert
   assert str(e_info.value) == '"' + arg_stat + '"'
 
-def test_format_status_returns_stat_in_its_status_color_when_stat_is_string_and_a_key():
+def test_print_io_format_status_returns_stat_in_its_status_color_when_stat_is_string_and_a_key():
   # Arrange
   arg_stat = pytest.gen.choice(list(util.print_io.status_colors.keys()))
 
@@ -519,7 +519,7 @@ def test_format_status_returns_stat_in_its_status_color_when_stat_is_string_and_
   # Assert
   assert result == expected_result
 
-def test_format_status_returns_only_a_right_parenthesis_in_string_when_stat_is_an_empty_list():
+def test_print_io_format_status_returns_only_a_right_parenthesis_in_string_when_stat_is_an_empty_list():
   # Arrange
   arg_stat = []
 
@@ -531,7 +531,7 @@ def test_format_status_returns_only_a_right_parenthesis_in_string_when_stat_is_a
   # Assert
   assert result == expected_result
 
-def test_format_status_returns_all_status_in_stat_formatted_into_string_when_stat_is_a_list_of_status(mocker):
+def test_print_io_format_status_returns_all_status_in_stat_formatted_into_string_when_stat_is_a_list_of_status(mocker):
   # Arrange
   num_stat = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
   arg_stat = []

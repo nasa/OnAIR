@@ -3,7 +3,7 @@ from mock import MagicMock
 import util.cleanup
 
 # clean_all tests
-def test_clean_all_removes_provided_file_types_back_two_directories_from_file_location_when_given_run_path_is_empty_string(mocker):
+def test_cleanup_clean_all_removes_provided_file_types_back_two_directories_from_file_location_when_given_run_path_is_empty_string(mocker):
   # Arrange
   arg_run_path = ''
 
@@ -27,7 +27,7 @@ def test_clean_all_removes_provided_file_types_back_two_directories_from_file_lo
   assert util.cleanup.os.system.call_args_list[0].args == ('find . | grep -E "(__pycache__|.pyc|.pyo$)" | xargs rm -rf', )
   assert util.cleanup.os.system.call_args_list[1].args == ('find . | grep -E ".DS_Store" | xargs rm -rf', )
 
-def test_clean_all_removes_provided_file_types_from_given_run_path_when_it_is_not_empty(mocker):
+def test_cleanup_clean_all_removes_provided_file_types_from_given_run_path_when_it_is_not_empty(mocker):
   # Arrange
   arg_run_path = str(MagicMock())
 
@@ -53,7 +53,7 @@ def test_clean_all_removes_provided_file_types_from_given_run_path_when_it_is_no
 
 
 # test_setup_folders
-def test_setup_folders_creates_dir_when_given_results_path_does_not_exist(mocker):
+def test_cleanup_setup_folders_creates_dir_when_given_results_path_does_not_exist(mocker):
   # Arrange
   arg_results_path = str(MagicMock())
 
@@ -68,7 +68,7 @@ def test_setup_folders_creates_dir_when_given_results_path_does_not_exist(mocker
   assert util.cleanup.os.mkdir.call_count == 1
   assert util.cleanup.os.mkdir.call_args_list[0].args == (arg_results_path, )
 
-def test_setup_folders_does_not_create_dir_when_it_already_exists(mocker):
+def test_cleanup_setup_folders_does_not_create_dir_when_it_already_exists(mocker):
   # Arrange
   arg_results_path = str(MagicMock())
 

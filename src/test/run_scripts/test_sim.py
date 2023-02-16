@@ -6,7 +6,7 @@ from src.run_scripts.sim import Simulator
 from math import ceil, floor
 
 # __init__ tests
-def test__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_True(mocker):
+def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_True(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
@@ -53,7 +53,7 @@ def test__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_data_and_Br
     assert sim.Brain.call_args_list[0].args == (fake_spaceCraft, )
     assert cut.brain == fake_brain
 
-def test__init__creates_Spacecraft_and_DataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_False(mocker):
+def test_Simulator__init__creates_Spacecraft_and_DataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_False(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
@@ -86,7 +86,7 @@ def test__init__creates_Spacecraft_and_DataSource_from_parsed_data_and_Brain_wit
     assert sim.Brain.call_args_list[0].args == (fake_spaceCraft, )
     assert cut.brain == fake_brain
 
-def test__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_True(mocker):
+def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_True(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
@@ -134,7 +134,7 @@ def test__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_data_and_Br
     assert cut.brain == fake_brain
 
 # run_sim tests
-def test_run_sim_simData_never_has_more_so_loop_does_not_run_and_diagnosis_list_is_empty_but_filled_with_brain_diagnose_and_returns_last_diagnosis(mocker):
+def test_Simulator_run_sim_simData_never_has_more_so_loop_does_not_run_and_diagnosis_list_is_empty_but_filled_with_brain_diagnose_and_returns_last_diagnosis(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
@@ -160,7 +160,7 @@ def test_run_sim_simData_never_has_more_so_loop_does_not_run_and_diagnosis_list_
     assert cut.brain.diagnose.call_args_list[0].args == (fake_time_step, )
     assert result == fake_diagnosis
 
-def test_run_sim_prints_header_when_given_IO_Flag_is_equal_to_True(mocker):
+def test_Simulator_run_sim_prints_header_when_given_IO_Flag_is_equal_to_True(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
@@ -182,7 +182,7 @@ def test_run_sim_prints_header_when_given_IO_Flag_is_equal_to_True(mocker):
     assert sim.print_msg.call_count == 0
     assert result == fake_diagnosis # check we ran through the method correctly
 
-def test_run_sim_prints_wait_message_when_given_IO_Flag_is_the_str_strict(mocker):
+def test_Simulator_run_sim_prints_wait_message_when_given_IO_Flag_is_the_str_strict(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
@@ -204,7 +204,7 @@ def test_run_sim_prints_wait_message_when_given_IO_Flag_is_the_str_strict(mocker
     assert sim.print_msg.call_args_list[0].args == ('Please wait...\n', )
     assert result == fake_diagnosis # check we ran through the method correctly
 
-def test_run_sim_runs_until_time_step_2050_when_simData_always_has_more(mocker):
+def test_Simulator_run_sim_runs_until_time_step_2050_when_simData_always_has_more(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
@@ -242,7 +242,7 @@ def test_run_sim_runs_until_time_step_2050_when_simData_always_has_more(mocker):
     assert cut.brain.diagnose.call_args_list[0].args == (2050, )
     assert result == fake_diagnosis
 
-def test_run_sim_diagnose_always_performed_when_fault_is_on_first_time_step(mocker):
+def test_Simulator_run_sim_diagnose_always_performed_when_fault_is_on_first_time_step(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
@@ -272,7 +272,7 @@ def test_run_sim_diagnose_always_performed_when_fault_is_on_first_time_step(mock
     assert cut.brain.diagnose.call_args_list[0].args == (0, )
     assert result == fake_diagnosis # check we ran through the method correctly
 
-def test_run_sim_diagnose_is_not_performed_again_when_faults_are_consecutive_until_the_hundreth_step_after_last_diagnosis_and_returns_last_diagnosis(mocker):
+def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_consecutive_until_the_hundreth_step_after_last_diagnosis_and_returns_last_diagnosis(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
@@ -311,7 +311,7 @@ def test_run_sim_diagnose_is_not_performed_again_when_faults_are_consecutive_unt
     assert result == fake_diagnoses[-1] # check we actually got the last diagnosis
 
 # set_benchmark_data tests
-def test_set_benchmark_data_sends_brain_supervised_learning_set_benchmark_data_given_filepath_files_and_indices(mocker):
+def test_Simulator_set_benchmark_data_sends_brain_supervised_learning_set_benchmark_data_given_filepath_files_and_indices(mocker):
     # Arrange
     arg_filepath = MagicMock()
     arg_files = MagicMock()
@@ -328,7 +328,7 @@ def test_set_benchmark_data_sends_brain_supervised_learning_set_benchmark_data_g
     assert cut.brain.supervised_learning.set_benchmark_data.call_args_list[0].args == (arg_filepath, arg_files, arg_indices, )
 
 # IO_check tests
-def test_IO_check_prints_sim_step_and_mission_status_when_given_IO_Flag_is_True(mocker):
+def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Flag_is_True(mocker):
     # Arrange
     arg_time_step = pytest.gen.randint(0, 100) # arbitrary from 0 to 100
     arg_IO_Flag = True
@@ -348,7 +348,7 @@ def test_IO_check_prints_sim_step_and_mission_status_when_given_IO_Flag_is_True(
     assert sim.print_mission_status.call_count == 1
     assert sim.print_mission_status.call_args_list[0].args == (cut.brain, cut.brain.spacecraft_rep.curr_data, )
 
-def test_IO_check_does_nothing_when_given_IO_Flag_is_not_True(mocker):
+def test_Simulator_IO_check_does_nothing_when_given_IO_Flag_is_not_True(mocker):
     # Arrange
     arg_time_step = pytest.gen.randint(0, 100) # arbitrary from 0 to 100
     arg_IO_Flag = MagicMock()

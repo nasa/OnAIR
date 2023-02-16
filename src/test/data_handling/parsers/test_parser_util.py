@@ -5,7 +5,7 @@ import src.data_handling.parsers.parser_util as parser_util
 
 
 # extract_configs tests
-def test_extract_configs_returns_empty_dicts_when_given_configFiles_is_vacant():
+def test_parser_util_extract_configs_returns_empty_dicts_when_given_configFiles_is_vacant():
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFiles = []
@@ -21,7 +21,7 @@ def test_extract_configs_returns_empty_dicts_when_given_configFiles_is_vacant():
     # Assert
     assert result == expected_result
 
-def test_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFiles = [MagicMock()]
@@ -49,7 +49,7 @@ def test_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cF
     assert parser_util.extract_config.call_args_list[0].kwargs == {'csv':arg_csv}
     assert result == expected_result
 
-def test_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_cFile(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_cFile(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFiles = [] 
@@ -88,7 +88,7 @@ def test_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_c
         assert parser_util.extract_config.call_args_list[i].kwargs == {'csv':arg_csv}
     assert result == expected_result
 
-def test_extract_configs_default_given_csv_is_False(mocker):
+def test_parser_util_extract_configs_default_given_csv_is_False(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFiles = [MagicMock()]
@@ -113,7 +113,7 @@ def test_extract_configs_default_given_csv_is_False(mocker):
     assert parser_util.extract_config.call_args_list[0].kwargs == {'csv':False}
     
 # extract_config tests
-def test_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_True_and_dataPts_is_vacant(mocker):
+def test_parser_util_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_True_and_dataPts_is_vacant(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = []
@@ -141,7 +141,7 @@ def test_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_lis
     assert fake_descriptor_file.close.call_count == 1
     assert result == (fake_data_source, [], [], [])
 
-def test_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_False_and_dataPts_is_vacant(mocker):
+def test_parser_util_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_False_and_dataPts_is_vacant(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = []
@@ -169,7 +169,7 @@ def test_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_lis
     assert fake_descriptor_file.close.call_count == 1
     assert result == (fake_data_source, [], [], [])
 
-def test_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expected_appended_lists_with_no_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_not_split_on_colon_and_single_test(mocker):
+def test_parser_util_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expected_appended_lists_with_no_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_not_split_on_colon_and_single_test(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = []
@@ -212,7 +212,7 @@ def test_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expecte
     assert parser_util.ast.literal_eval.call_args_list[1].args == (fake_str_test, )
     assert result == (fake_data_source, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
 
-def test_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expected_appended_lists_with_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_split_on_colon_and_single_test(mocker):
+def test_parser_util_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expected_appended_lists_with_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_split_on_colon_and_single_test(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = []
@@ -256,7 +256,7 @@ def test_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expecte
     assert parser_util.ast.literal_eval.call_args_list[1].args == (fake_str_test, )
     assert result == (fake_data_source, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
 
-def test_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expected_appended_lists_with_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_split_on_colon_and_multi_test(mocker):
+def test_parser_util_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expected_appended_lists_with_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_split_on_colon_and_multi_test(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = []
@@ -303,7 +303,7 @@ def test_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expecte
     assert parser_util.ast.literal_eval.call_args_list[2].args == (fake_str_test2, )
     assert result == (fake_data_source, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
 
-def test_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_False_and_dataPts_has_single_item(mocker):
+def test_parser_util_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_False_and_dataPts_has_single_item(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = []
@@ -340,7 +340,7 @@ def test_extract_config_returns_tuple_of_call_to_process_file_path_and_empty_lis
     assert parser_util.ast.literal_eval.call_count == 0
     assert result == (fake_data_source, [], [], [])
 
-def test_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expected_appended_lists_when_csv_resolves_to_True_and_there_are_multiple_data_points(mocker):
+def test_parser_util_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expected_appended_lists_when_csv_resolves_to_True_and_there_are_multiple_data_points(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = []
@@ -396,7 +396,7 @@ def test_extract_config_returns_tuple_of_call_to_process_file_path_and_3_expecte
 
 
 # str2lst tests
-def test_str2lst_returns_call_to_ast_literal_eval_which_receive_given_string(mocker):
+def test_parser_util_str2lst_returns_call_to_ast_literal_eval_which_receive_given_string(mocker):
     # Arrange
     arg_string = str(MagicMock())
 
@@ -412,7 +412,7 @@ def test_str2lst_returns_call_to_ast_literal_eval_which_receive_given_string(moc
     assert parser_util.ast.literal_eval.call_args_list[0].args == (arg_string, )
     assert result == expected_result
 
-def test_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_raises_exception(mocker):
+def test_parser_util_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_raises_exception(mocker):
     # Arrange
     arg_string = str(MagicMock())
     
@@ -430,7 +430,7 @@ def test_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_
     assert result == None
 
 # process_filepath
-def test_process_filepath_returns_filename_from_path_with_txt_replaced_by_csv_when_given_csv_resolves_to_True_and_given_return_config_is_not_True(mocker):
+def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replaced_by_csv_when_given_csv_resolves_to_True_and_given_return_config_is_not_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
 
@@ -448,7 +448,7 @@ def test_process_filepath_returns_filename_from_path_with_txt_replaced_by_csv_wh
     # Assert
     assert result == fake_filename + '.csv'
 
-def test_process_filepath_returns_filename_from_path_with_txt_replaced_by__CONFIG_dot_txt_when_given_csv_resolves_to_True_and_given_return_config_is_True(mocker):
+def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replaced_by__CONFIG_dot_txt_when_given_csv_resolves_to_True_and_given_return_config_is_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
 
@@ -466,7 +466,7 @@ def test_process_filepath_returns_filename_from_path_with_txt_replaced_by__CONFI
     # Assert
     assert result == fake_filename + '_CONFIG.txt'
 
-def test_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_not_True(mocker):
+def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_not_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
 
@@ -484,7 +484,7 @@ def test_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_
     # Assert
     assert result == fake_filename + '.txt'
 
-def test_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_True(mocker):
+def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
 
@@ -502,7 +502,7 @@ def test_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_
     # Assert
     assert result == fake_filename + '_CONFIG.txt'
 
-def test_process_filepath_default_given_csv_is_False(mocker):
+def test_parser_util_process_filepath_default_given_csv_is_False(mocker):
     # Arrange
     fake_filename = str(MagicMock())
 
@@ -519,7 +519,7 @@ def test_process_filepath_default_given_csv_is_False(mocker):
     # Assert
     assert result == fake_filename + '_CONFIG.txt'
 
-def test_process_filepath_default_given_return_config_is_False(mocker):
+def test_parser_util_process_filepath_default_given_return_config_is_False(mocker):
     # Arrange
     fake_filename = str(MagicMock())
 

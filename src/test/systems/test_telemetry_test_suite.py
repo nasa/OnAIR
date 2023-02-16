@@ -6,7 +6,7 @@ import src.systems.telemetry_test_suite as telemetry_test_suite
 from src.systems.telemetry_test_suite import TelemetryTestSuite
 
 # __init__ tests
-def test__init__sets_the_expected_values_with_given_headers_and_tests(mocker):
+def test_TelemetryTestSuite__init__sets_the_expected_values_with_given_headers_and_tests(mocker):
     # Arrange
     arg_headers = MagicMock()
     arg_tests = MagicMock()
@@ -27,7 +27,7 @@ def test__init__sets_the_expected_values_with_given_headers_and_tests(mocker):
                       'FEASIBILITY' : cut.feasibility, 
                              'NOOP' : cut.noop}
 
-def test__init__default_arg_tests_is_empty_list(mocker):
+def test_TelemetryTestSuite__init__default_arg_tests_is_empty_list(mocker):
     # Arrange
     arg_headers = MagicMock()
 
@@ -39,7 +39,7 @@ def test__init__default_arg_tests_is_empty_list(mocker):
     # Assert
     assert cut.tests == []
 
-def test__init__default_arg_headers_is_empty_list(mocker):
+def test_TelemetryTestSuite__init__default_arg_headers_is_empty_list(mocker):
     # Arrange
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -50,7 +50,7 @@ def test__init__default_arg_headers_is_empty_list(mocker):
     assert cut.dataFields == []
 
 # execute_suite tests
-def test_execute_suite_sets_the_latest_results_to_empty_list_when_updated_frame_len_is_0(mocker):
+def test_TelemetryTestSuite_execute_suite_sets_the_latest_results_to_empty_list_when_updated_frame_len_is_0(mocker):
     # Arrange
     arg_update_frame = '' # empty string for len of 0
     arg_sync_data = MagicMock()
@@ -63,7 +63,7 @@ def test_execute_suite_sets_the_latest_results_to_empty_list_when_updated_frame_
     # Assert
     assert cut.latest_results == []
 
-def test_execute_suite_sets_latests_results_to_list_of_run_tests_for_each_item_in_given_updated_frame(mocker):
+def test_TelemetryTestSuite_execute_suite_sets_latests_results_to_list_of_run_tests_for_each_item_in_given_updated_frame(mocker):
     # Arrange
     arg_update_frame = []
     arg_sync_data = MagicMock()
@@ -88,7 +88,7 @@ def test_execute_suite_sets_latests_results_to_list_of_run_tests_for_each_item_i
         assert cut.run_tests.call_args_list[i].args == (i, arg_update_frame[i], arg_sync_data, )
     assert cut.latest_results == expected_results
 
-def test_execute_suite_default_arg_sync_data_is_empty_map(mocker):
+def test_TelemetryTestSuite_execute_suite_default_arg_sync_data_is_empty_map(mocker):
     # Arrange
     arg_update_frame = [MagicMock()]
 
@@ -103,7 +103,7 @@ def test_execute_suite_default_arg_sync_data_is_empty_map(mocker):
     assert cut.run_tests.call_args_list[0].args == (0, arg_update_frame[0], {})
 
 # run_tests tests
-def test_run_tests_return_Status_object_based_upon_given_header_index_but_does_not_append_to_status_when_given_header_index_leads_to_empty_tests(mocker):
+def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_header_index_but_does_not_append_to_status_when_given_header_index_leads_to_empty_tests(mocker):
     # Arrange
     arg_header_index = MagicMock()
     arg_test_val = MagicMock()
@@ -131,7 +131,7 @@ def test_run_tests_return_Status_object_based_upon_given_header_index_but_does_n
     assert telemetry_test_suite.Status.call_args_list[0].args == (expected_datafield, fake_bayesian[0], fake_bayesian[1])
     assert result == expected_result
 
-def test_run_tests_return_Status_object_based_upon_given_header_index_appends_status_when_given_header_index_leads_to_a_single_test_not_named_SYNC(mocker):
+def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_header_index_appends_status_when_given_header_index_leads_to_a_single_test_not_named_SYNC(mocker):
     # Arrange
     arg_header_index = MagicMock()
     arg_test_val = MagicMock()
@@ -171,7 +171,7 @@ def test_run_tests_return_Status_object_based_upon_given_header_index_appends_st
     assert telemetry_test_suite.Status.call_args_list[0].args == (expected_datafield, fake_bayesian[0], fake_bayesian[1])
     assert result == expected_result
   
-def test_run_tests_return_Status_object_based_upon_given_header_index_appends_status_with_empty_data_var_not_in_sync_data_keys_when_given_header_index_leads_to_a_single_test_named_SYNC(mocker):
+def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_header_index_appends_status_with_empty_data_var_not_in_sync_data_keys_when_given_header_index_leads_to_a_single_test_named_SYNC(mocker):
     # Arrange
     arg_header_index = MagicMock()
     arg_test_val = MagicMock()
@@ -210,7 +210,7 @@ def test_run_tests_return_Status_object_based_upon_given_header_index_appends_st
     assert telemetry_test_suite.Status.call_args_list[0].args == (expected_datafield, fake_bayesian[0], fake_bayesian[1])
     assert result == expected_result
     
-def test_run_tests_return_Status_object_based_upon_given_header_index_appends_status_with_updated_data_var_in_sync_data_keys_when_given_header_index_leads_to_a_single_test_named_SYNC(mocker):
+def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_header_index_appends_status_with_updated_data_var_in_sync_data_keys_when_given_header_index_leads_to_a_single_test_named_SYNC(mocker):
     # Arrange
     arg_header_index = MagicMock()
     arg_test_val = MagicMock()
@@ -252,7 +252,7 @@ def test_run_tests_return_Status_object_based_upon_given_header_index_appends_st
     assert telemetry_test_suite.Status.call_args_list[0].args == (expected_datafield, fake_bayesian[0], fake_bayesian[1])
     assert result == expected_result
 
-def test_run_tests_return_Status_object_based_upon_given_header_index_appends_status_with_any_updates_where_vars_in_sync_data_keys_when_given_header_index_leads_to_multiple_tests(mocker):
+def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_header_index_appends_status_with_any_updates_where_vars_in_sync_data_keys_when_given_header_index_leads_to_multiple_tests(mocker):
     # Arrange
     arg_header_index = MagicMock()
     arg_test_val = MagicMock()
@@ -313,7 +313,7 @@ def test_run_tests_return_Status_object_based_upon_given_header_index_appends_st
     assert result == expected_result
   
 # get_latest_result tests
-def test_get_latest_results_returns_None_when_latest_results_is_None():
+def test_TelemetryTestSuite_get_latest_results_returns_None_when_latest_results_is_None():
     # Arrange
     arg_field_name = MagicMock()
 
@@ -326,7 +326,7 @@ def test_get_latest_results_returns_None_when_latest_results_is_None():
     # Assert
     assert result == None
 
-def test_get_latest_results_returns_None_when_latest_results_is_filled(mocker):
+def test_TelemetryTestSuite_get_latest_results_returns_None_when_latest_results_is_filled(mocker):
     # Arrange
     arg_field_name = MagicMock()
 
@@ -347,7 +347,7 @@ def test_get_latest_results_returns_None_when_latest_results_is_filled(mocker):
     assert result == expected_result
 
 # sync tests
-def test_sync_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
+def test_TelemetryTestSuite_sync_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
     # Arrange
     arg_val = MagicMock()
     arg_test_params = MagicMock()
@@ -362,7 +362,7 @@ def test_sync_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str
     assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
 # rotational tests
-def test_rotational_returns_tuple_of_str_YELLOW_and_empty_list():
+def test_TelemetryTestSuite_rotational_returns_tuple_of_str_YELLOW_and_empty_list():
     # Arrange
     arg_val = MagicMock()
     arg_test_params = MagicMock()
@@ -377,7 +377,7 @@ def test_rotational_returns_tuple_of_str_YELLOW_and_empty_list():
     assert result == ('YELLOW', [])
 
 # state tests
-def test_state_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0_when_int_val_is_in_range_test_params_0():
+def test_TelemetryTestSuite_state_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0_when_int_val_is_in_range_test_params_0():
     # Arrange
     arg_test_params = []
     arg_epsilon = MagicMock()
@@ -407,7 +407,7 @@ def test_state_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_st
     # Assert
     assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
-def test_state_returns_tuple_of_str_YELLOW_and_list_containing_tuple_of_set_of_str_YELLOW_and_1_pt_0_when_int_val_is_in_range_test_params_1_and_not_in_0():
+def test_TelemetryTestSuite_state_returns_tuple_of_str_YELLOW_and_list_containing_tuple_of_set_of_str_YELLOW_and_1_pt_0_when_int_val_is_in_range_test_params_1_and_not_in_0():
     # Arrange
     arg_test_params = []
     arg_epsilon = MagicMock()
@@ -441,7 +441,7 @@ def test_state_returns_tuple_of_str_YELLOW_and_list_containing_tuple_of_set_of_s
     # Assert
     assert result == ('YELLOW', [({'YELLOW'}, 1.0)])
     
-def test_state_returns_tuple_of_str_RED_and_list_containing_tuple_of_set_of_str_RED_and_1_pt_0_when_int_val_is_in_range_test_params_2_and_not_in_0_or_1():
+def test_TelemetryTestSuite_state_returns_tuple_of_str_RED_and_list_containing_tuple_of_set_of_str_RED_and_1_pt_0_when_int_val_is_in_range_test_params_2_and_not_in_0_or_1():
     # Arrange
     arg_test_params = []
     arg_epsilon = MagicMock()
@@ -476,7 +476,7 @@ def test_state_returns_tuple_of_str_RED_and_list_containing_tuple_of_set_of_str_
     # Assert
     assert result == ('RED', [({'RED'}, 1.0)])
      
-def test_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of_str_RED_YELLOW_and_GREEN_and_1_pt_0_when_int_val_is_in_not_in_any_range():
+def test_TelemetryTestSuite_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of_str_RED_YELLOW_and_GREEN_and_1_pt_0_when_int_val_is_in_not_in_any_range():
     # Arrange
     arg_test_params = []
     arg_epsilon = MagicMock()
@@ -512,7 +512,7 @@ def test_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of
     assert result == ('---', [({'RED', 'YELLOW', 'GREEN'}, 1.0)])
     
 # feasibility tests
-def test_feasibility_asserts_len_given_test_params_is_not_2_or_4(mocker):
+def test_TelemetryTestSuite_feasibility_asserts_len_given_test_params_is_not_2_or_4(mocker):
     # Arrange
     arg_val = MagicMock()
     arg_test_params = []
@@ -532,7 +532,7 @@ def test_feasibility_asserts_len_given_test_params_is_not_2_or_4(mocker):
     # Assert
     assert e_info.match('')
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_val_eq_to_lowest_bound_when_given_test_params_length_2(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_val_eq_to_lowest_bound_when_given_test_params_length_2(mocker):
     # Arrange
     arg_epsilon = MagicMock()
 
@@ -550,7 +550,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry
     # Assert
     assert result == ('RED', [({'RED', 'GREEN'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_eq_to_lowest_bound_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_eq_to_lowest_bound_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = MagicMock()
 
@@ -572,7 +572,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry
     # Assert
     assert result == ('RED', [({'RED', 'YELLOW'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_2(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_2(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -593,7 +593,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry
     # Assert
     assert result == ('RED', [({'RED'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -614,7 +614,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry
     # Assert
     assert result == ('RED', [({'RED'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_2(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_2(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -637,7 +637,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry
     # Assert
     assert result == ('RED', [({'RED'}, expected_mass), ({'GREEN', 'RED'}, expected_red_yellow_mass)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -662,7 +662,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_lower_boundry
     # Assert
     assert result == ('RED', [({'RED'}, expected_mass), ({'YELLOW', 'RED'}, expected_red_yellow_mass)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_val_eq_to_lowest_bound_when_given_test_params_length_2(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_val_eq_to_lowest_bound_when_given_test_params_length_2(mocker):
     # Arrange
     arg_epsilon = MagicMock()
 
@@ -680,7 +680,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_
     # Assert
     assert result == ('RED', [({'RED', 'GREEN'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_eq_to_lowest_bound_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_eq_to_lowest_bound_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = MagicMock()
 
@@ -702,7 +702,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_
     # Assert
     assert result == ('RED', [({'RED', 'YELLOW'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_2(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_2(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -723,7 +723,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_
     # Assert
     assert result == ('RED', [({'RED'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_less_than_low_range_minus_delta_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -744,7 +744,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_
     # Assert
     assert result == ('RED', [({'RED'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_2(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_2(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -767,7 +767,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_
     # Assert
     assert result == ('RED', [({'RED'}, expected_mass), ({'RED', 'GREEN'}, expected_red_yellow_mass)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_given_val_within_low_range_minus_delta_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -792,7 +792,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_high_boundry_
     # Assert
     assert result == ('RED', [({'RED'}, expected_mass), ({'YELLOW', 'RED'}, expected_red_yellow_mass)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_green_zone_when_given_test_params_length_2(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_green_zone_when_given_test_params_length_2(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -814,7 +814,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_
     # Assert
     assert result == ('GREEN', [({'GREEN'}, expected_mass), ({'GREEN', 'RED'}, 1.0 - expected_mass)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_green_zone_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_green_zone_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -839,7 +839,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_
     # Assert
     assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_yellow_low_zone_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_yellow_low_zone_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = 1.0
 
@@ -864,7 +864,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_
     # Assert
     assert result == ('YELLOW', [({'YELLOW'}, 0.5), ({'RED', 'YELLOW'}, 0.5)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_yellow_high_zone_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_in_yellow_high_zone_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = 0.5
 
@@ -886,7 +886,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_
     # Assert
     assert result == ('YELLOW', [({'YELLOW'}, 0.5), ({'YELLOW', 'RED'}, 0.5)])
 
-def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_on_yellow_high_mark_when_given_test_params_length_4(mocker):
+def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_val_on_yellow_high_mark_when_given_test_params_length_4(mocker):
     # Arrange
     arg_epsilon = 0.5
 
@@ -909,7 +909,7 @@ def test_feasibility_return_expected_stat_and_mass_assignments_for_within_bound_
     assert result == ('YELLOW', [({'YELLOW', 'GREEN'}, 1.0)])
 
 # noop tests
-def test_noop_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
+def test_TelemetryTestSuite_noop_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
     # Arrange
     arg_val = MagicMock()
     arg_test_params = MagicMock()
@@ -924,7 +924,7 @@ def test_noop_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str
     assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
 # calc_single_status tests
-def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_not_str_max_or_str_distr_or_str_strict(mocker):
+def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_not_str_max_or_str_distr_or_str_strict(mocker):
     # Arrange
     arg_status_list = MagicMock()
     arg_mode = MagicMock()
@@ -945,7 +945,7 @@ def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_o
     assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
     assert result == (fake_max_occurrence, 1.0)
 
-def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_str_max(mocker):
+def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_str_max(mocker):
     # Arrange
     arg_status_list = MagicMock()
     arg_mode = 'max'
@@ -966,7 +966,7 @@ def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_o
     assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
     assert result == (fake_max_occurrence, 1.0)
 
-def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_ratio_of_max_occurrence_over_len_given_status_list_when_mode_is_str_distr(mocker):
+def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_ratio_of_max_occurrence_over_len_given_status_list_when_mode_is_str_distr(mocker):
     # Arrange
     arg_status_list = []
     arg_mode = 'distr'
@@ -993,7 +993,7 @@ def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_o
     assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
     assert result == (fake_max_occurrence, expected_float)
 
-def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_str_strict_and_no_occurrences_of_str_RED(mocker):
+def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_occurrences_and_1_pt_0_when_mode_is_str_strict_and_no_occurrences_of_str_RED(mocker):
     # Arrange
     arg_status_list = []
     arg_mode = 'strict'
@@ -1020,7 +1020,7 @@ def test_calc_single_status_returns_tuple_of_value_from_call_to_most_common_on_o
     assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
     assert result == (fake_max_occurrence, 1.0)
 
-def test_calc_single_status_returns_tuple_of_str_RED_and_1_pt_0_when_mode_is_str_strict_and_ratio_of_RED_occurrence_over_len_given_status_list_with_occurrences_of_str_RED(mocker):
+def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_str_RED_and_1_pt_0_when_mode_is_str_strict_and_ratio_of_RED_occurrence_over_len_given_status_list_with_occurrences_of_str_RED(mocker):
     # Arrange
     arg_status_list = []
     arg_mode = 'strict'
@@ -1049,7 +1049,7 @@ def test_calc_single_status_returns_tuple_of_str_RED_and_1_pt_0_when_mode_is_str
     assert telemetry_test_suite.Counter.call_args_list[0].args == (arg_status_list, )
     assert result == ('RED', expected_float)
 
-def test_calc_single_status_default_given_mode_is_str_strict(mocker):
+def test_TelemetryTestSuite_calc_single_status_default_given_mode_is_str_strict(mocker):
     # Arrange
     arg_status_list = []
 
@@ -1078,7 +1078,7 @@ def test_calc_single_status_default_given_mode_is_str_strict(mocker):
     assert result == ('RED', expected_float)
 
 # get_suite_status
-def test_get_suite_status_raises_TypeError_when_latest_results_is_None():
+def test_TelemetryTestSuite_get_suite_status_raises_TypeError_when_latest_results_is_None():
     # Arrange
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
     cut.latest_results = None
@@ -1090,7 +1090,7 @@ def test_get_suite_status_raises_TypeError_when_latest_results_is_None():
     # Assert
     assert e_info.match("'NoneType' object is not iterable")
 
-def test_get_suite_status_returns_value_from_call_to_calc_single_status_when_it_is_given_empty_list_because_latest_results_are_empty(mocker):
+def test_TelemetryTestSuite_get_suite_status_returns_value_from_call_to_calc_single_status_when_it_is_given_empty_list_because_latest_results_are_empty(mocker):
     # Arrange
     expected_result = MagicMock()
 
@@ -1107,7 +1107,7 @@ def test_get_suite_status_returns_value_from_call_to_calc_single_status_when_it_
     assert cut.calc_single_status.call_args_list[0].args == ([], )
     assert result == expected_result
 
-def test_get_suite_status_returns_value_from_call_to_calc_single_status_when_it_is_given_list_of_all_statuses_in_latest_results(mocker):
+def test_TelemetryTestSuite_get_suite_status_returns_value_from_call_to_calc_single_status_when_it_is_given_list_of_all_statuses_in_latest_results(mocker):
     # Arrange
     num_fake_results = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has its own test)
     fake_latest_results = []
@@ -1139,7 +1139,7 @@ def test_get_suite_status_returns_value_from_call_to_calc_single_status_when_it_
 
 # get_status_specific_mnemonics
 # test_get_status_specific_mnemonics_raises_TypeError_when_latest_results_is_None was written because None is the init value for latest_results
-def test_get_status_specific_mnemonics_raises_TypeError_when_latest_results_is_None(mocker):
+def test_TelemetryTestSuite_get_status_specific_mnemonics_raises_TypeError_when_latest_results_is_None(mocker):
      # Arrange
     arg_status = MagicMock()
 
@@ -1153,7 +1153,7 @@ def test_get_status_specific_mnemonics_raises_TypeError_when_latest_results_is_N
     # Assert
     assert e_info.match("'NoneType' object is not iterable")
 
-def test_get_status_specific_mnemonics_returns_empty_list_when_latest_results_is_empty(mocker):
+def test_TelemetryTestSuite_get_status_specific_mnemonics_returns_empty_list_when_latest_results_is_empty(mocker):
     # Arrange
     arg_status = MagicMock()
 
@@ -1166,7 +1166,7 @@ def test_get_status_specific_mnemonics_returns_empty_list_when_latest_results_is
     # Assert
     assert result == []
 
-def test_get_status_specific_mnemonics_returns_the_only_name_in_latest_results_because_its_status_eq_given_status(mocker):
+def test_TelemetryTestSuite_get_status_specific_mnemonics_returns_the_only_name_in_latest_results_because_its_status_eq_given_status(mocker):
     # Arrange
     arg_status = MagicMock()
 
@@ -1186,7 +1186,7 @@ def test_get_status_specific_mnemonics_returns_the_only_name_in_latest_results_b
     # Assert
     assert result == [expected_name]
 
-def test_get_status_specific_mnemonics_returns_empty_list_latest_results_because_its_status_not_eq_given_status(mocker):
+def test_TelemetryTestSuite_get_status_specific_mnemonics_returns_empty_list_latest_results_because_its_status_not_eq_given_status(mocker):
     # Arrange
     arg_status = MagicMock()
 
@@ -1203,7 +1203,7 @@ def test_get_status_specific_mnemonics_returns_empty_list_latest_results_because
     # Assert
     assert result == []
 
-def test_get_status_specific_mnemonics_returns_only_names_in_latest_results_where_status_matches_given_status(mocker):
+def test_TelemetryTestSuite_get_status_specific_mnemonics_returns_only_names_in_latest_results_where_status_matches_given_status(mocker):
     # Arrange
     arg_status = MagicMock()
 
@@ -1237,7 +1237,7 @@ def test_get_status_specific_mnemonics_returns_only_names_in_latest_results_wher
     assert result == expected_names
     assert len(result) != len(fake_latest_results)
 
-def test_get_status_specific_mnemonics_returns_all_names_in_latest_results_when_all_statuses_matches_given_status(mocker):
+def test_TelemetryTestSuite_get_status_specific_mnemonics_returns_all_names_in_latest_results_when_all_statuses_matches_given_status(mocker):
     # Arrange
     arg_status = MagicMock()
 
@@ -1264,7 +1264,7 @@ def test_get_status_specific_mnemonics_returns_all_names_in_latest_results_when_
     assert result == expected_names
     assert len(result) == len(fake_latest_results)
 
-def test_get_status_specific_mnemonics_default_given_status_is_str_RED(mocker):
+def test_TelemetryTestSuite_get_status_specific_mnemonics_default_given_status_is_str_RED(mocker):
     # Arrange
     fake_res = MagicMock()
 

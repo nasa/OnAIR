@@ -5,7 +5,7 @@ import src.run_scripts.execution_engine as execution_engine
 from src.run_scripts.execution_engine import ExecutionEngine
 
 # __init__ tests
-def test__init__sets_expected_values_but_does_no_calls_when_config_file_is_empty_string(mocker):
+def test_ExecutionEngine__init__sets_expected_values_but_does_no_calls_when_config_file_is_empty_string(mocker):
     # Arrange
     arg_config_file = ''
     arg_run_name = MagicMock()
@@ -46,7 +46,7 @@ def test__init__sets_expected_values_but_does_no_calls_when_config_file_is_empty
     assert cut.parse_data.call_count == 0
     assert cut.setup_sim.call_count == 0
 
-def test__init__does_calls_when_config_file_is_an_occupied_string(mocker):
+def test_ExecutionEngine__init__does_calls_when_config_file_is_an_occupied_string(mocker):
     # Arrange
     arg_config_file = str(MagicMock())
     arg_run_name = MagicMock()
@@ -70,7 +70,7 @@ def test__init__does_calls_when_config_file_is_an_occupied_string(mocker):
     assert cut.parse_data.call_args_list[0].args == (cut.parser_name, cut.parser_file_name, cut.dataFilePath, cut.metadataFilePath, )
     assert cut.setup_sim.call_count == 1
 
-def test__init__accepts_no_arguments_using_defaults_instead_with_config_file_default_as_empty_string(mocker):
+def test_ExecutionEngine__init__accepts_no_arguments_using_defaults_instead_with_config_file_default_as_empty_string(mocker):
     # Arrange
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
@@ -89,7 +89,7 @@ def test__init__accepts_no_arguments_using_defaults_instead_with_config_file_def
     assert cut.init_save_paths.call_count == 0
 
 # parse_configs tests
-def test_parse_configs_sets_all_items_without_error(mocker):
+def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     # Arrange
     arg_config_file_path = MagicMock()
 
@@ -145,7 +145,7 @@ def test_parse_configs_sets_all_items_without_error(mocker):
     assert fake_run_flags.getboolean.call_args_list[3].args == ('Viz_Flag', )
     assert cut.Viz_Flag == fake_Viz_flags
 
-def test_parse_configs_bypasses_benmarks_when_access_raises_error(mocker):
+def test_ExecutionEngine_parse_configs_bypasses_benmarks_when_access_raises_error(mocker):
     # Arrange
     arg_config_file_path = MagicMock()
 
@@ -182,7 +182,7 @@ def test_parse_configs_bypasses_benmarks_when_access_raises_error(mocker):
     assert hasattr(cut, 'benchmarkIndices') == False
 
 # parse_data tests
-def test_parse_data_sets_the_processedSimData_to_the_TimeSynchronizer_which_was_given_the_sim_data_received_from_parsed_data(mocker):
+def test_ExecutionEngine_parse_data_sets_the_processedSimData_to_the_TimeSynchronizer_which_was_given_the_sim_data_received_from_parsed_data(mocker):
     # Arrange
     arg_parser_name = MagicMock()
     arg_parser_file_name = MagicMock()
@@ -240,7 +240,7 @@ def test_parse_data_sets_the_processedSimData_to_the_TimeSynchronizer_which_was_
     assert execution_engine.TimeSynchronizer.call_args_list[0].args == ({fake_parsed_data, FakeParser.init_data_path}, {FakeParser.init_metadata_path, FakeParser.init_tlm_files}, {FakeParser.init_metaFiles, FakeParser.init_subsystems_breakdown})
     assert cut.processedSimData == fake_processdSimData
 
-def test_parse_data_argument_subsystems_breakdown_optional_default_is_False(mocker):
+def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_default_is_False(mocker):
     # Arrange
     arg_parser_name = MagicMock()
     arg_parser_file_name = MagicMock()
@@ -287,7 +287,7 @@ def test_parse_data_argument_subsystems_breakdown_optional_default_is_False(mock
     assert FakeParser.init_subsystems_breakdown == False
 
 # setup_sim tests
-def test_setup_sim_sets_self_sim_to_new_Simulator_and_sets_benchmark_data_when_no_exceptions_are_encountered(mocker):
+def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_and_sets_benchmark_data_when_no_exceptions_are_encountered(mocker):
     # Arrange
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.sim_name = MagicMock()
@@ -327,7 +327,7 @@ def test_setup_sim_sets_self_sim_to_new_Simulator_and_sets_benchmark_data_when_n
     assert fake_sim.set_benchmark_data.call_count == 1
     assert fake_sim.set_benchmark_data.call_args_list[0].args == (fake_fp + '/../..' + cut.benchmarkFilePath, fake_fls, fake_bi, )
 
-def test_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_set_bencmark_data_because_exception_is_encountered(mocker):
+def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_set_bencmark_data_because_exception_is_encountered(mocker):
     # Arrange
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.sim_name = MagicMock()
@@ -364,7 +364,7 @@ def test_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_set_bencmark_data
     assert fake_sim.set_benchmark_data.call_count == 0
 
 # run_sim tests
-def test_run_sim_runs_but_does_not_save_results_when_save_flag_is_False(mocker):
+def test_ExecutionEngine_run_sim_runs_but_does_not_save_results_when_save_flag_is_False(mocker):
     # Arrange
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.sim = MagicMock()
@@ -384,7 +384,7 @@ def test_run_sim_runs_but_does_not_save_results_when_save_flag_is_False(mocker):
     assert cut.sim.run_sim.call_args_list[0].args == (cut.IO_Flag, cut.Dev_Flag, cut.Viz_Flag, )
     assert cut.save_results.call_count == 0
 
-def test_run_sim_runs_and_saves_results_when_save_flag_is_True(mocker):
+def test_ExecutionEngine_run_sim_runs_and_saves_results_when_save_flag_is_True(mocker):
     # Arrange
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.sim = MagicMock()
@@ -407,7 +407,7 @@ def test_run_sim_runs_and_saves_results_when_save_flag_is_True(mocker):
     assert cut.save_results.call_args_list[0].args == (cut.save_name, )
 
 # init_save_paths tests
-def test_init_save_paths_makes_tmp_and_models_and_diagnosis_directories_and_adds_them_to_os_environ(mocker):
+def test_ExecutionEngine_init_save_paths_makes_tmp_and_models_and_diagnosis_directories_and_adds_them_to_os_environ(mocker):
     # Arrange
     fake_save_path = str(MagicMock())
     fake_environ = {'RESULTS_PATH':fake_save_path}
@@ -440,7 +440,7 @@ def test_init_save_paths_makes_tmp_and_models_and_diagnosis_directories_and_adds
     assert execution_engine.os.environ['ONAIR_DIAGNOSIS_SAVE_PATH'] == fake_tmp_diagnosis_path
 
 # delete_save_path tests
-def test_delete_save_paths_does_nothing_when_save_path_has_no_tmp_dir(mocker):
+def test_ExecutionEngine_delete_save_paths_does_nothing_when_save_path_has_no_tmp_dir(mocker):
     # Arrange
     fake_save_path = str(MagicMock())
     fake_environ = {'RESULTS_PATH':fake_save_path}
@@ -463,7 +463,7 @@ def test_delete_save_paths_does_nothing_when_save_path_has_no_tmp_dir(mocker):
     assert execution_engine.os.listdir.call_args_list[0].args == (fake_save_path, )
     assert execution_engine.shutil.rmtree.call_count == 0
 
-def test_delete_save_paths_removes_tmp_tree_when_it_exists(mocker):
+def test_ExecutionEngine_delete_save_paths_removes_tmp_tree_when_it_exists(mocker):
     # Arrange
     fake_save_path = str(MagicMock())
     fake_environ = {'RESULTS_PATH':fake_save_path}
@@ -492,7 +492,7 @@ def test_delete_save_paths_removes_tmp_tree_when_it_exists(mocker):
     assert execution_engine.shutil.rmtree.call_args_list[0].args == (fake_save_path + '/tmp', )
     assert execution_engine.print.call_count == 0
 
-def test_delete_save_paths_prints_error_message_when_rmtree_raises_OSError(mocker):
+def test_ExecutionEngine_delete_save_paths_prints_error_message_when_rmtree_raises_OSError(mocker):
     # Arrange
     fake_save_path = str(MagicMock())
     fake_environ = {'RESULTS_PATH':fake_save_path}
@@ -524,7 +524,7 @@ def test_delete_save_paths_prints_error_message_when_rmtree_raises_OSError(mocke
     assert execution_engine.print.call_args_list[0].args == (("Error: " + fake_save_path + " : " + fake_error_message), )
 
 # save_results tests
-def test_save_results_creates_expected_save_path_and_copies_proper_tree_to_it(mocker):
+def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_proper_tree_to_it(mocker):
     # Arrange
     arg_save_name = str(MagicMock())
 
@@ -557,7 +557,7 @@ def test_save_results_creates_expected_save_path_and_copies_proper_tree_to_it(mo
     assert execution_engine.copy_tree.call_args_list[0].args == (fake_onair_tmp_save_path, fake_save_path, )
     
 # set_run_param tests
-def test_set_run_param_passes_given_arguments_to_setattr(mocker):
+def test_ExecutionEngine_set_run_param_passes_given_arguments_to_setattr(mocker):
     # Arrange
     arg_name = MagicMock()
     arg_val = MagicMock()

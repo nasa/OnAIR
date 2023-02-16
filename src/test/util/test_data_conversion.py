@@ -7,7 +7,7 @@ import util.data_conversion
 from numpy import ndarray
 
 # floatify_input tests
-def test_flotify_input_returns_empty_list_when_given__input_is_vacant(mocker):
+def test_data_conversion_flotify_input_returns_empty_list_when_given__input_is_vacant(mocker):
     # Arrange
     arg__input = [] # empty list, no iterations
     arg_remove_str = False
@@ -18,7 +18,7 @@ def test_flotify_input_returns_empty_list_when_given__input_is_vacant(mocker):
     # Assert
     assert result == []
 
-def test_flotify_input_returns_list_of_size_one_that_contains_the_call_to_float_when_no_Exception_is_thrown_and_given__input_is_str(mocker):
+def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_the_call_to_float_when_no_Exception_is_thrown_and_given__input_is_str(mocker):
     # Arrange
     arg__input = []
     arg_remove_str = False 
@@ -38,7 +38,7 @@ def test_flotify_input_returns_list_of_size_one_that_contains_the_call_to_float_
     assert float.call_args_list[0].args == (arg__input[0], )
     assert result == [expected_result]
 
-def test_flotify_input_returns_list_of_size_one_that_contains_the_second_call_to_float_after_replace_call_when_single_Exception_is_thrown(mocker):
+def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_the_second_call_to_float_after_replace_call_when_single_Exception_is_thrown(mocker):
     # Arrange
     arg__input = []
     arg_remove_str = False
@@ -66,7 +66,7 @@ def test_flotify_input_returns_list_of_size_one_that_contains_the_second_call_to
     assert fake_item.replace.call_args_list[2].args == ('.', '', )
     assert result == [expected_result]
 
-def test_flotify_input_returns_list_of_size_one_that_contains_0_dot_0_when_two_Exceptions_are_thrown_and_remove_str_is_False(mocker):
+def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_0_dot_0_when_two_Exceptions_are_thrown_and_remove_str_is_False(mocker):
     # Arrange
     arg__input = []
     arg_remove_str = False
@@ -93,7 +93,7 @@ def test_flotify_input_returns_list_of_size_one_that_contains_0_dot_0_when_two_E
     assert fake_item.replace.call_args_list[2].args == ('.', '', )
     assert result == [0.0]
 
-def test_flotify_input_default_arg_remove_str_is_False(mocker):
+def test_data_conversion_flotify_input_default_arg_remove_str_is_False(mocker):
     # Arrange
     arg__input = []
 
@@ -112,7 +112,7 @@ def test_flotify_input_default_arg_remove_str_is_False(mocker):
     # Assert
     assert result == [0.0] # shows flow was correct for remove_str being False
 
-def test_flotify_input_returns_empty_list_when_two_Exceptions_are_thrown_and_remove_str_is_True(mocker):
+def test_data_conversion_flotify_input_returns_empty_list_when_two_Exceptions_are_thrown_and_remove_str_is_True(mocker):
     # Arrange
     arg__input = []
     arg_remove_str = True
@@ -139,7 +139,7 @@ def test_flotify_input_returns_empty_list_when_two_Exceptions_are_thrown_and_rem
     assert fake_item.replace.call_args_list[2].args == ('.', '', )
     assert result == []
 
-def test_flotify_input_returns_call_to_float_that_was_given___input_item_when_type_of_item_is_not_str_and_there_is_single_item(mocker):
+def test_data_conversion_flotify_input_returns_call_to_float_that_was_given___input_item_when_type_of_item_is_not_str_and_there_is_single_item(mocker):
     # Arrange
     arg__input = []
 
@@ -158,7 +158,7 @@ def test_flotify_input_returns_call_to_float_that_was_given___input_item_when_ty
     # Assert
     assert result == [expected_result] # shows flow was correct for remove_str being False
 
-def test_flotify_input_returns_expected_values_for_given__input_that_is_multi_typed_when_remove_str_is_True(mocker):
+def test_data_conversion_flotify_input_returns_expected_values_for_given__input_that_is_multi_typed_when_remove_str_is_True(mocker):
     # Arrange
     arg__input = []
     arg_remove_str = True
@@ -211,7 +211,7 @@ def test_flotify_input_returns_expected_values_for_given__input_that_is_multi_ty
     # Assert
     assert result == expected_result
     
-def test_flotify_input_returns_expected_values_for_given__input_that_is_multi_typed_when_remove_str_is_False(mocker):
+def test_data_conversion_flotify_input_returns_expected_values_for_given__input_that_is_multi_typed_when_remove_str_is_False(mocker):
     # Arrange
     arg__input = []
     arg_remove_str = False
@@ -266,7 +266,7 @@ def test_flotify_input_returns_expected_values_for_given__input_that_is_multi_ty
     assert result == expected_result
     
 # status_to_oneHot tests
-def test_status_to_oneHot_returns_given_status_when_status_isinstance_of_np_ndarray(mocker):
+def test_data_conversion_status_to_oneHot_returns_given_status_when_status_isinstance_of_np_ndarray(mocker):
     # Arrange
     arg_status = MagicMock()
 
@@ -280,7 +280,7 @@ def test_status_to_oneHot_returns_given_status_when_status_isinstance_of_np_ndar
     assert util.data_conversion.isinstance.call_args_list[0].args == (arg_status, ndarray)
     assert result == arg_status
 
-def test_status_to_oneHot_returns_one_hot_set_to_list_of_four_zeros_and_the_value_of_the_classes_status_to_1_point_0(mocker):
+def test_data_conversion_status_to_oneHot_returns_one_hot_set_to_list_of_four_zeros_and_the_value_of_the_classes_status_to_1_point_0(mocker):
     # Arrange
     arg_status = MagicMock()
 
