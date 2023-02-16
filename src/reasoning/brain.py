@@ -11,7 +11,7 @@ from src.data_driven_components.data_driven_learning import DataDrivenLearning
 from src.systems.spacecraft import Spacecraft
 
 class Brain:
-    def __init__(self, spacecraft=None):
+    def __init__(self, spacecraft):
         self.spacecraft_rep = spacecraft
         self.learning_systems = DataDrivenLearning(self.spacecraft_rep.get_headers())
         self.mission_status = self.spacecraft_rep.get_status()
