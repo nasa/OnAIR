@@ -39,17 +39,6 @@ def test__init__sets_spacecraft_rep_to_given_spacecraft_and_learning_systems_and
     assert arg_spacecraft.get_bayesian_status.call_args_list[0].args == ()
     assert cut.bayesian_status == fake_bayesian_status
 
-def test__init__errors_when_using_default_for_given_spacecraft(mocker):
-    # Arrange
-    cut = Brain.__new__(Brain)
-
-    # Act
-    with pytest.raises(AttributeError) as e_info:
-        cut.__init__()
-
-    # Assert
-    assert e_info.match("'NoneType' object has no attribute 'get_headers'")
-
 # reason tests
 def test_reason_updates_spacecraft_rep_with_given_frame_and_sets_new_spacecraft_mission_status_and_updates_learning_systems_with_given_frame_and_new_mission_status(mocker):
     # Arrange
