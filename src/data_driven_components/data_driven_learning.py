@@ -4,13 +4,15 @@ Data driven learning class for managing all data driven AI components
 import importlib
 
 from src.util.data_conversion import *
+from src.data_driven_components.generic_component import AIPlugIn
+
 
 class DataDrivenLearning:
     def __init__(self, headers, _ai_plugins:list=['kalman']):
         assert(len(headers)>0)
         self.headers = headers
         self.ai_constructs = [
-            importlib.import_module('src.data_driven_components.' + plugin + '.core').AIPlugIn(plugin, headers) for plugin in _ai_plugins
+            importlib.import_module('src.data_driven_components.' + plugin_name + '.' + f'{plugin_name}_plugin').AIPlugIn(plugin_name, headers) for plugin_name in _ai_plugins
         ]
 
     def update(self, curr_data, status):

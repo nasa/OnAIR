@@ -1,4 +1,3 @@
-
 from src.data_driven_components.generic_intelligence_construct import GenericIntelligenceConstruct
 
 """This object serves as a proxy for all plug-ins.

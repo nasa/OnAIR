@@ -9,6 +9,7 @@ import copy
 from src.systems.status import Status
 from src.data_driven_components.data_driven_learning import DataDrivenLearning
 from src.systems.spacecraft import Spacecraft
+from src.reasoning.diagnosis import Diagnosis
 
 class Brain:
     def __init__(self, spacecraft):
@@ -24,5 +25,11 @@ class Brain:
         self.learning_systems.update(frame, self.mission_status)
 
     def diagnose(self, time_step):
-        None
+        """ Grab the mnemonics from the """
+        learning_system_results = self.learning_systems.render_diagnosis() 
+        diagnosis = Diagnosis(time_step, 
+                              learning_system_results,
+                              self.bayesian_status,
+                              self.spacecraft_rep.get_current_faulting_mnemonics())
+        return diagnosis
 
