@@ -433,15 +433,18 @@ def test_parser_util_str2lst_prints_message_when_ast_literal_eval_receives_given
 def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replaced_by_csv_when_given_csv_resolves_to_True_and_given_return_config_is_not_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
+    fake_os_sep = pytest.gen.choice('\/')
 
     arg_path = ""
     arg_return_config = False if pytest.gen.randint(0, 1) == 1 else 0
     arg_csv = True if pytest.gen.randint(0, 1) == 1 else MagicMock()
 
     for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + '/'
+        arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
-    print(arg_path)
+
+    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
 
@@ -451,15 +454,18 @@ def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replac
 def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replaced_by__CONFIG_dot_txt_when_given_csv_resolves_to_True_and_given_return_config_is_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
+    fake_os_sep = pytest.gen.choice('\/')
 
     arg_path = ""
     arg_return_config = True
     arg_csv = True if pytest.gen.randint(0, 1) == 1 else MagicMock()
 
     for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + '/'
+        arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
-    print(arg_path)
+
+    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
 
@@ -469,15 +475,18 @@ def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replac
 def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_not_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
+    fake_os_sep = pytest.gen.choice('\\')
 
     arg_path = ""
     arg_return_config = False if pytest.gen.randint(0, 1) == 1 else 0
     arg_csv = False if pytest.gen.randint(0, 1) == 1 else 0
 
     for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + '/'
+        arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
-    print(arg_path)
+
+    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
 
@@ -487,15 +496,18 @@ def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_
 def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_True(mocker):
     # Arrange
     fake_filename = str(MagicMock())
+    fake_os_sep = pytest.gen.choice('\\')
 
     arg_path = ""
     arg_return_config = True
     arg_csv = False if pytest.gen.randint(0, 1) == 1 else 0
 
     for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + '/'
+        arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
-    print(arg_path)
+
+    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
 
@@ -505,14 +517,17 @@ def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_
 def test_parser_util_process_filepath_default_given_csv_is_False(mocker):
     # Arrange
     fake_filename = str(MagicMock())
+    fake_os_sep = pytest.gen.choice('\\')
 
     arg_path = ""
     arg_return_config = True
 
     for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + '/'
+        arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
-    print(arg_path)
+
+    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config)
 
@@ -522,13 +537,16 @@ def test_parser_util_process_filepath_default_given_csv_is_False(mocker):
 def test_parser_util_process_filepath_default_given_return_config_is_False(mocker):
     # Arrange
     fake_filename = str(MagicMock())
+    fake_os_sep = pytest.gen.choice('\\')
 
     arg_path = ""
 
     for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + '/'
+        arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
-    print(arg_path)
+
+    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+
     # Act
     result = parser_util.process_filepath(arg_path)
 
