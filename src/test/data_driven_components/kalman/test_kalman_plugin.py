@@ -230,31 +230,64 @@ def test_Kalman_render_diagnosis_returns_value_returned_by_frame_diagnosis_funct
     assert result == forced_frame_diagnose_return
 
 # test mean
-def test_Kalman_():
+def test_Kalman_mean_calculates_return_value_by_dividing_sum_by_len(mocker):
     # Arrange
+    arg_values = MagicMock()
+
+    forced_sum_return_value = pytest.gen.uniform(1.0, 10.0) # arbitrary, random float from 1.0 to 10.0
+    forced_len_return_value = pytest.gen.uniform(1.0, 10.0) # arbitrary, random float from 1.0 to 10.0
+    mocker.patch('src.data_driven_components.kalman.kalman_plugin.sum', return_value=forced_sum_return_value)
+    mocker.patch('src.data_driven_components.kalman.kalman_plugin.len', return_value=forced_len_return_value)
+
+    cut = Kalman.__new__(Kalman)
 
     # Act
+    result = cut.mean(arg_values)
 
     # Assert
-    assert True
+    assert kalman.sum.call_count == 1
+    assert kalman.sum.call_args_list[0].args == (arg_values, )
+    assert kalman.len.call_count == 1
+    assert kalman.len.call_args_list[0].args == (arg_values, )
+    assert result == forced_sum_return_value/forced_len_return_value
 
 # test residual
-def test_Kalman_():
+def test_Kalman_residual_calculates_return_value_by_finding_the_abs_difference_of_given_args(mocker):
     # Arrange
+    arg_predicted = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+    arg_actual = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+
+    forced_abs_return_value = MagicMock()
+    mocker.patch('src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+
+    cut = Kalman.__new__(Kalman)
 
     # Act
+    result = cut.residual(arg_predicted, arg_actual)
 
     # Assert
-    assert True
+    assert result == forced_abs_return_value
+    assert kalman.abs.call_count == 1
+    assert kalman.abs.call_args_list[0].args == (arg_actual - arg_predicted, )
 
 # test std_dev
-def test_Kalman_():
+def test_Kalman_std_dev_calculates_return_value_by_using_np_std_function_on_arg_data(mocker):
     # Arrange
+    arg_data = MagicMock()
+
+    forced_std_return_value = MagicMock()
+    mocker.patch('src.data_driven_components.kalman.kalman_plugin.np.std', return_value=forced_std_return_value)
+
+    cut = Kalman.__new__(Kalman)
 
     # Act
+    result = cut.std_dev(arg_data)
 
     # Assert
-    assert True
+    assert result == forced_std_return_value
+    assert kalman.np.std.call_count == 1
+    assert kalman.np.std.call_args_list[0].args == (arg_data, )
+
     
 # test predict
 def test_Kalman_():
