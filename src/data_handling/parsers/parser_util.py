@@ -1,4 +1,5 @@
 import ast
+import os
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFiles, csv = False):
@@ -62,13 +63,13 @@ def str2lst(string):
         
 def process_filepath(path, return_config=False, csv = False):
     if csv:
-        filename =  path.split('/')[-1].replace('_CONFIG', '')
+        filename =  path.split(os.sep)[-1].replace('_CONFIG', '')
         filename = filename.replace('.txt', '.csv')
         if return_config == True:
             filename = filename.replace('.csv', '_CONFIG.txt')
         return filename
     else:
-        filename =  path.split('/')[-1].replace('_CONFIG', '')
+        filename =  path.split(os.sep)[-1].replace('_CONFIG', '')
         if return_config == True:
             filename = filename.replace('.txt', '_CONFIG.txt')
         return filename
