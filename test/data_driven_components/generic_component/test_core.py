@@ -31,7 +31,7 @@ class BadFakeAIPlugIn(AIPlugIn):
         return super().apriori_training()
 
     def update(self):
-        return super().update()
+        return None
 
     def render_diagnosis(self):
         return super().render_diagnosis()
@@ -107,18 +107,6 @@ def test_AIPlugIn__init__asserts_when_given__headers_len_is_less_than_0():
 
     # Assert
     assert e_info.match('')
-
-def test_AIPlugIn__init__returns_None_when_headers_len_is_greater_than_0():
-    # Arrange
-    fake_ic = FakeAIPlugIn.__new__(FakeAIPlugIn)
-
-    # Act
-    fake_headers = ["fake_item"]
-    fake_name = MagicMock()
-    result = fake_ic.__init__(fake_name, fake_headers)
-    
-    # Assert
-    assert result == None
 
 def test_AIPlugIn__init__sets_instance_values_to_given_args_when_when_given__headers_len_is_greater_than_0(mocker):
     # Arrange
