@@ -288,24 +288,240 @@ def test_Kalman_std_dev_calculates_return_value_by_using_np_std_function_on_arg_
     assert kalman.np.std.call_count == 1
     assert kalman.np.std.call_args_list[0].args == (arg_data, )
 
-    
 # test predict
-def test_Kalman_():
+def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_data_is_empty_and_initial_val_equals_None(mocker):
     # Arrange
+    arg_data = []
+    arg_forward_steps = MagicMock()
+    arg_initial_val = None
+
+    fake_kf = MagicMock()
+
+    forced_predict_return_value = MagicMock()
+    mocker.patch.object(fake_kf, 'smooth')
+    mocker.patch.object(fake_kf, 'predict', return_value=forced_predict_return_value)
+
+    cut = Kalman.__new__(Kalman)
+    cut.kf = fake_kf
 
     # Act
+    result = cut.predict(arg_data, arg_forward_steps, arg_initial_val)
 
     # Assert
-    assert True
-    
+    assert result == forced_predict_return_value
+    assert fake_kf.smooth.call_count == 1
+    assert fake_kf.smooth.call_args_list[0].args == (arg_data, )
+    assert fake_kf.predict.call_count == 1
+    assert fake_kf.predict.call_args_list[0].args == (arg_data, arg_forward_steps)
+   
+def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_data_is_empty_and_initial_val_is_not_None(mocker):
+    # Arrange
+    arg_data = []
+    arg_forward_steps = MagicMock()
+    arg_initial_val = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+
+    fake_kf = MagicMock()
+
+    forced_predict_return_value = MagicMock()
+    mocker.patch.object(fake_kf, 'smooth')
+    mocker.patch.object(fake_kf, 'predict', return_value=forced_predict_return_value)
+
+    cut = Kalman.__new__(Kalman)
+    cut.kf = fake_kf
+
+    # Act
+    result = cut.predict(arg_data, arg_forward_steps, arg_initial_val)
+
+    # Assert
+    assert result == forced_predict_return_value
+    assert fake_kf.smooth.call_count == 1
+    assert fake_kf.smooth.call_args_list[0].args == (arg_data, )
+    assert fake_kf.smooth.call_args_list[0].kwargs == {'initial_value' : [arg_initial_val,0]}
+    assert fake_kf.predict.call_count == 1
+    assert fake_kf.predict.call_args_list[0].args == (arg_data, arg_forward_steps)
+
+def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_initial_val_equals_None(mocker):
+    # Arrange
+    len_arg_data = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    arg_data = []
+    for i in range(len_arg_data):
+        rand_float = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+        arg_data.append(rand_float)
+    arg_forward_steps = MagicMock()
+    arg_initial_val = None
+
+    fake_kf = MagicMock()
+
+    forced_predict_return_value = MagicMock()
+    mocker.patch.object(fake_kf, 'smooth')
+    mocker.patch.object(fake_kf, 'predict', return_value=forced_predict_return_value)
+
+    cut = Kalman.__new__(Kalman)
+    cut.kf = fake_kf
+
+    # Act
+    result = cut.predict(arg_data, arg_forward_steps, arg_initial_val)
+
+    # Assert
+    assert result == forced_predict_return_value
+    assert fake_kf.smooth.call_count == 1
+    assert fake_kf.smooth.call_args_list[0].args == (arg_data, )
+    assert fake_kf.predict.call_count == 1
+    assert fake_kf.predict.call_args_list[0].args == (arg_data, arg_forward_steps)
+   
+def test_Kalman_predict_when_not_given_initial_val_arg_sets_initial_val_arg_equal_to_None(mocker):
+    # Arrange
+    len_arg_data = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    arg_data = []
+    for i in range(len_arg_data):
+        rand_float = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+        arg_data.append(rand_float)
+    arg_forward_steps = MagicMock()
+
+    fake_kf = MagicMock()
+
+    forced_predict_return_value = MagicMock()
+    mocker.patch.object(fake_kf, 'smooth')
+    mocker.patch.object(fake_kf, 'predict', return_value=forced_predict_return_value)
+
+    cut = Kalman.__new__(Kalman)
+    cut.kf = fake_kf
+
+    # Act
+    result = cut.predict(arg_data, arg_forward_steps)
+
+    # Assert
+    assert result == forced_predict_return_value
+    assert fake_kf.smooth.call_count == 1
+    assert fake_kf.smooth.call_args_list[0].args == (arg_data, )
+    assert fake_kf.predict.call_count == 1
+    assert fake_kf.predict.call_args_list[0].args == (arg_data, arg_forward_steps)
+   
+def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_initial_val_is_not_None(mocker):
+    # Arrange
+    len_arg_data = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    arg_data = []
+    for i in range(len_arg_data):
+        rand_float = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+        arg_data.append(rand_float)
+    arg_forward_steps = MagicMock()
+    arg_initial_val = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+
+    fake_kf = MagicMock()
+
+    forced_predict_return_value = MagicMock()
+    mocker.patch.object(fake_kf, 'smooth')
+    mocker.patch.object(fake_kf, 'predict', return_value=forced_predict_return_value)
+
+    cut = Kalman.__new__(Kalman)
+    cut.kf = fake_kf
+
+    # Act
+    result = cut.predict(arg_data, arg_forward_steps, arg_initial_val)
+
+    # Assert
+    assert result == forced_predict_return_value
+    assert fake_kf.smooth.call_count == 1
+    assert fake_kf.smooth.call_args_list[0].args == (arg_data, )
+    assert fake_kf.smooth.call_args_list[0].kwargs == {'initial_value' : [arg_initial_val,0]}
+    assert fake_kf.predict.call_count == 1
+    assert fake_kf.predict.call_args_list[0].args == (arg_data, arg_forward_steps)
+
+def test_Kalman_predict_floatifies_args_and_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_args_are_not_float_values(mocker):
+    # Arrange
+    len_arg_data = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    arg_data = []
+    arg_data_float = []
+    for i in range(len_arg_data):
+        rand_float = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+        arg_data_float.append(rand_float)
+        arg_data.append(str(rand_float))
+    arg_forward_steps = MagicMock()
+    arg_initial_val_float = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+    arg_initial_val = str(arg_initial_val_float)
+
+    fake_kf = MagicMock()
+
+    forced_predict_return_value = MagicMock()
+    mocker.patch.object(fake_kf, 'smooth')
+    mocker.patch.object(fake_kf, 'predict', return_value=forced_predict_return_value)
+
+    cut = Kalman.__new__(Kalman)
+    cut.kf = fake_kf
+
+    # Act
+    result = cut.predict(arg_data, arg_forward_steps, arg_initial_val)
+
+    # Assert
+    assert result == forced_predict_return_value
+    assert arg_data == arg_data_float
+    assert arg_initial_val != arg_initial_val_float
+    assert fake_kf.smooth.call_count == 1
+    assert fake_kf.smooth.call_args_list[0].args == (arg_data_float,)
+    assert fake_kf.smooth.call_args_list[0].kwargs == {'initial_value' : [arg_initial_val_float,0]}
+    assert fake_kf.predict.call_count == 1
+    assert fake_kf.predict.call_args_list[0].args == (arg_data_float, arg_forward_steps)
+
 # test predictions_for_given_data
-def test_Kalman_():
+def test_Kalman_predictions_for_given_data_raises_error_when_data_arg_is_empty(mocker):
     # Arrange
+    arg_data = []
+
+    cut = Kalman.__new__(Kalman)
+    mocker.patch.object(cut, 'predict')
 
     # Act
+    with pytest.raises(IndexError) as e_info:
+        result = cut.predictions_for_given_data(arg_data)
 
     # Assert
-    assert True
+    assert e_info.match('list index out of range')
+    assert cut.predict.call_count == 0
+
+def test_Kalman_predictions_for_given_data_returns_expected_result_when_data_arg_has_only_one_element(mocker):
+    # Arrange
+    arg_data = [MagicMock()]
+
+    cut = Kalman.__new__(Kalman)
+
+    forced_predict_return_value = MagicMock()
+    forced_pred_mean = MagicMock()
+    mocker.patch.object(cut, 'predict')
+
+    expected_result = [0]
+
+    # Act
+    result = cut.predictions_for_given_data(arg_data)
+
+    # Assert
+    assert result == expected_result
+    assert cut.predict.call_count == 0
+
+def test_Kalman_predictions_for_given_data_returns_expected_result_when_data_arg_has_more_than_one_element(mocker):
+    # Arrange
+    len_data = pytest.gen.randint(2, 10) # arbitrary, random int from 1 to 10
+    arg_data = [MagicMock()] * len_data
+
+    cut = Kalman.__new__(Kalman)
+
+    forced_predict_return_value = MagicMock()
+    forced_pred_mean = MagicMock()
+    mocker.patch.object(forced_predict_return_value, 'observations', forced_predict_return_value)
+    mocker.patch.object(forced_predict_return_value, 'mean', forced_pred_mean)
+    mocker.patch.object(cut, 'predict', return_value=forced_predict_return_value)
+
+    expected_result = []
+    for i in range(len_data - 1):
+        expected_result.append(forced_pred_mean)
+
+    # Act
+    result = cut.predictions_for_given_data(arg_data)
+
+    # Assert
+    assert result == expected_result
+    assert cut.predict.call_count == len_data - 1
+    for i in range(len_data - 1):
+        cut.predict.call_args_list[i].args == (arg_data[0:i+1], 1, arg_data[0])
     
 # test generate_residuals_for_given_data
 def test_Kalman_():
