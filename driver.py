@@ -2,6 +2,11 @@
 Driver
 Source of the main function for the OnAIR repo
 """
+import pytest
+import coverage
+# coverage started early to see all lines in all files (def and imports were being missed with programmatic runs)
+cov = coverage.Coverage(source=['src'], branch=True)
+cov.start()
 
 import os
 import sys
@@ -36,11 +41,11 @@ def main():
         blockPrint()
 
     init_global_paths(args.test)
-    setup_folders(os.environ['RESULTS_PATH'])
 
     if args.test:
-        run_unit_tests()
+        run_unit_tests(cov)
     else:
+        setup_folders(os.environ['RESULTS_PATH'])
         save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
         OnAIR = ExecutionEngine(args.configfile, save_name, args.save)
         OnAIR.run_sim()
@@ -49,9 +54,12 @@ def main():
 
 
 """ Runs all unit tests """
-def run_unit_tests():
-    # placeholder. Body was deleted with test_all.py file
-    return -1
+def run_unit_tests(Coverage: cov):
+    
+    retval=pytest.main(['test'])
+    cov.stop()
+    cov.save()
+    cov.html_report()
 
 """ Initializes global paths, used throughout execution """
 def init_global_paths(test=False):
