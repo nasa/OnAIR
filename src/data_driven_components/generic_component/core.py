@@ -24,19 +24,19 @@ class AIPlugIn(ABC):
         # There will be no return from this function (user can pull training)
         # data from the construct itself) 
         # I dont know yet whether we should allow empty batch data
-        pass
+        raise not NotImplementedError
         
     @abstractmethod
     def update(self, frame=[]):
         """
         Given streamed data point, system should update internally
         """
-        pass
+        raise not NotImplementedError
 
     @abstractmethod
     def render_diagnosis(self):
         """
         System should return its diagnosis
         """
-        pass
+        raise not NotImplementedError
 
