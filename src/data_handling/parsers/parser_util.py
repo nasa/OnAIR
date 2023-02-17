@@ -1,5 +1,4 @@
 import ast
-import os
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFiles, csv = False):
@@ -8,10 +7,10 @@ def extract_configs(configFilePath, configFiles, csv = False):
     desc_assigns = {}
 
     for cFile in configFiles:
-        filename, subsystem_assignments, tests, descs = extract_config(configFilePath, cFile, csv=csv)
-        ss_assigns[filename] = subsystem_assignments
-        test_assigns[filename] = tests
-        desc_assigns[filename] = descs
+        subsystem_assignments, tests, descs = extract_config(configFilePath, cFile, csv=csv)
+        ss_assigns = subsystem_assignments
+        test_assigns = tests
+        desc_assigns = descs
 
     configs = {'subsystem_assignments' : ss_assigns,
                'test_assignments' : test_assigns,
@@ -20,8 +19,6 @@ def extract_configs(configFilePath, configFiles, csv = False):
 
 ## Helper method for extract_configs
 def extract_config(configFilePath, configFile, csv = False):
-    data_source = process_filepath(configFile, csv=csv)
-
     subsystem_assignments = []
     mnemonic_tests = []
     descriptions = []
@@ -31,8 +28,9 @@ def extract_config(configFilePath, configFile, csv = False):
     descriptor_file.close()
 
     dataPts = data_str.split('\n')
-    if not csv:
-        dataPts = dataPts[:len(dataPts)-1]
+    dataPts = [i for i in dataPts if i]
+    # if not csv:
+    #     dataPts = dataPts[:len(dataPts)-1]
 
     for field_info in dataPts:
         data = field_info.split(' : ')
@@ -52,7 +50,7 @@ def extract_config(configFilePath, configFile, csv = False):
 
         mnemonic_tests.append(test_list)
 
-    return data_source, subsystem_assignments, mnemonic_tests, descriptions
+    return subsystem_assignments, mnemonic_tests, descriptions
 
 def str2lst(string):
     try:
@@ -63,14 +61,13 @@ def str2lst(string):
         
 def process_filepath(path, return_config=False, csv = False):
     if csv:
-        filename =  path.split(os.sep)[-1].replace('_CONFIG', '')
+        filename =  path.split('/')[-1].replace('_CONFIG', '')
         filename = filename.replace('.txt', '.csv')
         if return_config == True:
             filename = filename.replace('.csv', '_CONFIG.txt')
         return filename
     else:
-        filename =  path.split(os.sep)[-1].replace('_CONFIG', '')
+        filename =  path.split('/')[-1].replace('_CONFIG', '')
         if return_config == True:
             filename = filename.replace('.txt', '_CONFIG.txt')
         return filename
-
