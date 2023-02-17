@@ -11,13 +11,17 @@ class FakeAIPlugIn(AIPlugIn):
         return super().__init__(_name, _headers)
 
     def apriori_training(self):
-        return super().apriori_training()
+        return None
 
     def update(self):
-        return super().update()
+        return None
 
     def render_diagnosis(self):
-        return super().render_diagnosis()
+        return dict()
+
+class IncompleteFakeAIPlugIn(AIPlugIn):
+    def __init__(self, _name, _headers):
+        return super().__init__(_name, _headers)
 
 # abstract methods tests
 def test_AIPlugIn_has_expected_abstract_methods():
@@ -32,36 +36,30 @@ def test_AIPlugIn_has_expected_abstract_methods():
     assert "update" in e_info.__str__()
     assert "render_diagnosis" in e_info.__str__()
 
-# super call tests
-def test_AIPlugIn_apriori_training_returns_None():
-    # Arrange
-    fake_ic = FakeAIPlugIn.__new__(FakeAIPlugIn)
-
+def test_incomplete_AIPlugIn_has_expected_abstract_methods():
+    # Arrange - None
     # Act
-    result = fake_ic.apriori_training()
+    with pytest.raises(TypeError) as e_info:
+        cut = AIPlugIn.__new__(AIPlugIn)
     
     # Assert
-    assert result == None
+    assert "Can't instantiate abstract class AIPlugIn with" in e_info.__str__()
+    assert "apriori_training" in e_info.__str__()
+    assert "update" in e_info.__str__()
+    assert "render_diagnosis" in e_info.__str__()
 
-def test_AIPlugIn_update_returns_None():
+
+# Incomplete plugin call tests
+def test_complete_AIPlugIn_does_not_raise():
     # Arrange
-    fake_ic = FakeAIPlugIn.__new__(FakeAIPlugIn)
-
-    # Act
-    result = fake_ic.update()
+    exception_raised = False
+    try:
+        fake_ic = FakeAIPlugIn.__new__(FakeAIPlugIn)
+    except:
+        exception_raised = True
     
     # Assert
-    assert result == None
-
-def test_AIPlugIn_render_diagnosis_returns_None(mocker):
-    # Arrange
-    fake_ic = FakeAIPlugIn.__new__(FakeAIPlugIn)
-
-    # Act
-    result = fake_ic.render_diagnosis()
-    
-    # Assert
-    assert result == None
+    assert exception_raised == False
 
 # __init__ tests
 def test_AIPlugIn__init__asserts_when_given__headers_len_is_less_than_0():
@@ -77,18 +75,6 @@ def test_AIPlugIn__init__asserts_when_given__headers_len_is_less_than_0():
 
     # Assert
     assert e_info.match('')
-
-def test_AIPlugIn__init__returns_None_when_headers_len_is_greater_than_0():
-    # Arrange
-    fake_ic = FakeAIPlugIn.__new__(FakeAIPlugIn)
-
-    # Act
-    fake_headers = ["fake_item"]
-    fake_name = MagicMock()
-    result = fake_ic.__init__(fake_name, fake_headers)
-    
-    # Assert
-    assert result == None
 
 def test_AIPlugIn__init__sets_instance_values_to_given_args_when_when_given__headers_len_is_greater_than_0(mocker):
     # Arrange
