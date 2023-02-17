@@ -24,7 +24,7 @@ class IncompleteFakeAIPlugIn(AIPlugIn):
         return super().__init__(_name, _headers)
 
 # abstract methods tests
-def test_AIPlugIn_has_expected_abstract_methods():
+def test_AIPlugIn_raises_error_because_of_unimplemented_abstract_methods():
     # Arrange - None
     # Act
     with pytest.raises(TypeError) as e_info:
@@ -36,21 +36,19 @@ def test_AIPlugIn_has_expected_abstract_methods():
     assert "update" in e_info.__str__()
     assert "render_diagnosis" in e_info.__str__()
 
-def test_incomplete_AIPlugIn_has_expected_abstract_methods():
+def test_Incomplete_AIPlugIn_raises_error_because_of_unimplemented_abstract_methods():
     # Arrange - None
     # Act
     with pytest.raises(TypeError) as e_info:
-        cut = AIPlugIn.__new__(AIPlugIn)
+        cut = IncompleteFakeAIPlugIn.__new__(IncompleteFakeAIPlugIn)
     
     # Assert
-    assert "Can't instantiate abstract class AIPlugIn with" in e_info.__str__()
+    assert "Can't instantiate abstract class IncompleteFakeAIPlugIn with" in e_info.__str__()
     assert "apriori_training" in e_info.__str__()
     assert "update" in e_info.__str__()
     assert "render_diagnosis" in e_info.__str__()
 
-
-# Incomplete plugin call tests
-def test_complete_AIPlugIn_does_not_raise():
+def test_Complete_AIPlugIn_does_not_raise_error_because_abstract_methods_are_implemented():
     # Arrange
     exception_raised = False
     try:
@@ -61,8 +59,10 @@ def test_complete_AIPlugIn_does_not_raise():
     # Assert
     assert exception_raised == False
 
+# Complete plugin call tests
+
 # __init__ tests
-def test_AIPlugIn__init__asserts_when_given__headers_len_is_less_than_0():
+def test_AIPlugIn__init__raises_assertion_error_when_given__headers_len_is_not_greater_than_0():
     # Arrange
     arg__name = MagicMock()
     arg__headers = []
@@ -76,7 +76,7 @@ def test_AIPlugIn__init__asserts_when_given__headers_len_is_less_than_0():
     # Assert
     assert e_info.match('')
 
-def test_AIPlugIn__init__sets_instance_values_to_given_args_when_when_given__headers_len_is_greater_than_0(mocker):
+def test_AIPlugIn__init__sets_instance_values_to_given_args_when_given__headers_len_is_greater_than_0(mocker):
     # Arrange
     arg__name = MagicMock()
     arg__headers = MagicMock()
