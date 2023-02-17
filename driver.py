@@ -19,6 +19,8 @@ from src.util.cleanup import *
 
 from src.run_scripts.execution_engine import ExecutionEngine
 
+cov.stop()
+
 def main():
     """
     This is the standard naming format, for now.
@@ -55,7 +57,7 @@ def main():
 
 """ Runs all unit tests """
 def run_unit_tests(Coverage: cov):
-    
+    cov.start()
     retval=pytest.main(['test'])
     cov.stop()
     cov.save()
