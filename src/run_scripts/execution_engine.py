@@ -50,11 +50,11 @@ class ExecutionEngine:
             self.parse_data(self.parser_name, self.parser_file_name, self.dataFilePath, self.metadataFilePath)
             self.setup_sim()
 
-    def parse_configs(self, config_file_path):
-        # print("Using config file: {}".format(config_file_path))
+    def parse_configs(self, config_filepath):
+        # print("Using config file: {}".format(config_filepath))
 
         config = configparser.ConfigParser()
-        config.read(config_file_path)
+        config.read(config_filepath)
         ## Sort Data: Telementry Data & Configuration
         self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
         self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']

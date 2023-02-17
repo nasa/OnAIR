@@ -19,8 +19,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == ''
     assert cut.sim_data == ''
     assert cut.binning_configs == '' 
@@ -39,8 +39,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == ''
     assert cut.sim_data == ''
     assert cut.binning_configs == '' 
@@ -59,8 +59,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == ''
     assert cut.sim_data == ''
     assert cut.binning_configs == '' 
@@ -93,8 +93,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == fake_labels
     assert cut.sim_data == fake_data
     assert cut.binning_configs == expected_binning_configs 
@@ -144,8 +144,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == fake_labels
     assert cut.sim_data == fake_data
     assert cut.binning_configs == expected_binning_configs 
@@ -155,7 +155,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
     # Arrange
     arg_dataFile = MagicMock()
 
-    fake_raw_data_file_path = MagicMock()
+    fake_raw_data_filepath = MagicMock()
     forced_return_os_path_join = MagicMock()
     fake_initial_data_set = MagicMock()
     fake_initial_data_set.loc = MagicMock()
@@ -177,14 +177,14 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
     mocker.patch.object(fake_initial_data_set, 'iterrows', return_value=[])
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_file_path
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
 
     # Assert
     assert csv_parser.os.path.join.call_count == 1
-    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_file_path, arg_dataFile)
+    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_filepath, arg_dataFile)
     assert csv_parser.pd.read_csv.call_count == 1
     assert csv_parser.pd.read_csv.call_args_list[0].args == (forced_return_os_path_join, )
     assert csv_parser.pd.read_csv.call_args_list[0].kwargs == {'delimiter':',', 'header':0, 'dtype':str}
@@ -198,7 +198,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
     # Arrange
     arg_dataFile = MagicMock()
 
-    fake_raw_data_file_path = MagicMock()
+    fake_raw_data_filepath = MagicMock()
     forced_return_os_path_join = MagicMock()
     fake_initial_data_set = MagicMock()
     fake_initial_data_set.loc = MagicMock()
@@ -220,14 +220,14 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=[])
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_file_path
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
 
     # Assert
     assert csv_parser.os.path.join.call_count == 1
-    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_file_path, arg_dataFile)
+    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_filepath, arg_dataFile)
     assert csv_parser.pd.read_csv.call_count == 1
     assert csv_parser.pd.read_csv.call_args_list[0].args == (forced_return_os_path_join, )
     assert csv_parser.pd.read_csv.call_args_list[0].kwargs == {'delimiter':',', 'header':0, 'dtype':str}
@@ -241,7 +241,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     # Arrange
     arg_dataFile = MagicMock()
 
-    fake_raw_data_file_path = MagicMock()
+    fake_raw_data_filepath = MagicMock()
     forced_return_os_path_join = MagicMock()
     fake_initial_data_set = MagicMock()
     fake_loc = MagicMock()
@@ -274,14 +274,14 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_file_path
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
 
     # Assert
     assert csv_parser.os.path.join.call_count == 1
-    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_file_path, arg_dataFile)
+    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_filepath, arg_dataFile)
     assert csv_parser.pd.read_csv.call_count == 1
     assert csv_parser.pd.read_csv.call_args_list[0].args == (forced_return_os_path_join, )
     assert csv_parser.pd.read_csv.call_args_list[0].kwargs == {'delimiter':',', 'header':0, 'dtype':str}
@@ -293,7 +293,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     # Arrange
     arg_dataFile = MagicMock()
 
-    fake_raw_data_file_path = MagicMock()
+    fake_raw_data_filepath = MagicMock()
     forced_return_os_path_join = MagicMock()
     fake_initial_data_set = MagicMock()
     fake_loc = MagicMock()
@@ -328,14 +328,14 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_file_path
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
 
     # Assert
     assert csv_parser.os.path.join.call_count == 1
-    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_file_path, arg_dataFile)
+    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_filepath, arg_dataFile)
     assert csv_parser.pd.read_csv.call_count == 1
     assert csv_parser.pd.read_csv.call_args_list[0].args == (forced_return_os_path_join, )
     assert csv_parser.pd.read_csv.call_args_list[0].kwargs == {'delimiter':',', 'header':0, 'dtype':str}
@@ -347,7 +347,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     # Arrange
     arg_dataFile = MagicMock()
 
-    fake_raw_data_file_path = MagicMock()
+    fake_raw_data_filepath = MagicMock()
     forced_return_os_path_join = MagicMock()
     fake_initial_data_set = MagicMock()
     fake_loc = MagicMock()
@@ -392,14 +392,14 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_file_path
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
 
     # Assert
     assert csv_parser.os.path.join.call_count == 1
-    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_file_path, arg_dataFile)
+    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_filepath, arg_dataFile)
     assert csv_parser.pd.read_csv.call_count == 1
     assert csv_parser.pd.read_csv.call_args_list[0].args == (forced_return_os_path_join, )
     assert csv_parser.pd.read_csv.call_args_list[0].kwargs == {'delimiter':',', 'header':0, 'dtype':str}
@@ -408,12 +408,12 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     assert result == expected_result
 
 # CSV parse_config_data_CSV tests
-def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_file_path_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_when_given_ss_breakdown_does_not_resolve_to_False(mocker):
+def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_when_given_ss_breakdown_does_not_resolve_to_False(mocker):
     # Arrange
     arg_configFile = MagicMock()
     arg_ss_breakdown = True if pytest.gen.randint(0, 1) else MagicMock()
 
-    fake_metadata_file_path = MagicMock()
+    fake_metadata_filepath = MagicMock()
 
     expected_result = MagicMock()
 
@@ -421,24 +421,24 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     mocker.patch('src.data_handling.parsers.csv_parser.len')
 
     cut = CSV.__new__(CSV)
-    cut.metadata_file_path = fake_metadata_file_path
+    cut.metadata_filepath = fake_metadata_filepath
 
     # Act
     result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1
-    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_file_path, [arg_configFile])
+    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_configFile])
     assert csv_parser.extract_configs.call_args_list[0].kwargs == {'csv': True}
     assert csv_parser.len.call_count == 0
     assert result == expected_result
 
-def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_file_path_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_of_subsystem_assigments_def_of_call_to_process_file_path_given_configFile_and_kwarg_csv_set_to_True_set_to_empty_list_when_len_of_call_value_dict_def_of_subsystem_assigments_def_of_call_to_process_file_path_given_configFile_and_kwarg_csv_set_to_True_is_0_when_given_ss_breakdown_evaluates_to_False(mocker):
+def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_empty_list_when_len_of_call_value_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_is_0_when_given_ss_breakdown_evaluates_to_False(mocker):
     # Arrange
     arg_configFile = MagicMock()
     arg_ss_breakdown = False if pytest.gen.randint(0, 1) else 0
     
-    fake_metadata_file_path = MagicMock()
+    fake_metadata_filepath = MagicMock()
     forced_return_extract_configs = {}
     forced_return_process_filepath = MagicMock()
     forced_return_len = 0
@@ -453,14 +453,14 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     mocker.patch('src.data_handling.parsers.csv_parser.len', return_value=forced_return_len)
 
     cut = CSV.__new__(CSV)
-    cut.metadata_file_path = fake_metadata_file_path
+    cut.metadata_filepath = fake_metadata_filepath
 
     # Act
     result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1
-    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_file_path, [arg_configFile])
+    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_configFile])
     assert csv_parser.extract_configs.call_args_list[0].kwargs == {'csv': True}
     assert csv_parser.process_filepath.call_count == 2
     assert csv_parser.process_filepath.call_args_list[0].args == (arg_configFile, )
@@ -471,12 +471,12 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     assert csv_parser.len.call_args_list[0].args == (fake_empty_processed_filepath, )
     assert result['subsystem_assignments'][forced_return_process_filepath] == expected_result
 
-def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_file_path_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_subsystem_assignments_def_of_call_to_process_file_path_given_configFile_and_kwarg_csv_set_to_True_set_to_single_item_list_str_MISSION_for_each_item_when_given_ss_breakdown_evaluates_to_False(mocker):
+def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_subsystem_assignments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_single_item_list_str_MISSION_for_each_item_when_given_ss_breakdown_evaluates_to_False(mocker):
     # Arrange
     arg_configFile = MagicMock()
     arg_ss_breakdown = False if pytest.gen.randint(0, 1) else 0
     
-    fake_metadata_file_path = MagicMock()
+    fake_metadata_filepath = MagicMock()
     forced_return_extract_configs = {}
     forced_return_process_filepath = MagicMock()
     fake_processed_filepath = []
@@ -496,14 +496,14 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     mocker.patch('src.data_handling.parsers.csv_parser.len', return_value=forced_return_len)
 
     cut = CSV.__new__(CSV)
-    cut.metadata_file_path = fake_metadata_file_path
+    cut.metadata_filepath = fake_metadata_filepath
 
     # Act
     result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1
-    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_file_path, [arg_configFile])
+    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_configFile])
     assert csv_parser.extract_configs.call_args_list[0].kwargs == {'csv': True}
     assert csv_parser.process_filepath.call_count == 2
     assert csv_parser.process_filepath.call_args_list[0].args == (arg_configFile, )
