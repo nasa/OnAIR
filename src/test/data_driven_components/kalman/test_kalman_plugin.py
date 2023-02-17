@@ -642,10 +642,105 @@ def test_Kalman_current_attribute_chunk_get_error_returns_false_when_abs_of_mean
     assert kalman.abs.call_args_list[1].args == (forced_abs_return_value, )
 
 # test frame_diagnosis
-def test_Kalman_frame_diagnosis_(mocker):
+def test_Kalman_frame_diagnosis_returns_empty_list_when_args_frame_and_headers_are_empty():
     # Arrange
+    arg_frame = []
+    arg_headers = []
+
+    cut = Kalman.__new__(Kalman)
 
     # Act
+    result = cut.frame_diagnosis(arg_frame, arg_headers)
 
     # Assert
-    assert True
+    assert result == []
+
+def test_Kalman_frame_diagnosis_returns_empty_list_when_current_attribute_chunk_get_error_always_returns_false_and_args_not_empty(mocker):
+    # Arrange
+    len_args = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    arg_frame = []
+    for i in range(len_args):
+        arg_frame.append(MagicMock())
+    arg_headers = MagicMock()
+
+    cut = Kalman.__new__(Kalman)
+    forced_get_error_return_value = False
+    mocker.patch.object(cut, 'current_attribute_chunk_get_error', return_value=forced_get_error_return_value)
+
+    # Act
+    result = cut.frame_diagnosis(arg_frame, arg_headers)
+
+    # Assert
+    assert result == []
+    assert cut.current_attribute_chunk_get_error.call_count == len_args
+    for i in range(len_args):
+        assert cut.current_attribute_chunk_get_error.call_args_list[i].args == (arg_frame[i], )
+
+def test_Kalman_frame_diagnosis_returns_empty_list_when_all_elements_in_headers_arg_match_time_str(mocker):
+    # Arrange
+    len_args = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    arg_frame = [MagicMock()] * len_args
+    arg_headers = ['TIME'] * len_args
+
+    cut = Kalman.__new__(Kalman)
+    forced_get_error_return_value = True
+    mocker.patch.object(cut, 'current_attribute_chunk_get_error', return_value=forced_get_error_return_value)
+
+    # Act
+    result = cut.frame_diagnosis(arg_frame, arg_headers)
+
+    # Assert
+    assert result == []
+
+def test_Kalman_frame_diagnosis_returns_list_of_all_elements_in_headers_arg_when_current_attribute_chunk_get_error_always_returns_true_and_args_not_empty_and_headers_does_not_contain_strings_matching_time_str(mocker):
+    # Arrange
+    len_args = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    arg_frame = []
+    arg_headers = []
+    for i in range(len_args):
+        arg_frame.append(MagicMock())
+        arg_headers.append(str(MagicMock()))
+
+    cut = Kalman.__new__(Kalman)
+    forced_get_error_return_value = True
+    mocker.patch.object(cut, 'current_attribute_chunk_get_error', return_value=forced_get_error_return_value)
+
+    # Act
+    result = cut.frame_diagnosis(arg_frame, arg_headers)
+
+    # Assert
+    assert result == arg_headers
+
+def test_Kalman_frame_diagnosis_returns_expected_sublist_of_headers_when_headers_contains_strings_matching_time_str_and_the_result_of_current_attribute_chunk_get_error_is_not_constant(mocker):
+    # Arrange
+    len_args = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    arg_frame = []
+    arg_headers = []
+    for i in range(len_args):
+        arg_frame.append(MagicMock())
+        arg_headers.append(str(MagicMock()))
+
+    num_time_strings = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    for i in range(num_time_strings):
+        rand_index = pytest.gen.randint(0, len_args) # random index in arg_frame
+        arg_frame.append(MagicMock()) # ordering of frame does not matter
+        arg_headers.insert(rand_index, 'time')
+        len_args += 1
+
+    cut = Kalman.__new__(Kalman)
+    expected_result = []
+    forced_get_error_side_effect = []
+    for i in range(len_args):
+        coin_flip = pytest.gen.randint(0, 1) # random int, either 0 or 1
+        if coin_flip == 0 or arg_headers[i] == 'time':
+            forced_get_error_side_effect.append(False)
+        else:
+            forced_get_error_side_effect.append(True)
+            expected_result.append(arg_headers[i])
+    mocker.patch.object(cut, 'current_attribute_chunk_get_error', side_effect=forced_get_error_side_effect)
+
+    # Act
+    result = cut.frame_diagnosis(arg_frame, arg_headers)
+
+    # Assert
+    assert result == expected_result
