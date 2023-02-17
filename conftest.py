@@ -10,4 +10,4 @@ def pytest_configure():
   print(f"conftest random seed = {seed}")
 
   simdkalman = MagicMock()
-  sys.modules['simdkalman']  =simdkalman
+  sys.modules['simdkalman'] = simdkalman
