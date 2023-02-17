@@ -472,7 +472,7 @@ def test_Kalman_predictions_for_given_data_raises_error_when_data_arg_is_empty(m
 
     # Act
     with pytest.raises(IndexError) as e_info:
-        result = cut.predictions_for_given_data(arg_data)
+        cut.predictions_for_given_data(arg_data)
 
     # Assert
     assert e_info.match('list index out of range')
@@ -484,8 +484,6 @@ def test_Kalman_predictions_for_given_data_returns_expected_result_when_data_arg
 
     cut = Kalman.__new__(Kalman)
 
-    forced_predict_return_value = MagicMock()
-    forced_pred_mean = MagicMock()
     mocker.patch.object(cut, 'predict')
 
     expected_result = [0]
@@ -524,16 +522,127 @@ def test_Kalman_predictions_for_given_data_returns_expected_result_when_data_arg
         cut.predict.call_args_list[i].args == (arg_data[0:i+1], 1, arg_data[0])
     
 # test generate_residuals_for_given_data
-def test_Kalman_():
+def test_Kalman_generate_residuals_for_given_data_raises_error_when_data_arg_is_empty(mocker):
     # Arrange
+    arg_data = []
+
+    cut = Kalman.__new__(Kalman)
+    mocker.patch.object(cut, 'predict')
 
     # Act
+    with pytest.raises(IndexError) as e_info:
+        cut.generate_residuals_for_given_data(arg_data)
 
     # Assert
-    assert True
-    
+    assert e_info.match('list index out of range')
+    assert cut.predict.call_count == 0
+
+def test_Kalman_generate_residuals_for_given_data_returns_expected_result_when_data_arg_has_only_one_element(mocker):
+    # Arrange
+    arg_data = [MagicMock()]
+
+    cut = Kalman.__new__(Kalman)
+
+    mocker.patch.object(cut, 'predict')
+
+    expected_result = [0]
+
+    # Act
+    result = cut.generate_residuals_for_given_data(arg_data)
+
+    # Assert
+    assert result == expected_result
+    assert cut.predict.call_count == 0
+
+def test_Kalman_generate_residuals_for_given_data_returns_expected_result_when_data_arg_has_more_than_one_element(mocker):
+    # Arrange
+    len_data = pytest.gen.randint(2, 10) # arbitrary, random int from 1 to 10
+    arg_data = [MagicMock()] * len_data
+
+    cut = Kalman.__new__(Kalman)
+
+    forced_predict_return_value = MagicMock()
+    forced_pred_mean = MagicMock()
+    forced_residual_side_effect = []
+    for i in range(len_data - 1):
+        rand_float = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
+        forced_residual_side_effect.append(rand_float)
+    mocker.patch.object(forced_predict_return_value, 'observations', forced_predict_return_value)
+    mocker.patch.object(forced_predict_return_value, 'mean', forced_pred_mean)
+    mocker.patch.object(cut, 'residual', side_effect=forced_residual_side_effect)
+    mocker.patch.object(cut, 'predict', return_value=forced_predict_return_value)
+
+    expected_result = []
+    for i in range(len_data - 1):
+        expected_result.append(forced_residual_side_effect[i])
+
+    # Act
+    result = cut.generate_residuals_for_given_data(arg_data)
+
+    # Assert
+    assert result == expected_result
+    assert cut.predict.call_count == len_data - 1
+    for i in range(len_data - 1):
+        cut.predict.call_args_list[i].args == (arg_data[0:i+1], 1, arg_data[0])
+    assert cut.residual.call_count == len_data - 1
+    for i in range(len_data - 1):
+        cut.residual.call_args_list[i].args == (forced_pred_mean, arg_data[i + 1])
+
 # test current_attribute_chunk_get_error
-def test_Kalman_():
+def test_Kalman_current_attribute_chunk_get_error_returns_true_when_abs_of_mean_residuals_equal_to_or_greater_than_one_point_five(mocker):
+    # Arrange
+    arg_data = MagicMock()
+
+    cut = Kalman.__new__(Kalman)
+    forced_generate_residuals_return_value = MagicMock()
+    forced_mean_return_value = MagicMock()
+    forced_abs_return_value = pytest.gen.uniform(1.5, 10.0) # random float, greater than cutoff value 1.5
+
+    mocker.patch.object(cut, 'generate_residuals_for_given_data', return_value=forced_generate_residuals_return_value)
+    mocker.patch.object(cut, 'mean', return_value=forced_mean_return_value)
+    mocker.patch('src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+
+    # Act
+    result = cut.current_attribute_chunk_get_error(arg_data)
+
+    # Assert
+    assert result == True
+    assert cut.generate_residuals_for_given_data.call_count == 1
+    assert cut.generate_residuals_for_given_data.call_args_list[0].args == (arg_data, )
+    assert cut.mean.call_count == 1
+    assert cut.mean.call_args_list[0].args == (forced_generate_residuals_return_value, )
+    assert kalman.abs.call_count == 2
+    assert kalman.abs.call_args_list[0].args == (forced_mean_return_value, )
+    assert kalman.abs.call_args_list[1].args == (forced_abs_return_value, )
+    
+def test_Kalman_current_attribute_chunk_get_error_returns_false_when_abs_of_mean_residuals_less_than_one_point_five(mocker):
+    # Arrange
+    arg_data = MagicMock()
+
+    cut = Kalman.__new__(Kalman)
+    forced_generate_residuals_return_value = MagicMock()
+    forced_mean_return_value = MagicMock()
+    forced_abs_return_value = pytest.gen.uniform(0.0, 1.49) # random float, less than cutoff value 1.5
+
+    mocker.patch.object(cut, 'generate_residuals_for_given_data', return_value=forced_generate_residuals_return_value)
+    mocker.patch.object(cut, 'mean', return_value=forced_mean_return_value)
+    mocker.patch('src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+
+    # Act
+    result = cut.current_attribute_chunk_get_error(arg_data)
+
+    # Assert
+    assert result == False
+    assert cut.generate_residuals_for_given_data.call_count == 1
+    assert cut.generate_residuals_for_given_data.call_args_list[0].args == (arg_data, )
+    assert cut.mean.call_count == 1
+    assert cut.mean.call_args_list[0].args == (forced_generate_residuals_return_value, )
+    assert kalman.abs.call_count == 2
+    assert kalman.abs.call_args_list[0].args == (forced_mean_return_value, )
+    assert kalman.abs.call_args_list[1].args == (forced_abs_return_value, )
+
+# test frame_diagnosis
+def test_Kalman_frame_diagnosis_(mocker):
     # Arrange
 
     # Act
