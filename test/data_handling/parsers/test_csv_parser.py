@@ -457,16 +457,13 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     
     fake_metadata_filepath = MagicMock()
     forced_return_extract_configs = {}
-    forced_return_process_filepath = MagicMock()
     forced_return_len = 0
     fake_empty_processed_filepath = MagicMock()
-    forced_return_extract_configs['subsystem_assignments'] = {}
-    forced_return_extract_configs['subsystem_assignments'][forced_return_process_filepath] = fake_empty_processed_filepath
+    forced_return_extract_configs['subsystem_assignments'] = fake_empty_processed_filepath
 
     expected_result = []
 
     mocker.patch('src.data_handling.parsers.csv_parser.extract_configs', return_value=forced_return_extract_configs)
-    mocker.patch('src.data_handling.parsers.csv_parser.process_filepath', return_value=forced_return_process_filepath)
     mocker.patch('src.data_handling.parsers.csv_parser.len', return_value=forced_return_len)
 
     cut = CSV.__new__(CSV)
@@ -479,14 +476,9 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     assert csv_parser.extract_configs.call_count == 1
     assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_configFile])
     assert csv_parser.extract_configs.call_args_list[0].kwargs == {'csv': True}
-    assert csv_parser.process_filepath.call_count == 2
-    assert csv_parser.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert csv_parser.process_filepath.call_args_list[0].kwargs == {'csv': True}
-    assert csv_parser.process_filepath.call_args_list[1].args == (arg_configFile, )
-    assert csv_parser.process_filepath.call_args_list[1].kwargs == {'csv': True}
     assert csv_parser.len.call_count == 1
     assert csv_parser.len.call_args_list[0].args == (fake_empty_processed_filepath, )
-    assert result['subsystem_assignments'][forced_return_process_filepath] == expected_result
+    assert result['subsystem_assignments'] == expected_result
 
 def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_subsystem_assignments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_single_item_list_str_MISSION_for_each_item_when_given_ss_breakdown_evaluates_to_False(mocker):
     # Arrange
@@ -500,8 +492,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     num_fake_processed_filepaths = pytest.gen.randint(1,10) # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_processed_filepaths):
         fake_processed_filepath.append(i)
-    forced_return_extract_configs['subsystem_assignments'] = {}
-    forced_return_extract_configs['subsystem_assignments'][forced_return_process_filepath] = fake_processed_filepath
+    forced_return_extract_configs['subsystem_assignments'] = fake_processed_filepath
     forced_return_len = num_fake_processed_filepaths
 
     expected_result = []
@@ -509,7 +500,6 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
         expected_result.append(['MISSION'])
 
     mocker.patch('src.data_handling.parsers.csv_parser.extract_configs', return_value=forced_return_extract_configs)
-    mocker.patch('src.data_handling.parsers.csv_parser.process_filepath', return_value=forced_return_process_filepath)
     mocker.patch('src.data_handling.parsers.csv_parser.len', return_value=forced_return_len)
 
     cut = CSV.__new__(CSV)
@@ -522,14 +512,9 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     assert csv_parser.extract_configs.call_count == 1
     assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_configFile])
     assert csv_parser.extract_configs.call_args_list[0].kwargs == {'csv': True}
-    assert csv_parser.process_filepath.call_count == 2
-    assert csv_parser.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert csv_parser.process_filepath.call_args_list[0].kwargs == {'csv': True}
-    assert csv_parser.process_filepath.call_args_list[1].args == (arg_configFile, )
-    assert csv_parser.process_filepath.call_args_list[1].kwargs == {'csv': True}
     assert csv_parser.len.call_count == 1
     assert csv_parser.len.call_args_list[0].args == (fake_processed_filepath, )
-    assert result['subsystem_assignments'][forced_return_process_filepath] == expected_result
+    assert result['subsystem_assignments'] == expected_result
 
 # CSV get_sim_data tests
 def test_CSV_get_sim_data_returns_tuple_of_all_headers_and_sim_data_and_binning_configs():
