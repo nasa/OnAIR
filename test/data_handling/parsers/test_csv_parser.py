@@ -73,8 +73,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     arg_configFiles = MagicMock()
     arg_ss_breakdown = MagicMock()
 
-    fake_labels = MagicMock()
-    fake_data = MagicMock()
+    fake_labels = {}
+    fake_data = {}
     fake_configs = {}
 
     expected_binning_configs = {}
@@ -84,10 +84,10 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     
     cut = CSV.__new__(CSV)
 
-    mocker.patch('src.data_handling.parsers.csv_parser.str2lst', return_value=MagicMock())
+    forced_return_value_str2lst = MagicMock()
+    mocker.patch('src.data_handling.parsers.csv_parser.str2lst', return_value=forced_return_value_str2lst)
     mocker.patch.object(cut, 'parse_csv_data', return_value=[fake_labels, fake_data])
     mocker.patch.object(cut, 'parse_config_data_CSV', return_value=fake_configs)
-    mocker.patch('src.data_handling.parsers.csv_parser.ast.literal_eval', return_value=iter(arg_dataFiles))
 
     # Act
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
@@ -97,7 +97,13 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     assert cut.metadata_file_path == arg_metadataFilepath
     assert cut.all_headers == fake_labels
     assert cut.sim_data == fake_data
-    assert cut.binning_configs == expected_binning_configs 
+    assert cut.binning_configs == expected_binning_configs
+    assert csv_parser.str2lst.call_count == 2
+    assert csv_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
+    assert csv_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
+    assert cut.parse_config_data_CSV.call_count == 1
+    assert cut.parse_config_data_CSV.call_args_list[0].args == (forced_return_value_str2lst[0], arg_ss_breakdown)
+    assert cut.parse_csv_data.call_count == 0
 
 def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data_and_config_and_binning_configs_dicts_for_each_data_file_are_all_set_to_returned_config_values_when_given_dataFiles_and_configFiles_are_not_empty_strings(mocker):
     # Arrange
@@ -107,12 +113,19 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     arg_configFiles = MagicMock()
     arg_ss_breakdown = MagicMock()
 
-    fake_labels = MagicMock()
-    fake_data = MagicMock()
+    fake_labels = {}
+    fake_data = {}
+    num_fake_data_keys = pytest.gen.randint(1, 10) # arbitrary, from 0 to 10
+    for j in range(num_fake_data_keys):
+        fake_data[MagicMock()] = {}
+    
+    fake_subsystem_assignments = MagicMock()
+    fake_test_assignments = MagicMock()
+    fake_description_assignments = MagicMock()
     fake_configs = {}
-    fake_configs['subsystem_assignments'] = {}
-    fake_configs['test_assignments'] = {}
-    fake_configs['description_assignments'] = {}
+    fake_configs['subsystem_assignments'] = fake_subsystem_assignments
+    fake_configs['test_assignments'] = fake_test_assignments
+    fake_configs['description_assignments'] = fake_description_assignments
 
     expected_binning_configs = {}
     expected_binning_configs['subsystem_assignments'] = {}
@@ -122,12 +135,9 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     num_fake_dataFiles = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_dataFiles):
         fake_dataFile = MagicMock()
-        fake_subsystem_assignments = MagicMock()
-        fake_test_assignments = MagicMock()
-        fake_description_assignments = MagicMock()
-        fake_configs['subsystem_assignments'][fake_dataFile] = fake_subsystem_assignments
-        fake_configs['test_assignments'][fake_dataFile] = fake_test_assignments
-        fake_configs['description_assignments'][fake_dataFile] = fake_description_assignments
+        fake_labels[fake_dataFile] = MagicMock()
+        for key in fake_data:
+            fake_data[key][fake_dataFile] = MagicMock()
         expected_binning_configs['subsystem_assignments'][fake_dataFile] = fake_subsystem_assignments
         expected_binning_configs['test_assignments'][fake_dataFile] = fake_test_assignments
         expected_binning_configs['description_assignments'][fake_dataFile] = fake_description_assignments
@@ -135,10 +145,9 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     
     cut = CSV.__new__(CSV)
 
-    mocker.patch('src.data_handling.parsers.csv_parser.str2lst', return_value=MagicMock())
+    mocker.patch('src.data_handling.parsers.csv_parser.str2lst', return_value=arg_dataFiles)
     mocker.patch.object(cut, 'parse_csv_data', return_value=[fake_labels, fake_data])
     mocker.patch.object(cut, 'parse_config_data_CSV', return_value=fake_configs)
-    mocker.patch('src.data_handling.parsers.csv_parser.ast.literal_eval', return_value=iter(arg_dataFiles))
 
     # Act
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
@@ -148,7 +157,15 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     assert cut.metadata_file_path == arg_metadataFilepath
     assert cut.all_headers == fake_labels
     assert cut.sim_data == fake_data
-    assert cut.binning_configs == expected_binning_configs 
+    assert cut.binning_configs == expected_binning_configs
+    assert csv_parser.str2lst.call_count == 2
+    assert csv_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
+    assert csv_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
+    assert cut.parse_config_data_CSV.call_count == 1
+    assert cut.parse_config_data_CSV.call_args_list[0].args == (arg_dataFiles[0], arg_ss_breakdown)
+    assert cut.parse_csv_data.call_count == num_fake_dataFiles
+    for i in range(num_fake_dataFiles):
+        assert cut.parse_csv_data.call_args_list[i].args == (arg_dataFiles[i], )
 
 # CSV parse_csv_data tests
 def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_key_to_empty_list_and_empty_dict_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_empty(mocker):
