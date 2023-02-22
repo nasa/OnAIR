@@ -67,7 +67,7 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
         expected_ai_constructs.append(MagicMock())
 
     mocker.patch('importlib.import_module', return_value=fake_imported_module)
-    mocker.patch.object(fake_imported_module, 'AIPlugIn', side_effect=expected_ai_constructs)
+    mocker.patch.object(fake_imported_module, 'Plugin', side_effect=expected_ai_constructs)
 
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
 
@@ -78,9 +78,10 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
     assert importlib.import_module.call_count == num_fake_ai_plugins
     for i in range(num_fake_ai_plugins):
         assert importlib.import_module.call_args_list[i].args == ('src.data_driven_components.' + arg__ai_plugins[i] + '.core',)
-    assert fake_imported_module.AIPlugIn.call_count == num_fake_ai_plugins
+    assert fake_imported_module.Plugin.call_count == num_fake_ai_plugins
     for i in range(num_fake_ai_plugins):
-        assert fake_imported_module.AIPlugIn.call_args_list[i].args == (arg__ai_plugins[i], arg_headers)
+        assert fake_imported_module.Plugin.call_args_list[i].args == (arg__ai_plugins[i], arg_headers)
+        
     assert cut.ai_constructs == expected_ai_constructs
 
 # update tests
