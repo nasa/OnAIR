@@ -31,13 +31,13 @@ class BadFakeAIPlugIn(AIPlugIn):
         return super().apriori_training()
 
     def update(self):
-        return None
+        return super().update()
 
     def render_diagnosis(self):
         return super().render_diagnosis()
         
 # abstract methods tests
-def test_AIPlugIn_has_expected_abstract_methods():
+def test_AIPlugIn_raises_error_because_of_unimplemented_abstract_methods():
     # Arrange - None
     # Act
     with pytest.raises(TypeError) as e_info:
@@ -93,8 +93,10 @@ def test_AIPlugIn_does_not_raise_error_when_an_inherited_class_is_instantiated_b
     # Assert
     assert exception_raised == False
 
+# Complete plugin call tests
+
 # __init__ tests
-def test_AIPlugIn__init__asserts_when_given__headers_len_is_less_than_0():
+def test_AIPlugIn__init__raises_assertion_error_when_given__headers_len_is_not_greater_than_0():
     # Arrange
     arg__name = MagicMock()
     arg__headers = []
@@ -108,7 +110,7 @@ def test_AIPlugIn__init__asserts_when_given__headers_len_is_less_than_0():
     # Assert
     assert e_info.match('')
 
-def test_AIPlugIn__init__sets_instance_values_to_given_args_when_when_given__headers_len_is_greater_than_0(mocker):
+def test_AIPlugIn__init__sets_instance_values_to_given_args_when_given__headers_len_is_greater_than_0(mocker):
     # Arrange
     arg__name = MagicMock()
     arg__headers = MagicMock()
