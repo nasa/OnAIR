@@ -20,8 +20,8 @@ class Diagnosis:
         self.currently_faulting_mnemonics = currently_faulting_mnemonics
         self.ground_truth = ground_truth
 
-        self.has_kalman = "kalman_plugin" in learning_system_results
-        self.kalman_results = learning_system_results["kalman_plugin"] if self.has_kalman else None
+        self.has_kalman = "kalman" in learning_system_results
+        self.kalman_results = learning_system_results["kalman"] if self.has_kalman else None
         
     def perform_diagnosis(self):
         """ Diagnose the learning system results """

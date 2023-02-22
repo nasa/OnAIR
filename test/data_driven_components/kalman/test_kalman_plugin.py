@@ -11,7 +11,7 @@ import importlib
 def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args_except_window_size(mocker):
     # Arrange
     arg_name = MagicMock()
-    arg_headers = MagicMock()
+    arg_headers = [MagicMock(), MagicMock()]
 
     fake_var = MagicMock()
     class Fake_KalmanFilter():
@@ -48,7 +48,7 @@ def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_a
 def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args(mocker):
     # Arrange
     arg_name = MagicMock()
-    arg_headers = MagicMock()
+    arg_headers = [MagicMock(), MagicMock()]
     arg_window_size = MagicMock()
 
     fake_var = MagicMock()

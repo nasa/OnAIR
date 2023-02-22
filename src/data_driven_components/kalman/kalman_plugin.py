@@ -4,11 +4,11 @@ from src.data_driven_components.generic_component import AIPlugIn
 
 class Plugin(AIPlugIn):
     def __init__(self, name, headers, window_size=3):
-
         """
         :param headers: (int) length of time agent examines
         :param window_size: (int) size of time window to examine
         """
+        super().__init__(name, headers)
         self.frames = []
         self.component_name = name
         self.headers = headers

@@ -77,7 +77,7 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
     # Assert
     assert importlib.import_module.call_count == num_fake_ai_plugins
     for i in range(num_fake_ai_plugins):
-        assert importlib.import_module.call_args_list[i].args == ('src.data_driven_components.' + arg__ai_plugins[i] + '.{arg__ai_plugins[i]}_plugin')
+        assert importlib.import_module.call_args_list[i].args == (f'src.data_driven_components.{arg__ai_plugins[i]}.{arg__ai_plugins[i]}_plugin',)
     assert fake_imported_module.Plugin.call_count == num_fake_ai_plugins
     for i in range(num_fake_ai_plugins):
         assert fake_imported_module.Plugin.call_args_list[i].args == (arg__ai_plugins[i], arg_headers)
