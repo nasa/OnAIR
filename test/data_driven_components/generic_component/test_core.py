@@ -68,18 +68,10 @@ def test_AIPlugIn_raises_error_when_an_inherited_class_calls_abstract_methods_in
 
     # populate list with the functions that should raise exceptions when called.
     not_implemented_functions = [cut.update, cut.apriori_training, cut.render_diagnosis]
-    raised = [] # fill with exception results
-
     for fnc in not_implemented_functions:
-        exception_raised = False
-        try:
+        with pytest.raises(NotImplementedError) as e_info:
             fnc()
-        except:
-            exception_raised = True
-        raised.append(exception_raised)
-
-    # Assert
-    assert all(raised)
+        assert "NotImplementedError" in e_info.__str__()
 
 # Complete plugin call tests
 def test_AIPlugIn_does_not_raise_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_implemented_by_that_class():
