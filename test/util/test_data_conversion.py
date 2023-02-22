@@ -2,7 +2,7 @@
 import pytest
 from mock import MagicMock
 
-import util.data_conversion
+import src.util.data_conversion
 
 from numpy import ndarray
 
@@ -13,7 +13,7 @@ def test_data_conversion_flotify_input_returns_empty_list_when_given__input_is_v
     arg_remove_str = False
 
     # Act
-    result = util.data_conversion.floatify_input(arg__input, arg_remove_str)
+    result = src.util.data_conversion.floatify_input(arg__input, arg_remove_str)
 
     # Assert
     assert result == []
@@ -31,7 +31,7 @@ def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_th
     mocker.patch('builtins.float', return_value=expected_result)
 
     # Act
-    result = util.data_conversion.floatify_input(arg__input, arg_remove_str)
+    result = src.util.data_conversion.floatify_input(arg__input, arg_remove_str)
 
     # Assert
     assert float.call_count == 1
@@ -49,17 +49,17 @@ def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_th
     expected_replaced_i = MagicMock()
     expected_result = MagicMock()
 
-    mocker.patch('util.data_conversion.type', return_value=str)
-    mocker.patch('util.data_conversion.float', side_effect=[Exception, expected_result])
+    mocker.patch('src.util.data_conversion.type', return_value=str)
+    mocker.patch('src.util.data_conversion.float', side_effect=[Exception, expected_result])
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
-    result = util.data_conversion.floatify_input(arg__input, arg_remove_str)
+    result = src.util.data_conversion.floatify_input(arg__input, arg_remove_str)
 
     # Assert
-    assert util.data_conversion.float.call_count == 2
-    assert util.data_conversion.float.call_args_list[0].args == (arg__input[0], )
-    assert util.data_conversion.float.call_args_list[1].args == (expected_replaced_i, )
+    assert src.util.data_conversion.float.call_count == 2
+    assert src.util.data_conversion.float.call_args_list[0].args == (arg__input[0], )
+    assert src.util.data_conversion.float.call_args_list[1].args == (expected_replaced_i, )
     assert fake_item.replace.call_count == 3
     assert fake_item.replace.call_args_list[0].args == ('-', '', )
     assert fake_item.replace.call_args_list[1].args == (':', '', )
@@ -76,17 +76,17 @@ def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_0_
 
     expected_replaced_i = MagicMock()
 
-    mocker.patch('util.data_conversion.type', return_value=str)
-    mocker.patch('util.data_conversion.float', side_effect=[Exception, Exception])
+    mocker.patch('src.util.data_conversion.type', return_value=str)
+    mocker.patch('src.util.data_conversion.float', side_effect=[Exception, Exception])
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
-    result = util.data_conversion.floatify_input(arg__input, arg_remove_str)
+    result = src.util.data_conversion.floatify_input(arg__input, arg_remove_str)
 
     # Assert
-    assert util.data_conversion.float.call_count == 2
-    assert util.data_conversion.float.call_args_list[0].args == (arg__input[0], )
-    assert util.data_conversion.float.call_args_list[1].args == (expected_replaced_i, )
+    assert src.util.data_conversion.float.call_count == 2
+    assert src.util.data_conversion.float.call_args_list[0].args == (arg__input[0], )
+    assert src.util.data_conversion.float.call_args_list[1].args == (expected_replaced_i, )
     assert fake_item.replace.call_count == 3
     assert fake_item.replace.call_args_list[0].args == ('-', '', )
     assert fake_item.replace.call_args_list[1].args == (':', '', )
@@ -102,12 +102,12 @@ def test_data_conversion_flotify_input_default_arg_remove_str_is_False(mocker):
 
     expected_replaced_i = MagicMock()
 
-    mocker.patch('util.data_conversion.type', return_value=str)
-    mocker.patch('util.data_conversion.float', side_effect=[Exception, Exception])
+    mocker.patch('src.util.data_conversion.type', return_value=str)
+    mocker.patch('src.util.data_conversion.float', side_effect=[Exception, Exception])
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
-    result = util.data_conversion.floatify_input(arg__input)
+    result = src.util.data_conversion.floatify_input(arg__input)
 
     # Assert
     assert result == [0.0] # shows flow was correct for remove_str being False
@@ -122,17 +122,17 @@ def test_data_conversion_flotify_input_returns_empty_list_when_two_Exceptions_ar
 
     expected_replaced_i = MagicMock()
 
-    mocker.patch('util.data_conversion.type', return_value=str)
-    mocker.patch('util.data_conversion.float', side_effect=[Exception, Exception])
+    mocker.patch('src.util.data_conversion.type', return_value=str)
+    mocker.patch('src.util.data_conversion.float', side_effect=[Exception, Exception])
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
-    result = util.data_conversion.floatify_input(arg__input, arg_remove_str)
+    result = src.util.data_conversion.floatify_input(arg__input, arg_remove_str)
 
     # Assert
-    assert util.data_conversion.float.call_count == 2
-    assert util.data_conversion.float.call_args_list[0].args == (arg__input[0], )
-    assert util.data_conversion.float.call_args_list[1].args == (expected_replaced_i, )
+    assert src.util.data_conversion.float.call_count == 2
+    assert src.util.data_conversion.float.call_args_list[0].args == (arg__input[0], )
+    assert src.util.data_conversion.float.call_args_list[1].args == (expected_replaced_i, )
     assert fake_item.replace.call_count == 3
     assert fake_item.replace.call_args_list[0].args == ('-', '', )
     assert fake_item.replace.call_args_list[1].args == (':', '', )
@@ -149,11 +149,11 @@ def test_data_conversion_flotify_input_returns_call_to_float_that_was_given___in
     expected_replaced_i = MagicMock()
     expected_result = MagicMock()
 
-    mocker.patch('util.data_conversion.float', return_value=expected_result)
+    mocker.patch('src.util.data_conversion.float', return_value=expected_result)
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
-    result = util.data_conversion.floatify_input(arg__input)
+    result = src.util.data_conversion.floatify_input(arg__input)
 
     # Assert
     assert result == [expected_result] # shows flow was correct for remove_str being False
@@ -202,11 +202,11 @@ def test_data_conversion_flotify_input_returns_expected_values_for_given__input_
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
 
-    mocker.patch('util.data_conversion.type', side_effect=side_effects_for_type)
-    mocker.patch('util.data_conversion.float', side_effect=side_effects_for_float)
+    mocker.patch('src.util.data_conversion.type', side_effect=side_effects_for_type)
+    mocker.patch('src.util.data_conversion.float', side_effect=side_effects_for_float)
     
     # Act
-    result = util.data_conversion.floatify_input(arg__input, arg_remove_str)
+    result = src.util.data_conversion.floatify_input(arg__input, arg_remove_str)
 
     # Assert
     assert result == expected_result
@@ -256,11 +256,11 @@ def test_data_conversion_flotify_input_returns_expected_values_for_given__input_
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
 
-    mocker.patch('util.data_conversion.type', side_effect=side_effects_for_type)
-    mocker.patch('util.data_conversion.float', side_effect=side_effects_for_float)
+    mocker.patch('src.util.data_conversion.type', side_effect=side_effects_for_type)
+    mocker.patch('src.util.data_conversion.float', side_effect=side_effects_for_float)
     
     # Act
-    result = util.data_conversion.floatify_input(arg__input, arg_remove_str)
+    result = src.util.data_conversion.floatify_input(arg__input, arg_remove_str)
 
     # Assert
     assert result == expected_result
@@ -270,14 +270,14 @@ def test_data_conversion_status_to_oneHot_returns_given_status_when_status_isins
     # Arrange
     arg_status = MagicMock()
 
-    mocker.patch('util.data_conversion.isinstance', return_value=True)
+    mocker.patch('src.util.data_conversion.isinstance', return_value=True)
 
     # Act
-    result = util.data_conversion.status_to_oneHot(arg_status)
+    result = src.util.data_conversion.status_to_oneHot(arg_status)
 
     # Assert
-    assert util.data_conversion.isinstance.call_count == 1
-    assert util.data_conversion.isinstance.call_args_list[0].args == (arg_status, ndarray)
+    assert src.util.data_conversion.isinstance.call_count == 1
+    assert src.util.data_conversion.isinstance.call_args_list[0].args == (arg_status, ndarray)
     assert result == arg_status
 
 def test_data_conversion_status_to_oneHot_returns_one_hot_set_to_list_of_four_zeros_and_the_value_of_the_classes_status_to_1_point_0(mocker):
@@ -289,12 +289,12 @@ def test_data_conversion_status_to_oneHot_returns_one_hot_set_to_list_of_four_ze
     expected_result = [0.0, 0.0, 0.0, 0.0]
     expected_result[fake_status] = 1.0
 
-    util.data_conversion.classes = {arg_status: fake_status}
+    src.util.data_conversion.classes = {arg_status: fake_status}
 
-    mocker.patch('util.data_conversion.isinstance', return_value=False)
+    mocker.patch('src.util.data_conversion.isinstance', return_value=False)
 
     # Act
-    result = util.data_conversion.status_to_oneHot(arg_status)
+    result = src.util.data_conversion.status_to_oneHot(arg_status)
 
     # Assert
     assert result == expected_result

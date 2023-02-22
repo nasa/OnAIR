@@ -2,7 +2,7 @@ import pytest
 import random
 import datetime
 from mock import MagicMock
-import util.file_io
+import src.util.file_io
 
 # parse_associations_from_json tests
 
@@ -16,20 +16,20 @@ def test_file_io_parse_associations_raises_KeyError_when_loaded_data_does_not_ha
 
   fake_data = {}
 
-  mocker.patch('util.file_io.open', return_value=fake_f)
-  mocker.patch('util.file_io.json.load', return_value=fake_data)
-  mocker.patch('util.file_io.print')
+  mocker.patch('src.util.file_io.open', return_value=fake_f)
+  mocker.patch('src.util.file_io.json.load', return_value=fake_data)
+  mocker.patch('src.util.file_io.print')
 
   # Act
   with pytest.raises(KeyError) as e_info:
-    util.file_io.parse_associations_from_json(arg_filepath)
+    src.util.file_io.parse_associations_from_json(arg_filepath)
 
   # Assert
   assert str(e_info.value) == "'children'"
-  assert util.file_io.open.call_count == 1
-  assert util.file_io.json.load.call_count == 1
-  assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
-  assert util.file_io.print.call_count == 0
+  assert src.util.file_io.open.call_count == 1
+  assert src.util.file_io.json.load.call_count == 1
+  assert src.util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
+  assert src.util.file_io.print.call_count == 0
 
 def test_file_io_parse_associations_does_not_print_when_loaded_data_children_is_empty(mocker):
   # Arrange
@@ -41,18 +41,18 @@ def test_file_io_parse_associations_does_not_print_when_loaded_data_children_is_
   fake_data = {}
   fake_data['children'] = []
 
-  mocker.patch('util.file_io.open', return_value=fake_f)
-  mocker.patch('util.file_io.json.load', return_value=fake_data)
-  mocker.patch('util.file_io.print')
+  mocker.patch('src.util.file_io.open', return_value=fake_f)
+  mocker.patch('src.util.file_io.json.load', return_value=fake_data)
+  mocker.patch('src.util.file_io.print')
 
   # Act
-  util.file_io.parse_associations_from_json(arg_filepath)
+  src.util.file_io.parse_associations_from_json(arg_filepath)
 
   # Assert
-  assert util.file_io.open.call_count == 1
-  assert util.file_io.json.load.call_count == 1
-  assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
-  assert util.file_io.print.call_count == 0
+  assert src.util.file_io.open.call_count == 1
+  assert src.util.file_io.json.load.call_count == 1
+  assert src.util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
+  assert src.util.file_io.print.call_count == 0
 
 def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_missing_name(mocker):
   # Arrange
@@ -64,20 +64,20 @@ def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_missi
   fake_data = {}
   fake_data['children'] = [{}]
 
-  mocker.patch('util.file_io.open', return_value=fake_f)
-  mocker.patch('util.file_io.json.load', return_value=fake_data)
-  mocker.patch('util.file_io.print')
+  mocker.patch('src.util.file_io.open', return_value=fake_f)
+  mocker.patch('src.util.file_io.json.load', return_value=fake_data)
+  mocker.patch('src.util.file_io.print')
 
   # Act
   with pytest.raises(KeyError) as e_info:
-    util.file_io.parse_associations_from_json(arg_filepath)
+    src.util.file_io.parse_associations_from_json(arg_filepath)
 
   # Assert
   assert str(e_info.value) == "'name'"
-  assert util.file_io.open.call_count == 1
-  assert util.file_io.json.load.call_count == 1
-  assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
-  assert util.file_io.print.call_count == 0
+  assert src.util.file_io.open.call_count == 1
+  assert src.util.file_io.json.load.call_count == 1
+  assert src.util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
+  assert src.util.file_io.print.call_count == 0
 
 def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_missing_connections(mocker):
   # Arrange
@@ -89,20 +89,20 @@ def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_missi
   fake_data = {}
   fake_data['children'] = [{'name':'I have a name!'}]
 
-  mocker.patch('util.file_io.open', return_value=fake_f)
-  mocker.patch('util.file_io.json.load', return_value=fake_data)
-  mocker.patch('util.file_io.print')
+  mocker.patch('src.util.file_io.open', return_value=fake_f)
+  mocker.patch('src.util.file_io.json.load', return_value=fake_data)
+  mocker.patch('src.util.file_io.print')
 
   # Act
   with pytest.raises(KeyError) as e_info:
-    util.file_io.parse_associations_from_json(arg_filepath)
+    src.util.file_io.parse_associations_from_json(arg_filepath)
 
   # Assert
   assert str(e_info.value) == "'connections'"
-  assert util.file_io.open.call_count == 1
-  assert util.file_io.json.load.call_count == 1
-  assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
-  assert util.file_io.print.call_count == 0
+  assert src.util.file_io.open.call_count == 1
+  assert src.util.file_io.json.load.call_count == 1
+  assert src.util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
+  assert src.util.file_io.print.call_count == 0
 
 def test_file_io_parse_associations_does_not_print_when_loaded_data_child_conections_are_empty(mocker):
   # Arrange
@@ -114,18 +114,18 @@ def test_file_io_parse_associations_does_not_print_when_loaded_data_child_conect
   fake_data = {}
   fake_data['children'] = [{'name':'I have a name!', 'connections':[]}]
 
-  mocker.patch('util.file_io.open', return_value=fake_f)
-  mocker.patch('util.file_io.json.load', return_value=fake_data)
-  mocker.patch('util.file_io.print')
+  mocker.patch('src.util.file_io.open', return_value=fake_f)
+  mocker.patch('src.util.file_io.json.load', return_value=fake_data)
+  mocker.patch('src.util.file_io.print')
 
   # Act
-  util.file_io.parse_associations_from_json(arg_filepath)
+  src.util.file_io.parse_associations_from_json(arg_filepath)
 
   # Assert
-  assert util.file_io.open.call_count == 1
-  assert util.file_io.json.load.call_count == 1
-  assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
-  assert util.file_io.print.call_count == 0
+  assert src.util.file_io.open.call_count == 1
+  assert src.util.file_io.json.load.call_count == 1
+  assert src.util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
+  assert src.util.file_io.print.call_count == 0
 
 def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_connections_missing_target(mocker):
   # Arrange
@@ -137,20 +137,20 @@ def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_conne
   fake_data = {}
   fake_data['children'] = [{'name':'I have a name!', 'connections':[{}]}]
 
-  mocker.patch('util.file_io.open', return_value=fake_f)
-  mocker.patch('util.file_io.json.load', return_value=fake_data)
-  mocker.patch('util.file_io.print')
+  mocker.patch('src.util.file_io.open', return_value=fake_f)
+  mocker.patch('src.util.file_io.json.load', return_value=fake_data)
+  mocker.patch('src.util.file_io.print')
 
   # Act
   with pytest.raises(KeyError) as e_info:
-    util.file_io.parse_associations_from_json(arg_filepath)
+    src.util.file_io.parse_associations_from_json(arg_filepath)
 
   # Assert
   assert str(e_info.value) == "'target'"
-  assert util.file_io.open.call_count == 1
-  assert util.file_io.json.load.call_count == 1
-  assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
-  assert util.file_io.print.call_count == 0
+  assert src.util.file_io.open.call_count == 1
+  assert src.util.file_io.json.load.call_count == 1
+  assert src.util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
+  assert src.util.file_io.print.call_count == 0
 
 def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_connections_missing_weight(mocker):
   # Arrange
@@ -162,20 +162,20 @@ def test_file_io_parse_associations_raises_KeyError_when_loaded_data_child_conne
   fake_data = {}
   fake_data['children'] = [{'name':'I have a name!', 'connections':[{'target':'I have a target!'}]}]
 
-  mocker.patch('util.file_io.open', return_value=fake_f)
-  mocker.patch('util.file_io.json.load', return_value=fake_data)
-  mocker.patch('util.file_io.print')
+  mocker.patch('src.util.file_io.open', return_value=fake_f)
+  mocker.patch('src.util.file_io.json.load', return_value=fake_data)
+  mocker.patch('src.util.file_io.print')
 
   # Act
   with pytest.raises(KeyError) as e_info:
-    util.file_io.parse_associations_from_json(arg_filepath)
+    src.util.file_io.parse_associations_from_json(arg_filepath)
 
   # Assert
   assert str(e_info.value) == "'weight'"
-  assert util.file_io.open.call_count == 1
-  assert util.file_io.json.load.call_count == 1
-  assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
-  assert util.file_io.print.call_count == 0
+  assert src.util.file_io.open.call_count == 1
+  assert src.util.file_io.json.load.call_count == 1
+  assert src.util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
+  assert src.util.file_io.print.call_count == 0
 
 def test_file_io_parse_associations_prints_associations_in_reverse_sort_by_weight_when_data_is_properly_formed(mocker):
   # Arrange
@@ -207,20 +207,20 @@ def test_file_io_parse_associations_prints_associations_in_reverse_sort_by_weigh
     fake_connections.insert(pytest.gen.randint(0, len(fake_connections)), fake_connection)
     expected_prints.append(f"{fake_child['name']} --> {fake_target}, {str(fake_weight)}")
 
-  mocker.patch('util.file_io.open', return_value=fake_f)
-  mocker.patch('util.file_io.json.load', return_value=fake_data)
-  mocker.patch('util.file_io.print')
+  mocker.patch('src.util.file_io.open', return_value=fake_f)
+  mocker.patch('src.util.file_io.json.load', return_value=fake_data)
+  mocker.patch('src.util.file_io.print')
 
   # Act
-  util.file_io.parse_associations_from_json(arg_filepath)
+  src.util.file_io.parse_associations_from_json(arg_filepath)
 
   # Assert
-  assert util.file_io.open.call_count == 1
-  assert util.file_io.json.load.call_count == 1
-  assert util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
-  assert util.file_io.print.call_count == total_num_connections
+  assert src.util.file_io.open.call_count == 1
+  assert src.util.file_io.json.load.call_count == 1
+  assert src.util.file_io.json.load.call_args_list[0].args == (fake_file_iterator,)
+  assert src.util.file_io.print.call_count == total_num_connections
   for i in range(total_num_connections):
-    assert util.file_io.print.call_args_list[i].args == (expected_prints[i],)
+    assert src.util.file_io.print.call_args_list[i].args == (expected_prints[i],)
 
 # aggregate_results tests
 
@@ -229,7 +229,7 @@ def test_file_io_aggregate_results_does_nothing_then_returns_None():
   expected_result = None
 
   # Act
-  result = util.file_io.aggregate_results()
+  result = src.util.file_io.aggregate_results()
 
   # Assert
   assert result == expected_result
