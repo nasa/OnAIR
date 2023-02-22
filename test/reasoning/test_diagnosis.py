@@ -5,10 +5,10 @@ from src.reasoning.diagnosis import Diagnosis
 
 
 # __init__ tests
-def test_Diagnose__init__sets_spacecraft_rep_to_given_spacecraft_and_learning_systems_and_mission_status_and_bayesian_status(mocker):
+def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_is_empty_dict():
 
     fake_timestep = MagicMock()
-    fake_learning_system_results = MagicMock()
+    fake_learning_system_results = {}
     fake_status_confidence = MagicMock()
     fake_currently_faulting_mnemonics = MagicMock()
     fake_ground_truth = MagicMock()
@@ -20,15 +20,74 @@ def test_Diagnose__init__sets_spacecraft_rep_to_given_spacecraft_and_learning_sy
                           fake_learning_system_results,
                           fake_status_confidence,
                           fake_currently_faulting_mnemonics,
-                          fake_ground_truth
-                          )
+                          fake_ground_truth)
 
     assert cut.time_step == fake_timestep
     assert cut.learning_system_results == fake_learning_system_results
     assert cut.status_confidence == fake_status_confidence
     assert cut.currently_faulting_mnemonics == fake_currently_faulting_mnemonics
     assert cut.ground_truth == fake_ground_truth
-     
+    assert cut.has_kalman == False
+    assert cut.kalman_results == None
+
+def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_does_not_contain_kalman_plugin():
+
+    fake_timestep = MagicMock()
+    fake_learning_system_results = {}
+    num_learning_system_results = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
+    for i in range(num_learning_system_results):
+        fake_learning_system_results[MagicMock()] = MagicMock()
+    fake_status_confidence = MagicMock()
+    fake_currently_faulting_mnemonics = MagicMock()
+    fake_ground_truth = MagicMock()
+
+    cut = Diagnosis.__new__(Diagnosis)
+
+    # Act
+    result = cut.__init__(fake_timestep,
+                          fake_learning_system_results,
+                          fake_status_confidence,
+                          fake_currently_faulting_mnemonics,
+                          fake_ground_truth)
+
+    assert cut.time_step == fake_timestep
+    assert cut.learning_system_results == fake_learning_system_results
+    assert cut.status_confidence == fake_status_confidence
+    assert cut.currently_faulting_mnemonics == fake_currently_faulting_mnemonics
+    assert cut.ground_truth == fake_ground_truth
+    assert cut.has_kalman == False
+    assert cut.kalman_results == None
+
+def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_contains_kalman_plugin():
+
+    fake_timestep = MagicMock()
+    fake_learning_system_results = {}
+    num_learning_system_results = pytest.gen.randint(0, 10) # arbitrary, random int from 0 to 10
+    for i in range(num_learning_system_results):
+        fake_learning_system_results[MagicMock()] = MagicMock()
+    fake_kalman_results = MagicMock()
+    fake_learning_system_results['kalman_plugin'] = fake_kalman_results
+    fake_status_confidence = MagicMock()
+    fake_currently_faulting_mnemonics = MagicMock()
+    fake_ground_truth = MagicMock()
+
+    cut = Diagnosis.__new__(Diagnosis)
+
+    # Act
+    result = cut.__init__(fake_timestep,
+                          fake_learning_system_results,
+                          fake_status_confidence,
+                          fake_currently_faulting_mnemonics,
+                          fake_ground_truth)
+
+    assert cut.time_step == fake_timestep
+    assert cut.learning_system_results == fake_learning_system_results
+    assert cut.status_confidence == fake_status_confidence
+    assert cut.currently_faulting_mnemonics == fake_currently_faulting_mnemonics
+    assert cut.ground_truth == fake_ground_truth
+    assert cut.has_kalman == True
+    assert cut.kalman_results == fake_kalman_results
+
 # diagnose tests
 def test_Diagnose_returns_empty_Dict():
     # Arrange
