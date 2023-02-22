@@ -66,14 +66,18 @@ def test_Brain_reason_updates_spacecraft_rep_with_given_frame_and_sets_new_space
     assert cut.learning_systems.update.call_args_list[0].args == (arg_frame, fake_mission_status) 
      
 # diagnose tests
-def test_Brain_diagnose_returns_None():
+def test_Brain_diagnose_returns_empty_Dict():
     # Arrange
     arg_time_step = MagicMock()
 
     cut = Brain.__new__(Brain)
+    cut.learning_systems = MagicMock()
+    cut.bayesian_status = MagicMock()
+    cut.spacecraft_rep = MagicMock()
 
     # Act
     result = cut.diagnose(arg_time_step)
 
     # Assert
-    assert result == None
+    assert type(result) == dict
+    assert result == {}
