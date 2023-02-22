@@ -69,7 +69,7 @@ def test_Diagnosis__init__initializes_all_attributes_to_expected_values_when_arg
     for i in range(num_learning_system_results):
         fake_learning_system_results[MagicMock()] = MagicMock()
     fake_kalman_results = MagicMock()
-    fake_learning_system_results['kalman_plugin'] = fake_kalman_results
+    fake_learning_system_results['kalman'] = fake_kalman_results
     fake_status_confidence = MagicMock()
     fake_currently_faulting_mnemonics = MagicMock()
     fake_ground_truth = MagicMock()
