@@ -5,7 +5,7 @@ from src.reasoning.diagnosis import Diagnosis
 
 
 # __init__ tests
-def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_is_empty_dict():
+def test_Diagnosis__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_is_empty_dict():
 
     fake_timestep = MagicMock()
     fake_learning_system_results = {}
@@ -30,7 +30,7 @@ def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_
     assert cut.has_kalman == False
     assert cut.kalman_results == None
 
-def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_does_not_contain_kalman_plugin():
+def test_Diagnosis__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_does_not_contain_kalman_plugin():
 
     fake_timestep = MagicMock()
     fake_learning_system_results = {}
@@ -58,7 +58,7 @@ def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_
     assert cut.has_kalman == False
     assert cut.kalman_results == None
 
-def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_contains_kalman_plugin():
+def test_Diagnosis__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_contains_kalman_plugin():
 
     fake_timestep = MagicMock()
     fake_learning_system_results = {}
@@ -88,17 +88,11 @@ def test_Diagnose__init__initializes_all_attributes_to_expected_values_when_arg_
     assert cut.has_kalman == True
     assert cut.kalman_results == fake_kalman_results
 
-# diagnose tests
-def test_Diagnose_returns_empty_Dict():
+# perform_diagnosis tests
+def test_Diagnosis_perform_diagnosis_returns_empty_Dict_when_has_kalman_is_False():
     # Arrange
-    arg_time_step = MagicMock()
-
     cut = Diagnosis.__new__(Diagnosis)
-    cut.learning_systems = MagicMock()
-    cut.bayesian_status = MagicMock()
-    cut.spacecraft_rep = MagicMock()
     cut.has_kalman = False
-    cut.kalman_results = MagicMock()
 
     # Act
     result = cut.perform_diagnosis()
@@ -107,6 +101,25 @@ def test_Diagnose_returns_empty_Dict():
     assert type(result) == dict
     assert result == {}
 
+def test_Diagnosis_perform_diagnosis_returns_dict_of_str_top_and_walkdown_of_random_mnemonic_when_has_kalman_is_True(mocker):
+    # Arrange
+    cut = Diagnosis.__new__(Diagnosis)
+    cut.has_kalman = True
+    cut.kalman_results = MagicMock()
+
+    forced_return_value = MagicMock()
+    mocker.patch('src.reasoning.diagnosis.list', return_value=forced_return_value)
+    mocker.patch('src.reasoning.diagnosis.random.choice', return_value=forced_return_value)
+    mocker.patch.object(cut, 'walkdown', return_value=forced_return_value)
+
+    # Act
+    result = cut.perform_diagnosis()
+
+    # Assert
+    assert type(result) == dict
+    assert result == {'top' : forced_return_value}
+
+# walkdown tests
 def test_Diagnosis_walkdown_returns_NODIAGNOSIS():
     # Arrange
     arg_time_step = MagicMock()
