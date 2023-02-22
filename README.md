@@ -6,24 +6,9 @@ Create a conda environment with the necessary packages
 
     conda create --name onair --file requirements.txt
 
-## Running driver file test
+## Running unit tests
 
-Make a results directory in your root folder and test folder:
-
-    mkdir results
-    mkdir src/test/results
-
-Move test data from to src folder, and the config to src, unless you already have data there
-
-    cp -r src/test/data src/
-    mv src/data/config src
-
-Then you can just run the driver
-
-    python driver.py -t
-
-## Running pytest
-How to run unit tests for OnAIR
+Instructions on how to run unit tests for OnAIR
 
 ### Required python installs:
 pytest,
@@ -33,36 +18,50 @@ coverage
 ### Optional python install:
 pytest-randomly
 
-### Command used to run the tests:
+### Running the unit tests from the driver.py file
+
+From the parent directory of your local repository:
 ```
-PYTHONPATH=src RUN_PATH=./src/test coverage run --omit="src/test/*" -m pytest ./src/test/
+python driver.py -t
 ```
 
-### Command breakdown:
+### Running pytest directly from command line
 
-`PYTHONPATH=src` - sets env variable so tests can find src
+For the equivalent of the driver.py run:
+```
+python -m coverage run --branch --source=src -m pytest ./test/
+```
 
-`RUN_PATH=./src/test` - sets env variable; otherwise, several tests will fail
+#### Command breakdown:
+`python -m` - invokes the python runtime on the library following the -m
 
-`coverage run` - runs coverage data collection during test wrapping pytest
+`coverage run` - runs coverage data collection during testing, wrapping itself on the test runner used
 
-`--omit="src/test/*"` - keeps the test files out of the coverage statistics
+`--branch` - includes code branching information in the coverage report
+
+`--source=src` - tells coverage where the code under test exists for reporting line hits
 
 `-m pytest` - tells coverage what test runner (framework) to wrap
 
-`./src/test` - run all tests found in this directory and subdirectories
+`./test` - run all tests found in this directory and subdirectories
 
-### A few optional settings
-These options may be added to the test run to stop some features from operating. Use these at your own discretion.
+#### A few optional settings
+Options that may be added to the command line test run. Use these at your own discretion.
 
-`--disable-warnings` - removes the full warning reports, but still counts them (i.e., 124 passed, 1 warning in 0.65s)
+`PYTHONPATH=src` - sets env variable so tests can find src, but only use if tests won't run without
+
+`--disable-warnings` - removes the warning reports, but displays count (i.e., 124 passed, 1 warning in 0.65s)
 
 `-p no:randomly` - ONLY required to stop random order testing IFF pytest-randomly installed
 
-### To get coverage after run:
+### To view testing line coverage after run:
 
 `coverage report` - prints basic results in terminal
 
 or
 
-`coverage html` - creates htmlcov/index.html for use by your favorite browser
+`coverage html` - creates htmlcov/index.html, automatic when using driver.py for testing
+
+and
+
+`<browser_here> htmlcov/index.html` - browsable coverage (i.e., `firefox htmlcov/index.html`)
