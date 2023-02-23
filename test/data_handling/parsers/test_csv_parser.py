@@ -19,8 +19,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == ''
     assert cut.sim_data == ''
     assert cut.binning_configs == '' 
@@ -39,8 +39,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == ''
     assert cut.sim_data == ''
     assert cut.binning_configs == '' 
@@ -59,8 +59,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == ''
     assert cut.sim_data == ''
     assert cut.binning_configs == '' 
@@ -93,8 +93,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == fake_labels
     assert cut.sim_data == fake_data
     assert cut.binning_configs == expected_binning_configs
@@ -153,8 +153,8 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
     # Assert
-    assert cut.raw_data_file_path == arg_rawDataFilepath
-    assert cut.metadata_file_path == arg_metadataFilepath
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
     assert cut.all_headers == fake_labels
     assert cut.sim_data == fake_data
     assert cut.binning_configs == expected_binning_configs
@@ -194,7 +194,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
     mocker.patch.object(fake_initial_data_set, 'iterrows', return_value=[])
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_filepath
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
@@ -237,7 +237,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=[])
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_filepath
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
@@ -291,7 +291,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_filepath
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
@@ -345,7 +345,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_filepath
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
@@ -409,7 +409,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
 
     cut = CSV.__new__(CSV)
-    cut.raw_data_file_path = fake_raw_data_filepath
+    cut.raw_data_filepath = fake_raw_data_filepath
 
     # Act
     result = cut.parse_csv_data(arg_dataFile)
@@ -438,7 +438,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     mocker.patch('src.data_handling.parsers.csv_parser.len')
 
     cut = CSV.__new__(CSV)
-    cut.metadata_file_path = fake_metadata_filepath
+    cut.metadata_filepath = fake_metadata_filepath
 
     # Act
     result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
@@ -467,7 +467,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     mocker.patch('src.data_handling.parsers.csv_parser.len', return_value=forced_return_len)
 
     cut = CSV.__new__(CSV)
-    cut.metadata_file_path = fake_metadata_filepath
+    cut.metadata_filepath = fake_metadata_filepath
 
     # Act
     result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
@@ -503,7 +503,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     mocker.patch('src.data_handling.parsers.csv_parser.len', return_value=forced_return_len)
 
     cut = CSV.__new__(CSV)
-    cut.metadata_file_path = fake_metadata_filepath
+    cut.metadata_filepath = fake_metadata_filepath
 
     # Act
     result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
