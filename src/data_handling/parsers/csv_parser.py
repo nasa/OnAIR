@@ -23,8 +23,8 @@ class CSV:
            This means that, if you want to use this class to parse in real time, 
            it needs to at least have seen one sample of the anticipated format """
         
-        self.raw_data_file_path = rawDataFilepath
-        self.metadata_file_path = metadataFilepath
+        self.raw_data_filepath = rawDataFilepath
+        self.metadata_filepath = metadataFilepath
         self.all_headers = ''
         self.sim_data = ''
         self.binning_configs = ''
@@ -69,7 +69,7 @@ class CSV:
 ##### INITIAL PROCESSING ####
     def parse_csv_data(self, dataFile):
         #Read in the data set
-        dataset = pd.read_csv(os.path.join(self.raw_data_file_path, dataFile), delimiter=',', header=0, dtype=str)
+        dataset = pd.read_csv(os.path.join(self.raw_data_filepath, dataFile), delimiter=',', header=0, dtype=str)
         dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
         #Get headers from dataset and format them into a dictionary
         # {fileName: [Header1, Header2, ...]}
@@ -97,7 +97,7 @@ class CSV:
         return all_headers, all_data 
 
     def parse_config_data_CSV(self, configFile, ss_breakdown):
-        parsed_configs = extract_configs(self.metadata_file_path, [configFile], csv=True)
+        parsed_configs = extract_configs(self.metadata_filepath, [configFile], csv=True)
         if ss_breakdown == False:
             num_elements = len(parsed_configs['subsystem_assignments'])
             parsed_configs['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
