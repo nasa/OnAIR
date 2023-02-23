@@ -27,18 +27,17 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     arg_configFiles = [MagicMock()]
     arg_csv = MagicMock()
 
-    fake_filename = MagicMock()
     fake_subsystem_assignments = MagicMock()
     fake_tests = MagicMock()
     fake_descs = MagicMock()
 
-    forced_return_extract_config = [fake_filename, fake_subsystem_assignments, fake_tests, fake_descs]
+    forced_return_extract_config = [fake_subsystem_assignments, fake_tests, fake_descs]
 
     mocker.patch('src.data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
 
-    expected_result = {'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
-                       'test_assignments' : {fake_filename:fake_tests},
-                       'description_assignments' : {fake_filename:fake_descs}}
+    expected_result = {'subsystem_assignments' : fake_subsystem_assignments,
+                       'test_assignments' : fake_tests,
+                       'description_assignments' : fake_descs}
 
     # Act
     result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
@@ -57,7 +56,6 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
 
     num_fake_cFiles = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
 
-    fake_filenames = [MagicMock()] * num_fake_cFiles
     fake_subsystem_assignments = [MagicMock()] * num_fake_cFiles
     fake_tests = [MagicMock()] * num_fake_cFiles
     fake_descs = [MagicMock()] * num_fake_cFiles
@@ -65,18 +63,14 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     forced_return_extract_configs = []
     for i in range(num_fake_cFiles):
         arg_configFiles.append(MagicMock())
-        forced_return_extract_configs.append([fake_filenames[i], fake_subsystem_assignments[i], fake_tests[i], fake_descs[i]])
+        forced_return_extract_configs.append([fake_subsystem_assignments[i], fake_tests[i], fake_descs[i]])
 
     mocker.patch('src.data_handling.parsers.parser_util.extract_config', side_effect=forced_return_extract_configs)
 
     expected_result = {}
-    expected_result['subsystem_assignments'] = {fake_filenames[0]:fake_subsystem_assignments[0]}
-    expected_result['test_assignments'] = {fake_filenames[0]:fake_tests[0]}
-    expected_result['description_assignments'] = {fake_filenames[0]:fake_descs[0]}
-    for i in range(1, num_fake_cFiles):
-        expected_result['subsystem_assignments'][fake_filenames[i]] = fake_subsystem_assignments[i]
-        expected_result['test_assignments'][fake_filenames[i]] = fake_tests[i]
-        expected_result['description_assignments'][fake_filenames[i]] = fake_descs[i]
+    expected_result['subsystem_assignments'] = fake_subsystem_assignments[num_fake_cFiles-1]
+    expected_result['test_assignments'] = fake_tests[num_fake_cFiles-1]
+    expected_result['description_assignments'] = fake_descs[num_fake_cFiles-1]
 
     # Act
     result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
@@ -93,18 +87,17 @@ def test_parser_util_extract_configs_default_given_csv_is_False(mocker):
     arg_configFilePath = MagicMock()
     arg_configFiles = [MagicMock()]
 
-    fake_filename = MagicMock()
     fake_subsystem_assignments = MagicMock()
     fake_tests = MagicMock()
     fake_descs = MagicMock()
 
-    forced_return_extract_config = [fake_filename, fake_subsystem_assignments, fake_tests, fake_descs]
+    forced_return_extract_config = [fake_subsystem_assignments, fake_tests, fake_descs]
 
     mocker.patch('src.data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
 
-    expected_result = {'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
-                       'test_assignments' : {fake_filename:fake_tests},
-                       'description_assignments' : {fake_filename:fake_descs}}
+    expected_result = {'subsystem_assignments' : fake_subsystem_assignments,
+                       'test_assignments' : fake_tests,
+                       'description_assignments' : fake_descs}
 
     # Act
     result = parser_util.extract_configs(arg_configFilePath, arg_configFiles)
@@ -119,11 +112,9 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     arg_configFile = []
     arg_csv = MagicMock()
 
-    fake_data_source = MagicMock()
     fake_descriptor_file = MagicMock()
     fake_data_str = ''
 
-    mocker.patch('src.data_handling.parsers.parser_util.process_filepath', return_value=fake_data_source)
     mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, '.read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, '.close')
@@ -132,14 +123,11 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
-    assert parser_util.process_filepath.call_count == 1
-    assert parser_util.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert parser_util.process_filepath.call_args_list[0].kwargs == {'csv':arg_csv}
     assert parser_util.open.call_count == 1
     assert parser_util.open.call_args_list[0].args == (arg_configFilePath + arg_configFile, "r+")
     assert fake_descriptor_file.read.call_count == 1
     assert fake_descriptor_file.close.call_count == 1
-    assert result == (fake_data_source, [], [], [])
+    assert result == ([], [], [])
 
 def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_False_and_dataPts_is_vacant(mocker):
     # Arrange
@@ -147,11 +135,9 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     arg_configFile = []
     arg_csv = False if pytest.gen.randint(0, 1) == 1 else 0
 
-    fake_data_source = MagicMock()
     fake_descriptor_file = MagicMock()
     fake_data_str = ''
 
-    mocker.patch('src.data_handling.parsers.parser_util.process_filepath', return_value=fake_data_source)
     mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, '.read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, '.close')
@@ -160,14 +146,11 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
-    assert parser_util.process_filepath.call_count == 1
-    assert parser_util.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert parser_util.process_filepath.call_args_list[0].kwargs == {'csv':arg_csv}
     assert parser_util.open.call_count == 1
     assert parser_util.open.call_args_list[0].args == (arg_configFilePath + arg_configFile, "r+")
     assert fake_descriptor_file.read.call_count == 1
     assert fake_descriptor_file.close.call_count == 1
-    assert result == (fake_data_source, [], [], [])
+    assert result == ([], [], [])
 
 def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_and_3_expected_appended_lists_with_no_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_not_split_on_colon_and_single_test(mocker):
     # Arrange
@@ -175,7 +158,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     arg_configFile = []
     arg_csv = MagicMock()
 
-    fake_data_source = MagicMock()
     fake_descriptor_file = MagicMock()
     fake_descriptor = str(MagicMock()).replace(" ", "")
     fake_subsystem_assignment = MagicMock()
@@ -190,7 +172,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test]
 
-    mocker.patch('src.data_handling.parsers.parser_util.process_filepath', return_value=fake_data_source)
     mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
@@ -200,9 +181,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
-    assert parser_util.process_filepath.call_count == 1
-    assert parser_util.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert parser_util.process_filepath.call_args_list[0].kwargs == {'csv':arg_csv}
     assert parser_util.open.call_count == 1
     assert parser_util.open.call_args_list[0].args == (arg_configFilePath + arg_configFile, "r+")
     assert fake_descriptor_file.read.call_count == 1
@@ -210,7 +188,7 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     assert parser_util.ast.literal_eval.call_count == 2
     assert parser_util.ast.literal_eval.call_args_list[0].args == (fake_str_subsystem_assignment, )
     assert parser_util.ast.literal_eval.call_args_list[1].args == (fake_str_test, )
-    assert result == (fake_data_source, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
+    assert result == (expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
 
 def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_and_3_expected_appended_lists_with_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_split_on_colon_and_single_test(mocker):
     # Arrange
@@ -218,7 +196,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     arg_configFile = []
     arg_csv = MagicMock()
 
-    fake_data_source = MagicMock()
     fake_descriptor_file = MagicMock()
     fake_descriptor = str(MagicMock()).replace(" ", "")
     fake_description = str(MagicMock())
@@ -234,7 +211,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test]
 
-    mocker.patch('src.data_handling.parsers.parser_util.process_filepath', return_value=fake_data_source)
     mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
@@ -244,9 +220,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
-    assert parser_util.process_filepath.call_count == 1
-    assert parser_util.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert parser_util.process_filepath.call_args_list[0].kwargs == {'csv':arg_csv}
     assert parser_util.open.call_count == 1
     assert parser_util.open.call_args_list[0].args == (arg_configFilePath + arg_configFile, "r+")
     assert fake_descriptor_file.read.call_count == 1
@@ -254,7 +227,7 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     assert parser_util.ast.literal_eval.call_count == 2
     assert parser_util.ast.literal_eval.call_args_list[0].args == (fake_str_subsystem_assignment, )
     assert parser_util.ast.literal_eval.call_args_list[1].args == (fake_str_test, )
-    assert result == (fake_data_source, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
+    assert result == (expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
 
 def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_and_3_expected_appended_lists_with_description_when_csv_resolves_to_True_and_dataPts_has_one_item_and_field_info_does_split_on_colon_and_multi_test(mocker):
     # Arrange
@@ -262,7 +235,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     arg_configFile = []
     arg_csv = MagicMock()
 
-    fake_data_source = MagicMock()
     fake_descriptor_file = MagicMock()
     fake_descriptor = str(MagicMock()).replace(" ", "")
     fake_description = str(MagicMock())
@@ -280,7 +252,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test, fake_test2]
 
-    mocker.patch('src.data_handling.parsers.parser_util.process_filepath', return_value=fake_data_source)
     mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
@@ -290,9 +261,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
-    assert parser_util.process_filepath.call_count == 1
-    assert parser_util.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert parser_util.process_filepath.call_args_list[0].kwargs == {'csv':arg_csv}
     assert parser_util.open.call_count == 1
     assert parser_util.open.call_args_list[0].args == (arg_configFilePath + arg_configFile, "r+")
     assert fake_descriptor_file.read.call_count == 1
@@ -301,7 +269,7 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     assert parser_util.ast.literal_eval.call_args_list[0].args == (fake_str_subsystem_assignment, )
     assert parser_util.ast.literal_eval.call_args_list[1].args == (fake_str_test, )
     assert parser_util.ast.literal_eval.call_args_list[2].args == (fake_str_test2, )
-    assert result == (fake_data_source, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
+    assert result == (expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
 
 def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_False_and_dataPts_has_single_item(mocker):
     # Arrange
@@ -309,7 +277,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     arg_configFile = []
     arg_csv = False if pytest.gen.randint(0, 1) == 1 else 0
 
-    fake_data_source = MagicMock()
     fake_descriptor_file = MagicMock()
     fake_descriptor = str(MagicMock()).replace(" ", "")
     fake_subsystem_assignment = MagicMock()
@@ -320,25 +287,21 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test]
 
-    mocker.patch('src.data_handling.parsers.parser_util.process_filepath', return_value=fake_data_source)
     mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval')
+    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
         
     # Act
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
-    assert parser_util.process_filepath.call_count == 1
-    assert parser_util.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert parser_util.process_filepath.call_args_list[0].kwargs == {'csv':arg_csv}
     assert parser_util.open.call_count == 1
     assert parser_util.open.call_args_list[0].args == (arg_configFilePath + arg_configFile, "r+")
     assert fake_descriptor_file.read.call_count == 1
     assert fake_descriptor_file.close.call_count == 1
-    assert parser_util.ast.literal_eval.call_count == 0
-    assert result == (fake_data_source, [], [], [])
+    assert parser_util.ast.literal_eval.call_count == 2
+    assert result == ([fake_subsystem_assignment], [[fake_test]], ['No description'])
 
 def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_and_3_expected_appended_lists_when_csv_resolves_to_True_and_there_are_multiple_data_points(mocker):
     # Arrange
@@ -346,7 +309,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     arg_configFile = []
     arg_csv = MagicMock()
 
-    fake_data_source = MagicMock()
     fake_descriptor_file = MagicMock()
 
     num_fake_dataPts = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 items (0 and 1 have own tests)
@@ -371,7 +333,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     expected_mnemonic_tests = [[fake_test]] * num_fake_dataPts
     expected_descriptions = [fake_description] * num_fake_dataPts
 
-    mocker.patch('src.data_handling.parsers.parser_util.process_filepath', return_value=fake_data_source)
     mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
@@ -381,9 +342,6 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert    
-    assert parser_util.process_filepath.call_count == 1
-    assert parser_util.process_filepath.call_args_list[0].args == (arg_configFile, )
-    assert parser_util.process_filepath.call_args_list[0].kwargs == {'csv':arg_csv}
     assert parser_util.open.call_count == 1
     assert parser_util.open.call_args_list[0].args == (arg_configFilePath + arg_configFile, "r+")
     assert fake_descriptor_file.read.call_count == 1
@@ -392,7 +350,7 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     for i in range(num_fake_dataPts):
         assert parser_util.ast.literal_eval.call_args_list[2 * i].args == (fake_str_subsystem_assignment, )
         assert parser_util.ast.literal_eval.call_args_list[(2*i) + 1].args == (fake_str_test, )
-    assert result == (fake_data_source, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
+    assert result == (expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions)
 
 
 # str2lst tests
