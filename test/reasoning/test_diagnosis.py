@@ -32,7 +32,7 @@ def test_Diagnosis__init__initializes_all_attributes_to_expected_values_when_arg
     assert cut.has_kalman == False
     assert cut.kalman_results == None
 
-def test_Diagnosis__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results__is_non_empty_and_does_not_contain_kalman_plugin():
+def test_Diagnosis__init__initializes_all_attributes_to_expected_values_when_arg_learning_system_results_is_non_empty_and_does_not_contain_kalman_plugin():
     # Arrange
     fake_timestep = MagicMock()
     fake_learning_system_results = {}
