@@ -9,7 +9,7 @@ import re
 import time
 
 from src.util.print_io import *
-from src.data_handling.parsers.parser_util import * 
+from data_handling.parsers.parser_util import * 
 
 import pandas as pd
 

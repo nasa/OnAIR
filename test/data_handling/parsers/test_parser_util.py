@@ -1,7 +1,7 @@
 """ Test Parser Util Functionality """
 import pytest
 from mock import MagicMock
-import src.data_handling.parsers.parser_util as parser_util
+import data_handling.parsers.parser_util as parser_util
 
 
 # extract_configs tests
@@ -33,7 +33,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
 
     forced_return_extract_config = [fake_subsystem_assignments, fake_tests, fake_descs]
 
-    mocker.patch('src.data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
+    mocker.patch('data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
 
     expected_result = {'subsystem_assignments' : fake_subsystem_assignments,
                        'test_assignments' : fake_tests,
@@ -65,7 +65,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
         arg_configFiles.append(MagicMock())
         forced_return_extract_configs.append([fake_subsystem_assignments[i], fake_tests[i], fake_descs[i]])
 
-    mocker.patch('src.data_handling.parsers.parser_util.extract_config', side_effect=forced_return_extract_configs)
+    mocker.patch('data_handling.parsers.parser_util.extract_config', side_effect=forced_return_extract_configs)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = fake_subsystem_assignments[num_fake_cFiles-1]
@@ -93,7 +93,7 @@ def test_parser_util_extract_configs_default_given_csv_is_False(mocker):
 
     forced_return_extract_config = [fake_subsystem_assignments, fake_tests, fake_descs]
 
-    mocker.patch('src.data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
+    mocker.patch('data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
 
     expected_result = {'subsystem_assignments' : fake_subsystem_assignments,
                        'test_assignments' : fake_tests,
@@ -115,7 +115,7 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     fake_descriptor_file = MagicMock()
     fake_data_str = ''
 
-    mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
+    mocker.patch('data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, '.read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, '.close')
     
@@ -138,7 +138,7 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     fake_descriptor_file = MagicMock()
     fake_data_str = ''
 
-    mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
+    mocker.patch('data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, '.read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, '.close')
     
@@ -172,10 +172,10 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test]
 
-    mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
+    mocker.patch('data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
+    mocker.patch('data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
     
     # Act
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
@@ -211,10 +211,10 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test]
 
-    mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
+    mocker.patch('data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
+    mocker.patch('data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
     
     # Act
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
@@ -252,10 +252,10 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test, fake_test2]
 
-    mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
+    mocker.patch('data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
+    mocker.patch('data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
     
     # Act
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
@@ -287,10 +287,10 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test]
 
-    mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
+    mocker.patch('data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
+    mocker.patch('data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
         
     # Act
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
@@ -333,10 +333,10 @@ def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_an
     expected_mnemonic_tests = [[fake_test]] * num_fake_dataPts
     expected_descriptions = [fake_description] * num_fake_dataPts
 
-    mocker.patch('src.data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
+    mocker.patch('data_handling.parsers.parser_util.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
+    mocker.patch('data_handling.parsers.parser_util.ast.literal_eval', side_effect=forced_returns_literal_eval)
     
     # Act
     result = parser_util.extract_config(arg_configFilePath, arg_configFile, arg_csv)
@@ -360,7 +360,7 @@ def test_parser_util_str2lst_returns_call_to_ast_literal_eval_which_receive_give
 
     expected_result = MagicMock()
     
-    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', return_value=expected_result)
+    mocker.patch('data_handling.parsers.parser_util.ast.literal_eval', return_value=expected_result)
 
     # Act
     result = parser_util.str2lst(arg_string)
@@ -374,8 +374,8 @@ def test_parser_util_str2lst_prints_message_when_ast_literal_eval_receives_given
     # Arrange
     arg_string = str(MagicMock())
     
-    mocker.patch('src.data_handling.parsers.parser_util.ast.literal_eval', side_effect=Exception)
-    mocker.patch('src.data_handling.parsers.parser_util.print')
+    mocker.patch('data_handling.parsers.parser_util.ast.literal_eval', side_effect=Exception)
+    mocker.patch('data_handling.parsers.parser_util.print')
     
     # Act
     result = parser_util.str2lst(arg_string)
@@ -401,7 +401,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replac
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
@@ -422,7 +422,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replac
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
@@ -443,7 +443,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
@@ -464,7 +464,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
@@ -484,7 +484,7 @@ def test_parser_util_process_filepath_default_given_csv_is_False(mocker):
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config)
@@ -503,7 +503,7 @@ def test_parser_util_process_filepath_default_given_return_config_is_False(mocke
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('src.data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path)

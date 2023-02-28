@@ -9,7 +9,7 @@ import copy
 
 from collections import OrderedDict 
 
-from src.data_handling.parsers.parser_util import str2lst
+from data_handling.parsers.parser_util import str2lst
 
 class TimeSynchronizer:
     def __init__(self, headers={}, dataFrames={}, test_configs={}):

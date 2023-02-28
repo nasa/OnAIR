@@ -1,8 +1,8 @@
 """ Test CSV Parser Functionality """
 import pytest
 from mock import MagicMock
-import src.data_handling.parsers.csv_parser as csv_parser
-from src.data_handling.parsers.csv_parser import CSV
+import data_handling.parsers.csv_parser as csv_parser
+from data_handling.parsers.csv_parser import CSV
 
 # CSV __init__ tests
 def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_and_data_and_config_when_given_dataFiles_and_configFiles_are_empty_strings_and_given_ss_breakdown_does_not_matter(mocker):
@@ -85,7 +85,7 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     cut = CSV.__new__(CSV)
 
     forced_return_value_str2lst = MagicMock()
-    mocker.patch('src.data_handling.parsers.csv_parser.str2lst', return_value=forced_return_value_str2lst)
+    mocker.patch('data_handling.parsers.csv_parser.str2lst', return_value=forced_return_value_str2lst)
     mocker.patch.object(cut, 'parse_csv_data', return_value=[fake_labels, fake_data])
     mocker.patch.object(cut, 'parse_config_data_CSV', return_value=fake_configs)
 
@@ -145,7 +145,7 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     
     cut = CSV.__new__(CSV)
 
-    mocker.patch('src.data_handling.parsers.csv_parser.str2lst', return_value=arg_dataFiles)
+    mocker.patch('data_handling.parsers.csv_parser.str2lst', return_value=arg_dataFiles)
     mocker.patch.object(cut, 'parse_csv_data', return_value=[fake_labels, fake_data])
     mocker.patch.object(cut, 'parse_config_data_CSV', return_value=fake_configs)
 
@@ -187,8 +187,8 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
 
     expected_result = ({arg_dataFile: []}, {})
 
-    mocker.patch('src.data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
-    mocker.patch('src.data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
+    mocker.patch('data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
+    mocker.patch('data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
     mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
     mocker.patch.object(fake_initial_data_set, 'loc.__getitem__', return_value=fake_second_data_set)
     mocker.patch.object(fake_initial_data_set, 'iterrows', return_value=[])
@@ -230,8 +230,8 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
 
     expected_result = ({arg_dataFile: []}, {})
 
-    mocker.patch('src.data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
-    mocker.patch('src.data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
+    mocker.patch('data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
+    mocker.patch('data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
     mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
     mocker.patch.object(fake_initial_data_set, 'loc.__getitem__', return_value=fake_second_data_set)
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=[])
@@ -284,8 +284,8 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     
     expected_result = ({arg_dataFile: []}, expected_result_dict)
 
-    mocker.patch('src.data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
-    mocker.patch('src.data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
+    mocker.patch('data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
+    mocker.patch('data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
     mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
     mocker.patch.object(fake_loc, '__getitem__', return_value=fake_second_data_set)
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
@@ -338,8 +338,8 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     
     expected_result = ({arg_dataFile: fake_second_data_set.columns.values}, expected_result_dict)
 
-    mocker.patch('src.data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
-    mocker.patch('src.data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
+    mocker.patch('data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
+    mocker.patch('data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
     mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
     mocker.patch.object(fake_loc, '__getitem__', return_value=fake_second_data_set)
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
@@ -402,8 +402,8 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     
     expected_result = ({arg_dataFile: fake_second_data_set.columns.values}, expected_result_dict)
 
-    mocker.patch('src.data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
-    mocker.patch('src.data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
+    mocker.patch('data_handling.parsers.csv_parser.os.path.join', return_value=forced_return_os_path_join)
+    mocker.patch('data_handling.parsers.csv_parser.pd.read_csv', return_value=fake_initial_data_set)
     mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
     mocker.patch.object(fake_loc, '__getitem__', return_value=fake_second_data_set)
     mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
@@ -434,8 +434,8 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
 
     expected_result = MagicMock()
 
-    mocker.patch('src.data_handling.parsers.csv_parser.extract_configs', return_value=expected_result)
-    mocker.patch('src.data_handling.parsers.csv_parser.len')
+    mocker.patch('data_handling.parsers.csv_parser.extract_configs', return_value=expected_result)
+    mocker.patch('data_handling.parsers.csv_parser.len')
 
     cut = CSV.__new__(CSV)
     cut.metadata_filepath = fake_metadata_filepath
@@ -463,8 +463,8 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
 
     expected_result = []
 
-    mocker.patch('src.data_handling.parsers.csv_parser.extract_configs', return_value=forced_return_extract_configs)
-    mocker.patch('src.data_handling.parsers.csv_parser.len', return_value=forced_return_len)
+    mocker.patch('data_handling.parsers.csv_parser.extract_configs', return_value=forced_return_extract_configs)
+    mocker.patch('data_handling.parsers.csv_parser.len', return_value=forced_return_len)
 
     cut = CSV.__new__(CSV)
     cut.metadata_filepath = fake_metadata_filepath
@@ -499,8 +499,8 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     for i in range(num_fake_processed_filepaths):
         expected_result.append(['MISSION'])
 
-    mocker.patch('src.data_handling.parsers.csv_parser.extract_configs', return_value=forced_return_extract_configs)
-    mocker.patch('src.data_handling.parsers.csv_parser.len', return_value=forced_return_len)
+    mocker.patch('data_handling.parsers.csv_parser.extract_configs', return_value=forced_return_extract_configs)
+    mocker.patch('data_handling.parsers.csv_parser.len', return_value=forced_return_len)
 
     cut = CSV.__new__(CSV)
     cut.metadata_filepath = fake_metadata_filepath

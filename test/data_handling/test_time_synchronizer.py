@@ -4,8 +4,8 @@ import unittest
 import pytest
 
 from mock import MagicMock
-import src.data_handling.time_synchronizer as time_synchronizer
-from src.data_handling.time_synchronizer import TimeSynchronizer
+import data_handling.time_synchronizer as time_synchronizer
+from data_handling.time_synchronizer import TimeSynchronizer
 
 # __init__ tests
 def test_TimeSynchronizer_init_does_not_set_instance_default_values_when_calls_to_init_sync_data_and_sort_data_do_not_raise_exceptions(mocker):
@@ -198,7 +198,7 @@ def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_i
 
     fake_deep_copy = MagicMock()
 
-    mocker.patch('src.data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
 
     cut = TimeSynchronizer.__new__(TimeSynchronizer)
     # NOTE: this accessed item in the cut helps set num_sources, but that is an usued variable that should be removed, after it is setting cut.ordered_sources no longer needs to be done
@@ -235,7 +235,7 @@ def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_i
 
     fake_deep_copy = MagicMock()
 
-    mocker.patch('src.data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
 
     cut = TimeSynchronizer.__new__(TimeSynchronizer)
     # NOTE: this accessed item in the cut helps set num_sources, but that is an usued variable that should be removed, after it is setting cut.ordered_sources no longer needs to be done
@@ -272,7 +272,7 @@ def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_l
 
     fake_deep_copy = MagicMock()
 
-    mocker.patch('src.data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
 
     expected_clean_data_symbol = '-'
 
@@ -311,7 +311,7 @@ def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_l
 
     fake_deep_copy = MagicMock()
 
-    mocker.patch('src.data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
 
     expected_clean_data_symbol = '-'
 
@@ -356,7 +356,7 @@ def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_l
 
     fake_deep_copy = MagicMock()
 
-    mocker.patch('src.data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
 
     expected_clean_data_symbol = '-'
 
@@ -410,7 +410,7 @@ def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_l
 
 #     fake_deep_copy = MagicMock()
 
-#     mocker.patch('src.data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+#     mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
 
 #     expected_clean_data_symbol = '-'
 

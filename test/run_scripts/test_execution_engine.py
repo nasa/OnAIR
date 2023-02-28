@@ -228,7 +228,7 @@ def test_ExecutionEngine_parse_data_sets_the_processedSimData_to_the_TimeSynchro
 
     # Assert
     assert execution_engine.importlib.import_module.call_count == 1
-    assert execution_engine.importlib.import_module.call_args_list[0].args == ('src.data_handling.parsers.' + arg_parser_file_name, )
+    assert execution_engine.importlib.import_module.call_args_list[0].args == ('data_handling.parsers.' + arg_parser_file_name, )
     assert execution_engine.getattr.call_count == 1
     assert execution_engine.getattr.call_args_list[0].args == (fake_parser, arg_parser_name,)
     assert FakeParser.init_data_path == fake_run_path + arg_dataFilePath

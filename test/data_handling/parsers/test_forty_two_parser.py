@@ -1,8 +1,8 @@
 """ Test 42 Parser Functionality """
 import pytest
 from mock import MagicMock
-import src.data_handling.parsers.forty_two_parser as forty_two_parser
-from src.data_handling.parsers.forty_two_parser import FortyTwo
+import data_handling.parsers.forty_two_parser as forty_two_parser
+from data_handling.parsers.forty_two_parser import FortyTwo
 
 # tests for init
 def test_FortyTwo_init_default_constructor_initializes_variables_to_empty_strings():
@@ -86,7 +86,7 @@ def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_argumen
 
     cut = FortyTwo.__new__(FortyTwo)
 
-    mocker.patch('src.data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
+    mocker.patch('data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
     mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
     mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
     
@@ -131,7 +131,7 @@ def test_FortyTwo_init_initializes_variables_correctly_when_given_arguments_and_
     
     cut = FortyTwo.__new__(FortyTwo)
 
-    mocker.patch('src.data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
+    mocker.patch('data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
     mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
     mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
     
@@ -166,7 +166,7 @@ def test_FortyTwo_parse_sim_data_raises_index_error_when_given_empty_data_file(m
     cut = FortyTwo.__new__(FortyTwo)
     cut.raw_data_filepath = fake_filepath
 
-    mocker.patch('src.data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
+    mocker.patch('data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
     mocker.patch.object(fake_txt_file, 'read',return_value=fake_data_str)
     mocker.patch.object(fake_txt_file, 'close')
     mocker.patch.object(cut, 'parse_headers', return_value=fake_headers)
@@ -202,7 +202,7 @@ def test_FortyTwo_parse_sim_data_with_only_one_data_pt(mocker):
     cut = FortyTwo.__new__(FortyTwo)
     cut.raw_data_filepath = fake_filepath
 
-    mocker.patch('src.data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
+    mocker.patch('data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
     mocker.patch.object(fake_txt_file, 'read',return_value=fake_data_str)
     mocker.patch.object(fake_txt_file, 'close')
     mocker.patch.object(cut, 'parse_headers', return_value=fake_headers)
@@ -253,7 +253,7 @@ def test_FortyTwo_parse_sim_data_with_more_than_one_data_pt(mocker):
     cut = FortyTwo.__new__(FortyTwo)
     cut.raw_data_filepath = fake_filepath
 
-    mocker.patch('src.data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
+    mocker.patch('data_handling.parsers.forty_two_parser.open', return_value=fake_txt_file)
     mocker.patch.object(fake_txt_file, 'read',return_value=fake_data_str)
     mocker.patch.object(fake_txt_file, 'close')
     mocker.patch.object(cut, 'parse_headers', return_value=fake_headers)
@@ -365,7 +365,8 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
                                         'test_assignments' : fake_tests,
                                         'description_assignments' : fake_descs}
 
-    mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
+    mocker.patch('data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
+    mocker.patch('data_handling.parsers.forty_two_parser.process_filepath', return_value=fake_filename)
 
     expected_result = { 'subsystem_assignments' : [['MISSION']],
                         'test_assignments' : fake_tests,
@@ -398,7 +399,8 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
                                         'description_assignments' : fake_descs}
     forced_return_process_filepath = fake_filename
     
-    mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
+    mocker.patch('data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
+    mocker.patch('data_handling.parsers.forty_two_parser.process_filepath', return_value=forced_return_process_filepath)
 
     expected_result = { 'subsystem_assignments' : [['MISSION']] * num_ss_assignments,
                         'test_assignments' : fake_tests,
@@ -424,10 +426,10 @@ def test_FortyTwo_parse_config_data_returns_return_value_of_extract_configs_when
     cut = FortyTwo.__new__(FortyTwo)
     cut.metadata_filepath = fake_metadata_filepath
 
-    forced_return_extract_configs = { 'subsystem_assignments' : fake_subsystem_assignments,
-                                        'test_assignments' : fake_tests,
-                                        'description_assignments' : fake_descs}
-    mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
+    forced_return_extract_configs = { 'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
+                                        'test_assignments' : {fake_filename:fake_tests},
+                                        'description_assignments' : {fake_filename:fake_descs}}
+    mocker.patch('data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
     
     # Act
     result = cut.parse_config_data(arg_config_file, True)

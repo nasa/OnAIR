@@ -10,7 +10,7 @@ from src.systems.vehicle_rep import VehicleRepresentation
 from src.util.file_io import *
 from src.util.print_io import *
 from src.util.sim_io import *
-from src.data_handling.data_source import DataSource
+from data_handling.data_source import DataSource
 
 class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):

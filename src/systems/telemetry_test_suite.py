@@ -5,7 +5,7 @@ Handles telemetry mnemonic testing
 """
 
 # from collections import Counter
-from src.data_handling.data_source import DataSource
+from data_handling.data_source import DataSource
 from src.systems.status import Status
 from collections import Counter
 
