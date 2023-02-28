@@ -29,7 +29,7 @@ python driver.py -t
 
 For the equivalent of the driver.py run:
 ```
-python -m coverage run --branch --source=src -m pytest ./test/
+python -m coverage run --branch --source=src,data_handling -m pytest ./test/
 ```
 
 #### Command breakdown:
@@ -39,7 +39,7 @@ python -m coverage run --branch --source=src -m pytest ./test/
 
 `--branch` - includes code branching information in the coverage report
 
-`--source=src` - tells coverage where the code under test exists for reporting line hits
+`--source=src,data_handling` - tells coverage where the code under test exists for reporting line hits
 
 `-m pytest` - tells coverage what test runner (framework) to wrap
 

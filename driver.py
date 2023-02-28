@@ -5,7 +5,7 @@ Source of the main function for the OnAIR repo
 import pytest
 import coverage
 # coverage started early to see all lines in all files (def and imports were being missed with programmatic runs)
-cov = coverage.Coverage(source=['src'], branch=True)
+cov = coverage.Coverage(source=['src','data_handling'], branch=True)
 cov.start()
 
 import os
