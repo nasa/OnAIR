@@ -70,6 +70,9 @@ def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_argumen
     fake_sim_data = MagicMock()
     fake_list_len = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
     fake_list = [MagicMock()] * fake_list_len
+    fake_ss_assigns = MagicMock()
+    fake_test_assigns = MagicMock()
+    fake_desc_assigns = MagicMock()
     
     arg_data_filepath = str(MagicMock())
     arg_metadata_filepath = str(MagicMock())
@@ -77,15 +80,19 @@ def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_argumen
     arg_config_files = str(MagicMock())
 
     forced_parse_sim_data_return_value = fake_headers, fake_sim_data
-    forced_parse_config_data_return_value = { 'subsystem_assignments' : {fake_data_file_name:MagicMock()},
-                                                'test_assignments' : {fake_data_file_name:MagicMock()},
-                                                'description_assignments' : {fake_data_file_name:MagicMock()}}
+    forced_parse_config_data_return_value = { 'subsystem_assignments' : fake_ss_assigns,
+                                                'test_assignments' : fake_test_assigns,
+                                                'description_assignments' : fake_desc_assigns}
 
     cut = FortyTwo.__new__(FortyTwo)
 
     mocker.patch('src.data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
     mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
     mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
+    
+    expected_binning_configs = { 'subsystem_assignments' : {fake_list[0] : fake_ss_assigns},
+                                                'test_assignments' : {fake_list[0] : fake_test_assigns},
+                                                'description_assignments' : {fake_list[0] : fake_desc_assigns}}
     
     # Act
     cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_data_files, arg_config_files, True)
@@ -95,9 +102,7 @@ def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_argumen
     assert cut.metadata_filepath == arg_metadata_filepath
     assert cut.all_headers == fake_headers
     assert cut.sim_data == fake_sim_data
-    assert cut.binning_configs == forced_parse_config_data_return_value
-    assert cut.binning_configs == forced_parse_config_data_return_value
-    assert cut.binning_configs == forced_parse_config_data_return_value
+    assert cut.binning_configs == expected_binning_configs
     assert cut.parse_sim_data.call_count == 1
     assert cut.parse_sim_data.call_args_list[0].args == (fake_list[0],)
     assert cut.parse_config_data.call_count == 1
@@ -110,6 +115,9 @@ def test_FortyTwo_init_initializes_variables_correctly_when_given_arguments_and_
     fake_sim_data = MagicMock()
     fake_list_len = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
     fake_list = [MagicMock()] * fake_list_len
+    fake_ss_assigns = MagicMock()
+    fake_test_assigns = MagicMock()
+    fake_desc_assigns = MagicMock()
 
     arg_data_filepath = str(MagicMock())
     arg_metadata_filepath = str(MagicMock())
@@ -117,15 +125,19 @@ def test_FortyTwo_init_initializes_variables_correctly_when_given_arguments_and_
     arg_config_files = str(MagicMock())
 
     forced_parse_sim_data_return_value = fake_headers, fake_sim_data
-    forced_parse_config_data_return_value = { 'subsystem_assignments' : {fake_data_file_name:MagicMock()},
-                                                'test_assignments' : {fake_data_file_name:MagicMock()},
-                                                'description_assignments' : {fake_data_file_name:MagicMock()}}
+    forced_parse_config_data_return_value = { 'subsystem_assignments' : fake_ss_assigns,
+                                                'test_assignments' : fake_test_assigns,
+                                                'description_assignments' : fake_desc_assigns}
     
     cut = FortyTwo.__new__(FortyTwo)
 
     mocker.patch('src.data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
     mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
     mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
+    
+    expected_binning_configs = { 'subsystem_assignments' : {fake_list[0] : fake_ss_assigns},
+                                                'test_assignments' : {fake_list[0] : fake_test_assigns},
+                                                'description_assignments' : {fake_list[0] : fake_desc_assigns}}
     
     # Act
     cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_data_files, arg_config_files, False)
@@ -135,9 +147,7 @@ def test_FortyTwo_init_initializes_variables_correctly_when_given_arguments_and_
     assert cut.metadata_filepath == arg_metadata_filepath
     assert cut.all_headers == fake_headers
     assert cut.sim_data == fake_sim_data
-    assert cut.binning_configs == forced_parse_config_data_return_value
-    assert cut.binning_configs == forced_parse_config_data_return_value
-    assert cut.binning_configs == forced_parse_config_data_return_value
+    assert cut.binning_configs == expected_binning_configs
     assert cut.parse_sim_data.call_count == 1
     assert cut.parse_sim_data.call_args_list[0].args == (fake_list[0],)
     assert cut.parse_config_data.call_count == 1
@@ -351,16 +361,15 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
     cut = FortyTwo.__new__(FortyTwo)
     cut.metadata_filepath = fake_metadata_filepath
 
-    forced_return_extract_configs = { 'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
-                                        'test_assignments' : {fake_filename:fake_tests},
-                                        'description_assignments' : {fake_filename:fake_descs}}
+    forced_return_extract_configs = { 'subsystem_assignments' : fake_subsystem_assignments,
+                                        'test_assignments' : fake_tests,
+                                        'description_assignments' : fake_descs}
 
     mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
-    mocker.patch('src.data_handling.parsers.forty_two_parser.process_filepath', return_value=fake_filename)
 
-    expected_result = { 'subsystem_assignments' : {fake_filename:[['MISSION']]},
-                        'test_assignments' : {fake_filename:fake_tests},
-                        'description_assignments' : {fake_filename:fake_descs}}
+    expected_result = { 'subsystem_assignments' : [['MISSION']],
+                        'test_assignments' : fake_tests,
+                        'description_assignments' : fake_descs}
 
     # Act
     result = cut.parse_config_data(arg_config_file, False)
@@ -369,9 +378,6 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
     assert result == expected_result
     assert forty_two_parser.extract_configs.call_count == 1
     assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_config_file])
-    assert forty_two_parser.process_filepath.call_count == 2
-    assert forty_two_parser.process_filepath.call_args_list[0].args == (arg_config_file,)
-    assert forty_two_parser.process_filepath.call_args_list[1].args == (arg_config_file,)
 
 def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is_false_and_number_of_subsystem_assignments_greater_than_one(mocker):
     # Arrange
@@ -387,17 +393,16 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
     cut = FortyTwo.__new__(FortyTwo)
     cut.metadata_filepath = fake_metadata_filepath
 
-    forced_return_extract_configs = { 'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
-                                        'test_assignments' : {fake_filename:fake_tests},
-                                        'description_assignments' : {fake_filename:fake_descs}}
+    forced_return_extract_configs = { 'subsystem_assignments' : fake_subsystem_assignments,
+                                        'test_assignments' : fake_tests,
+                                        'description_assignments' : fake_descs}
     forced_return_process_filepath = fake_filename
     
     mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
-    mocker.patch('src.data_handling.parsers.forty_two_parser.process_filepath', return_value=forced_return_process_filepath)
 
-    expected_result = { 'subsystem_assignments' : {fake_filename:[['MISSION']] * num_ss_assignments},
-                        'test_assignments' : {fake_filename:fake_tests},
-                        'description_assignments' : {fake_filename:fake_descs}}
+    expected_result = { 'subsystem_assignments' : [['MISSION']] * num_ss_assignments,
+                        'test_assignments' : fake_tests,
+                        'description_assignments' : fake_descs}
 
     # Act
     result = cut.parse_config_data(arg_config_file, False)
@@ -405,9 +410,6 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
     # Assert
     assert result == expected_result
     assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_config_file])
-    assert forty_two_parser.process_filepath.call_count == 2
-    assert forty_two_parser.process_filepath.call_args_list[0].args == (arg_config_file,)
-    assert forty_two_parser.process_filepath.call_args_list[1].args == (arg_config_file,)
 
 def test_FortyTwo_parse_config_data_returns_return_value_of_extract_configs_when_ss_breakdown_is_true(mocker):
     # Arrange
@@ -422,9 +424,9 @@ def test_FortyTwo_parse_config_data_returns_return_value_of_extract_configs_when
     cut = FortyTwo.__new__(FortyTwo)
     cut.metadata_filepath = fake_metadata_filepath
 
-    forced_return_extract_configs = { 'subsystem_assignments' : {fake_filename:fake_subsystem_assignments},
-                                        'test_assignments' : {fake_filename:fake_tests},
-                                        'description_assignments' : {fake_filename:fake_descs}}
+    forced_return_extract_configs = { 'subsystem_assignments' : fake_subsystem_assignments,
+                                        'test_assignments' : fake_tests,
+                                        'description_assignments' : fake_descs}
     mocker.patch('src.data_handling.parsers.forty_two_parser.extract_configs', return_value=forced_return_extract_configs)
     
     # Act
