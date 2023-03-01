@@ -5,7 +5,7 @@ Helper class to create and run a simulation
 
 import importlib
 
-from src.reasoning.brain import Agent
+from src.reasoning.agent import Agent
 from src.systems.vehicle_rep import VehicleRepresentation
 from src.util.file_io import *
 from src.util.print_io import *
