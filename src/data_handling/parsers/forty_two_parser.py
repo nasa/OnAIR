@@ -40,10 +40,10 @@ class FortyTwo:
             self.binning_configs['test_assignments'] = {}
             self.binning_configs['description_assignments'] = {}
 
-            for data_file in ast.literal_eval(dataFiles):
-                self.binning_configs['subsystem_assignments'][data_file] = configs['subsystem_assignments'][data_file]
-                self.binning_configs['test_assignments'][data_file] = configs['test_assignments'][data_file]
-                self.binning_configs['description_assignments'][data_file] = configs['description_assignments'][data_file]
+            for data_file in str2lst(dataFiles):
+                self.binning_configs['subsystem_assignments'][data_file] = configs['subsystem_assignments']
+                self.binning_configs['test_assignments'][data_file] = configs['test_assignments']
+                self.binning_configs['description_assignments'][data_file] = configs['description_assignments']
 
     ##### INITIAL PROCESSING ####
     def parse_sim_data(self, dataFile):
@@ -109,8 +109,8 @@ class FortyTwo:
     def parse_config_data(self, configFile, ss_breakdown):
         parsed_configs = extract_configs(self.metadata_filepath, [configFile])
         if ss_breakdown == False:
-            num_elements = len(parsed_configs['subsystem_assignments'][process_filepath(configFile)])
-            parsed_configs['subsystem_assignments'][process_filepath(configFile)] = [['MISSION'] for elem in range(num_elements)]
+            num_elements = len(parsed_configs['subsystem_assignments'])
+            parsed_configs['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
         return parsed_configs
 
     ##### GETTERS ##################################
