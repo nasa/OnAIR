@@ -107,7 +107,7 @@ class TimeSynchronizer:
             num_removed = num_removed + 1
         return data
 
-    def get_spacecraft_metadata(self):
+    def get_vehicle_metadata(self):
         return self.ordered_fused_headers, self.ordered_fused_tests
 
     def get_sim_data(self):

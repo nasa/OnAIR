@@ -6,7 +6,7 @@ Helper class to create and run a simulation
 import importlib
 
 from src.reasoning.brain import Brain
-from src.systems.spacecraft import Spacecraft
+from src.systems.spacecraft import VehicleRepresentation
 from src.util.file_io import *
 from src.util.print_io import *
 from src.util.sim_io import *
@@ -15,7 +15,7 @@ from src.data_handling.data_source import DataSource
 class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):
         self.simulator = simType
-        spaceCraft = Spacecraft(*parsedData.get_spacecraft_metadata())
+        vehicle = VehicleRepresentation(*parsedData.get_vehicle_metadata())
 
         if SBN_Flag:
             # TODO: This is ugly, but sbn_client is only available when built for cFS...
@@ -27,7 +27,7 @@ class Simulator:
             
         else:
             self.simData = DataSource(parsedData.get_sim_data())
-        self.brain = Brain(spaceCraft)
+        self.brain = Brain(vehicle)
 
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
         if IO_Flag == True: print_sim_header()
@@ -68,7 +68,7 @@ class Simulator:
     def IO_check(self, time_step, IO_Flag):
         if IO_Flag == True:
             print_sim_step(time_step + 1)
-            curr_data = self.brain.spacecraft_rep.curr_data
+            curr_data = self.brain.vehicle_rep.curr_data
             print_mission_status(self.brain, curr_data)
         else:
             # print_dots(time_step)

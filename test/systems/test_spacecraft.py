@@ -1,11 +1,11 @@
-""" Test Spacecraft Functionality """
+""" Test VehicleRepresentation Functionality """
 import pytest
 from mock import MagicMock
-import src.systems.spacecraft as spacecraft
-from src.systems.spacecraft import Spacecraft
+import src.systems.spacecraft as vehicle
+from src.systems.spacecraft import VehicleRepresentation
 
 # __init__ tests
-def test_Spacecraft__init__asserts_when_len_given_headers_is_not_eq_to_len_given_tests(mocker):
+def test_VehicleRepresentation__init__asserts_when_len_given_headers_is_not_eq_to_len_given_tests(mocker):
     # Arrange
     arg_headers = MagicMock()
     arg_tests = MagicMock()
@@ -16,7 +16,7 @@ def test_Spacecraft__init__asserts_when_len_given_headers_is_not_eq_to_len_given
     while fake_len[1] == fake_len[0]: # need a value not equal for test to pass
         fake_len[1] = pytest.gen.randint(0, 100) # arbitrary, same as fake_len_headers
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
     mocker.patch('src.systems.spacecraft.len', side_effect=fake_len)
     # Act
@@ -24,13 +24,13 @@ def test_Spacecraft__init__asserts_when_len_given_headers_is_not_eq_to_len_given
         cut.__init__(arg_headers, arg_tests)
     
     # Assert
-    assert spacecraft.len.call_count == 2
+    assert vehicle.len.call_count == 2
     call_list = set({})
-    [call_list.add(spacecraft.len.call_args_list[i].args) for i in range(len(spacecraft.len.call_args_list))]
+    [call_list.add(vehicle.len.call_args_list[i].args) for i in range(len(vehicle.len.call_args_list))]
     assert call_list == {(arg_headers, ), (arg_tests, )}
     assert e_info.match('')
 
-def test_Spacecraft__init__sets_status_to_Status_with_str_MISSION_and_headers_to_given_headers_and_test_suite_to_TelemetryTestSuite_with_given_headers_and_tests_and_curr_data_to_all_empty_step_len_of_headers(mocker):
+def test_VehicleRepresentation__init__sets_status_to_Status_with_str_MISSION_and_headers_to_given_headers_and_test_suite_to_TelemetryTestSuite_with_given_headers_and_tests_and_curr_data_to_all_empty_step_len_of_headers(mocker):
     # Arrange
     arg_headers = MagicMock()
     arg_tests = MagicMock()
@@ -39,7 +39,7 @@ def test_Spacecraft__init__sets_status_to_Status_with_str_MISSION_and_headers_to
     fake_status = MagicMock()
     fake_test_suite = MagicMock()
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
     mocker.patch('src.systems.spacecraft.len', return_value=fake_len)
     mocker.patch('src.systems.spacecraft.Status', return_value=fake_status)
@@ -49,19 +49,19 @@ def test_Spacecraft__init__sets_status_to_Status_with_str_MISSION_and_headers_to
     cut.__init__(arg_headers, arg_tests)
 
     # Assert
-    assert spacecraft.Status.call_count == 1
-    assert spacecraft.Status.call_args_list[0].args == ('MISSION', )
+    assert vehicle.Status.call_count == 1
+    assert vehicle.Status.call_args_list[0].args == ('MISSION', )
     assert cut.status == fake_status
     assert cut.headers == arg_headers
-    assert spacecraft.TelemetryTestSuite.call_count == 1
-    assert spacecraft.TelemetryTestSuite.call_args_list[0].args == (arg_headers, arg_tests)
+    assert vehicle.TelemetryTestSuite.call_count == 1
+    assert vehicle.TelemetryTestSuite.call_args_list[0].args == (arg_headers, arg_tests)
     assert cut.test_suite == fake_test_suite
     assert cut.curr_data == ['-'] * fake_len
 
 # NOTE: commonly each optional arg is tested, but because their sizes must be equal testing both at once
-def test_Spacecraft__init__default_given_headers_and_tests_are_both_empty_list(mocker):
+def test_VehicleRepresentation__init__default_given_headers_and_tests_are_both_empty_list(mocker):
     # Arrange
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
     mocker.patch('src.systems.spacecraft.Status')
     mocker.patch('src.systems.spacecraft.TelemetryTestSuite')
@@ -71,16 +71,16 @@ def test_Spacecraft__init__default_given_headers_and_tests_are_both_empty_list(m
 
     # Assert
     assert cut.headers == []
-    assert spacecraft.TelemetryTestSuite.call_count == 1
-    assert spacecraft.TelemetryTestSuite.call_args_list[0].args == ([], [])
+    assert vehicle.TelemetryTestSuite.call_count == 1
+    assert vehicle.TelemetryTestSuite.call_args_list[0].args == ([], [])
     assert cut.curr_data == ['-'] * 0
 
 # update tests
-def test_Spacecraft_update_does_not_set_any_curr_data_when_given_frame_is_vacant_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_frame_is_vacant_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
 
@@ -103,7 +103,7 @@ def test_Spacecraft_update_does_not_set_any_curr_data_when_given_frame_is_vacant
     assert cut.status.set_status.call_count == 1
     assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
     
-def test_Spacecraft_update_does_not_set_any_curr_data_when_given_frame_is_all_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_frame_is_all_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
 
@@ -111,7 +111,7 @@ def test_Spacecraft_update_does_not_set_any_curr_data_when_given_frame_is_all_em
     for i in range(num_fake_empty_steps):
         arg_frame.append('-')
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     cut.curr_data = []
@@ -137,7 +137,7 @@ def test_Spacecraft_update_does_not_set_any_curr_data_when_given_frame_is_all_em
     assert cut.status.set_status.call_count == 1
     assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
     
-def test_Spacecraft_update_does_puts_all_frame_data_into_curr_data_when_none_are_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+def test_VehicleRepresentation_update_does_puts_all_frame_data_into_curr_data_when_none_are_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
 
@@ -145,7 +145,7 @@ def test_Spacecraft_update_does_puts_all_frame_data_into_curr_data_when_none_are
     for i in range(num_fake_full_steps):
         arg_frame.append(MagicMock())
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     cut.curr_data = [MagicMock()] * num_fake_full_steps
@@ -171,7 +171,7 @@ def test_Spacecraft_update_does_puts_all_frame_data_into_curr_data_when_none_are
     assert cut.status.set_status.call_count == 1
     assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
     
-def test_Spacecraft_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
 
@@ -182,7 +182,7 @@ def test_Spacecraft_update_puts_frame_data_into_curr_data_at_same_list_location_
     for i in location_fake_empty_steps:
         arg_frame[i] = '-'
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     unchanged_data = MagicMock()
@@ -213,7 +213,7 @@ def test_Spacecraft_update_puts_frame_data_into_curr_data_at_same_list_location_
     assert cut.status.set_status.call_count == 1
     assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
     
-def test_Spacecraft_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_including_locations_in_curr_data_that_do_not_exist_in_frame_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_including_locations_in_curr_data_that_do_not_exist_in_frame_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
 
@@ -224,7 +224,7 @@ def test_Spacecraft_update_puts_frame_data_into_curr_data_at_same_list_location_
     for i in location_fake_empty_steps:
         arg_frame[i] = '-'
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     unchanged_data = MagicMock()
@@ -256,7 +256,7 @@ def test_Spacecraft_update_puts_frame_data_into_curr_data_at_same_list_location_
     assert cut.status.set_status.call_count == 1
     assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
     
-def test_Spacecraft_update_raises_IndexError_when_frame_location_size_with_relevant_data_extends_beyond_curr_data_size(mocker):
+def test_VehicleRepresentation_update_raises_IndexError_when_frame_location_size_with_relevant_data_extends_beyond_curr_data_size(mocker):
     # Arrange
     arg_frame = []
 
@@ -264,7 +264,7 @@ def test_Spacecraft_update_raises_IndexError_when_frame_location_size_with_relev
     for i in range(num_fake_total_steps):
         arg_frame.append(MagicMock())
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     unchanged_data = MagicMock()
@@ -285,7 +285,7 @@ def test_Spacecraft_update_raises_IndexError_when_frame_location_size_with_relev
     # Assert
     assert e_info.match('list assignment index out of range')
     
-def test_Spacecraft_update_does_not_raise_IndexError_when_frame_location_size_with_only_empty_steps_extends_beyond_curr_data_size(mocker):
+def test_VehicleRepresentation_update_does_not_raise_IndexError_when_frame_location_size_with_only_empty_steps_extends_beyond_curr_data_size(mocker):
     # Arrange
     arg_frame = []
 
@@ -293,7 +293,7 @@ def test_Spacecraft_update_does_not_raise_IndexError_when_frame_location_size_wi
     for i in range(num_fake_total_steps):
         arg_frame.append(MagicMock())
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     unchanged_data = MagicMock()
@@ -318,11 +318,11 @@ def test_Spacecraft_update_does_not_raise_IndexError_when_frame_location_size_wi
     assert e_info.match(fake_non_IndexError_message)
 
 # get_headers
-def test_Spacecraft_get_headers_returns_headers():
+def test_VehicleRepresentation_get_headers_returns_headers():
     # Arrange
     expected_result = MagicMock()
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.headers = expected_result
 
     # Act
@@ -332,11 +332,11 @@ def test_Spacecraft_get_headers_returns_headers():
     assert result == expected_result
 
 # get_current_faulting_mnemonics tests, return_value=fake_suite_status
-def test_Spacecraft_get_current_faulting_mnemonics_returns_test_suite_call_get_status_specific_mnemonics(mocker):
+def test_VehicleRepresentation_get_current_faulting_mnemonics_returns_test_suite_call_get_status_specific_mnemonics(mocker):
     # Arrange
     expected_result = MagicMock()
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.test_suite = MagicMock()
 
     mocker.patch.object(cut.test_suite, 'get_status_specific_mnemonics', return_value=expected_result)
@@ -350,11 +350,11 @@ def test_Spacecraft_get_current_faulting_mnemonics_returns_test_suite_call_get_s
     assert result == expected_result
 
 # get_current_data tests
-def test_Spacecraft_get_current_data_returns_curr_data():
+def test_VehicleRepresentation_get_current_data_returns_curr_data():
     # Arrange
     expected_result = MagicMock()
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.curr_data = expected_result
 
     # Act
@@ -364,11 +364,11 @@ def test_Spacecraft_get_current_data_returns_curr_data():
     assert result == expected_result
 
 # get_current_time tests
-def test_Spacecraft_get_current_time_returns_curr_data_item_0():
+def test_VehicleRepresentation_get_current_time_returns_curr_data_item_0():
     # Arrange
     expected_result = MagicMock()
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.curr_data = []
     cut.curr_data.append(expected_result)
 
@@ -379,11 +379,11 @@ def test_Spacecraft_get_current_time_returns_curr_data_item_0():
     assert result == expected_result
 
 # get_status tests
-def test_Spacecraft_get_status_returns_status_call_to_get_status(mocker):
+def test_VehicleRepresentation_get_status_returns_status_call_to_get_status(mocker):
     # Arrange
     expected_result = MagicMock()
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.status = MagicMock()
 
     mocker.patch.object(cut.status, 'get_status', return_value=expected_result)
@@ -397,11 +397,11 @@ def test_Spacecraft_get_status_returns_status_call_to_get_status(mocker):
     assert result == expected_result
 
 # get_bayesian_status tests
-def test_Spacecraft_get_bayesian_status_returns_status_call_to_get_bayesian_status(mocker):
+def test_VehicleRepresentation_get_bayesian_status_returns_status_call_to_get_bayesian_status(mocker):
     # Arrange
     expected_result = MagicMock()
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.status = MagicMock()
 
     mocker.patch.object(cut.status, 'get_bayesian_status', return_value=expected_result)
@@ -415,13 +415,13 @@ def test_Spacecraft_get_bayesian_status_returns_status_call_to_get_bayesian_stat
     assert result == expected_result
 
 # get_batch_status_reports tests
-def test_Spacecraft_get_batch_status_reports_returngets_None():
+def test_VehicleRepresentation_get_batch_status_reports_returngets_None():
     # Arrange
     arg_batch_data = MagicMock()
 
     expected_result = None
 
-    cut = Spacecraft.__new__(Spacecraft)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
     # Act
     result = cut.get_batch_status_reports(arg_batch_data)

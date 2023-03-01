@@ -99,7 +99,7 @@ class FortyTwo:
         clean_frame.append(time)
         data = data[1:] # remove time
 
-        spacecraft = data[0].split('.')[0] # Not doing anything with this for now.. may parse it out
+        vehicle = data[0].split('.')[0] # Not doing anything with this for now.. may parse it out
 
         for datum in data:
             clean_frame.append(datum.split(' = ')[1])

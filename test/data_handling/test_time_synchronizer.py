@@ -641,8 +641,8 @@ def test_TimeSynchronizer_remove_time_datapoints_returns_data_with_indices_remov
     # Assert
     assert result == expected_result
 
-# get_spacecraft_metadata tests
-def test_TimeSynchronizer_get_spacecraft_metadata_returns_tuple_of_instance_values_ordered_fused_headers_and_ordered_fused_tests():
+# get_vehicle_metadata tests
+def test_TimeSynchronizer_get_vehicle_metadata_returns_tuple_of_instance_values_ordered_fused_headers_and_ordered_fused_tests():
     # Arrange
     fake_ordered_fused_headers = MagicMock()
     fake_ordered_fused_tests = MagicMock()
@@ -652,7 +652,7 @@ def test_TimeSynchronizer_get_spacecraft_metadata_returns_tuple_of_instance_valu
     cut.ordered_fused_tests = fake_ordered_fused_tests
 
     # Act
-    result = cut.get_spacecraft_metadata()
+    result = cut.get_vehicle_metadata()
 
     # Assert
     assert result == (fake_ordered_fused_headers, fake_ordered_fused_tests)
@@ -745,7 +745,7 @@ def test_TimeSynchronizer_get_sim_data_returns_instance_value_of_sim_data():
 #         clean_data = self.TS.remove_time_datapoints(data, indices_to_remove)
 #         self.assertEqual(clean_data, [[],[]])
 
-#     def test_get_spacecraft_metadata(self):
+#     def test_get_vehicle_metadata(self):
 #         return 
 
 #     def test_get_sim_data(self):

@@ -58,11 +58,11 @@ class ExecutionEngine:
         ## Sort Data: Telementry Data & Configuration
         self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
         self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
-        self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for spacecraft telemetry
-        self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Spacecraft telemetry data
+        self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for vehicle telemetry
+        self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Vehicle telemetry data
         try:
             self.benchmarkFilePath = config['DEFAULT']['BenchmarkFilePath']
-            self.benchmarkFiles = config['DEFAULT']['BenchmarkFiles'] # Spacecraft telemetry data
+            self.benchmarkFiles = config['DEFAULT']['BenchmarkFiles'] # Vehicle telemetry data
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass

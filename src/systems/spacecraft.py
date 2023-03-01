@@ -1,6 +1,6 @@
 """
-Spacecraft Class
-Handles retrieval and storage of spacecraft subsystem information
+VehicleRepresentation Class
+Handles retrieval and storage of vehicle subsystem information
 """
 
 from src.systems.status import Status
@@ -8,7 +8,7 @@ from src.systems.telemetry_test_suite import TelemetryTestSuite
 
 from src.util.print_io import *
 
-class Spacecraft:
+class VehicleRepresentation:
     def __init__(self, headers=[], tests=[]): # metaData is a timesynchronizer obj
         assert(len(headers) == len(tests))
         self.status = Status('MISSION')

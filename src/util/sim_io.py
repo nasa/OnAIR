@@ -53,7 +53,7 @@ def print_dots(ts):
 
 ####################################################################################
 # print('\033[95m [TIMESTEP] \033[0m' + str(time_step))
-# print('\033[95m [FAULTING MNEMONICS] \033[0m' + str(self.brain.spacecraft_rep.get_faulting_mnemonics()))
+# print('\033[95m [FAULTING MNEMONICS] \033[0m' + str(self.brain.vehicle_rep.get_faulting_mnemonics()))
 # # print('\033[95m [IMPORTANCE] \033[0m' + str(self.brain.supervised_learning.get_importance_sampling()))
 # record_input = input('\033[95m record diagnosis? (y/n/exit) >>> \033[0m')
 # if record_input == 'exit': 

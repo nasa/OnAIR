@@ -6,7 +6,7 @@ from src.run_scripts.sim import Simulator
 from math import ceil, floor
 
 # __init__ tests
-def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_True(mocker):
+def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Brain_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
@@ -23,8 +23,8 @@ def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_d
             else:
                 FakeDataAdapterSource.connect_call_count = 1
 
-    fake_spacecraft_metadata = [MagicMock(), MagicMock()]
-    fake_spaceCraft = MagicMock()
+    fake_vehicle_metadata = [MagicMock(), MagicMock()]
+    fake_vehicle = MagicMock()
     fake_sim_data = MagicMock()
     fake_sbn_adapter = MagicMock()
     fake_simData = MagicMock()
@@ -32,8 +32,8 @@ def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_d
 
     cut = Simulator.__new__(Simulator)
 
-    mocker.patch.object(arg_parsedData, 'get_spacecraft_metadata', return_value=fake_spacecraft_metadata)
-    mocker.patch('src.run_scripts.sim.Spacecraft', return_value=fake_spaceCraft)
+    mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
+    mocker.patch('src.run_scripts.sim.vehicle', return_value=fake_vehicle)
     mocker.patch('src.run_scripts.sim.importlib.import_module', return_value=fake_sbn_adapter)
     mocker.patch('src.run_scripts.sim.getattr', return_value=FakeDataAdapterSource)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
@@ -44,31 +44,31 @@ def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_d
 
     # Assert
     assert cut.simulator == arg_simType
-    assert sim.Spacecraft.call_count == 1
-    assert sim.Spacecraft.call_args_list[0].args == (fake_spacecraft_metadata[0], fake_spacecraft_metadata[1], )
+    assert sim.vehicle.call_count == 1
+    assert sim.vehicle.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
     assert FakeDataAdapterSource.simData == cut.simData
     assert FakeDataAdapterSource.sim_data == fake_sim_data
     assert FakeDataAdapterSource.connect_call_count == 1
     assert sim.Brain.call_count == 1
-    assert sim.Brain.call_args_list[0].args == (fake_spaceCraft, )
+    assert sim.Brain.call_args_list[0].args == (fake_vehicle, )
     assert cut.brain == fake_brain
 
-def test_Simulator__init__creates_Spacecraft_and_DataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_False(mocker):
+def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Brain_with_vehicle_when_SBN_Flag_resolves_to_False(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
     arg_SBN_Flag = False if (pytest.gen.randint(0,1) == 0) else None
 
-    fake_spacecraft_metadata = [MagicMock(), MagicMock()]
-    fake_spaceCraft = MagicMock()
+    fake_vehicle_metadata = [MagicMock(), MagicMock()]
+    fake_vehicle = MagicMock()
     fake_sim_data = MagicMock()
     fake_simData = MagicMock()
     fake_brain = MagicMock()
 
     cut = Simulator.__new__(Simulator)
 
-    mocker.patch.object(arg_parsedData, 'get_spacecraft_metadata', return_value=fake_spacecraft_metadata)
-    mocker.patch('src.run_scripts.sim.Spacecraft', return_value=fake_spaceCraft)
+    mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
+    mocker.patch('src.run_scripts.sim.VehicleRepresentation', return_value=fake_vehicle)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
     mocker.patch('src.run_scripts.sim.DataSource', return_value=fake_simData)
     mocker.patch('src.run_scripts.sim.Brain', return_value=fake_brain)
@@ -78,15 +78,15 @@ def test_Simulator__init__creates_Spacecraft_and_DataSource_from_parsed_data_and
 
     # Assert
     assert cut.simulator == arg_simType
-    assert sim.Spacecraft.call_count == 1
-    assert sim.Spacecraft.call_args_list[0].args == (fake_spacecraft_metadata[0], fake_spacecraft_metadata[1], )
+    assert sim.VehicleRepresentation.call_count == 1
+    assert sim.VehicleRepresentation.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
     assert sim.DataSource.call_count == 1
     assert sim.DataSource.call_args_list[0].args == (fake_sim_data, )
     assert sim.Brain.call_count == 1
-    assert sim.Brain.call_args_list[0].args == (fake_spaceCraft, )
+    assert sim.Brain.call_args_list[0].args == (fake_vehicle, )
     assert cut.brain == fake_brain
 
-def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_data_and_Brain_with_spaceCraft_when_SBN_Flag_resolves_to_True(mocker):
+def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Brain_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
@@ -103,8 +103,8 @@ def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_d
             else:
                 FakeDataAdapterSource.connect_call_count = 1
 
-    fake_spacecraft_metadata = [MagicMock(), MagicMock()]
-    fake_spaceCraft = MagicMock()
+    fake_vehicle_metadata = [MagicMock(), MagicMock()]
+    fake_vehicle = MagicMock()
     fake_sim_data = MagicMock()
     fake_sbn_adapter = MagicMock()
     fake_simData = MagicMock()
@@ -112,8 +112,8 @@ def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_d
 
     cut = Simulator.__new__(Simulator)
 
-    mocker.patch.object(arg_parsedData, 'get_spacecraft_metadata', return_value=fake_spacecraft_metadata)
-    mocker.patch('src.run_scripts.sim.Spacecraft', return_value=fake_spaceCraft)
+    mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
+    mocker.patch('src.run_scripts.sim.VehicleRepresentation', return_value=fake_vehicle)
     mocker.patch('src.run_scripts.sim.importlib.import_module', return_value=fake_sbn_adapter)
     mocker.patch('src.run_scripts.sim.getattr', return_value=FakeDataAdapterSource)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
@@ -124,13 +124,13 @@ def test_Simulator__init__creates_Spacecraft_and_AdapterDataSource_from_parsed_d
 
     # Assert
     assert cut.simulator == arg_simType
-    assert sim.Spacecraft.call_count == 1
-    assert sim.Spacecraft.call_args_list[0].args == (fake_spacecraft_metadata[0], fake_spacecraft_metadata[1], )
+    assert sim.VehicleRepresentation.call_count == 1
+    assert sim.VehicleRepresentation.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
     assert FakeDataAdapterSource.simData == cut.simData
     assert FakeDataAdapterSource.sim_data == fake_sim_data
     assert FakeDataAdapterSource.connect_call_count == 1
     assert sim.Brain.call_count == 1
-    assert sim.Brain.call_args_list[0].args == (fake_spaceCraft, )
+    assert sim.Brain.call_args_list[0].args == (fake_vehicle, )
     assert cut.brain == fake_brain
 
 # run_sim tests
@@ -346,7 +346,7 @@ def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Fla
     assert sim.print_sim_step.call_count == 1
     assert sim.print_sim_step.call_args_list[0].args == (arg_time_step + 1, )
     assert sim.print_mission_status.call_count == 1
-    assert sim.print_mission_status.call_args_list[0].args == (cut.brain, cut.brain.spacecraft_rep.curr_data, )
+    assert sim.print_mission_status.call_args_list[0].args == (cut.brain, cut.brain.vehicle_rep.curr_data, )
 
 def test_Simulator_IO_check_does_nothing_when_given_IO_Flag_is_not_True(mocker):
     # Arrange
