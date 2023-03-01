@@ -1,8 +1,8 @@
 """ Test VehicleRepresentation Functionality """
 import pytest
 from mock import MagicMock
-import src.systems.spacecraft as vehicle
-from src.systems.spacecraft import VehicleRepresentation
+import src.systems.vehicle_rep as vehicle
+from src.systems.vehicle_rep import VehicleRepresentation
 
 # __init__ tests
 def test_VehicleRepresentation__init__asserts_when_len_given_headers_is_not_eq_to_len_given_tests(mocker):
@@ -18,7 +18,7 @@ def test_VehicleRepresentation__init__asserts_when_len_given_headers_is_not_eq_t
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
-    mocker.patch('src.systems.spacecraft.len', side_effect=fake_len)
+    mocker.patch('src.systems.vehicle_rep.len', side_effect=fake_len)
     # Act
     with pytest.raises(AssertionError) as e_info:
         cut.__init__(arg_headers, arg_tests)
@@ -41,9 +41,9 @@ def test_VehicleRepresentation__init__sets_status_to_Status_with_str_MISSION_and
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
-    mocker.patch('src.systems.spacecraft.len', return_value=fake_len)
-    mocker.patch('src.systems.spacecraft.Status', return_value=fake_status)
-    mocker.patch('src.systems.spacecraft.TelemetryTestSuite', return_value=fake_test_suite)
+    mocker.patch('src.systems.vehicle_rep.len', return_value=fake_len)
+    mocker.patch('src.systems.vehicle_rep.Status', return_value=fake_status)
+    mocker.patch('src.systems.vehicle_rep.TelemetryTestSuite', return_value=fake_test_suite)
     
     # Act
     cut.__init__(arg_headers, arg_tests)
@@ -63,8 +63,8 @@ def test_VehicleRepresentation__init__default_given_headers_and_tests_are_both_e
     # Arrange
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
-    mocker.patch('src.systems.spacecraft.Status')
-    mocker.patch('src.systems.spacecraft.TelemetryTestSuite')
+    mocker.patch('src.systems.vehicle_rep.Status')
+    mocker.patch('src.systems.vehicle_rep.TelemetryTestSuite')
     
     # Act
     cut.__init__()

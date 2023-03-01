@@ -8,7 +8,7 @@ import copy
 
 from src.systems.status import Status
 from src.data_driven_components.data_driven_learning import DataDrivenLearning
-from src.systems.spacecraft import VehicleRepresentation
+from src.systems.vehicle_rep import VehicleRepresentation
 from src.reasoning.diagnosis import Diagnosis
 
 class Brain:
