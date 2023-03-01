@@ -1,12 +1,12 @@
-""" Test Brain Functionality """
+""" Test Agent Functionality """
 import pytest
 from mock import MagicMock
-import src.reasoning.brain as brain
-from src.reasoning.brain import Brain
+import src.reasoning.brain as agent
+from src.reasoning.brain import Agent
 
 
 # __init__ tests
-def test_Brain__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and_mission_status_and_bayesian_status(mocker):
+def test_Agent__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and_mission_status_and_bayesian_status(mocker):
     # Arrange
     arg_vehicle = MagicMock()
 
@@ -20,7 +20,7 @@ def test_Brain__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and
     mocker.patch.object(arg_vehicle, 'get_status', return_value=fake_mission_status)
     mocker.patch.object(arg_vehicle, 'get_bayesian_status', return_value=fake_bayesian_status)
 
-    cut = Brain.__new__(Brain)
+    cut = Agent.__new__(Agent)
 
     # Act
     result = cut.__init__(arg_vehicle)
@@ -29,8 +29,8 @@ def test_Brain__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and
     assert cut.vehicle_rep == arg_vehicle
     assert arg_vehicle.get_headers.call_count == 1
     assert arg_vehicle.get_headers.call_args_list[0].args == ()
-    assert brain.DataDrivenLearning.call_count == 1
-    assert brain.DataDrivenLearning.call_args_list[0].args == (fake_headers, )
+    assert agent.DataDrivenLearning.call_count == 1
+    assert agent.DataDrivenLearning.call_args_list[0].args == (fake_headers, )
     assert cut.learning_systems == fake_learning_systems
     assert arg_vehicle.get_status.call_count == 1
     assert arg_vehicle.get_status.call_args_list[0].args == ()
@@ -40,13 +40,13 @@ def test_Brain__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and
     assert cut.bayesian_status == fake_bayesian_status
 
 # reason tests
-def test_Brain_reason_updates_vehicle_rep_with_given_frame_and_sets_new_vehicle_mission_status_and_updates_learning_systems_with_given_frame_and_new_mission_status(mocker):
+def test_Agent_reason_updates_vehicle_rep_with_given_frame_and_sets_new_vehicle_mission_status_and_updates_learning_systems_with_given_frame_and_new_mission_status(mocker):
     # Arrange
     arg_frame = MagicMock()
 
     fake_mission_status = MagicMock()
 
-    cut = Brain.__new__(Brain)
+    cut = Agent.__new__(Agent)
     cut.vehicle_rep = MagicMock()
     cut.learning_systems = MagicMock()
     
@@ -66,11 +66,11 @@ def test_Brain_reason_updates_vehicle_rep_with_given_frame_and_sets_new_vehicle_
     assert cut.learning_systems.update.call_args_list[0].args == (arg_frame, fake_mission_status) 
      
 # diagnose tests
-def test_Brain_diagnose_returns_empty_Dict():
+def test_Agent_diagnose_returns_empty_Dict():
     # Arrange
     arg_time_step = MagicMock()
 
-    cut = Brain.__new__(Brain)
+    cut = Agent.__new__(Agent)
     cut.learning_systems = MagicMock()
     cut.bayesian_status = MagicMock()
     cut.vehicle_rep = MagicMock()

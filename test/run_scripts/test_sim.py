@@ -6,7 +6,7 @@ from src.run_scripts.sim import Simulator
 from math import ceil, floor
 
 # __init__ tests
-def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Brain_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
+def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
@@ -28,7 +28,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     fake_sim_data = MagicMock()
     fake_sbn_adapter = MagicMock()
     fake_simData = MagicMock()
-    fake_brain = MagicMock()
+    fake_agent = MagicMock()
 
     cut = Simulator.__new__(Simulator)
 
@@ -37,7 +37,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     mocker.patch('src.run_scripts.sim.importlib.import_module', return_value=fake_sbn_adapter)
     mocker.patch('src.run_scripts.sim.getattr', return_value=FakeDataAdapterSource)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
-    mocker.patch('src.run_scripts.sim.Brain', return_value=fake_brain)
+    mocker.patch('src.run_scripts.sim.Agent', return_value=fake_agent)
 
     # Act
     cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
@@ -49,11 +49,11 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     assert FakeDataAdapterSource.simData == cut.simData
     assert FakeDataAdapterSource.sim_data == fake_sim_data
     assert FakeDataAdapterSource.connect_call_count == 1
-    assert sim.Brain.call_count == 1
-    assert sim.Brain.call_args_list[0].args == (fake_vehicle, )
-    assert cut.brain == fake_brain
+    assert sim.Agent.call_count == 1
+    assert sim.Agent.call_args_list[0].args == (fake_vehicle, )
+    assert cut.agent == fake_agent
 
-def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Brain_with_vehicle_when_SBN_Flag_resolves_to_False(mocker):
+def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_False(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
@@ -63,7 +63,7 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Br
     fake_vehicle = MagicMock()
     fake_sim_data = MagicMock()
     fake_simData = MagicMock()
-    fake_brain = MagicMock()
+    fake_agent = MagicMock()
 
     cut = Simulator.__new__(Simulator)
 
@@ -71,7 +71,7 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Br
     mocker.patch('src.run_scripts.sim.VehicleRepresentation', return_value=fake_vehicle)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
     mocker.patch('src.run_scripts.sim.DataSource', return_value=fake_simData)
-    mocker.patch('src.run_scripts.sim.Brain', return_value=fake_brain)
+    mocker.patch('src.run_scripts.sim.Agent', return_value=fake_agent)
 
     # Act
     cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
@@ -82,11 +82,11 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Br
     assert sim.VehicleRepresentation.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
     assert sim.DataSource.call_count == 1
     assert sim.DataSource.call_args_list[0].args == (fake_sim_data, )
-    assert sim.Brain.call_count == 1
-    assert sim.Brain.call_args_list[0].args == (fake_vehicle, )
-    assert cut.brain == fake_brain
+    assert sim.Agent.call_count == 1
+    assert sim.Agent.call_args_list[0].args == (fake_vehicle, )
+    assert cut.agent == fake_agent
 
-def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Brain_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
+def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
     # Arrange
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
@@ -108,7 +108,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     fake_sim_data = MagicMock()
     fake_sbn_adapter = MagicMock()
     fake_simData = MagicMock()
-    fake_brain = MagicMock()
+    fake_agent = MagicMock()
 
     cut = Simulator.__new__(Simulator)
 
@@ -117,7 +117,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     mocker.patch('src.run_scripts.sim.importlib.import_module', return_value=fake_sbn_adapter)
     mocker.patch('src.run_scripts.sim.getattr', return_value=FakeDataAdapterSource)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
-    mocker.patch('src.run_scripts.sim.Brain', return_value=fake_brain)
+    mocker.patch('src.run_scripts.sim.Agent', return_value=fake_agent)
 
     # Act
     cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
@@ -129,16 +129,16 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     assert FakeDataAdapterSource.simData == cut.simData
     assert FakeDataAdapterSource.sim_data == fake_sim_data
     assert FakeDataAdapterSource.connect_call_count == 1
-    assert sim.Brain.call_count == 1
-    assert sim.Brain.call_args_list[0].args == (fake_vehicle, )
-    assert cut.brain == fake_brain
+    assert sim.Agent.call_count == 1
+    assert sim.Agent.call_args_list[0].args == (fake_vehicle, )
+    assert cut.agent == fake_agent
 
 # run_sim tests
-def test_Simulator_run_sim_simData_never_has_more_so_loop_does_not_run_and_diagnosis_list_is_empty_but_filled_with_brain_diagnose_and_returns_last_diagnosis(mocker):
+def test_Simulator_run_sim_simData_never_has_more_so_loop_does_not_run_and_diagnosis_list_is_empty_but_filled_with_agent_diagnose_and_returns_last_diagnosis(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
-    cut.brain = MagicMock()
+    cut.agent = MagicMock()
 
     fake_diagnosis = MagicMock()
     fake_time_step = 0
@@ -146,7 +146,7 @@ def test_Simulator_run_sim_simData_never_has_more_so_loop_does_not_run_and_diagn
     mocker.patch('src.run_scripts.sim.print_sim_header')
     mocker.patch('src.run_scripts.sim.print_msg')
     mocker.patch.object(cut.simData, 'has_more', return_value=False)
-    mocker.patch.object(cut.brain, 'diagnose', return_value=fake_diagnosis)
+    mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
 
     # Act
     result = cut.run_sim()
@@ -156,22 +156,22 @@ def test_Simulator_run_sim_simData_never_has_more_so_loop_does_not_run_and_diagn
     assert sim.print_msg.call_count == 0
     assert cut.simData.has_more.call_count == 1
     assert cut.simData.has_more.call_args_list[0].args == ()
-    assert cut.brain.diagnose.call_count == 1
-    assert cut.brain.diagnose.call_args_list[0].args == (fake_time_step, )
+    assert cut.agent.diagnose.call_count == 1
+    assert cut.agent.diagnose.call_args_list[0].args == (fake_time_step, )
     assert result == fake_diagnosis
 
 def test_Simulator_run_sim_prints_header_when_given_IO_Flag_is_equal_to_True(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
-    cut.brain = MagicMock()
+    cut.agent = MagicMock()
 
     fake_diagnosis = MagicMock()
 
     mocker.patch('src.run_scripts.sim.print_sim_header')
     mocker.patch('src.run_scripts.sim.print_msg')
     mocker.patch.object(cut.simData, 'has_more', return_value=False)
-    mocker.patch.object(cut.brain, 'diagnose', return_value=fake_diagnosis)
+    mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
 
     # Act
     result = cut.run_sim(True)
@@ -186,14 +186,14 @@ def test_Simulator_run_sim_prints_wait_message_when_given_IO_Flag_is_the_str_str
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
-    cut.brain = MagicMock()
+    cut.agent = MagicMock()
 
     fake_diagnosis = MagicMock()
 
     mocker.patch('src.run_scripts.sim.print_sim_header')
     mocker.patch('src.run_scripts.sim.print_msg')
     mocker.patch.object(cut.simData, 'has_more', return_value=False)
-    mocker.patch.object(cut.brain, 'diagnose', return_value=fake_diagnosis)
+    mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
 
     # Act
     result = cut.run_sim('strict')
@@ -208,7 +208,7 @@ def test_Simulator_run_sim_runs_until_time_step_2050_when_simData_always_has_mor
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
-    cut.brain = MagicMock()
+    cut.agent = MagicMock()
 
     fake_diagnosis = MagicMock()
     fake_next = MagicMock()
@@ -218,10 +218,10 @@ def test_Simulator_run_sim_runs_until_time_step_2050_when_simData_always_has_mor
     mocker.patch('src.run_scripts.sim.print_msg')
     mocker.patch.object(cut.simData, 'has_more', return_value=True)
     mocker.patch.object(cut.simData, 'get_next', return_value=fake_next)
-    mocker.patch.object(cut.brain, 'reason')
+    mocker.patch.object(cut.agent, 'reason')
     mocker.patch.object(cut, 'IO_check')
-    mocker.patch.object(cut.brain, 'mission_status', MagicMock()) # never equals 'RED'
-    mocker.patch.object(cut.brain, 'diagnose', return_value=fake_diagnosis)
+    mocker.patch.object(cut.agent, 'mission_status', MagicMock()) # never equals 'RED'
+    mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
 
     # Act
     result = cut.run_sim(fake_IO_Flag)
@@ -232,21 +232,21 @@ def test_Simulator_run_sim_runs_until_time_step_2050_when_simData_always_has_mor
     assert cut.simData.get_next.call_count == 2050
     for i in range(2050):
         assert cut.simData.get_next.call_args_list[i].args == ()
-    assert cut.brain.reason.call_count == 2050
+    assert cut.agent.reason.call_count == 2050
     for i in range(2050):
-        assert cut.brain.reason.call_args_list[i].args == (fake_next, )
+        assert cut.agent.reason.call_args_list[i].args == (fake_next, )
     assert cut.IO_check.call_count == 2050
     for i in range(2050):
         assert cut.IO_check.call_args_list[i].args == (i, fake_IO_Flag, )
-    assert cut.brain.diagnose.call_count == 1
-    assert cut.brain.diagnose.call_args_list[0].args == (2050, )
+    assert cut.agent.diagnose.call_count == 1
+    assert cut.agent.diagnose.call_args_list[0].args == (2050, )
     assert result == fake_diagnosis
 
 def test_Simulator_run_sim_diagnose_always_performed_when_fault_is_on_first_time_step(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
-    cut.brain = MagicMock()
+    cut.agent = MagicMock()
 
     fake_diagnosis = MagicMock()
     fake_next = MagicMock()
@@ -256,27 +256,27 @@ def test_Simulator_run_sim_diagnose_always_performed_when_fault_is_on_first_time
     mocker.patch('src.run_scripts.sim.print_msg')
     mocker.patch.object(cut.simData, 'has_more', side_effect=[True, False]) # single loop
     mocker.patch.object(cut.simData, 'get_next', return_value=fake_next)
-    mocker.patch.object(cut.brain, 'reason')
+    mocker.patch.object(cut.agent, 'reason')
     mocker.patch.object(cut, 'IO_check')
-    mocker.patch.object(cut.brain, 'mission_status', 'RED')
-    mocker.patch.object(cut.brain, 'diagnose', return_value=fake_diagnosis)
+    mocker.patch.object(cut.agent, 'mission_status', 'RED')
+    mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
 
     # Act
     result = cut.run_sim(fake_IO_Flag)
 
     # Assert
     assert cut.simData.get_next.call_count == 1 # verifies in loop
-    assert cut.brain.reason.call_count == 1 # verifies in loop
+    assert cut.agent.reason.call_count == 1 # verifies in loop
     assert cut.IO_check.call_count == 1 # verifies in loop
-    assert cut.brain.diagnose.call_count == 1
-    assert cut.brain.diagnose.call_args_list[0].args == (0, )
+    assert cut.agent.diagnose.call_count == 1
+    assert cut.agent.diagnose.call_args_list[0].args == (0, )
     assert result == fake_diagnosis # check we ran through the method correctly
 
 def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_consecutive_until_the_hundreth_step_after_last_diagnosis_and_returns_last_diagnosis(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
-    cut.brain = MagicMock()
+    cut.agent = MagicMock()
 
     fake_diagnoses = [MagicMock()] * floor(2050/100)
     fake_diagnoses.append(MagicMock())
@@ -287,10 +287,10 @@ def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_conse
     mocker.patch('src.run_scripts.sim.print_msg')
     mocker.patch.object(cut.simData, 'has_more',  return_value=True) # True runs all time_steps
     mocker.patch.object(cut.simData, 'get_next', return_value=fake_next)
-    mocker.patch.object(cut.brain, 'reason')
+    mocker.patch.object(cut.agent, 'reason')
     mocker.patch.object(cut, 'IO_check')
-    mocker.patch.object(cut.brain, 'mission_status', 'RED')
-    mocker.patch.object(cut.brain, 'diagnose', side_effect=fake_diagnoses)
+    mocker.patch.object(cut.agent, 'mission_status', 'RED')
+    mocker.patch.object(cut.agent, 'diagnose', side_effect=fake_diagnoses)
 
     # Act
     result = cut.run_sim(fake_IO_Flag)
@@ -299,33 +299,33 @@ def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_conse
     assert cut.simData.get_next.call_count == 2050
     for i in range(2050):
         assert cut.simData.get_next.call_args_list[i].args == ()
-    assert cut.brain.reason.call_count == 2050
+    assert cut.agent.reason.call_count == 2050
     for i in range(2050):
-        assert cut.brain.reason.call_args_list[i].args == (fake_next, )
+        assert cut.agent.reason.call_args_list[i].args == (fake_next, )
     assert cut.IO_check.call_count == 2050
     for i in range(2050):
         assert cut.IO_check.call_args_list[i].args == (i, fake_IO_Flag, )
-    assert cut.brain.diagnose.call_count == ceil(2050/100)
-    for i in range(cut.brain.diagnose.call_count):
-        assert cut.brain.diagnose.call_args_list[i].args == (i * 100, )
+    assert cut.agent.diagnose.call_count == ceil(2050/100)
+    for i in range(cut.agent.diagnose.call_count):
+        assert cut.agent.diagnose.call_args_list[i].args == (i * 100, )
     assert result == fake_diagnoses[-1] # check we actually got the last diagnosis
 
 # set_benchmark_data tests
-def test_Simulator_set_benchmark_data_sends_brain_supervised_learning_set_benchmark_data_given_filepath_files_and_indices(mocker):
+def test_Simulator_set_benchmark_data_sends_agent_supervised_learning_set_benchmark_data_given_filepath_files_and_indices(mocker):
     # Arrange
     arg_filepath = MagicMock()
     arg_files = MagicMock()
     arg_indices = MagicMock()
 
     cut = Simulator.__new__(Simulator)
-    cut.brain = MagicMock()
+    cut.agent = MagicMock()
 
     # Act
     cut.set_benchmark_data(arg_filepath, arg_files, arg_indices)
 
     # Assert
-    assert cut.brain.supervised_learning.set_benchmark_data.call_count == 1
-    assert cut.brain.supervised_learning.set_benchmark_data.call_args_list[0].args == (arg_filepath, arg_files, arg_indices, )
+    assert cut.agent.supervised_learning.set_benchmark_data.call_count == 1
+    assert cut.agent.supervised_learning.set_benchmark_data.call_args_list[0].args == (arg_filepath, arg_files, arg_indices, )
 
 # IO_check tests
 def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Flag_is_True(mocker):
@@ -337,7 +337,7 @@ def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Fla
     mocker.patch('src.run_scripts.sim.print_mission_status')
 
     cut = Simulator.__new__(Simulator)
-    cut.brain = MagicMock()
+    cut.agent = MagicMock()
 
     # Act
     cut.IO_check(arg_time_step, arg_IO_Flag)
@@ -346,7 +346,7 @@ def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Fla
     assert sim.print_sim_step.call_count == 1
     assert sim.print_sim_step.call_args_list[0].args == (arg_time_step + 1, )
     assert sim.print_mission_status.call_count == 1
-    assert sim.print_mission_status.call_args_list[0].args == (cut.brain, cut.brain.vehicle_rep.curr_data, )
+    assert sim.print_mission_status.call_args_list[0].args == (cut.agent, cut.agent.vehicle_rep.curr_data, )
 
 def test_Simulator_IO_check_does_nothing_when_given_IO_Flag_is_not_True(mocker):
     # Arrange

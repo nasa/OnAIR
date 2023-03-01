@@ -249,21 +249,21 @@ def test_print_io_print_msg_prints_all_scolors_given_in_clrs(mocker):
 
 
 #print_mission_status
-def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_data_not_given(mocker):
+def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_data_not_given(mocker):
   # Arrange
-  arg_brain = MagicMock()
+  arg_agent = MagicMock()
   
   fake_mission_status = MagicMock()
   fake_status = MagicMock()
 
   expected_print = "INTERPRETED MISSION STATUS: " + str(fake_status)
 
-  arg_brain.mission_status = fake_mission_status
+  arg_agent.mission_status = fake_mission_status
   mocker.patch('src.util.print_io.format_status', return_value=fake_status)
   mocker.patch('src.util.print_io.print')
 
   # Act
-  src.util.print_io.print_mission_status(arg_brain)
+  src.util.print_io.print_mission_status(arg_agent)
   
   # Assert
   assert src.util.print_io.format_status.call_count == 1
@@ -271,9 +271,9 @@ def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_d
   assert src.util.print_io.print.call_count == 1
   assert src.util.print_io.print.call_args_list[0].args == (expected_print, )
 
-def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_data_given_is_None(mocker):
+def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_data_given_is_None(mocker):
   # Arrange
-  arg_brain = MagicMock()
+  arg_agent = MagicMock()
   arg_data = None
   
   fake_mission_status = MagicMock()
@@ -281,12 +281,12 @@ def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_d
 
   expected_print = "INTERPRETED MISSION STATUS: " + str(fake_status)
 
-  arg_brain.mission_status = fake_mission_status
+  arg_agent.mission_status = fake_mission_status
   mocker.patch('src.util.print_io.format_status', return_value=fake_status)
   mocker.patch('src.util.print_io.print')
 
   # Act
-  src.util.print_io.print_mission_status(arg_brain, arg_data)
+  src.util.print_io.print_mission_status(arg_agent, arg_data)
   
   # Assert
   assert src.util.print_io.format_status.call_count == 1
@@ -294,9 +294,9 @@ def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_d
   assert src.util.print_io.print.call_count == 1
   assert src.util.print_io.print.call_args_list[0].args == (expected_print, )
 
-def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_data_given_is_None(mocker):
+def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_data_given_is_None(mocker):
   # Arrange
-  arg_brain = MagicMock()
+  arg_agent = MagicMock()
   arg_data = MagicMock()
   
   fake_mission_status = MagicMock()
@@ -306,12 +306,12 @@ def test_print_io_print_mission_status_only_prints_brain_formatted_status_when_d
   expected_print.append("CURRENT TLM: " + str(arg_data))
   expected_print.append("INTERPRETED MISSION STATUS: " + str(fake_status))
 
-  arg_brain.mission_status = fake_mission_status
+  arg_agent.mission_status = fake_mission_status
   mocker.patch('src.util.print_io.format_status', return_value=fake_status)
   mocker.patch('src.util.print_io.print')
 
   # Act
-  src.util.print_io.print_mission_status(arg_brain, arg_data)
+  src.util.print_io.print_mission_status(arg_agent, arg_data)
   
   # Assert
   assert src.util.print_io.format_status.call_count == 1

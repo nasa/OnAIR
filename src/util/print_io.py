@@ -57,11 +57,11 @@ def print_msg(msg, clrs=['HEADER']):
     print("---- " + msg + bcolors.ENDC)
 
 # Print interpreted mission status
-def print_mission_status(brain, data = None):
+def print_mission_status(agent, data = None):
     # print_separator(bcolors.OKBLUE)
     if data != None:
         print("CURRENT TLM: " + str(data)) 
-    print("INTERPRETED MISSION STATUS: " + str(format_status(brain.mission_status)))
+    print("INTERPRETED MISSION STATUS: " + str(format_status(agent.mission_status)))
     # print_separator(bcolors.OKBLUE)
 
 # Print diagnosis info

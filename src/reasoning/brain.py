@@ -1,5 +1,5 @@
 """
-Brain Class
+Agent Class
 Deals with supervised learning for diagnosing statuses
 """
 
@@ -11,7 +11,7 @@ from src.data_driven_components.data_driven_learning import DataDrivenLearning
 from src.systems.vehicle_rep import VehicleRepresentation
 from src.reasoning.diagnosis import Diagnosis
 
-class Brain:
+class Agent:
     def __init__(self, vehicle):
         self.vehicle_rep = vehicle
         self.learning_systems = DataDrivenLearning(self.vehicle_rep.get_headers())

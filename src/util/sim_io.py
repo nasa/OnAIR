@@ -53,13 +53,13 @@ def print_dots(ts):
 
 ####################################################################################
 # print('\033[95m [TIMESTEP] \033[0m' + str(time_step))
-# print('\033[95m [FAULTING MNEMONICS] \033[0m' + str(self.brain.vehicle_rep.get_faulting_mnemonics()))
-# # print('\033[95m [IMPORTANCE] \033[0m' + str(self.brain.supervised_learning.get_importance_sampling()))
+# print('\033[95m [FAULTING MNEMONICS] \033[0m' + str(self.agent.vehicle_rep.get_faulting_mnemonics()))
+# # print('\033[95m [IMPORTANCE] \033[0m' + str(self.agent.supervised_learning.get_importance_sampling()))
 # record_input = input('\033[95m record diagnosis? (y/n/exit) >>> \033[0m')
 # if record_input == 'exit': 
-#     diagnosis_list.append(self.brain.diagnose(time_step))
-#     # print(self.brain.supervised_learning.get_benchmark_graph())
+#     diagnosis_list.append(self.agent.diagnose(time_step))
+#     # print(self.agent.supervised_learning.get_benchmark_graph())
 #     break
-# if record_input == 'y': diagnosis_list.append(self.brain.diagnose(time_step))
+# if record_input == 'y': diagnosis_list.append(self.agent.diagnose(time_step))
 ####################################################################################
 

@@ -1,4 +1,4 @@
-""" Test Brain Functionality """
+""" Test Diagnosis Functionality """
 import pytest
 from mock import MagicMock
 import src.reasoning.diagnosis as diagnosis
