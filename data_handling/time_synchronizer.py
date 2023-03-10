@@ -95,13 +95,12 @@ class TimeSynchronizer:
 
 
     def remove_time_datapoints(self, data, indices_to_remove):
-        outstanding_removal = indices_to_remove
-        num_removed = 0 
+        outstanding_removal = indices_to_remove.copy()
+        outstanding_removal.sort(reverse=True)
 
-        for i in range(len(outstanding_removal)):
-            curr_index = outstanding_removal[i]
-            del data[curr_index-num_removed]
-            num_removed = num_removed + 1
+        for i in outstanding_removal:
+            del data[i]
+
         return data
 
     def get_vehicle_metadata(self):
