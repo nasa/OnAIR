@@ -53,16 +53,13 @@ class TimeSynchronizer:
 
     def sort_data(self, dataFrames):
         sorted_data = []
-        num_sources = len(self.ordered_sources)
-        num_frames = len(dataFrames.keys())
-
+        
         total_times = list(dataFrames.keys())
         total_times.sort()
 
         sorted_data = []
 
         for time in total_times:
-            dataFromMultSources = dataFrames[time] # can be from any data source
             num_unclean_hdrs = len(self.indices_to_remove) + len(self.ordered_fused_headers) - 1 # unclean list, remove one of the added 'TIME' in clean
             clean_array_of_data = ['-']*num_unclean_hdrs
             for source in dataFrames[time].keys():
