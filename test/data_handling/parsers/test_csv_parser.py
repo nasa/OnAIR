@@ -1,6 +1,7 @@
 """ Test CSV Parser Functionality """
 import pytest
 from mock import MagicMock
+import data_handling.parsers.on_air_parser as on_air_parser
 import data_handling.parsers.csv_parser as csv_parser
 from data_handling.parsers.csv_parser import CSV
 
@@ -21,9 +22,9 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     # Assert
     assert cut.raw_data_filepath == arg_rawDataFilepath
     assert cut.metadata_filepath == arg_metadataFilepath
-    assert cut.all_headers == ''
-    assert cut.sim_data == ''
-    assert cut.binning_configs == '' 
+    assert cut.all_headers == {}
+    assert cut.sim_data == {}
+    assert cut.binning_configs == {} 
 
 def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_and_data_and_config_when_given_dataFiles_is_not_empty_string_but_configFiles_is_and_given_ss_breakdown_does_not_matter(mocker):
     # Arrange
@@ -41,9 +42,9 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     # Assert
     assert cut.raw_data_filepath == arg_rawDataFilepath
     assert cut.metadata_filepath == arg_metadataFilepath
-    assert cut.all_headers == ''
-    assert cut.sim_data == ''
-    assert cut.binning_configs == '' 
+    assert cut.all_headers == {}
+    assert cut.sim_data == {}
+    assert cut.binning_configs == {} 
 
 def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_and_data_and_config_when_given_dataFiles_is_empty_string_but_configFiles_is_not_and_given_ss_breakdown_does_not_matter(mocker):
     # Arrange
@@ -61,9 +62,9 @@ def test_CSV__init__sets_instance_variables_as_expected_and_does_not_set_labels_
     # Assert
     assert cut.raw_data_filepath == arg_rawDataFilepath
     assert cut.metadata_filepath == arg_metadataFilepath
-    assert cut.all_headers == ''
-    assert cut.sim_data == ''
-    assert cut.binning_configs == '' 
+    assert cut.all_headers == {}
+    assert cut.sim_data == {}
+    assert cut.binning_configs == {} 
 
 def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data_and_config_and_binning_configs_dicts_are_all_empty_when_given_dataFiles_and_configFiles_are_not_empty_strings_but_dataFiles_has_no_items(mocker):
     # Arrange
@@ -85,9 +86,9 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     cut = CSV.__new__(CSV)
 
     forced_return_value_str2lst = MagicMock()
-    mocker.patch('data_handling.parsers.csv_parser.str2lst', return_value=forced_return_value_str2lst)
+    mocker.patch('data_handling.parsers.on_air_parser.str2lst', return_value=forced_return_value_str2lst)
     mocker.patch.object(cut, 'parse_csv_data', return_value=[fake_labels, fake_data])
-    mocker.patch.object(cut, 'parse_config_data_CSV', return_value=fake_configs)
+    mocker.patch.object(cut, 'parse_config_data', return_value=fake_configs)
 
     # Act
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
@@ -98,11 +99,11 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     assert cut.all_headers == fake_labels
     assert cut.sim_data == fake_data
     assert cut.binning_configs == expected_binning_configs
-    assert csv_parser.str2lst.call_count == 2
-    assert csv_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
-    assert csv_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
-    assert cut.parse_config_data_CSV.call_count == 1
-    assert cut.parse_config_data_CSV.call_args_list[0].args == (forced_return_value_str2lst[0], arg_ss_breakdown)
+    assert on_air_parser.str2lst.call_count == 2
+    assert on_air_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
+    assert on_air_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
+    assert cut.parse_config_data.call_count == 1
+    assert cut.parse_config_data.call_args_list[0].args == (forced_return_value_str2lst[0], arg_ss_breakdown)
     assert cut.parse_csv_data.call_count == 0
 
 def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data_and_config_and_binning_configs_dicts_for_each_data_file_are_all_set_to_returned_config_values_when_given_dataFiles_and_configFiles_are_not_empty_strings(mocker):
@@ -203,9 +204,9 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     
     cut = CSV.__new__(CSV)
 
-    mocker.patch('data_handling.parsers.csv_parser.str2lst', return_value=arg_dataFiles)
+    mocker.patch('data_handling.parsers.on_air_parser.str2lst', return_value=arg_dataFiles)
     mocker.patch.object(cut, 'parse_csv_data', return_value=[fake_labels, fake_data])
-    mocker.patch.object(cut, 'parse_config_data_CSV', return_value=fake_configs)
+    mocker.patch.object(cut, 'parse_config_data', return_value=fake_configs)
 
     # Act
     cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
@@ -216,11 +217,11 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     assert cut.all_headers == fake_labels
     assert cut.sim_data == fake_data
     assert cut.binning_configs == expected_binning_configs
-    assert csv_parser.str2lst.call_count == 2
-    assert csv_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
-    assert csv_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
-    assert cut.parse_config_data_CSV.call_count == 1
-    assert cut.parse_config_data_CSV.call_args_list[0].args == (arg_dataFiles[0], arg_ss_breakdown)
+    assert on_air_parser.str2lst.call_count == 2
+    assert on_air_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
+    assert on_air_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
+    assert cut.parse_config_data.call_count == 1
+    assert cut.parse_config_data.call_args_list[0].args == (arg_dataFiles[0], arg_ss_breakdown)
     assert cut.parse_csv_data.call_count == num_fake_dataFiles
     for i in range(num_fake_dataFiles):
         assert cut.parse_csv_data.call_args_list[i].args == (arg_dataFiles[i], )
@@ -482,8 +483,8 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     assert fake_columns_str.contains.call_args_list[0].args == ('^Unnamed', )
     assert result == expected_result
 
-# CSV parse_config_data_CSV tests
-def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_when_given_ss_breakdown_does_not_resolve_to_False(mocker):
+# CSV parse_config_data tests
+def test_CSV_parse_config_data_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_when_given_ss_breakdown_does_not_resolve_to_False(mocker):
     # Arrange
     arg_configFile = MagicMock()
     arg_ss_breakdown = True if pytest.gen.randint(0, 1) else MagicMock()
@@ -499,7 +500,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     cut.metadata_filepath = fake_metadata_filepath
 
     # Act
-    result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
+    result = cut.parse_config_data(arg_configFile, arg_ss_breakdown)
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1
@@ -508,7 +509,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     assert csv_parser.len.call_count == 0
     assert result == expected_result
 
-def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_empty_list_when_len_of_call_value_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_is_0_when_given_ss_breakdown_evaluates_to_False(mocker):
+def test_CSV_parse_config_data_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_empty_list_when_len_of_call_value_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_is_0_when_given_ss_breakdown_evaluates_to_False(mocker):
     # Arrange
     arg_configFile = MagicMock()
     arg_ss_breakdown = False if pytest.gen.randint(0, 1) else 0
@@ -528,7 +529,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     cut.metadata_filepath = fake_metadata_filepath
 
     # Act
-    result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
+    result = cut.parse_config_data(arg_configFile, arg_ss_breakdown)
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1
@@ -538,7 +539,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     assert csv_parser.len.call_args_list[0].args == (fake_empty_processed_filepath, )
     assert result['subsystem_assignments'] == expected_result
 
-def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_subsystem_assignments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_single_item_list_str_MISSION_for_each_item_when_given_ss_breakdown_evaluates_to_False(mocker):
+def test_CSV_parse_config_data_returns_call_to_extract_configs_given_metadata_filepath_and_config_File_as_single_item_list_and_kwarg_csv_set_to_True_with_dict_def_subsystem_assignments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_single_item_list_str_MISSION_for_each_item_when_given_ss_breakdown_evaluates_to_False(mocker):
     # Arrange
     arg_configFile = MagicMock()
     arg_ss_breakdown = False if pytest.gen.randint(0, 1) else 0
@@ -564,7 +565,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
     cut.metadata_filepath = fake_metadata_filepath
 
     # Act
-    result = cut.parse_config_data_CSV(arg_configFile, arg_ss_breakdown)
+    result = cut.parse_config_data(arg_configFile, arg_ss_breakdown)
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1

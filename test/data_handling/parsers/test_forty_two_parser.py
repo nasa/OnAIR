@@ -1,6 +1,7 @@
 """ Test 42 Parser Functionality """
 import pytest
 from mock import MagicMock
+import data_handling.parsers.on_air_parser as on_air_parser
 import data_handling.parsers.forty_two_parser as forty_two_parser
 from data_handling.parsers.forty_two_parser import FortyTwo
 
@@ -15,52 +16,52 @@ def test_FortyTwo_init_default_constructor_initializes_variables_to_empty_string
     # Assert
     assert cut.raw_data_filepath == ''
     assert cut.metadata_filepath == ''
-    assert cut.all_headers == ''
-    assert cut.sim_data == ''
-    assert cut.binning_configs == ''
+    assert cut.all_headers == {}
+    assert cut.sim_data == {}
+    assert cut.binning_configs == {}
 
 def test_FortyTwo_init_initializes_variables_correctly_when_dataFiles_arg_is_empty_string(mocker):
     # Arrange    
     arg_data_filepath = str(MagicMock())
     arg_metadata_filepath = str(MagicMock())
-    arg_data_files = ''
-    arg_config_files = str(MagicMock())
+    arg_dataFiles = ''
+    arg_configFiles = str(MagicMock())
 
     cut = FortyTwo.__new__(FortyTwo)
 
     mocker.patch.object(cut, 'parse_sim_data')
 
     # Act
-    cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_data_files, arg_config_files)
+    cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_dataFiles, arg_configFiles)
 
     # Assert
     assert cut.raw_data_filepath == arg_data_filepath
     assert cut.metadata_filepath == arg_metadata_filepath
-    assert cut.all_headers == ''
-    assert cut.sim_data == ''
-    assert cut.binning_configs == ''
+    assert cut.all_headers == {}
+    assert cut.sim_data == {}
+    assert cut.binning_configs == {}
     assert cut.parse_sim_data.call_count == 0
 
 def test_FortyTwo_init_initializes_variables_correctly_when_configFiles_arg_is_empty_string(mocker):
     # Arrange    
     arg_data_filepath = str(MagicMock())
     arg_metadata_filepath = str(MagicMock())
-    arg_data_files = str(MagicMock())
-    arg_config_files = ''
+    arg_dataFiles = str(MagicMock())
+    arg_configFiles = ''
 
     cut = FortyTwo.__new__(FortyTwo)
     
     mocker.patch.object(cut, 'parse_sim_data')
 
     # Act
-    cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_data_files, arg_config_files)
+    cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_dataFiles, arg_configFiles)
 
     # Assert
     assert cut.raw_data_filepath == arg_data_filepath
     assert cut.metadata_filepath == arg_metadata_filepath
-    assert cut.all_headers == ''
-    assert cut.sim_data == ''
-    assert cut.binning_configs == ''
+    assert cut.all_headers == {}
+    assert cut.sim_data == {}
+    assert cut.binning_configs == {}
     assert cut.parse_sim_data.call_count == 0
 
 def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_arguments_and_ss_breakdown_is_true(mocker):
@@ -76,8 +77,8 @@ def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_argumen
     
     arg_data_filepath = str(MagicMock())
     arg_metadata_filepath = str(MagicMock())
-    arg_data_files = str([fake_data_file_name])
-    arg_config_files = str(MagicMock())
+    arg_dataFiles = str([fake_data_file_name])
+    arg_configFiles = str(MagicMock())
 
     forced_parse_sim_data_return_value = fake_headers, fake_sim_data
     forced_parse_config_data_return_value = { 'subsystem_assignments' : fake_ss_assigns,
@@ -86,6 +87,7 @@ def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_argumen
 
     cut = FortyTwo.__new__(FortyTwo)
 
+    mocker.patch('data_handling.parsers.on_air_parser.str2lst', return_value=fake_list)
     mocker.patch('data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
     mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
     mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
@@ -95,7 +97,7 @@ def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_argumen
                                                 'description_assignments' : {fake_list[0] : fake_desc_assigns}}
     
     # Act
-    cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_data_files, arg_config_files, True)
+    cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_dataFiles, arg_configFiles, True)
 
     # Assert
     assert cut.raw_data_filepath == arg_data_filepath
@@ -103,6 +105,11 @@ def test_FortyTwo_init_initializes_values_correctly_when_given_non_empty_argumen
     assert cut.all_headers == fake_headers
     assert cut.sim_data == fake_sim_data
     assert cut.binning_configs == expected_binning_configs
+    assert on_air_parser.str2lst.call_count == 2
+    assert on_air_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
+    assert on_air_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
+    assert forty_two_parser.str2lst.call_count == 1
+    assert forty_two_parser.str2lst.call_args_list[0].args == (arg_dataFiles, )
     assert cut.parse_sim_data.call_count == 1
     assert cut.parse_sim_data.call_args_list[0].args == (fake_list[0],)
     assert cut.parse_config_data.call_count == 1
@@ -121,8 +128,8 @@ def test_FortyTwo_init_initializes_variables_correctly_when_given_arguments_and_
 
     arg_data_filepath = str(MagicMock())
     arg_metadata_filepath = str(MagicMock())
-    arg_data_files = str([fake_data_file_name])
-    arg_config_files = str(MagicMock())
+    arg_dataFiles = str([fake_data_file_name])
+    arg_configFiles = str(MagicMock())
 
     forced_parse_sim_data_return_value = fake_headers, fake_sim_data
     forced_parse_config_data_return_value = { 'subsystem_assignments' : fake_ss_assigns,
@@ -131,6 +138,7 @@ def test_FortyTwo_init_initializes_variables_correctly_when_given_arguments_and_
     
     cut = FortyTwo.__new__(FortyTwo)
 
+    mocker.patch('data_handling.parsers.on_air_parser.str2lst', return_value=fake_list)
     mocker.patch('data_handling.parsers.forty_two_parser.str2lst', return_value=fake_list)
     mocker.patch.object(cut, 'parse_sim_data', return_value=forced_parse_sim_data_return_value)
     mocker.patch.object(cut, 'parse_config_data', return_value=forced_parse_config_data_return_value)
@@ -140,7 +148,7 @@ def test_FortyTwo_init_initializes_variables_correctly_when_given_arguments_and_
                                                 'description_assignments' : {fake_list[0] : fake_desc_assigns}}
     
     # Act
-    cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_data_files, arg_config_files, False)
+    cut.__init__(arg_data_filepath, arg_metadata_filepath, arg_dataFiles, arg_configFiles, False)
 
     # Assert
     assert cut.raw_data_filepath == arg_data_filepath
@@ -148,6 +156,11 @@ def test_FortyTwo_init_initializes_variables_correctly_when_given_arguments_and_
     assert cut.all_headers == fake_headers
     assert cut.sim_data == fake_sim_data
     assert cut.binning_configs == expected_binning_configs
+    assert on_air_parser.str2lst.call_count == 2
+    assert on_air_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
+    assert on_air_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
+    assert forty_two_parser.str2lst.call_count == 1
+    assert forty_two_parser.str2lst.call_args_list[0].args == (arg_dataFiles, )
     assert cut.parse_sim_data.call_count == 1
     assert cut.parse_sim_data.call_args_list[0].args == (fake_list[0],)
     assert cut.parse_config_data.call_count == 1
