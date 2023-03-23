@@ -13,7 +13,7 @@ from src.util.sim_io import *
 from data_handling.data_source import DataSource
 
 MAX_STEPS = 2050
-PLACEHOLDER_NAME = 100
+DIAGNOSIS_INTERVAL = 100
 
 class Simulator:
     def __init__(self, simType, parsedData, SBN_Flag):
@@ -49,7 +49,7 @@ class Simulator:
             ### Stop when a fault is reached  
             if self.agent.mission_status == 'RED':
                 if last_fault == time_step - 1: #if they are consecutive
-                    if (time_step - last_diagnosis) % PLACEHOLDER_NAME == 0:
+                    if (time_step - last_diagnosis) % DIAGNOSIS_INTERVAL == 0:
                         diagnosis_list.append(self.agent.diagnose(time_step))
                         last_diagnosis = time_step
                 else:
