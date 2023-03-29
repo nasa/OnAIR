@@ -1,5 +1,6 @@
 import ast
 import os
+import orjson
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFiles, csv = False):
@@ -72,3 +73,17 @@ def process_filepath(path, return_config=False, csv = False):
         if return_config == True:
             filename = filename.replace('.txt', '_CONFIG.txt')
         return filename
+
+def parseJson(path):
+    file = open(path, 'rb')
+    file_str = file.read()
+
+    data = orjson.loads(file_str)
+    file.close()
+    return data
+
+def writeToJson(path, data):
+    file = open(path, 'wb')
+
+    file.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
+    file.close()
