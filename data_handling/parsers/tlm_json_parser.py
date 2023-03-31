@@ -1,8 +1,9 @@
-import parser_util
+import ast
+import orjson
 
-# parse tlm config file in new json format
+# parse tlm config json file
 def parseTlmConfJson(file_path):
-    data = parser_util.parseJson(file_path)
+    data = parseJson(file_path)
     reorg_data = reorganizeTlmDict(data)
 
     labels = []
@@ -12,7 +13,7 @@ def parseTlmConfJson(file_path):
     
     for label in reorg_data:
         subsys = reorg_data[label]['subsystem']
-        temp = parser_util.str2lst(reorg_data[label]['limits'])
+        temp = str2lst(reorg_data[label]['limits'])
         if temp == []:
             mnemonics = [reorg_data[label]['tests']]
         else:
@@ -22,9 +23,14 @@ def parseTlmConfJson(file_path):
         labels.append(label)
         subsys_assignments.append(subsys)
         mnemonic_tests.append(mnemonics)
-        descriptions.append(desc)        
+        descriptions.append(desc)
     
-    return [labels, subsys_assignments, mnemonic_tests, descriptions]
+    configs = {}
+    configs['subsystem_assignments'] = subsys_assignments
+    configs['test_assignments'] = mnemonic_tests
+    configs['description_assignments'] = descriptions
+    
+    return configs
 
 # process tlm dict into dict of labels and their attributes
 def reorganizeTlmDict(data):
@@ -53,3 +59,36 @@ def reorganizeTlmDictRecursiveStep(label, subsys, data):
         processed_data.update(ret)
 
     return processed_data
+
+def str2lst(string):
+    try:
+        return ast.literal_eval(string)
+    except:
+        print("Unable to process string representation of list")
+        # return string
+
+def parseJson(path):
+    file = open(path, 'rb')
+    file_str = file.read()
+
+    data = orjson.loads(file_str)
+    file.close()
+    return data
+
+def writeToJson(path, data):
+    file = open(path, 'wb')
+
+    file.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
+    file.close()
+
+
+
+# checking parser
+import os
+path = os.path.dirname(__file__)
+path = os.path.dirname(path)
+path = os.path.dirname(path)
+path = os.path.join(path, 'data')
+path = os.path.join(path, 'telemetry_configs')
+path = os.path.join(path, '42_TLM_CONFIG.json')
+print (parseTlmConfJson(path))
