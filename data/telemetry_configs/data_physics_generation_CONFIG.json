@@ -1,0 +1,73 @@
+{
+  "subsystems": {
+    "NONE": {
+      "Time": {
+        "conversion": "",
+        "test": "SYNC",
+        "limits": "['TIME']",
+        "description": "No Description",
+        "label": ""
+      },
+      "THRUST": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[-999999999999999, 999999999999999]",
+        "description": "No Description",
+        "label": ""
+      },
+      "ALTITUDE": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[-999999999999999, 999999999999999]",
+        "description": "No Description",
+        "label": ""
+      },
+      "ACCELERATION": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[-20.1111, 20.1111]",
+        "description": "No Description",
+        "label": ""
+      },
+      "SCIENCE_COLLECTION": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[-0.9999, 1.1111]",
+        "description": "No Description",
+        "label": ""
+      },
+      "LABEL_ERROR_STATE": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "['LABEL']",
+        "description": "No Description",
+        "label": ""
+      }
+    },
+    "POWER": {
+      "VOLTAGE": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[12.9999, 18.1111]",
+        "description": "No Description",
+        "label": ""
+      },
+      "CURRENT": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[2.9999, 5.1111]",
+        "description": "No Description",
+        "label": ""
+      }
+    },
+    "THERMAL": {
+      "TEMPERATURE": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[9.9999, 90.1111]",
+        "description": "No Description",
+        "label": ""
+      }
+    }
+  }
+}
