@@ -1,6 +1,6 @@
 import ast
 import os
-from data_handling.parsers.tlm_json_parser import * 
+from data_handling.parsers.tlm_json_parser import *
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFiles, csv = False):
@@ -17,6 +17,26 @@ def extract_configs(configFilePath, configFiles, csv = False):
     configs = {'subsystem_assignments' : ss_assigns,
                'test_assignments' : test_assigns,
                'description_assignments' : desc_assigns}
+    return configs
+
+def extract_configs_json(configFilePath, configFile, csv = False):
+    configs = parseTlmConfJson(configFilePath + configFile)
+
+    configs_len = len(configs['subsystem_assignments'])
+
+    for i in range(configs_len):
+        configs['subsystem_assignments'][i] = [configs['subsystem_assignments'][i]]
+
+        test_assign = configs['test_assignments'][i]
+        if len(test_assign) > 1:
+            test = [test_assign[0]]
+            limits = str2lst(test_assign[1])
+            test_assign = test + limits
+        elif test_assign[0] != 'NOOP':
+            test_assign = str2lst(test_assign[0])
+
+        configs['test_assignments'][i] = [test_assign]
+
     return configs
 
 ## Helper method for extract_configs
