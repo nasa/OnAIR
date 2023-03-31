@@ -80,15 +80,3 @@ def writeToJson(path, data):
 
     file.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
     file.close()
-
-
-
-# checking parser
-import os
-path = os.path.dirname(__file__)
-path = os.path.dirname(path)
-path = os.path.dirname(path)
-path = os.path.join(path, 'data')
-path = os.path.join(path, 'telemetry_configs')
-path = os.path.join(path, '42_TLM_CONFIG.json')
-print (parseTlmConfJson(path))
