@@ -69,5 +69,16 @@
         "label": ""
       }
     }
-  }
+  },
+  "labels": [
+    "Time",
+    "VOLTAGE",
+    "CURRENT",
+    "THRUST",
+    "ALTITUDE",
+    "ACCELERATION",
+    "TEMPERATURE",
+    "SCIENCE_COLLECTION",
+    "LABEL_ERROR_STATE"
+  ]
 }

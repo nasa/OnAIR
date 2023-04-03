@@ -25,7 +25,22 @@ def parseTlmConfJson(file_path):
         subsys_assignments.append(subsys)
         mnemonic_tests.append(mnemonics)
         descriptions.append(desc)
-    
+
+    # if given an order, reorder data to match
+    if 'order' in data and data['order'] != []:
+        original_order = {}
+        for i in range(len(data['order'])):
+            original_order[data['order'][i]] = i
+
+        ordering_list = []
+        for label in labels:
+            ordering_list.append(original_order[label])
+
+        labels = [y for x, y in sorted(zip(ordering_list, labels))]
+        subsys_assignments = [y for x, y in sorted(zip(ordering_list, subsys_assignments))]
+        mnemonic_tests = [y for x, y in sorted(zip(ordering_list, mnemonic_tests))]
+        descriptions = [y for x, y in sorted(zip(ordering_list, descriptions))]
+
     configs = {}
     configs['subsystem_assignments'] = subsys_assignments
     configs['test_assignments'] = mnemonic_tests
@@ -113,6 +128,7 @@ def convertTlmDictToJsonDict(data):
             mergeDicts(json_data[s], data)
     
     json_data = {'subsystems' : json_data}
+    json_data['order'] = labels
     return json_data
 
 # helper function to organize data parsed from tlm file into desired json format
@@ -181,8 +197,3 @@ def mergeDicts(dict1, dict2):
             mergeDicts(dict1[key], dict2[key])
         else:
             dict1.update(dict2)
-
-# path1 = getConfigPath('data_physics_generation_CONFIG.txt')
-# path2 = getConfigPath('data_physics_generation_CONFIG.json')
-
-# convertTlmToJson(path1, path2)
