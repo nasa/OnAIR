@@ -4,19 +4,21 @@ from data_handling.parsers.tlm_json_parser import *
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFiles, csv = False):
-    ss_assigns = {}
-    test_assigns = {}
-    desc_assigns = {}
+    # ss_assigns = {}
+    # test_assigns = {}
+    # desc_assigns = {}
 
-    for cFile in configFiles:
-        subsystem_assignments, tests, descs = extract_config(configFilePath, cFile, csv=csv)
-        ss_assigns = subsystem_assignments
-        test_assigns = tests
-        desc_assigns = descs
+    # for cFile in configFiles:
+    #     subsystem_assignments, tests, descs = extract_config(configFilePath, cFile, csv=csv)
+    #     ss_assigns = subsystem_assignments
+    #     test_assigns = tests
+    #     desc_assigns = descs
 
-    configs = {'subsystem_assignments' : ss_assigns,
-               'test_assignments' : test_assigns,
-               'description_assignments' : desc_assigns}
+    # configs = {'subsystem_assignments' : ss_assigns,
+    #            'test_assignments' : test_assigns,
+    #            'description_assignments' : desc_assigns}
+
+    configs = extract_configs_json(configFilePath, configFiles[0], csv)
     return configs
 
 def extract_configs_json(configFilePath, configFile, csv = False):
