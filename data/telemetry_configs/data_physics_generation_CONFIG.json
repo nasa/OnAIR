@@ -70,7 +70,7 @@
       }
     }
   },
-  "labels": [
+  "order": [
     "Time",
     "VOLTAGE",
     "CURRENT",
