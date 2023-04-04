@@ -1,6 +1,7 @@
 coverage==6.5.0
 mock==4.0.3
 numpy==1.23.4
+orjson==3.8.8
 pandas==1.5.1
 pytest==7.2.0
 pytest-mock==3.10.0
