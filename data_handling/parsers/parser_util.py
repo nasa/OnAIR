@@ -4,6 +4,11 @@ from data_handling.parsers.tlm_json_parser import *
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFiles, csv = False):
+    if configFiles == []:
+        return {'subsystem_assignments' : {},
+                'test_assignments' : {},
+                'description_assignments' : {}}
+
     configs = parseTlmConfJson(configFilePath + configFiles[0])
 
     configs_len = len(configs['subsystem_assignments'])
@@ -23,7 +28,7 @@ def extract_configs(configFilePath, configFiles, csv = False):
 
     return configs
 
-## Helper method for extract_configs
+## Helper method for extract_configs -- UNUSED
 def extract_config(configFilePath, configFile, csv = False):
     subsystem_assignments = []
     mnemonic_tests = []

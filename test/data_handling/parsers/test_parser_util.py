@@ -21,6 +21,7 @@ def test_parser_util_extract_configs_returns_empty_dicts_when_given_configFiles_
     # Assert
     assert result == expected_result
 
+# needs revision
 def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
@@ -48,6 +49,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     assert parser_util.extract_config.call_args_list[0].kwargs == {'csv':arg_csv}
     assert result == expected_result
 
+# needs revision
 def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_cFile(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
@@ -82,6 +84,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
         assert parser_util.extract_config.call_args_list[i].kwargs == {'csv':arg_csv}
     assert result == expected_result
 
+# needs revision
 def test_parser_util_extract_configs_default_given_csv_is_False(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
