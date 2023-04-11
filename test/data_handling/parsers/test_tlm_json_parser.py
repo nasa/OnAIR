@@ -155,16 +155,254 @@ def test_tlm_json_parser_writeJson_opens_given_path_and_writes_data_using_orjson
 # ----- Tests for conversion functions -----
 
 # convertTlmToJson tests
+def test_tlm_json_parser_convertTlmToJson_calls_expected_functions_with_expected_behavior(mocker):
+    # Arrange
+    arg_tlm = MagicMock()
+    arg_json = MagicMock()
 
+    fake_tlm_path = MagicMock()
+    fake_json_path = MagicMock()
+
+    side_effect_list_get_config_path = [fake_tlm_path, fake_json_path]
+    forced_return_parse_tlm_conf = MagicMock()
+    forced_return_convert_tlm_to_json = MagicMock()
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.getConfigPath', side_effect=side_effect_list_get_config_path)
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseTlmConfTxt', return_value=forced_return_parse_tlm_conf)
+    mocker.patch('data_handling.parsers.tlm_json_parser.convertTlmDictToJsonDict', return_value=forced_return_convert_tlm_to_json)
+    mocker.patch('data_handling.parsers.tlm_json_parser.writeToJson')
+
+    # Act
+    tlm_parser.convertTlmToJson(arg_tlm, arg_json)
+
+    # Assert
+    assert tlm_parser.getConfigPath.call_count == 2
+    assert tlm_parser.getConfigPath.call_args_list[0].args == (arg_tlm,)
+    assert tlm_parser.getConfigPath.call_args_list[1].args == (arg_json,)
+    assert tlm_parser.parseTlmConfTxt.call_count == 1
+    assert tlm_parser.parseTlmConfTxt.call_args_list[0].args == (fake_tlm_path,)
+    assert tlm_parser.convertTlmDictToJsonDict.call_count == 1
+    assert tlm_parser.convertTlmDictToJsonDict.call_args_list[0].args == (forced_return_parse_tlm_conf,)
+    assert tlm_parser.writeToJson.call_count == 1
+    assert tlm_parser.writeToJson.call_args_list[0].args == (fake_json_path, forced_return_convert_tlm_to_json)
 
 # convertTlmDictToJsonDict tests
 
 
 # getJsonData tests
+def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_equals_TIME():
+    # Arrange
+    fake_test = MagicMock()
+    fake_limits = []
+    
+    arg_label = 'TIME'
+    arg_mnemonics = [fake_test]
+    arg_description = MagicMock()
 
+    expected_result = {arg_label : {'conversion' : '', 'test' : str(fake_test), 'limits' : str(fake_limits), 'description' : str(arg_description)}}
+
+    # Act
+    result = tlm_parser.getJsonData(arg_label, arg_mnemonics, arg_description)
+
+    # Assert
+    assert result == expected_result
+
+def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_is_not_split_by_period():
+    # Arrange
+    fake_test = MagicMock()
+    num_limits = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_limits = [MagicMock()] * num_limits
+    
+    arg_label = str(MagicMock())
+    arg_mnemonics = [fake_test]
+    arg_mnemonics.append(fake_limits)
+    arg_mnemonics = [arg_mnemonics]
+    arg_description = MagicMock()
+
+    expected_result = {arg_label : {'conversion' : '', 'test' : str(fake_test), 'limits' : str([fake_limits]), 'description' : str(arg_description)}}
+
+    # Act
+    result = tlm_parser.getJsonData(arg_label, arg_mnemonics, arg_description)
+
+    # Assert
+    assert result == expected_result
+
+def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_is_split_by_period():
+    # Arrange
+    fake_test = MagicMock()
+    num_limits = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_limits = [MagicMock()] * num_limits
+
+    arg_mnemonics = [fake_test]
+    arg_mnemonics.append(fake_limits)
+    arg_mnemonics = [arg_mnemonics]
+    arg_description = MagicMock()
+    num_label_splits = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+
+    label_list = [str(MagicMock())]
+    arg_label = label_list[0]
+    for i in range(num_label_splits):
+        label = str(MagicMock())
+        arg_label = label + '.' + arg_label
+        label_list.append(label)
+
+    expected_result = {'conversion' : '', 'test' : str(fake_test), 'limits' : str([fake_limits]), 'description' : str(arg_description)}
+    for label in label_list:
+        expected_result = {label : expected_result}
+
+    # Act
+    result = tlm_parser.getJsonData(arg_label, arg_mnemonics, arg_description)
+
+    # Assert
+    assert result == expected_result
 
 # parseTlmConfTxt tests
+def test_tlm_json_parser_parseTlmConfTxt_returns_tuple_of_empty_lists_when_dataPts_is_vacant(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
 
+    fake_descriptor_file = MagicMock()
+    fake_data_str = ''
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.open', return_value=fake_descriptor_file)
+    mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
+    mocker.patch.object(fake_descriptor_file, 'close')
+    
+    # Act
+    result = tlm_parser.parseTlmConfTxt(arg_configFilePath)
+
+    # Assert
+    assert tlm_parser.open.call_count == 1
+    assert tlm_parser.open.call_args_list[0].args == (arg_configFilePath, 'r')
+    assert fake_descriptor_file.read.call_count == 1
+    assert fake_descriptor_file.close.call_count == 1
+    assert result == [[], [], [], []]
+
+def test_tlm_json_parser_parseTlmConfTxt_returns_tuple_of_4_expected_appended_lists_with_no_description_when_dataPts_has_one_item_and_field_info_does_not_split_on_colon_and_single_test(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
+
+    fake_descriptor_file = MagicMock()
+    fake_descriptor = str(MagicMock()).replace(" ", "")
+    fake_subsystem_assignment = MagicMock()
+    fake_str_subsystem_assignment = str(fake_subsystem_assignment).replace(" ", "")
+    fake_test = MagicMock()
+    fake_str_test = str(fake_test).replace(" ", "")
+    fake_data_str = fake_descriptor + ' ' + fake_str_subsystem_assignment + ' ' + fake_str_test
+
+    expected_labels = [fake_descriptor]
+    expected_subsystem_assignments = [fake_subsystem_assignment]
+    expected_mnemonic_tests = [[fake_test]]
+    expected_descriptions = ["No Description"]
+
+    forced_returns_str2lst = [fake_subsystem_assignment, fake_test]
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.open', return_value=fake_descriptor_file)
+    mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
+    mocker.patch.object(fake_descriptor_file, 'close')
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst', side_effect=forced_returns_str2lst)
+    
+    # Act
+    result = tlm_parser.parseTlmConfTxt(arg_configFilePath)
+
+    # Assert
+    assert tlm_parser.open.call_count == 1
+    assert tlm_parser.open.call_args_list[0].args == (arg_configFilePath, "r")
+    assert fake_descriptor_file.read.call_count == 1
+    assert fake_descriptor_file.close.call_count == 1
+    assert tlm_parser.str2lst.call_count == 2
+    assert tlm_parser.str2lst.call_args_list[0].args == (fake_str_subsystem_assignment, )
+    assert tlm_parser.str2lst.call_args_list[1].args == (fake_str_test, )
+    assert result == [expected_labels, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions]
+
+def test_tlm_json_parser_parseTlmConfTxt_returns_tuple_of_4_expected_appended_lists_with_description_when_dataPts_has_one_item_and_field_info_does_split_on_colon_and_multi_test(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
+
+    fake_descriptor_file = MagicMock()
+    fake_descriptor = str(MagicMock()).replace(" ", "")
+    fake_description = str(MagicMock())
+    fake_subsystem_assignment = MagicMock()
+    fake_str_subsystem_assignment = str(fake_subsystem_assignment).replace(" ", "")
+    fake_test = MagicMock()
+    fake_str_test = str(fake_test).replace(" ", "")
+    fake_test2 = MagicMock()
+    fake_str_test2 = str(fake_test).replace(" ", "")
+    fake_data_str = fake_descriptor + ' ' + fake_str_subsystem_assignment + ' ' + fake_str_test + ' ' + fake_str_test2 + ' : ' + fake_description
+
+    expected_labels = [fake_descriptor]
+    expected_subsystem_assignments = [fake_subsystem_assignment]
+    expected_mnemonic_tests = [[fake_test, fake_test2]]
+    expected_descriptions = [fake_description]
+
+    forced_returns_literal_eval = [fake_subsystem_assignment, fake_test, fake_test2]
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.open', return_value=fake_descriptor_file)
+    mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
+    mocker.patch.object(fake_descriptor_file, 'close')
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst', side_effect=forced_returns_literal_eval)
+    
+    # Act
+    result = tlm_parser.parseTlmConfTxt(arg_configFilePath)
+
+    # Assert
+    assert tlm_parser.open.call_count == 1
+    assert tlm_parser.open.call_args_list[0].args == (arg_configFilePath, "r")
+    assert fake_descriptor_file.read.call_count == 1
+    assert fake_descriptor_file.close.call_count == 1
+    assert tlm_parser.str2lst.call_count == 3
+    assert tlm_parser.str2lst.call_args_list[0].args == (fake_str_subsystem_assignment, )
+    assert tlm_parser.str2lst.call_args_list[1].args == (fake_str_test, )
+    assert tlm_parser.str2lst.call_args_list[2].args == (fake_str_test2, )
+    assert result == [expected_labels, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions]
+
+def test_tlm_json_parser_parseTlmConfTxt_returns_tuple_of_4_expected_appended_lists_when_there_are_multiple_data_points(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
+
+    fake_descriptor_file = MagicMock()
+
+    num_fake_dataPts = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 items (0 and 1 have own tests)
+
+    fake_descriptor = str(MagicMock()).replace(" ", "")
+    fake_description = str(MagicMock())
+    fake_subsystem_assignment = MagicMock()
+    fake_str_subsystem_assignment = str(fake_subsystem_assignment).replace(" ", "")
+    fake_test = MagicMock()
+    fake_str_test = str(fake_test).replace(" ", "")
+    fake_data_str = ''
+
+    forced_returns_str2lst = []
+    for i in range(num_fake_dataPts):
+        fake_data_str += fake_descriptor + ' ' + fake_str_subsystem_assignment + ' ' + fake_str_test + ' : ' + fake_description + '\n'
+        forced_returns_str2lst.append(fake_subsystem_assignment)
+        forced_returns_str2lst.append(fake_test)
+    # remove final newline character
+    fake_data_str = fake_data_str[:-1]
+
+    expected_labels = [fake_descriptor] * num_fake_dataPts
+    expected_subsystem_assignments = [fake_subsystem_assignment] * num_fake_dataPts
+    expected_mnemonic_tests = [[fake_test]] * num_fake_dataPts
+    expected_descriptions = [fake_description] * num_fake_dataPts
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.open', return_value=fake_descriptor_file)
+    mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
+    mocker.patch.object(fake_descriptor_file, 'close')
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst', side_effect=forced_returns_str2lst)
+    
+    # Act
+    result = tlm_parser.parseTlmConfTxt(arg_configFilePath)
+
+    # Assert    
+    assert tlm_parser.open.call_count == 1
+    assert tlm_parser.open.call_args_list[0].args == (arg_configFilePath, "r")
+    assert fake_descriptor_file.read.call_count == 1
+    assert fake_descriptor_file.close.call_count == 1
+    assert tlm_parser.str2lst.call_count == 2 * num_fake_dataPts
+    for i in range(num_fake_dataPts):
+        assert tlm_parser.str2lst.call_args_list[2 * i].args == (fake_str_subsystem_assignment, )
+        assert tlm_parser.str2lst.call_args_list[(2*i) + 1].args == (fake_str_test, )
+    assert result == [expected_labels, expected_subsystem_assignments, expected_mnemonic_tests, expected_descriptions]
 
 # getConfigPath tests
 def test_tlm_json_parser_getConfigPath_uses_os_functions_to_find_file_path(mocker):
@@ -260,4 +498,48 @@ def test_tlm_json_parser_mergeDicts_when_args_are_not_empty_and_have_no_shared_k
     assert arg_dict1 == expected_dict1
     assert arg_dict2 == expected_dict2
 
-# test for recursion needed
+def test_tlm_json_parser_mergeDicts_when_args_contain_shared_keys(mocker):
+    # Arrange
+    merged_dict = {}
+    expected_dict1 = {}
+    expected_dict2 = {}
+    base_dicts = [{}, {}]
+
+    for i in range(len(base_dicts)):
+        dict_len = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+        for j in range(dict_len):
+            key, value = str(MagicMock()), str(MagicMock())
+            base_dicts[i][key] = value
+            merged_dict[key] = value
+
+    dict_len = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    arg_dict1 = {}
+    for i in range(dict_len):
+        key, value = MagicMock(), MagicMock()
+        arg_dict1[key] = value
+        expected_dict1[key] = value
+
+    dict_len = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    arg_dict2 = {}
+    for i in range(dict_len):
+        key, value = MagicMock(), MagicMock()
+        arg_dict2[key] = value
+        expected_dict1[key] = value
+        expected_dict2[key] = value
+
+    num_shared_keys = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    shared_keys = []
+    for i in range(num_shared_keys):
+        key = MagicMock()
+        shared_keys.append(key)
+        arg_dict1[key] = base_dicts[0]
+        arg_dict2[key] = base_dicts[1]
+        expected_dict1[key] = merged_dict
+        expected_dict2[key] = base_dicts[1]
+
+    # Act
+    tlm_parser.mergeDicts(arg_dict1, arg_dict2)
+
+    # Assert
+    assert arg_dict1 == expected_dict1
+    assert arg_dict2 == expected_dict2

@@ -148,9 +148,9 @@ def getJsonData(label, mnemonics, description):
     return json_data
 
 # parse tlm config files in original txt format
-def parseTlmConfTxt(file_path):    
-    with open(file_path, 'r') as f:
-        data_str = f.read()
+def parseTlmConfTxt(file_path):   
+    f = open(file_path, 'r')
+    data_str = f.read()
     f.close()
 
     labels = []
