@@ -1,6 +1,6 @@
 import ast
 import os
-from data_handling.parsers.tlm_json_parser import *
+from data_handling.parsers.tlm_json_parser import parseTlmConfJson
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFiles, csv = False):

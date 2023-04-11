@@ -21,8 +21,7 @@ def test_parser_util_extract_configs_returns_empty_dicts_when_given_configFiles_
     # Assert
     assert result == expected_result
 
-# needs revision
-def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile_and_configs_len_equal_to_zero(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFiles = [MagicMock()]
@@ -32,82 +31,233 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     fake_tests = MagicMock()
     fake_descs = MagicMock()
 
-    forced_return_extract_config = [fake_subsystem_assignments, fake_tests, fake_descs]
+    forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
+                                'test_assignments' : fake_tests,
+                                'description_assignments' : fake_descs}
+    forced_return_len = 0
 
-    mocker.patch('data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
-
-    expected_result = {'subsystem_assignments' : fake_subsystem_assignments,
-                       'test_assignments' : fake_tests,
-                       'description_assignments' : fake_descs}
+    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('data_handling.parsers.parser_util.len', return_value=forced_return_len)
+    mocker.patch('data_handling.parsers.parser_util.str2lst')
 
     # Act
     result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
 
     # Assert
-    assert parser_util.extract_config.call_count == 1
-    assert parser_util.extract_config.call_args_list[0].args == (arg_configFilePath, arg_configFiles[0], )
-    assert parser_util.extract_config.call_args_list[0].kwargs == {'csv':arg_csv}
+    assert parser_util.parseTlmConfJson.call_count == 1
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.len.call_count == 1
+    assert parser_util.len.call_args_list[0].args == (fake_subsystem_assignments, )
+    assert parser_util.str2lst.call_count == 0
+    assert result == forced_return_parse_tlm
+
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile_and_configs_len_equal_to_one(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
+    arg_configFiles = [MagicMock()]
+    arg_csv = MagicMock()
+
+    fake_subsystem_assignments = [MagicMock()]
+    fake_test_assign = [MagicMock()]
+    fake_tests = [fake_test_assign]
+    fake_descs = [MagicMock()]
+
+    forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
+                                'test_assignments' : fake_tests,
+                                'description_assignments' : fake_descs}
+    forced_return_str2lst = MagicMock()
+
+    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('data_handling.parsers.parser_util.str2lst', return_value=forced_return_str2lst)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = fake_subsystem_assignments
+    expected_result['test_assignments'] = [[forced_return_str2lst]]
+    expected_result['description_assignments'] = fake_descs
+
+    # Act
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+
+    # Assert
+    assert parser_util.parseTlmConfJson.call_count == 1
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.str2lst.call_count == 1
+    assert parser_util.str2lst.call_args_list[0].args == (fake_test_assign[0], )
+    assert result == forced_return_parse_tlm
+
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile_and_len_configs_greater_than_one(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
+    arg_configFiles = [MagicMock()] 
+    arg_csv = MagicMock()
+
+    len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
+    fake_subsystem_assignments = [MagicMock()] * len_configs
+    fake_test_assign = [MagicMock()]
+    fake_tests = [fake_test_assign] * len_configs
+    fake_descs = [MagicMock()] * len_configs
+
+    forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
+                                'test_assignments' : fake_tests,
+                                'description_assignments' : fake_descs}
+    forced_return_str2lst = MagicMock()
+
+    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('data_handling.parsers.parser_util.str2lst', return_value=forced_return_str2lst)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = fake_subsystem_assignments
+    expected_result['test_assignments'] = [[forced_return_str2lst]] * len_configs
+    expected_result['description_assignments'] = fake_descs
+
+    # Act
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+
+    # Assert
+    assert parser_util.parseTlmConfJson.call_count == 1
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.str2lst.call_count == len_configs
+    for i in range(len_configs):
+        assert parser_util.str2lst.call_args_list[i].args == (fake_test_assign[0], )
     assert result == expected_result
 
-# needs revision
-def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_cFile(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_configFiles_greater_than_one_and_len_configs_greater_than_one_and_len_test_assigns_greater_than_one(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
+    arg_configFiles = [MagicMock()] 
+    arg_csv = MagicMock()
+
+    len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
+    fake_subsystem_assignments = [MagicMock()] * len_configs
+    fake_tests= []
+    fake_descs = [MagicMock()] * len_configs
+    for i in range(len_configs):
+        len_test_assigns = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+        fake_test_assigns = [MagicMock()] * len_test_assigns
+        fake_tests.append(fake_test_assigns)
+
+    forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
+                                'test_assignments' : fake_tests,
+                                'description_assignments' : fake_descs}
+    forced_return_str2lst = [MagicMock()]
+
+    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('data_handling.parsers.parser_util.str2lst', return_value=forced_return_str2lst)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = fake_subsystem_assignments
+    expected_result['test_assignments'] = fake_tests
+    expected_result['description_assignments'] = fake_descs
+
+    expected_str2lst_args = []
+
+    for i in range(len_configs):
+        if len(fake_tests[i]) > 1:
+            expected_result['test_assignments'][i] = [fake_tests[i][0]] + forced_return_str2lst
+            expected_str2lst_args.append(fake_tests[i][1])
+        else:
+            expected_result['test_assignments'][i] = [forced_return_str2lst]
+            expected_str2lst_args.append(fake_tests[i][0])
+
+    # Act
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+
+    # Assert
+    assert parser_util.parseTlmConfJson.call_count == 1
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.str2lst.call_count == len_configs
+    for i in range(len_configs):
+        assert parser_util.str2lst.call_args_list[i].args == (expected_str2lst_args[i], )
+    assert result == expected_result
+
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_cFile_and_len_configs_less_than_two(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFiles = [] 
     arg_csv = MagicMock()
 
     num_fake_cFiles = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
+    [arg_configFiles.append(MagicMock()) for i in range(num_fake_cFiles)]
 
-    fake_subsystem_assignments = [MagicMock()] * num_fake_cFiles
-    fake_tests = [MagicMock()] * num_fake_cFiles
-    fake_descs = [MagicMock()] * num_fake_cFiles
+    len_configs = pytest.gen.randint(0, 1) # arbitrary, from 0 to 1
+    fake_subsystem_assignments = [MagicMock()] * len_configs
+    fake_tests = []
+    fake_tests_copy = []
+    fake_descs = [MagicMock()] * len_configs
 
-    forced_return_extract_configs = []
-    for i in range(num_fake_cFiles):
-        arg_configFiles.append(MagicMock())
-        forced_return_extract_configs.append([fake_subsystem_assignments[i], fake_tests[i], fake_descs[i]])
+    for i in range(len_configs):
+        fake_test_assign = [MagicMock()]
+        fake_tests.append(fake_test_assign)
+        fake_tests_copy.append(fake_test_assign)
 
-    mocker.patch('data_handling.parsers.parser_util.extract_config', side_effect=forced_return_extract_configs)
+    forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
+                                'test_assignments' : fake_tests,
+                                'description_assignments' : fake_descs}
+    forced_return_str2lst = [MagicMock()]
+
+    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('data_handling.parsers.parser_util.str2lst', return_value=forced_return_str2lst)
 
     expected_result = {}
-    expected_result['subsystem_assignments'] = fake_subsystem_assignments[num_fake_cFiles-1]
-    expected_result['test_assignments'] = fake_tests[num_fake_cFiles-1]
-    expected_result['description_assignments'] = fake_descs[num_fake_cFiles-1]
+    expected_result['subsystem_assignments'] = fake_subsystem_assignments
+    expected_result['test_assignments'] = [[forced_return_str2lst]] * len_configs
+    expected_result['description_assignments'] = fake_descs
 
     # Act
     result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
 
     # Assert
-    assert parser_util.extract_config.call_count == num_fake_cFiles
-    for i in range(num_fake_cFiles):
-        assert parser_util.extract_config.call_args_list[i].args == (arg_configFilePath, arg_configFiles[i], )
-        assert parser_util.extract_config.call_args_list[i].kwargs == {'csv':arg_csv}
+    assert parser_util.parseTlmConfJson.call_count == 1
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.str2lst.call_count == len_configs
+    for i in range(len_configs):
+        assert parser_util.str2lst.call_args_list[i].args == (fake_tests_copy[i][0], )
     assert result == expected_result
 
-# needs revision
-def test_parser_util_extract_configs_default_given_csv_is_False(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_cFile_and_len_configs_greater_than_one(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = [MagicMock()]
+    arg_configFiles = [] 
+    arg_csv = MagicMock()
 
-    fake_subsystem_assignments = MagicMock()
-    fake_tests = MagicMock()
-    fake_descs = MagicMock()
+    num_fake_cFiles = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
+    [arg_configFiles.append(MagicMock()) for i in range(num_fake_cFiles)]
 
-    forced_return_extract_config = [fake_subsystem_assignments, fake_tests, fake_descs]
+    len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
+    fake_subsystem_assignments = [MagicMock()] * len_configs
+    fake_tests = []
+    fake_tests_copy = []
+    fake_descs = [MagicMock()] * len_configs
 
-    mocker.patch('data_handling.parsers.parser_util.extract_config', return_value=forced_return_extract_config)
+    for i in range(len_configs):
+        fake_test_assign = [MagicMock()]
+        fake_tests.append(fake_test_assign)
+        fake_tests_copy.append(fake_test_assign)
 
-    expected_result = {'subsystem_assignments' : fake_subsystem_assignments,
-                       'test_assignments' : fake_tests,
-                       'description_assignments' : fake_descs}
+    forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
+                                'test_assignments' : fake_tests,
+                                'description_assignments' : fake_descs}
+    forced_return_str2lst = [MagicMock()]
+
+    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('data_handling.parsers.parser_util.str2lst', return_value=forced_return_str2lst)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = fake_subsystem_assignments
+    expected_result['test_assignments'] = fake_tests
+    expected_result['description_assignments'] = fake_descs
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
 
     # Assert
-    assert parser_util.extract_config.call_args_list[0].kwargs == {'csv':False}
-    
+    assert parser_util.parseTlmConfJson.call_count == 1
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.str2lst.call_count == len_configs
+    for i in range(len_configs):
+        assert parser_util.str2lst.call_args_list[i].args == (fake_tests_copy[i][0], )
+    assert result == expected_result
+
 # extract_config tests
 def test_parser_util_extract_config_returns_tuple_of_call_to_process_filepath_and_empty_list_and_empty_list_and_empty_list_when_csv_resolves_to_True_and_dataPts_is_vacant(mocker):
     # Arrange
