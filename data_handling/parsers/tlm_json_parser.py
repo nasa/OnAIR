@@ -134,13 +134,13 @@ def convertTlmDictToJsonDict(data):
 # helper function to organize data parsed from tlm file into desired json format
 def getJsonData(label, mnemonics, description):
     if label == 'TIME':
-        return {label : {'conversion' : '', 'test' : str(mnemonics[0]), 'limits' : '[]', 'description' : str(description), 'label' : ''}}
+        return {label : {'conversion' : '', 'test' : str(mnemonics[0]), 'limits' : '[]', 'description' : str(description)}}
     
     attributes = label.split('.')
     num_attr = len(attributes)
     test_attr = mnemonics[0][0]
     limits_attr = mnemonics[0][1:]
-    json_data = {attributes[num_attr-1] : {'conversion' : '', 'test' : str(test_attr), 'limits' : str(limits_attr), 'description' : str(description), 'label' : ''}}
+    json_data = {attributes[num_attr-1] : {'conversion' : '', 'test' : str(test_attr), 'limits' : str(limits_attr), 'description' : str(description)}}
     
     for attr in reversed(attributes[:num_attr-1]):
         json_data = {attr : json_data}
@@ -192,6 +192,9 @@ def getConfigPath(file_name):
 
 # helper function to merge two dicts together
 def mergeDicts(dict1, dict2):
+    if not isinstance(dict1, dict) or not isinstance(dict2, dict):
+        return
+
     for key in dict2:
         if key in dict1:
             mergeDicts(dict1[key], dict2[key])
