@@ -6,8 +6,7 @@
         "conversion": "",
         "test": "['SYNC', 'TIME']",
         "limits": "[]",
-        "description": "No Description",
-        "label": ""
+        "description": "No Description"
       }
     },
     "GNC": {
@@ -17,15 +16,13 @@
             "conversion": "",
             "test": "FEASIBILITY",
             "limits": "[-1.0, 0.0, 10.0, 15.0]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           },
           "sample_data_value": {
             "conversion": "",
             "test": "NOOP",
             "limits": "[]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           }
         },
         "sample_data_gps_t": {
@@ -33,29 +30,25 @@
             "conversion": "",
             "test": "FEASIBILITY",
             "limits": "[-1.0, 0.0, 10.0, 15.0]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           },
           "sample_data_lat": {
             "conversion": "",
             "test": "NOOP",
             "limits": "[]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           },
           "sample_data_lng": {
             "conversion": "",
             "test": "NOOP",
             "limits": "[]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           },
           "sample_data_alt": {
             "conversion": "",
             "test": "NOOP",
             "limits": "[]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           }
         }
       }
@@ -67,22 +60,19 @@
             "conversion": "",
             "test": "FEASIBILITY",
             "limits": "[-1.0, 0.0, 10.0, 15.0]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           },
           "sample_data_voltage": {
             "conversion": "",
             "test": "NOOP",
             "limits": "[]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           },
           "sample_data_current": {
             "conversion": "",
             "test": "NOOP",
             "limits": "[]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           }
         }
       }
@@ -94,15 +84,13 @@
             "conversion": "",
             "test": "FEASIBILITY",
             "limits": "[-1.0, 0.0, 10.0, 15.0]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           },
           "sample_data_external_temp": {
             "conversion": "",
             "test": "NOOP",
             "limits": "[]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           }
         },
         "sample_data_thernal_t": {
@@ -110,8 +98,7 @@
             "conversion": "",
             "test": "NOOP",
             "limits": "[]",
-            "description": "No Description",
-            "label": ""
+            "description": "No Description"
           }
         }
       }
