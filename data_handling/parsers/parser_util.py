@@ -28,41 +28,6 @@ def extract_configs(configFilePath, configFiles, csv = False):
 
     return configs
 
-## Helper method for extract_configs -- UNUSED
-def extract_config(configFilePath, configFile, csv = False):
-    subsystem_assignments = []
-    mnemonic_tests = []
-    descriptions = []
-
-    descriptor_file = open(configFilePath + configFile, "r+")
-    data_str = descriptor_file.read()
-    descriptor_file.close()
-
-    dataPts = data_str.split('\n')
-    dataPts = [i for i in dataPts if i]
-    # if not csv:
-    #     dataPts = dataPts[:len(dataPts)-1]
-
-    for field_info in dataPts:
-        data = field_info.split(' : ')
-        if len(data) == 1:
-            description = 'No description'
-        else:
-            description = data[1]
-
-        descriptors = data[0].split(' ')
-
-        subsystem_assignments.append(ast.literal_eval(descriptors[1]))
-        descriptions.append(description)
-
-        test_list = []
-        for test in descriptors[2:]:
-            test_list.append(ast.literal_eval(test))
-
-        mnemonic_tests.append(test_list)
-
-    return subsystem_assignments, mnemonic_tests, descriptions
-
 def str2lst(string):
     try:
         return ast.literal_eval(string)
