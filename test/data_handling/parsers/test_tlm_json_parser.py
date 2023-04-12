@@ -4,10 +4,279 @@ from mock import MagicMock
 import data_handling.parsers.tlm_json_parser as tlm_parser
 
 # parseTlmConfJson tests
+def test_tlm_json_parser_parseTlmConfJson_returns_configs_with_empty_dicts_when_reorg_dict_is_empty(mocker):
+    # Arrange
+    arg_file_path = MagicMock()
 
+    fake_data = MagicMock()
+    fake_organized_data = {}
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = []
+    expected_result['test_assignments'] = []
+    expected_result['description_assignments'] = []
+
+    # Act
+    result = tlm_parser.parseTlmConfJson(arg_file_path)
+
+    # Assert
+    assert tlm_parser.parseJson.call_count == 1
+    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert result == expected_result
+
+def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_only_one_label_and_order_key_does_not_exist(mocker):
+    # Arrange
+    arg_file_path = MagicMock()
+
+    fake_data = MagicMock()
+    fake_label = MagicMock()
+    fake_subsystem = MagicMock()
+    fake_limits = MagicMock()
+    fake_mnemonics = MagicMock()
+    fake_description = MagicMock()
+    fake_organized_data = {}
+    fake_organized_data[fake_label] = {'subsystem' : fake_subsystem,
+                                       'limits' : fake_limits,
+                                       'tests' : fake_mnemonics,
+                                       'description' : fake_description}
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst', return_value=fake_limits)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = [fake_subsystem]
+    expected_result['test_assignments'] = [[fake_mnemonics, fake_limits]]
+    expected_result['description_assignments'] = [fake_description]
+
+    # Act
+    result = tlm_parser.parseTlmConfJson(arg_file_path)
+
+    # Assert
+    assert tlm_parser.parseJson.call_count == 1
+    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_parser.str2lst.call_count == 1
+    assert tlm_parser.str2lst.call_args_list[0].args == (fake_limits, )
+    assert result == expected_result
+
+def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_only_one_label_and_order_key_does_exist(mocker):
+    # Arrange
+    arg_file_path = MagicMock()
+
+    fake_label = MagicMock()
+    fake_data = {'order' : [fake_label]}
+    fake_subsystem = MagicMock()
+    fake_limits = MagicMock()
+    fake_mnemonics = MagicMock()
+    fake_description = MagicMock()
+    fake_organized_data = {}
+    fake_organized_data[fake_label] = {'subsystem' : fake_subsystem,
+                                       'limits' : fake_limits,
+                                       'tests' : fake_mnemonics,
+                                       'description' : fake_description}
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst', return_value=fake_limits)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = [fake_subsystem]
+    expected_result['test_assignments'] = [[fake_mnemonics, fake_limits]]
+    expected_result['description_assignments'] = [fake_description]
+
+    # Act
+    result = tlm_parser.parseTlmConfJson(arg_file_path)
+
+    # Assert
+    assert tlm_parser.parseJson.call_count == 1
+    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_parser.str2lst.call_count == 1
+    assert tlm_parser.str2lst.call_args_list[0].args == (fake_limits, )
+    assert result == expected_result
+
+def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_more_than_one_label_and_order_key_does_not_exist(mocker):
+    # Arrange
+    arg_file_path = MagicMock()
+
+    fake_data = MagicMock()
+    num_elems = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_label = [MagicMock() for i in range(num_elems)]
+    fake_subsystem = MagicMock()
+    fake_limits = MagicMock()
+    fake_mnemonics = MagicMock()
+    fake_description = MagicMock()
+    fake_organized_data = {}
+    for label in fake_label:
+        fake_organized_data[label] = {'subsystem' : fake_subsystem,
+                                      'limits' : fake_limits,
+                                      'tests' : fake_mnemonics,
+                                      'description' : fake_description}
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst', return_value=fake_limits)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = [fake_subsystem] * num_elems
+    expected_result['test_assignments'] = [[fake_mnemonics, fake_limits]] * num_elems
+    expected_result['description_assignments'] = [fake_description] * num_elems
+
+    # Act
+    result = tlm_parser.parseTlmConfJson(arg_file_path)
+
+    # Assert
+    assert tlm_parser.parseJson.call_count == 1
+    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_parser.str2lst.call_count == num_elems
+    for i in range(num_elems):
+        assert tlm_parser.str2lst.call_args_list[i].args == (fake_limits, )
+    assert result == expected_result
+
+def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_more_than_one_label_and_order_key_does_exist(mocker):
+    # Arrange
+    arg_file_path = MagicMock()
+
+    num_elems = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_label = []
+    fake_subsystem = []
+    fake_limits = []
+    fake_mnemonics = []
+    fake_description = []
+    for i in range(num_elems):
+        fake_label.append(MagicMock())
+        fake_subsystem.append(MagicMock())
+        fake_limits.append(MagicMock())
+        fake_mnemonics.append(MagicMock())
+        fake_description.append(MagicMock())
+    fake_order = fake_label.copy()
+    pytest.gen.shuffle(fake_order)
+    fake_data = {'order' : fake_order}
+
+    desired_order = {}
+    for i in range(num_elems):
+        desired_order[fake_order[i]] = i
+
+    ordering_list = []
+    for label in fake_label:
+        ordering_list.append(desired_order[label])
+    
+    ordered_subsys = [y for x, y in sorted(zip(ordering_list, fake_subsystem))]
+    ordered_mnemonics = [y for x, y in sorted(zip(ordering_list, fake_mnemonics))]
+    ordered_limits = [y for x, y in sorted(zip(ordering_list, fake_limits))]
+    ordered_descs = [y for x, y in sorted(zip(ordering_list, fake_description))]
+    
+    fake_organized_data = {}
+    for i in range(num_elems):
+        fake_organized_data[fake_label[i]] = {'subsystem' : fake_subsystem[i],
+                                              'limits' : fake_limits[i],
+                                              'tests' : fake_mnemonics[i],
+                                              'description' : fake_description[i]}
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst', return_value=fake_limits)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = []
+    expected_result['test_assignments'] = []
+    expected_result['description_assignments'] = []
+    for i in range(num_elems):
+        expected_result['subsystem_assignments'].append(ordered_subsys[i])
+        expected_result['test_assignments'].append([ordered_mnemonics[i], ordered_limits[i]])
+        expected_result['description_assignments'].append(ordered_descs[i])
+
+    # Act
+    result = tlm_parser.parseTlmConfJson(arg_file_path)
+
+    # Assert
+    assert tlm_parser.parseJson.call_count == 1
+    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_parser.str2lst.call_count == num_elems
+    for i in range(num_elems):
+        assert tlm_parser.str2lst.call_args_list[i].args == (fake_limits[i], )
+    assert result == expected_result
+
+def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_more_than_one_label_and_limits_are_interpreted_as_empty_lists(mocker):
+    # Arrange
+    arg_file_path = MagicMock()
+
+    num_elems = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_label = []
+    fake_subsystem = []
+    fake_limits = []
+    fake_mnemonics = []
+    fake_description = []
+    for i in range(num_elems):
+        fake_label.append(MagicMock())
+        fake_subsystem.append(MagicMock())
+        fake_limits.append(MagicMock())
+        fake_mnemonics.append(MagicMock())
+        fake_description.append(MagicMock())
+    fake_order = fake_label.copy()
+    pytest.gen.shuffle(fake_order)
+    fake_data = {'order' : fake_order}
+
+    desired_order = {}
+    for i in range(num_elems):
+        desired_order[fake_order[i]] = i
+
+    ordering_list = []
+    for label in fake_label:
+        ordering_list.append(desired_order[label])
+    
+    ordered_subsys = [y for x, y in sorted(zip(ordering_list, fake_subsystem))]
+    ordered_mnemonics = [y for x, y in sorted(zip(ordering_list, fake_mnemonics))]
+    ordered_descs = [y for x, y in sorted(zip(ordering_list, fake_description))]
+    
+    fake_organized_data = {}
+    for i in range(num_elems):
+        fake_organized_data[fake_label[i]] = {'subsystem' : fake_subsystem[i],
+                                              'limits' : fake_limits[i],
+                                              'tests' : fake_mnemonics[i],
+                                              'description' : fake_description[i]}
+
+    forced_return_str2lst = []
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst', return_value=forced_return_str2lst)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = []
+    expected_result['test_assignments'] = []
+    expected_result['description_assignments'] = []
+    for i in range(num_elems):
+        expected_result['subsystem_assignments'].append(ordered_subsys[i])
+        expected_result['test_assignments'].append([ordered_mnemonics[i]])
+        expected_result['description_assignments'].append(ordered_descs[i])
+
+    # Act
+    result = tlm_parser.parseTlmConfJson(arg_file_path)
+
+    # Assert
+    assert tlm_parser.parseJson.call_count == 1
+    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_parser.str2lst.call_count == num_elems
+    for i in range(num_elems):
+        assert tlm_parser.str2lst.call_args_list[i].args == (fake_limits[i], )
+    assert result == expected_result
 
 # reorganizeTlmDict tests
-def test_reorganizeTlmDict_raises_error_when_arg_data_does_not_contain_subsystems_key():
+def test_tlm_json_parser_reorganizeTlmDict_raises_error_when_arg_data_does_not_contain_subsystems_key():
     # Arrange
     arg_data_len = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
     arg_data = {}
@@ -20,7 +289,7 @@ def test_reorganizeTlmDict_raises_error_when_arg_data_does_not_contain_subsystem
     # Act
     assert e_info.match('subsystems')
 
-def test_reorganizeTlmDict_returns_empty_dict_when_arg_data_subsystems_exists_and_is_empty():
+def test_tlm_json_parser_reorganizeTlmDict_returns_empty_dict_when_arg_data_subsystems_exists_and_is_empty():
     # Arrange
     arg_data_len = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
     arg_data = {}
@@ -33,7 +302,7 @@ def test_reorganizeTlmDict_returns_empty_dict_when_arg_data_subsystems_exists_an
     # Act
     assert result == {}
 
-def test_reorganizeTlmDict_updates_data_with_return_value_from_recursive_helper_function_when_arg_data_subsystems_exists_and_is_not_empty(mocker):
+def test_tlm_json_parser_reorganizeTlmDict_updates_data_with_return_value_from_recursive_helper_function_when_arg_data_subsystems_exists_and_is_not_empty(mocker):
     # Arrange
     fake_app_name = MagicMock()
     fake_app_data = MagicMock()
@@ -63,6 +332,155 @@ def test_reorganizeTlmDict_updates_data_with_return_value_from_recursive_helper_
         assert tlm_parser.reorganizeTlmDictRecursiveStep.call_args_list[i].args == (fake_app_name, fake_subsystems[i], fake_app_data)
 
 # reorganizeTlmDictRecursiveStep tests
+def test_tlm_json_parser_reorganizeTlmDictRecursiveStep_returns_empty_dict_when_unable_to_find_description_key_and_unable_to_recurse():
+    # Arrange
+    arg_label = MagicMock()
+    arg_subsys = MagicMock()
+    arg_data = MagicMock()
+
+    # Act
+    result = tlm_parser.reorganizeTlmDictRecursiveStep(arg_label, arg_subsys, arg_data)
+
+    # Assert
+    assert result == {}
+
+def test_tlm_json_parser_reorganizeTlmDictRecursiveStep_returns_expected_dict_and_does_not_recurse_when_description_key_is_found():
+    # Arrange
+    fake_test = MagicMock()
+    fake_limits = MagicMock()
+    fake_description = MagicMock()
+
+    arg_label = MagicMock()
+    arg_subsys = MagicMock()
+    arg_data = {'test' : fake_test, 'limits' : fake_limits, 'description' : fake_description}
+
+    expected_result = {arg_label : {}}
+    expected_result[arg_label]['subsystem'] = arg_subsys
+    expected_result[arg_label]['tests'] = fake_test
+    expected_result[arg_label]['limits'] = fake_limits
+    expected_result[arg_label]['description'] = fake_description
+
+    # Act
+    result = tlm_parser.reorganizeTlmDictRecursiveStep(arg_label, arg_subsys, arg_data)
+
+    # Assert
+    assert result == expected_result
+
+def test_tlm_json_parser_reorganizeTlmDictRecursiveStep_returns_empty_dict_when_able_to_recurse_but_description_key_is_not_found_in_base_node():
+    # Arrange
+    num_layers = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_labels = [MagicMock()] * num_layers
+
+    arg_label = str(fake_labels[0])
+    for label in fake_labels[1:]:
+        arg_label = arg_label + f'.{label}'
+    arg_subsys = MagicMock()
+    arg_data = MagicMock()
+
+    # Act
+    result = tlm_parser.reorganizeTlmDictRecursiveStep(arg_label, arg_subsys, arg_data)
+
+    # Assert
+    assert result == {}
+
+def test_tlm_json_parser_reorganizeTlmDictRecursiveStep_returns_expected_dict_when_able_to_recurse_and_description_key_exists_in_base_node():
+    # Arrange
+    fake_test = MagicMock()
+    fake_limits = MagicMock()
+    fake_description = MagicMock()
+    num_layers = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_labels = [MagicMock()] * num_layers
+
+    arg_label = str(fake_labels[0])
+    arg_data = {'test' : fake_test, 'limits' : fake_limits, 'description' : fake_description}
+    for label in fake_labels[1:]:
+        arg_data = {str(label) : arg_data}
+    arg_subsys = MagicMock()
+
+    expected_label = arg_label
+    for label in fake_labels[1:]:
+        expected_label = expected_label + f'.{label}'
+    expected_result = {expected_label : {}}
+    expected_result[expected_label]['subsystem'] = arg_subsys
+    expected_result[expected_label]['tests'] = fake_test
+    expected_result[expected_label]['limits'] = fake_limits
+    expected_result[expected_label]['description'] = fake_description
+
+    # Act
+    result = tlm_parser.reorganizeTlmDictRecursiveStep(arg_label, arg_subsys, arg_data)
+
+    # Assert
+    assert result == expected_result
+
+def test_tlm_json_parser_reorganizeTlmDictRecursiveStep_returns_expected_dict_when_able_to_recurse_and_description_key_exists_in_base_node_and_there_is_only_one_branch():
+    # Arrange
+    fake_test = MagicMock()
+    fake_limits = MagicMock()
+    fake_description = MagicMock()
+
+    arg_label = str(MagicMock())
+    arg_subsys = MagicMock()
+    arg_data = {}
+
+    num_branches = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    expected_data_list = []
+    for i in range(num_branches):
+        num_layers = pytest.gen.randint(1, 10) # arbitrary, from 2 to 10
+        fake_labels = [MagicMock()] * num_layers
+
+        fake_data_branch = {'test' : fake_test, 'limits' : fake_limits, 'description' : fake_description}
+        for label in fake_labels:
+            fake_data_branch = {str(label) : fake_data_branch}
+        arg_data.update(fake_data_branch)
+
+        expected_label = arg_label
+        for label in fake_labels:
+            expected_label = expected_label + f'.{label}'
+        expected_data = {expected_label : {}}
+        expected_data[expected_label]['subsystem'] = arg_subsys
+        expected_data[expected_label]['tests'] = fake_test
+        expected_data[expected_label]['limits'] = fake_limits
+        expected_data[expected_label]['description'] = fake_description
+        expected_data_list.append(expected_data)
+
+    expected_result = {}
+    for data in expected_data_list:
+        expected_result.update(data)
+
+    # Act
+    result = tlm_parser.reorganizeTlmDictRecursiveStep(arg_label, arg_subsys, arg_data)
+
+    # Assert
+    assert result == expected_result
+
+def test_tlm_json_parser_reorganizeTlmDictRecursiveStep_returns_expected_dict_when_able_to_recurse_and_description_key_exists_in_base_node_and_there_are_multiple_branches():
+    # Arrange
+    fake_test = MagicMock()
+    fake_limits = MagicMock()
+    fake_description = MagicMock()
+    num_layers = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_labels = [MagicMock()] * num_layers
+
+    arg_label = str(fake_labels[0])
+    arg_data = {'test' : fake_test, 'limits' : fake_limits, 'description' : fake_description}
+    for label in fake_labels[1:]:
+        arg_data = {str(label) : arg_data}
+    arg_subsys = MagicMock()
+
+    expected_label = arg_label
+    for label in fake_labels[1:]:
+        expected_label = expected_label + f'.{label}'
+    expected_result = {expected_label : {}}
+    expected_result[expected_label]['subsystem'] = arg_subsys
+    expected_result[expected_label]['tests'] = fake_test
+    expected_result[expected_label]['limits'] = fake_limits
+    expected_result[expected_label]['description'] = fake_description
+
+    # Act
+    result = tlm_parser.reorganizeTlmDictRecursiveStep(arg_label, arg_subsys, arg_data)
+
+    # Assert
+    assert result == expected_result
 
 
 # str2lst tests
