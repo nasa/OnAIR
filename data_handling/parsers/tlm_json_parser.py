@@ -193,7 +193,7 @@ def getConfigPath(file_name):
 # helper function to merge two dicts together
 def mergeDicts(dict1, dict2):
     if not isinstance(dict1, dict) or not isinstance(dict2, dict):
-        return
+        return -1
 
     for key in dict2:
         if key in dict1:

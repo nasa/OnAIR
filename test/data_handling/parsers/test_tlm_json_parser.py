@@ -187,7 +187,223 @@ def test_tlm_json_parser_convertTlmToJson_calls_expected_functions_with_expected
     assert tlm_parser.writeToJson.call_args_list[0].args == (fake_json_path, forced_return_convert_tlm_to_json)
 
 # convertTlmDictToJsonDict tests
+def test_tlm_json_parser_convertTlmDictToJsonDict_returns_expected_dict_with_subsystem_NONE_and_order_empty_list_when_all_data_components_are_empty(mocker):
+    # Arrange
+    fake_labels = []
+    fake_subsys_assigns = []
+    fake_mnemonics = []
+    fake_descs = []
 
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    expected_result = {'subsystems' : {'NONE' : {}}, 'order' : []}
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.getJsonData')
+
+    # Act
+    result = tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert tlm_parser.getJsonData.call_count == 0
+    assert result == expected_result
+
+def test_tlm_json_parser_convertTlmDictToJsonDict_raises_error_when_length_of_labels_is_not_same_as_other_data_components():
+    # Arrange
+    num_elems = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    len_dif = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_labels = [MagicMock()] * (num_elems + len_dif)
+    fake_subsys_assigns = [MagicMock()] * num_elems
+    fake_mnemonics = [MagicMock()] * num_elems
+    fake_descs = [MagicMock()] * num_elems
+
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    # Act
+    with pytest.raises(AssertionError) as e_info:
+        tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert e_info.match('')
+
+def test_tlm_json_parser_convertTlmDictToJsonDict_raises_error_when_length_of_subsys_assigns_is_not_same_as_other_data_components():
+    # Arrange
+    num_elems = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    len_dif = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_labels = [MagicMock()] * num_elems
+    fake_subsys_assigns = [MagicMock()] * (num_elems + len_dif)
+    fake_mnemonics = [MagicMock()] * num_elems
+    fake_descs = [MagicMock()] * num_elems
+
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    # Act
+    with pytest.raises(AssertionError) as e_info:
+        tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert e_info.match('')
+
+def test_tlm_json_parser_convertTlmDictToJsonDict_raises_error_when_length_of_menmonics_is_not_same_as_other_data_components():
+    # Arrange
+    num_elems = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    len_dif = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_labels = [MagicMock()] * num_elems
+    fake_subsys_assigns = [MagicMock()] * num_elems
+    fake_mnemonics = [MagicMock()] * (num_elems + len_dif)
+    fake_descs = [MagicMock()] * num_elems
+
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    # Act
+    with pytest.raises(AssertionError) as e_info:
+        tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert e_info.match('')
+
+def test_tlm_json_parser_convertTlmDictToJsonDict_raises_error_when_length_of_descriptions_is_not_same_as_other_data_components():
+    # Arrange
+    num_elems = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    len_dif = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_labels = [MagicMock()] * num_elems
+    fake_subsys_assigns = [MagicMock()] * num_elems
+    fake_mnemonics = [MagicMock()] * num_elems
+    fake_descs = [MagicMock()] * (num_elems + len_dif)
+
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    # Act
+    with pytest.raises(AssertionError) as e_info:
+        tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert e_info.match('')
+
+def test_tlm_json_parser_convertTlmDictToJsonDict_returns_expected_dict_when_data_components_len_equals_one_and_subsystem_assign_contains_empty_list(mocker):
+    # Arrange
+    fake_labels = [MagicMock()]
+    fake_subsys_assigns = [[]]
+    fake_mnemonics = [MagicMock()]
+    fake_descs = [MagicMock()]
+
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    expected_result = {'subsystems' : {'NONE' : {}}, 'order' : [fake_labels[0]]}
+
+    forced_return_get_json_data = MagicMock()
+    mocker.patch('data_handling.parsers.tlm_json_parser.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.mergeDicts')
+
+    # Act
+    result = tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert tlm_parser.getJsonData.call_count == 1
+    assert tlm_parser.getJsonData.call_args_list[0].args == (fake_labels[0], fake_mnemonics[0], fake_descs[0])
+    assert tlm_parser.mergeDicts.call_count == 1
+    assert tlm_parser.mergeDicts.call_args_list[0].args == ({}, forced_return_get_json_data)
+    assert result == expected_result
+
+def test_tlm_json_parser_convertTlmDictToJsonDict_calls_mergeDicts_and_returns_expected_dict_when_len_of_all_data_components_equals_one_and_subsystem_assign_contains_one_subsys(mocker):
+    # Arrange
+    fake_labels = [MagicMock()]
+    fake_subsys_assigns = [[MagicMock()]]
+    fake_mnemonics = [MagicMock()]
+    fake_descs = [MagicMock()]
+
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    expected_result = {'subsystems' : {'NONE' : {}, fake_subsys_assigns[0][0] : {}}, 'order' : [fake_labels[0]]}
+
+    forced_return_get_json_data = MagicMock()
+    mocker.patch('data_handling.parsers.tlm_json_parser.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.mergeDicts')
+
+    # Act
+    result = tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert tlm_parser.getJsonData.call_count == 1
+    assert tlm_parser.getJsonData.call_args_list[0].args == (fake_labels[0], fake_mnemonics[0], fake_descs[0])
+    assert tlm_parser.mergeDicts.call_count == 1
+    assert tlm_parser.mergeDicts.call_args_list[0].args == ({}, forced_return_get_json_data)
+    assert result == expected_result
+
+def test_tlm_json_parser_convertTlmDictToJsonDict_calls_mergeDicts_and_returns_expected_dict_when_len_of_all_data_components_equals_one_and_subsystem_assign_contains_many_subsys(mocker):
+    # Arrange
+    num_elems = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_labels = [MagicMock()] * num_elems
+    fake_mnemonics = [MagicMock()] * num_elems
+    fake_descs = [MagicMock()] * num_elems
+    expected_mergeDicts_call_count = 0
+    fake_subsys_assigns = []
+    for i in range(num_elems):
+        num_subsys = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+        expected_mergeDicts_call_count = expected_mergeDicts_call_count + num_subsys
+        fake_subsys_assigns.append([MagicMock()] * num_subsys)
+
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    expected_result = {'subsystems' : {'NONE' : {}}, 'order' : []}
+    for s_list in fake_subsys_assigns:
+        for s in s_list:
+            expected_result['subsystems'][s] = {}
+    expected_result['order'] = fake_labels
+
+    forced_return_get_json_data = MagicMock()
+    mocker.patch('data_handling.parsers.tlm_json_parser.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.mergeDicts')
+
+    # Act
+    result = tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert tlm_parser.getJsonData.call_count == num_elems
+    assert tlm_parser.getJsonData.call_args_list[0].args == (fake_labels[0], fake_mnemonics[0], fake_descs[0])
+    assert tlm_parser.mergeDicts.call_count == expected_mergeDicts_call_count
+    assert tlm_parser.mergeDicts.call_args_list[0].args == ({}, forced_return_get_json_data)
+    assert result == expected_result
+
+def test_tlm_json_parser_convertTlmDictToJsonDict_calls_mergeDicts_and_returns_expected_dict_for_arbitrary_data_components_len_and_subsystem_assign_contains_both_empty_and_non_empty_lists(mocker):
+    # Arrange
+    num_non_empty_subsys_lists = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    num_empty_subsys_lists = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    expected_mergeDicts_call_count = 0
+    fake_subsys_assigns = []
+    for i in range(num_non_empty_subsys_lists):
+        num_subsys = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+        expected_mergeDicts_call_count = expected_mergeDicts_call_count + num_subsys
+        fake_subsys_assigns.append([MagicMock()] * num_subsys)
+    for i in range(num_empty_subsys_lists):
+        fake_subsys_assigns.append([])
+    expected_mergeDicts_call_count = expected_mergeDicts_call_count + num_empty_subsys_lists
+
+    num_elems = num_empty_subsys_lists + num_non_empty_subsys_lists
+    fake_labels = [MagicMock()] * num_elems
+    fake_mnemonics = [MagicMock()] * num_elems
+    fake_descs = [MagicMock()] * num_elems
+
+    arg_data = [fake_labels, fake_subsys_assigns, fake_mnemonics, fake_descs]
+
+    expected_result = {'subsystems' : {'NONE' : {}}, 'order' : []}
+    for s_list in fake_subsys_assigns:
+        for s in s_list:
+            expected_result['subsystems'][s] = {}
+    expected_result['order'] = fake_labels
+
+    forced_return_get_json_data = MagicMock()
+    mocker.patch('data_handling.parsers.tlm_json_parser.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.mergeDicts')
+
+    # Act
+    result = tlm_parser.convertTlmDictToJsonDict(arg_data)
+
+    # Assert
+    assert tlm_parser.getJsonData.call_count == num_elems
+    assert tlm_parser.getJsonData.call_args_list[0].args == (fake_labels[0], fake_mnemonics[0], fake_descs[0])
+    assert tlm_parser.mergeDicts.call_count == expected_mergeDicts_call_count
+    assert tlm_parser.mergeDicts.call_args_list[0].args == ({}, forced_return_get_json_data)
+    assert result == expected_result
 
 # getJsonData tests
 def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_equals_TIME():
@@ -543,3 +759,29 @@ def test_tlm_json_parser_mergeDicts_when_args_contain_shared_keys(mocker):
     # Assert
     assert arg_dict1 == expected_dict1
     assert arg_dict2 == expected_dict2
+
+def test_tlm_json_parser_mergeDicts_returns_negative_one_if_arg_dict1_is_not_instance_of_dict(mocker):
+    # Arrange
+    arg_dict1 = MagicMock()
+    arg_dict2 = {}
+
+    # Act
+    result = tlm_parser.mergeDicts(arg_dict1, arg_dict2)
+
+    # Assert
+    assert arg_dict1 == arg_dict1
+    assert arg_dict2 == arg_dict2
+    assert result == -1
+
+def test_tlm_json_parser_mergeDicts_returns_negative_one_if_arg_dict2_is_not_instance_of_dict(mocker):
+    # Arrange
+    arg_dict1 = {}
+    arg_dict2 = MagicMock()
+
+    # Act
+    result = tlm_parser.mergeDicts(arg_dict1, arg_dict2)
+
+    # Assert
+    assert arg_dict1 == arg_dict1
+    assert arg_dict2 == arg_dict2
+    assert result == -1
