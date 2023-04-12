@@ -7,10 +7,7 @@ from src.util.print_io import *
 from data_handling.parsers.parser_util import * 
 
 class FortyTwo(OnAirParser):
-
-    ##Prototype
     def pre_process_data(self, dataFiles):
-        print('pre_process_data')
         labels, data = self.parse_sim_data(str2lst(dataFiles)[0])
         self.all_headers = labels
         self.sim_data = data

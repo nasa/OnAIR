@@ -1,8 +1,8 @@
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from data_handling.parsers.parser_util import * 
 
-class OnAirParser():
+class OnAirParser(ABC):
     def __init__(self, rawDataFilepath = '', 
                     metadataFilepath = '', 
                             dataFiles = '', 
@@ -34,13 +34,22 @@ class OnAirParser():
               self.binning_configs['description_assignments'][data_file] = configs['description_assignments']
 
     @abstractmethod
-    def pre_process_data(self, configFile, ss_breakdown):
-        pass
+    def pre_process_data(self, dataFiles):
+        """
+        Adjust dataFiles before parsing into binning_configs
+        """
+        raise NotImplementedError
 
     @abstractmethod
-    def process_data_per_data_file(self, configFile, ss_breakdown):
-        pass
+    def process_data_per_data_file(self, data_file):
+        """
+        Adjust each individual data_file before parsing into binning_configs
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def parse_config_data(self, configFile, ss_breakdown):
-        pass
+        """
+        Create the configs that will be used to populate the binning_configs for the data files
+        """
+        raise NotImplementedError

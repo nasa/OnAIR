@@ -10,8 +10,6 @@ from src.util.print_io import *
 from data_handling.parsers.parser_util import * 
 
 class CSV(OnAirParser):
- 
- ##Prototype
     def pre_process_data(self, dataFiles):
         pass
 

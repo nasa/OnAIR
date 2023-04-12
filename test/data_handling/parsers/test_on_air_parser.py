@@ -4,29 +4,53 @@ from mock import MagicMock
 import data_handling.parsers.on_air_parser as on_air_parser
 from data_handling.parsers.on_air_parser import OnAirParser
 
+
+class FakeOnAirParser(OnAirParser):
+    def pre_process_data(self, dataFiles):
+        super().pre_process_data(dataFiles)
+
+    def process_data_per_data_file(self, data_file):
+        super().process_data_per_data_file(data_file)
+
+    def parse_config_data(self, configFile, ss_breakdown):
+        super().parse_config_data(configFile, ss_breakdown)
+
+class IncompleteOnAirParser(OnAirParser):
+    pass
+
+class BadFakeOnAirParser(OnAirParser):
+    def pre_process_data(self, dataFiles):
+        return super().pre_process_data(dataFiles)
+    
+    def process_data_per_data_file(self, data_file):
+        return super().process_data_per_data_file(data_file)
+
+    def parse_config_data(self, configFile, ss_breakdown):
+        return super().parse_config_data(configFile, ss_breakdown)
+
 @pytest.fixture
 def setup_teardown():
-    pytest.cut = OnAirParser.__new__(OnAirParser)
+    pytest.cut = FakeOnAirParser.__new__(FakeOnAirParser)
     yield 'setup_teardown'
 
 # __init__ tests
 def test_OnAirParser__init__sets_instance_variables_as_expected_and_does_not_do_configs_when_dataFiles_and_configFiles_are_empty_strings(setup_teardown):
-  # Arrange
-  arg_rawDataFilepath = MagicMock()
-  arg_metadataFilepath = MagicMock()
-  arg_dataFiles = ''
-  arg_configFiles = ''
-  arg_ss_breakdown = MagicMock()
+    # Arrange
+    arg_rawDataFilepath = MagicMock()
+    arg_metadataFilepath = MagicMock()
+    arg_dataFiles = ''
+    arg_configFiles = ''
+    arg_ss_breakdown = MagicMock()
 
-  # Act
-  pytest.cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
+    # Act
+    pytest.cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
 
-  # Assert
-  assert pytest.cut.raw_data_filepath == arg_rawDataFilepath
-  assert pytest.cut.metadata_filepath == arg_metadataFilepath
-  assert pytest.cut.all_headers == {}
-  assert pytest.cut.sim_data == {}
-  assert pytest.cut.binning_configs == {}
+    # Assert
+    assert pytest.cut.raw_data_filepath == arg_rawDataFilepath
+    assert pytest.cut.metadata_filepath == arg_metadataFilepath
+    assert pytest.cut.all_headers == {}
+    assert pytest.cut.sim_data == {}
+    assert pytest.cut.binning_configs == {}
 
 def test_OnAirParser__init__sets_instance_variables_as_expected_and_does_not_do_configs_when_only_configFiles_is_empty_string(setup_teardown):
   # Arrange
@@ -183,3 +207,61 @@ def test_OnAirParser__init__preprocesses_dataFiles_and_processes_data_per_file_s
     assert pytest.cut.binning_configs['test_assignments'][fake_str2lst_second_return[i]] == fake_configs['test_assignments']
     assert pytest.cut.binning_configs['description_assignments'][fake_str2lst_second_return[i]] == fake_configs['description_assignments']
  
+# pre_process_data tests
+
+# process_data_per_data_file tests
+
+# parse_config_data tests
+
+# abstract methods tests
+def test_OnAirParser_raises_error_because_of_unimplemented_abstract_methods():
+    # Arrange - None
+    # Act
+    with pytest.raises(TypeError) as e_info:
+        cut = OnAirParser.__new__(OnAirParser)
+    
+    # Assert
+    assert "Can't instantiate abstract class OnAirParser with" in e_info.__str__()
+    assert "pre_process_data" in e_info.__str__()
+    assert "process_data_per_data_file" in e_info.__str__()
+    assert "parse_config_data" in e_info.__str__()
+
+# Incomplete plugin call tests
+def test_OnAirParser_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
+    # Arrange - None
+    # Act
+    with pytest.raises(TypeError) as e_info:
+        cut = IncompleteOnAirParser.__new__(IncompleteOnAirParser)
+    
+    # Assert
+    assert "Can't instantiate abstract class IncompleteOnAirParser with" in e_info.__str__()
+    assert "pre_process_data" in e_info.__str__()
+    assert "process_data_per_data_file" in e_info.__str__()
+    assert "parse_config_data" in e_info.__str__()
+
+def test_OnAirParser_raises_error_when_an_inherited_class_calls_abstract_method_pre_process_data():
+    # Act
+    cut = BadFakeOnAirParser.__new__(BadFakeOnAirParser)
+
+    # populate list with the functions that should raise exceptions when called.
+    with pytest.raises(NotImplementedError) as e_info:
+        cut.pre_process_data(None)
+    assert "NotImplementedError" in e_info.__str__()
+
+def test_OnAirParser_raises_error_when_an_inherited_class_calls_abstract_method_process_data_per_data_file():
+    # Act
+    cut = BadFakeOnAirParser.__new__(BadFakeOnAirParser)
+
+    # populate list with the functions that should raise exceptions when called.
+    with pytest.raises(NotImplementedError) as e_info:
+        cut.process_data_per_data_file(None)
+    assert "NotImplementedError" in e_info.__str__()
+
+def test_OnAirParser_raises_error_when_an_inherited_class_calls_abstract_method_parse_config_data():
+    # Act
+    cut = BadFakeOnAirParser.__new__(BadFakeOnAirParser)
+
+    # populate list with the functions that should raise exceptions when called.
+    with pytest.raises(NotImplementedError) as e_info:
+        cut.parse_config_data(None, None)
+    assert "NotImplementedError" in e_info.__str__()
