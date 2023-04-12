@@ -120,6 +120,44 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     for i in range(len_configs):
         assert parser_util.str2lst.call_args_list[i].args == (fake_test_assign[0], )
     assert result == expected_result
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile_and_len_configs_greater_than_one_and_NOOPs_contained_in_test_assigns(mocker):
+    # Arrange
+    arg_configFilePath = MagicMock()
+    arg_configFiles = [MagicMock()] 
+    arg_csv = MagicMock()
+
+    len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
+    num_noops = pytest.gen.randint(2, 10)
+    len_configs = len_configs + num_noops
+    fake_subsystem_assignments = [MagicMock()] * len_configs
+    fake_test_assign = [MagicMock()]
+    noop_test_assign = [['NOOP']]
+    fake_tests = [[fake_test_assign]] * (len_configs - num_noops) + noop_test_assign * num_noops
+    fake_descs = [MagicMock()] * len_configs
+    
+    forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
+                                'test_assignments' : fake_tests,
+                                'description_assignments' : fake_descs}
+    forced_return_str2lst = MagicMock()
+
+    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('data_handling.parsers.parser_util.str2lst', return_value=forced_return_str2lst)
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = fake_subsystem_assignments
+    expected_result['test_assignments'] = [[forced_return_str2lst]] * (len_configs - num_noops) + [noop_test_assign] * num_noops
+    expected_result['description_assignments'] = fake_descs
+
+    # Act
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+
+    # Assert
+    assert parser_util.parseTlmConfJson.call_count == 1
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.str2lst.call_count == len_configs - num_noops
+    for i in range(len_configs - num_noops):
+        assert parser_util.str2lst.call_args_list[i].args == (fake_test_assign, )
+    assert result == expected_result
 
 def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_configFiles_greater_than_one_and_len_configs_greater_than_one_and_len_test_assigns_greater_than_one(mocker):
     # Arrange
