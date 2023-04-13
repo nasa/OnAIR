@@ -17,7 +17,6 @@ class TelemetryTestSuite:
         self.latest_results = None
         self.epsilon = 0.00001 # should define this intelligently 
         self.all_tests = {'SYNC' : self.sync,
-                    'ROTATIONAL' : self.rotational, 
                          'STATE' : self.state,
                    'FEASIBILITY' : self.feasibility, 
                           'NOOP' : self.noop}
@@ -72,11 +71,6 @@ class TelemetryTestSuite:
         #     return stat, mass_assignments
 
         # return '---', mass_assignments
-
-    def rotational(self, val, test_params, epsilon):
-        stat = 'YELLOW'
-        mass_assignments = []
-        return stat, mass_assignments
 
     def state(self, val, test_params, epsilon):
         mass_assignments = []

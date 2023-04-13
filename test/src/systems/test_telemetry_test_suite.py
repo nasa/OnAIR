@@ -22,7 +22,6 @@ def test_TelemetryTestSuite__init__sets_the_expected_values_with_given_headers_a
     assert cut.latest_results == None
     assert cut.epsilon == 1/100000 # production codes notes this value as needing intelligent definition
     assert cut.all_tests == {'SYNC' : cut.sync,
-                       'ROTATIONAL' : cut.rotational, 
                             'STATE' : cut.state,
                       'FEASIBILITY' : cut.feasibility, 
                              'NOOP' : cut.noop}
@@ -360,21 +359,6 @@ def test_TelemetryTestSuite_sync_returns_tuple_of_str_GREEN_and_list_containing_
 
     # Assert
     assert result == ('GREEN', [({'GREEN'}, 1.0)])
-
-# rotational tests
-def test_TelemetryTestSuite_rotational_returns_tuple_of_str_YELLOW_and_empty_list():
-    # Arrange
-    arg_val = MagicMock()
-    arg_test_params = MagicMock()
-    arg_epsilon = MagicMock()
-
-    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
-
-    # Act
-    result = cut.rotational(arg_val, arg_test_params, arg_epsilon)
-
-    # Assert
-    assert result == ('YELLOW', [])
 
 # state tests
 def test_TelemetryTestSuite_state_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0_when_int_val_is_in_range_test_params_0():
