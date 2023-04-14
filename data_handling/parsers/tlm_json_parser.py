@@ -163,7 +163,7 @@ def parseTlmConfTxt(file_path):
     for field_info in data_pts:
         data = field_info.split(' : ')
         if len(data) == 1:
-            desc = 'No Description'
+            desc = 'No description'
         else:
             desc = data[1]
     

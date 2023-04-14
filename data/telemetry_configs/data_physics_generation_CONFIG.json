@@ -5,37 +5,37 @@
         "conversion": "",
         "test": "SYNC",
         "limits": "['TIME']",
-        "description": "No Description"
+        "description": "No description"
       },
       "THRUST": {
         "conversion": "",
         "test": "FEASIBILITY",
         "limits": "[-999999999999999, 999999999999999]",
-        "description": "No Description"
+        "description": "No description"
       },
       "ALTITUDE": {
         "conversion": "",
         "test": "FEASIBILITY",
         "limits": "[-999999999999999, 999999999999999]",
-        "description": "No Description"
+        "description": "No description"
       },
       "ACCELERATION": {
         "conversion": "",
         "test": "FEASIBILITY",
         "limits": "[-20.1111, 20.1111]",
-        "description": "No Description"
+        "description": "No description"
       },
       "SCIENCE_COLLECTION": {
         "conversion": "",
         "test": "FEASIBILITY",
         "limits": "[-0.9999, 1.1111]",
-        "description": "No Description"
+        "description": "No description"
       },
       "LABEL_ERROR_STATE": {
         "conversion": "",
         "test": "NOOP",
         "limits": "['LABEL']",
-        "description": "No Description"
+        "description": "No description"
       }
     },
     "POWER": {
@@ -43,13 +43,13 @@
         "conversion": "",
         "test": "FEASIBILITY",
         "limits": "[12.9999, 18.1111]",
-        "description": "No Description"
+        "description": "No description"
       },
       "CURRENT": {
         "conversion": "",
         "test": "FEASIBILITY",
         "limits": "[2.9999, 5.1111]",
-        "description": "No Description"
+        "description": "No description"
       }
     },
     "THERMAL": {
@@ -57,7 +57,7 @@
         "conversion": "",
         "test": "FEASIBILITY",
         "limits": "[9.9999, 90.1111]",
-        "description": "No Description"
+        "description": "No description"
       }
     }
   },
