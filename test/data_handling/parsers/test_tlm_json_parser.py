@@ -927,7 +927,7 @@ def test_tlm_json_parser_parseTlmConfTxt_returns_tuple_of_4_expected_appended_li
     expected_labels = [fake_descriptor]
     expected_subsystem_assignments = [fake_subsystem_assignment]
     expected_mnemonic_tests = [[fake_test]]
-    expected_descriptions = ["No Description"]
+    expected_descriptions = ["No description"]
 
     forced_returns_str2lst = [fake_subsystem_assignment, fake_test]
 
