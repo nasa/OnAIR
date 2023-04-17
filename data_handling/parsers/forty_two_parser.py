@@ -107,7 +107,7 @@ class FortyTwo:
         return clean_frame
 
     def parse_config_data(self, configFile, ss_breakdown):
-        parsed_configs = extract_configs(self.metadata_filepath, [configFile])
+        parsed_configs = extract_configs(self.metadata_filepath, configFile)
         if ss_breakdown == False:
             num_elements = len(parsed_configs['subsystem_assignments'])
             parsed_configs['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]

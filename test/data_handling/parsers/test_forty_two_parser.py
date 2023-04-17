@@ -378,7 +378,7 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
     # Assert
     assert result == expected_result
     assert forty_two_parser.extract_configs.call_count == 1
-    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_config_file])
+    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, arg_config_file)
 
 def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is_false_and_number_of_subsystem_assignments_greater_than_one(mocker):
     # Arrange
@@ -411,7 +411,7 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
         
     # Assert
     assert result == expected_result
-    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_config_file])
+    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, arg_config_file)
 
 def test_FortyTwo_parse_config_data_returns_return_value_of_extract_configs_when_ss_breakdown_is_true(mocker):
     # Arrange
@@ -437,7 +437,7 @@ def test_FortyTwo_parse_config_data_returns_return_value_of_extract_configs_when
     # Assert
     assert result == forced_return_extract_configs
     assert forty_two_parser.extract_configs.call_count == 1
-    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_config_file])
+    assert forty_two_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, arg_config_file)
 
 # test for get_sim_data
 def test_FortyTwo_get_sim_data_returns_tuple_of_all_headers_and_sim_data_and_binning_configs_without_modifying_values():

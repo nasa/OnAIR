@@ -3,13 +3,10 @@ import os
 from data_handling.parsers.tlm_json_parser import parseTlmConfJson
 
 ## Method to extract configuration data and return 3 dictionaries
-def extract_configs(configFilePath, configFiles, csv = False):
-    if configFiles == []:
-        return {'subsystem_assignments' : {},
-                'test_assignments' : {},
-                'description_assignments' : {}}
+def extract_configs(configFilePath, configFile, csv = False):
+    assert configFile != ''
 
-    configs = parseTlmConfJson(configFilePath + configFiles[0])
+    configs = parseTlmConfJson(configFilePath + configFile)
 
     configs_len = len(configs['subsystem_assignments'])
 

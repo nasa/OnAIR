@@ -445,7 +445,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1
-    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_configFile])
+    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, arg_configFile)
     assert csv_parser.extract_configs.call_args_list[0].kwargs == {'csv': True}
     assert csv_parser.len.call_count == 0
     assert result == expected_result
@@ -474,7 +474,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1
-    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_configFile])
+    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, arg_configFile)
     assert csv_parser.extract_configs.call_args_list[0].kwargs == {'csv': True}
     assert csv_parser.len.call_count == 1
     assert csv_parser.len.call_args_list[0].args == (fake_empty_processed_filepath, )
@@ -510,7 +510,7 @@ def test_CSV_parse_config_data_CSV_returns_call_to_extract_configs_given_metadat
 
     # Assert
     assert csv_parser.extract_configs.call_count == 1
-    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, [arg_configFile])
+    assert csv_parser.extract_configs.call_args_list[0].args == (fake_metadata_filepath, arg_configFile)
     assert csv_parser.extract_configs.call_args_list[0].kwargs == {'csv': True}
     assert csv_parser.len.call_count == 1
     assert csv_parser.len.call_args_list[0].args == (fake_processed_filepath, )

@@ -5,26 +5,23 @@ import data_handling.parsers.parser_util as parser_util
 
 
 # extract_configs tests
-def test_parser_util_extract_configs_returns_empty_dicts_when_given_configFiles_is_vacant():
+def test_parser_util_extract_configs_raises_error_when_given_blank_configFile():
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = []
+    arg_configFile = ''
     arg_csv = MagicMock()
 
-    expected_result = {'subsystem_assignments' : {},
-                       'test_assignments' : {},
-                       'description_assignments' : {}}
-
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+    with pytest.raises(AssertionError) as e_info:
+        result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
-    assert result == expected_result
+    assert e_info.match('')
 
-def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile_and_configs_len_equal_to_zero(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configs_len_equal_to_zero(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = [MagicMock()]
+    arg_configFile = MagicMock()
     arg_csv = MagicMock()
 
     fake_subsystem_assignments = MagicMock()
@@ -41,20 +38,20 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     mocker.patch('data_handling.parsers.parser_util.str2lst')
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
-    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFile, )
     assert parser_util.len.call_count == 1
     assert parser_util.len.call_args_list[0].args == (fake_subsystem_assignments, )
     assert parser_util.str2lst.call_count == 0
     assert result == forced_return_parse_tlm
 
-def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile_and_configs_len_equal_to_one(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configs_len_equal_to_one(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = [MagicMock()]
+    arg_configFile = MagicMock()
     arg_csv = MagicMock()
 
     fake_subsystem_assignments = [MagicMock()]
@@ -76,19 +73,19 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     expected_result['description_assignments'] = fake_descs
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
-    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFile, )
     assert parser_util.str2lst.call_count == 1
     assert parser_util.str2lst.call_args_list[0].args == (fake_test_assign[0], )
     assert result == forced_return_parse_tlm
 
-def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile_and_len_configs_greater_than_one(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_configs_greater_than_one(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = [MagicMock()] 
+    arg_configFile = MagicMock()
     arg_csv = MagicMock()
 
     len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
@@ -111,19 +108,19 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     expected_result['description_assignments'] = fake_descs
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
-    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFile, )
     assert parser_util.str2lst.call_count == len_configs
     for i in range(len_configs):
         assert parser_util.str2lst.call_args_list[i].args == (fake_test_assign[0], )
     assert result == expected_result
-def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_one_cFile_and_len_configs_greater_than_one_and_NOOPs_contained_in_test_assigns(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_configs_greater_than_one_and_NOOPs_contained_in_test_assigns(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = [MagicMock()] 
+    arg_configFile = MagicMock() 
     arg_csv = MagicMock()
 
     len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
@@ -149,20 +146,20 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     expected_result['description_assignments'] = fake_descs
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
-    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFile, )
     assert parser_util.str2lst.call_count == len_configs - num_noops
     for i in range(len_configs - num_noops):
         assert parser_util.str2lst.call_args_list[i].args == (fake_test_assign, )
     assert result == expected_result
 
-def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_configFiles_greater_than_one_and_len_configs_greater_than_one_and_len_test_assigns_greater_than_one(mocker):
+def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_configs_greater_than_one_and_len_test_assigns_greater_than_one(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = [MagicMock()] 
+    arg_configFile = MagicMock()
     arg_csv = MagicMock()
 
     len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
@@ -198,11 +195,11 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
             expected_str2lst_args.append(fake_tests[i][0])
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
-    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFile, )
     assert parser_util.str2lst.call_count == len_configs
     for i in range(len_configs):
         assert parser_util.str2lst.call_args_list[i].args == (expected_str2lst_args[i], )
@@ -211,11 +208,8 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
 def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_cFile_and_len_configs_less_than_two(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = [] 
+    arg_configFile = MagicMock()
     arg_csv = MagicMock()
-
-    num_fake_cFiles = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
-    [arg_configFiles.append(MagicMock()) for i in range(num_fake_cFiles)]
 
     len_configs = pytest.gen.randint(0, 1) # arbitrary, from 0 to 1
     fake_subsystem_assignments = [MagicMock()] * len_configs
@@ -242,11 +236,11 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     expected_result['description_assignments'] = fake_descs
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
-    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFile, )
     assert parser_util.str2lst.call_count == len_configs
     for i in range(len_configs):
         assert parser_util.str2lst.call_args_list[i].args == (fake_tests_copy[i][0], )
@@ -255,11 +249,8 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
 def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFiles_has_many_cFile_and_len_configs_greater_than_one(mocker):
     # Arrange
     arg_configFilePath = MagicMock()
-    arg_configFiles = [] 
+    arg_configFile = MagicMock()
     arg_csv = MagicMock()
-
-    num_fake_cFiles = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
-    [arg_configFiles.append(MagicMock()) for i in range(num_fake_cFiles)]
 
     len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
     fake_subsystem_assignments = [MagicMock()] * len_configs
@@ -286,11 +277,11 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     expected_result['description_assignments'] = fake_descs
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFiles, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
-    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFiles[0], )
+    assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFile, )
     assert parser_util.str2lst.call_count == len_configs
     for i in range(len_configs):
         assert parser_util.str2lst.call_args_list[i].args == (fake_tests_copy[i][0], )
