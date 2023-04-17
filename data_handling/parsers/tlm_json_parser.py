@@ -16,9 +16,9 @@ def parseTlmConfJson(file_path):
         subsys = reorg_data[label]['subsystem']
         temp = str2lst(reorg_data[label]['limits'])
         if temp == []:
-            mnemonics = [reorg_data[label]['tests']]
+            mnemonics = [reorg_data[label]['test']]
         else:
-            mnemonics = [reorg_data[label]['tests'], reorg_data[label]['limits']]
+            mnemonics = [reorg_data[label]['test'], reorg_data[label]['limits']]
         desc = reorg_data[label]['description']
         
         labels.append(label)
@@ -53,27 +53,10 @@ def reorganizeTlmDict(data):
     processed_data = {}
     
     for s in data['subsystems']:
-        for app in data['subsystems'][s]:
-            app_data = reorganizeTlmDictRecursiveStep(app, s, data['subsystems'][s][app])
-            processed_data.update(app_data)
+        for label in data['subsystems'][s]:
+            processed_data[label] = data['subsystems'][s][label]
+            processed_data[label]['subsystem'] = s
     
-    return processed_data
-
-# recursive helper function for reorganizeTlmDict
-def reorganizeTlmDictRecursiveStep(label, subsys, data):    
-    if 'description' in data:
-        ret_data = {label: {}}
-        ret_data[label]['subsystem'] = subsys
-        ret_data[label]['tests'] = data['test']
-        ret_data[label]['limits'] = data['limits']
-        ret_data[label]['description'] = data['description']
-        return ret_data
-    
-    processed_data = {}
-    for elem in data:
-        ret = reorganizeTlmDictRecursiveStep(f'{label}.{elem}', subsys, data[elem])
-        processed_data.update(ret)
-
     return processed_data
 
 def str2lst(string):
