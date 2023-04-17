@@ -136,14 +136,15 @@ def getJsonData(label, mnemonics, description):
     if label == 'TIME':
         return {label : {'conversion' : '', 'test' : str(mnemonics[0]), 'limits' : '[]', 'description' : str(description)}}
     
-    attributes = label.split('.')
-    num_attr = len(attributes)
+    # attributes = label.split('.')
+    # num_attr = len(attributes)
     test_attr = mnemonics[0][0]
     limits_attr = mnemonics[0][1:]
-    json_data = {attributes[num_attr-1] : {'conversion' : '', 'test' : str(test_attr), 'limits' : str(limits_attr), 'description' : str(description)}}
+    json_data = {label : {'conversion' : '', 'test' : str(test_attr), 'limits' : str(limits_attr), 'description' : str(description)}}
+    # json_data = {attributes[num_attr-1] : {'conversion' : '', 'test' : str(test_attr), 'limits' : str(limits_attr), 'description' : str(description)}}
     
-    for attr in reversed(attributes[:num_attr-1]):
-        json_data = {attr : json_data}
+    # for attr in reversed(attributes[:num_attr-1]):
+        # json_data = {attr : json_data}
     
     return json_data
 
@@ -200,3 +201,7 @@ def mergeDicts(dict1, dict2):
             mergeDicts(dict1[key], dict2[key])
         else:
             dict1[key] = dict2[key]
+
+# convertTlmToJson('42_TLM_CONFIG.txt', '42_TLM_CONFIG.json')
+# convertTlmToJson('adapter_TLM_CONFIG.txt', 'adapter_TLM_CONFIG.json')
+# convertTlmToJson('data_physics_generation_CONFIG.txt', 'data_physics_generation_CONFIG.json')

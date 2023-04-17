@@ -10,97 +10,81 @@
       }
     },
     "GNC": {
-      "SAMPLE": {
-        "sample_data_tlm_t": {
-          "sample_data_counter": {
-            "conversion": "",
-            "test": "FEASIBILITY",
-            "limits": "[-1.0, 0.0, 10.0, 15.0]",
-            "description": "No description"
-          },
-          "sample_data_value": {
-            "conversion": "",
-            "test": "NOOP",
-            "limits": "[]",
-            "description": "No description"
-          }
-        },
-        "sample_data_gps_t": {
-          "sample_data_counter": {
-            "conversion": "",
-            "test": "FEASIBILITY",
-            "limits": "[-1.0, 0.0, 10.0, 15.0]",
-            "description": "No description"
-          },
-          "sample_data_lat": {
-            "conversion": "",
-            "test": "NOOP",
-            "limits": "[]",
-            "description": "No description"
-          },
-          "sample_data_lng": {
-            "conversion": "",
-            "test": "NOOP",
-            "limits": "[]",
-            "description": "No description"
-          },
-          "sample_data_alt": {
-            "conversion": "",
-            "test": "NOOP",
-            "limits": "[]",
-            "description": "No description"
-          }
-        }
+      "SAMPLE.sample_data_tlm_t.sample_data_counter": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[-1.0, 0.0, 10.0, 15.0]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_tlm_t.sample_data_value": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "[]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_gps_t.sample_data_counter": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[-1.0, 0.0, 10.0, 15.0]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_gps_t.sample_data_lat": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "[]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_gps_t.sample_data_lng": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "[]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_gps_t.sample_data_alt": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "[]",
+        "description": "No description"
       }
     },
     "POWER": {
-      "SAMPLE": {
-        "sample_data_power_t": {
-          "sample_data_counter": {
-            "conversion": "",
-            "test": "FEASIBILITY",
-            "limits": "[-1.0, 0.0, 10.0, 15.0]",
-            "description": "No description"
-          },
-          "sample_data_voltage": {
-            "conversion": "",
-            "test": "NOOP",
-            "limits": "[]",
-            "description": "No description"
-          },
-          "sample_data_current": {
-            "conversion": "",
-            "test": "NOOP",
-            "limits": "[]",
-            "description": "No description"
-          }
-        }
+      "SAMPLE.sample_data_power_t.sample_data_counter": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[-1.0, 0.0, 10.0, 15.0]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_power_t.sample_data_voltage": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "[]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_power_t.sample_data_current": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "[]",
+        "description": "No description"
       }
     },
     "THERMAL": {
-      "SAMPLE": {
-        "sample_data_thermal_t": {
-          "sample_data_counter": {
-            "conversion": "",
-            "test": "FEASIBILITY",
-            "limits": "[-1.0, 0.0, 10.0, 15.0]",
-            "description": "No description"
-          },
-          "sample_data_external_temp": {
-            "conversion": "",
-            "test": "NOOP",
-            "limits": "[]",
-            "description": "No description"
-          }
-        },
-        "sample_data_thernal_t": {
-          "sample_data_internal_temp": {
-            "conversion": "",
-            "test": "NOOP",
-            "limits": "[]",
-            "description": "No description"
-          }
-        }
+      "SAMPLE.sample_data_thermal_t.sample_data_counter": {
+        "conversion": "",
+        "test": "FEASIBILITY",
+        "limits": "[-1.0, 0.0, 10.0, 15.0]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_thernal_t.sample_data_internal_temp": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "[]",
+        "description": "No description"
+      },
+      "SAMPLE.sample_data_thermal_t.sample_data_external_temp": {
+        "conversion": "",
+        "test": "NOOP",
+        "limits": "[]",
+        "description": "No description"
       }
     }
   },

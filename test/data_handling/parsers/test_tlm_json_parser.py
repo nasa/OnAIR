@@ -841,7 +841,7 @@ def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_equals_TIM
     # Assert
     assert result == expected_result
 
-def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_is_not_split_by_period():
+def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_is_not_TIME():
     # Arrange
     fake_test = MagicMock()
     num_limits = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
@@ -854,35 +854,6 @@ def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_is_not_spl
     arg_description = MagicMock()
 
     expected_result = {arg_label : {'conversion' : '', 'test' : str(fake_test), 'limits' : str([fake_limits]), 'description' : str(arg_description)}}
-
-    # Act
-    result = tlm_parser.getJsonData(arg_label, arg_mnemonics, arg_description)
-
-    # Assert
-    assert result == expected_result
-
-def test_tlm_json_parser_getJsonData_returns_expected_data_when_label_is_split_by_period():
-    # Arrange
-    fake_test = MagicMock()
-    num_limits = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
-    fake_limits = [MagicMock()] * num_limits
-
-    arg_mnemonics = [fake_test]
-    arg_mnemonics.append(fake_limits)
-    arg_mnemonics = [arg_mnemonics]
-    arg_description = MagicMock()
-    num_label_splits = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
-
-    label_list = [str(MagicMock())]
-    arg_label = label_list[0]
-    for i in range(num_label_splits):
-        label = str(MagicMock())
-        arg_label = label + '.' + arg_label
-        label_list.append(label)
-
-    expected_result = {'conversion' : '', 'test' : str(fake_test), 'limits' : str([fake_limits]), 'description' : str(arg_description)}
-    for label in label_list:
-        expected_result = {label : expected_result}
 
     # Act
     result = tlm_parser.getJsonData(arg_label, arg_mnemonics, arg_description)
