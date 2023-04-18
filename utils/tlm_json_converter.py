@@ -1,6 +1,6 @@
 import orjson
 import os
-from data_handling.parsers.tlm_json_parser import str2lst
+import ast
 
 # Functions for converting old configs to new format
 
@@ -112,6 +112,12 @@ def writeToJson(path, data):
 
     file.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
     file.close()
+
+def str2lst(string):
+    try:
+        return ast.literal_eval(string)
+    except:
+        print("Unable to process string representation of list")
 
 # convertTlmToJson('42_TLM_CONFIG.txt', '42_TLM_CONFIG.json')
 # convertTlmToJson('adapter_TLM_CONFIG.txt', 'adapter_TLM_CONFIG.json')

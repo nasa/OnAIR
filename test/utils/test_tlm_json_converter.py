@@ -1,7 +1,7 @@
 """ Test TLM Json Converter Functionality """
 import pytest
 from mock import MagicMock
-import data_handling.parsers.tlm_json_converter as tlm_converter
+import utils.tlm_json_converter as tlm_converter
 
 # ----- Tests for conversion functions -----
 
@@ -18,10 +18,10 @@ def test_tlm_json_converter_convertTlmToJson_calls_expected_functions_with_expec
     forced_return_parse_tlm_conf = MagicMock()
     forced_return_convert_tlm_to_json = MagicMock()
 
-    mocker.patch('data_handling.parsers.tlm_json_converter.getConfigPath', side_effect=side_effect_list_get_config_path)
-    mocker.patch('data_handling.parsers.tlm_json_converter.parseTlmConfTxt', return_value=forced_return_parse_tlm_conf)
-    mocker.patch('data_handling.parsers.tlm_json_converter.convertTlmDictToJsonDict', return_value=forced_return_convert_tlm_to_json)
-    mocker.patch('data_handling.parsers.tlm_json_converter.writeToJson')
+    mocker.patch('utils.tlm_json_converter.getConfigPath', side_effect=side_effect_list_get_config_path)
+    mocker.patch('utils.tlm_json_converter.parseTlmConfTxt', return_value=forced_return_parse_tlm_conf)
+    mocker.patch('utils.tlm_json_converter.convertTlmDictToJsonDict', return_value=forced_return_convert_tlm_to_json)
+    mocker.patch('utils.tlm_json_converter.writeToJson')
 
     # Act
     tlm_converter.convertTlmToJson(arg_tlm, arg_json)
@@ -49,7 +49,7 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_returns_expected_dict_with_
 
     expected_result = {'subsystems' : {'NONE' : {}}, 'order' : []}
 
-    mocker.patch('data_handling.parsers.tlm_json_converter.getJsonData')
+    mocker.patch('utils.tlm_json_converter.getJsonData')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -142,8 +142,8 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_returns_expected_dict_when_
     expected_result = {'subsystems' : {'NONE' : {}}, 'order' : [fake_labels[0]]}
 
     forced_return_get_json_data = MagicMock()
-    mocker.patch('data_handling.parsers.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
-    mocker.patch('data_handling.parsers.tlm_json_converter.mergeDicts')
+    mocker.patch('utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('utils.tlm_json_converter.mergeDicts')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -167,8 +167,8 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_calls_mergeDicts_and_return
     expected_result = {'subsystems' : {'NONE' : {}, fake_subsys_assigns[0][0] : {}}, 'order' : [fake_labels[0]]}
 
     forced_return_get_json_data = MagicMock()
-    mocker.patch('data_handling.parsers.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
-    mocker.patch('data_handling.parsers.tlm_json_converter.mergeDicts')
+    mocker.patch('utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('utils.tlm_json_converter.mergeDicts')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -202,8 +202,8 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_calls_mergeDicts_and_return
     expected_result['order'] = fake_labels
 
     forced_return_get_json_data = MagicMock()
-    mocker.patch('data_handling.parsers.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
-    mocker.patch('data_handling.parsers.tlm_json_converter.mergeDicts')
+    mocker.patch('utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('utils.tlm_json_converter.mergeDicts')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -243,8 +243,8 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_calls_mergeDicts_and_return
     expected_result['order'] = fake_labels
 
     forced_return_get_json_data = MagicMock()
-    mocker.patch('data_handling.parsers.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
-    mocker.patch('data_handling.parsers.tlm_json_converter.mergeDicts')
+    mocker.patch('utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('utils.tlm_json_converter.mergeDicts')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -302,7 +302,7 @@ def test_tlm_json_converter_parseTlmConfTxt_returns_tuple_of_empty_lists_when_da
     fake_descriptor_file = MagicMock()
     fake_data_str = ''
 
-    mocker.patch('data_handling.parsers.tlm_json_converter.open', return_value=fake_descriptor_file)
+    mocker.patch('utils.tlm_json_converter.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
     
@@ -335,10 +335,10 @@ def test_tlm_json_converter_parseTlmConfTxt_returns_tuple_of_4_expected_appended
 
     forced_returns_str2lst = [fake_subsystem_assignment, fake_test]
 
-    mocker.patch('data_handling.parsers.tlm_json_converter.open', return_value=fake_descriptor_file)
+    mocker.patch('utils.tlm_json_converter.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('data_handling.parsers.tlm_json_converter.str2lst', side_effect=forced_returns_str2lst)
+    mocker.patch('utils.tlm_json_converter.str2lst', side_effect=forced_returns_str2lst)
     
     # Act
     result = tlm_converter.parseTlmConfTxt(arg_configFilePath)
@@ -375,10 +375,10 @@ def test_tlm_json_converter_parseTlmConfTxt_returns_tuple_of_4_expected_appended
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test, fake_test2]
 
-    mocker.patch('data_handling.parsers.tlm_json_converter.open', return_value=fake_descriptor_file)
+    mocker.patch('utils.tlm_json_converter.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('data_handling.parsers.tlm_json_converter.str2lst', side_effect=forced_returns_literal_eval)
+    mocker.patch('utils.tlm_json_converter.str2lst', side_effect=forced_returns_literal_eval)
     
     # Act
     result = tlm_converter.parseTlmConfTxt(arg_configFilePath)
@@ -423,10 +423,10 @@ def test_tlm_json_converter_parseTlmConfTxt_returns_tuple_of_4_expected_appended
     expected_mnemonic_tests = [[fake_test]] * num_fake_dataPts
     expected_descriptions = [fake_description] * num_fake_dataPts
 
-    mocker.patch('data_handling.parsers.tlm_json_converter.open', return_value=fake_descriptor_file)
+    mocker.patch('utils.tlm_json_converter.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('data_handling.parsers.tlm_json_converter.str2lst', side_effect=forced_returns_str2lst)
+    mocker.patch('utils.tlm_json_converter.str2lst', side_effect=forced_returns_str2lst)
     
     # Act
     result = tlm_converter.parseTlmConfTxt(arg_configFilePath)
@@ -453,9 +453,9 @@ def test_tlm_json_converter_getConfigPath_uses_os_functions_to_find_file_path(mo
 
     arg_file_name = MagicMock()
 
-    mocker.patch('data_handling.parsers.tlm_json_converter.__file__', fake__file__)
-    mocker.patch('data_handling.parsers.tlm_json_converter.os.path.dirname', return_value=fake_parent_dir)
-    mocker.patch('data_handling.parsers.tlm_json_converter.os.path.join', side_effect=[fake_data_dir, fake_configs_dir, fake_file_path])
+    mocker.patch('utils.tlm_json_converter.__file__', fake__file__)
+    mocker.patch('utils.tlm_json_converter.os.path.dirname', return_value=fake_parent_dir)
+    mocker.patch('utils.tlm_json_converter.os.path.join', side_effect=[fake_data_dir, fake_configs_dir, fake_file_path])
 
     # Act
     result = tlm_converter.getConfigPath(arg_file_name)
@@ -617,9 +617,9 @@ def test_tlm_json_converter_writeJson_opens_given_path_and_writes_data_using_orj
     fake_file = MagicMock()
     fake_json_data = MagicMock()
 
-    mocker.patch('data_handling.parsers.tlm_json_converter.open', return_value=fake_file)
+    mocker.patch('utils.tlm_json_converter.open', return_value=fake_file)
     mocker.patch.object(fake_file, 'write')
-    mocker.patch('data_handling.parsers.tlm_json_converter.orjson.dumps', return_value=fake_json_data)
+    mocker.patch('utils.tlm_json_converter.orjson.dumps', return_value=fake_json_data)
     mocker.patch.object(fake_file, 'close')
 
     # Act
@@ -634,3 +634,37 @@ def test_tlm_json_converter_writeJson_opens_given_path_and_writes_data_using_orj
     assert fake_file.write.call_count == 1
     assert fake_file.write.call_args_list[0].args == (fake_json_data, )
     assert fake_file.close.call_count == 1
+
+# str2lst tests
+def test_tlm_json_converter_str2lst_returns_call_to_ast_literal_eval_which_receive_given_string(mocker):
+    # Arrange
+    arg_string = str(MagicMock())
+
+    expected_result = MagicMock()
+    
+    mocker.patch('utils.tlm_json_converter.ast.literal_eval', return_value=expected_result)
+
+    # Act
+    result = tlm_converter.str2lst(arg_string)
+
+    # Assert
+    assert tlm_converter.ast.literal_eval.call_count == 1
+    assert tlm_converter.ast.literal_eval.call_args_list[0].args == (arg_string, )
+    assert result == expected_result
+
+def test_tlm_json_converter_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_raises_exception(mocker):
+    # Arrange
+    arg_string = str(MagicMock())
+    
+    mocker.patch('utils.tlm_json_converter.ast.literal_eval', side_effect=Exception)
+    mocker.patch('utils.tlm_json_converter.print')
+    
+    # Act
+    result = tlm_converter.str2lst(arg_string)
+
+    # Assert
+    assert tlm_converter.ast.literal_eval.call_count == 1
+    assert tlm_converter.ast.literal_eval.call_args_list[0].args == (arg_string, )
+    assert tlm_converter.print.call_count == 1
+    assert tlm_converter.print.call_args_list[0].args == ("Unable to process string representation of list", )
+    assert result == None
