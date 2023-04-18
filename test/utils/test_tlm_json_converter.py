@@ -462,10 +462,9 @@ def test_tlm_json_converter_getConfigPath_uses_os_functions_to_find_file_path(mo
 
     # Assert
     assert result == fake_file_path
-    assert tlm_converter.os.path.dirname.call_count == 3
+    assert tlm_converter.os.path.dirname.call_count == 2
     assert tlm_converter.os.path.dirname.call_args_list[0].args == (fake__file__, )
     assert tlm_converter.os.path.dirname.call_args_list[1].args == (fake_parent_dir, )
-    assert tlm_converter.os.path.dirname.call_args_list[2].args == (fake_parent_dir, )
     assert tlm_converter.os.path.join.call_count == 3
     assert tlm_converter.os.path.join.call_args_list[0].args == (fake_parent_dir, 'data')
     assert tlm_converter.os.path.join.call_args_list[1].args == (fake_data_dir, 'telemetry_configs')

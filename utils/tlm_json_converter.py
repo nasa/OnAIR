@@ -1,6 +1,7 @@
 import orjson
 import os
 import ast
+import argparse
 
 # Functions for converting old configs to new format
 
@@ -90,7 +91,7 @@ def parseTlmConfTxt(file_path):
 # helper function to get path to config file
 def getConfigPath(file_name):
     parent_dir = __file__
-    for i in range(3):
+    for i in range(2):
         parent_dir = os.path.dirname(parent_dir)
     data_dir = os.path.join(parent_dir, 'data')
     configs_dir = os.path.join(data_dir, 'telemetry_configs')
@@ -119,6 +120,17 @@ def str2lst(string):
     except:
         print("Unable to process string representation of list")
 
-# convertTlmToJson('42_TLM_CONFIG.txt', '42_TLM_CONFIG.json')
-# convertTlmToJson('adapter_TLM_CONFIG.txt', 'adapter_TLM_CONFIG.json')
-# convertTlmToJson('data_physics_generation_CONFIG.txt', 'data_physics_generation_CONFIG.json')
+def main():
+    arg_parser = argparse.ArgumentParser(description='')
+    arg_parser.add_argument('text_config', nargs='?', help='Config file to be converted')
+    arg_parser.add_argument('json_config', nargs='?', help='Config file to be written to')
+    args = arg_parser.parse_args()
+    
+    convertTlmToJson(args.text_config, args.json_config)
+    # try:
+    #     convertTlmToJson(str(args.text_config), str(args.json_config))
+    # except:
+    #     print ('failed to convert file to json')
+
+if __name__ == '__main__':
+    main()
