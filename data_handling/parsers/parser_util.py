@@ -1,6 +1,6 @@
 import ast
 import os
-from data_handling.parsers.tlm_json_parser import parseTlmConfJson
+from data_handling.parsers.tlm_json_parser import parseTlmConfJson, str2lst
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFile, csv = False):
@@ -24,13 +24,6 @@ def extract_configs(configFilePath, configFile, csv = False):
         configs['test_assignments'][i] = [test_assign]
 
     return configs
-
-def str2lst(string):
-    try:
-        return ast.literal_eval(string)
-    except:
-        print("Unable to process string representation of list")
-        # return string
         
 def process_filepath(path, return_config=False, csv = False):
     if csv:
