@@ -11,7 +11,10 @@ def extract_configs(configFilePath, configFile, csv = False):
     configs_len = len(configs['subsystem_assignments'])
 
     for i in range(configs_len):
-        configs['subsystem_assignments'][i] = [configs['subsystem_assignments'][i]]
+        if configs['subsystem_assignments'][i] != 'NONE':
+            configs['subsystem_assignments'][i] = [configs['subsystem_assignments'][i]]
+        else:
+            configs['subsystem_assignments'][i] = []
 
         test_assign = configs['test_assignments'][i]
         if len(test_assign) > 1:
