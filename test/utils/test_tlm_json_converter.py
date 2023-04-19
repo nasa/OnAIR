@@ -667,3 +667,68 @@ def test_tlm_json_converter_str2lst_prints_message_when_ast_literal_eval_receive
     assert tlm_converter.print.call_count == 1
     assert tlm_converter.print.call_args_list[0].args == ("Unable to process string representation of list", )
     assert result == None
+
+def test_tlm_json_converter_main_trys_to_call_convertTlmToJson_with_parsed_args_and_does_not_print_error_msg_on_success(mocker):
+    # Arrange
+    fake_text_file = MagicMock()
+    fake_json_file = MagicMock()
+    fake_arg_parser = MagicMock()
+    fake_args = MagicMock()
+
+    mocker.patch('utils.tlm_json_converter.argparse.ArgumentParser', return_value=fake_arg_parser)
+    mocker.patch.object(fake_arg_parser, 'add_argument')
+    mocker.patch.object(fake_arg_parser, 'parse_args', return_value=fake_args)
+    mocker.patch.object(fake_args, 'text_config', fake_text_file)
+    mocker.patch.object(fake_args, 'json_config', fake_json_file)
+    mocker.patch('utils.tlm_json_converter.convertTlmToJson')
+    mocker.patch('utils.tlm_json_converter.print')
+
+    # Act
+    tlm_converter.main()
+
+    # Assert
+    assert tlm_converter.argparse.ArgumentParser.call_count == 1
+    assert tlm_converter.argparse.ArgumentParser.call_args_list[0].kwargs == {'description' : ''}
+    assert fake_arg_parser.add_argument.call_count == 2
+    assert fake_arg_parser.add_argument.call_args_list[0].args == ('text_config', )
+    assert fake_arg_parser.add_argument.call_args_list[0].kwargs == {'nargs' : '?', 'help' : 'Config file to be converted'}
+    assert fake_arg_parser.add_argument.call_args_list[1].args == ('json_config', )
+    assert fake_arg_parser.add_argument.call_args_list[1].kwargs == {'nargs' : '?', 'help' : 'Config file to be written to'}
+    assert tlm_converter.convertTlmToJson.call_count == 1
+    assert tlm_converter.convertTlmToJson.call_args_list[0].args == (fake_text_file, fake_json_file)
+    assert tlm_converter.print.call_count == 0
+
+def testtest_tlm_json_converter_main_prints_error_msg_when_call_to_convertTlmToJson_raises_error(mocker):
+    # Arrange
+    fake_text_file = MagicMock()
+    fake_json_file = MagicMock()
+    fake_arg_parser = MagicMock()
+    fake_args = MagicMock()
+
+    fake_error = Exception('')
+
+    mocker.patch('utils.tlm_json_converter.argparse.ArgumentParser', return_value=fake_arg_parser)
+    mocker.patch.object(fake_arg_parser, 'add_argument')
+    mocker.patch.object(fake_arg_parser, 'parse_args', return_value=fake_args)
+    mocker.patch.object(fake_args, 'text_config', fake_text_file)
+    mocker.patch.object(fake_args, 'json_config', fake_json_file)
+    mocker.patch('utils.tlm_json_converter.convertTlmToJson', side_effect=fake_error)
+    mocker.patch('utils.tlm_json_converter.print')
+
+    expected_print_msg = 'failed to convert file to json'
+
+    # Act
+    tlm_converter.main()
+
+    # Assert
+    assert tlm_converter.argparse.ArgumentParser.call_count == 1
+    assert tlm_converter.argparse.ArgumentParser.call_args_list[0].kwargs == {'description' : ''}
+    assert fake_arg_parser.add_argument.call_count == 2
+    assert fake_arg_parser.add_argument.call_args_list[0].args == ('text_config', )
+    assert fake_arg_parser.add_argument.call_args_list[0].kwargs == {'nargs' : '?', 'help' : 'Config file to be converted'}
+    assert fake_arg_parser.add_argument.call_args_list[1].args == ('json_config', )
+    assert fake_arg_parser.add_argument.call_args_list[1].kwargs == {'nargs' : '?', 'help' : 'Config file to be written to'}
+    assert tlm_converter.convertTlmToJson.call_count == 1
+    assert tlm_converter.convertTlmToJson.call_args_list[0].args == (fake_text_file, fake_json_file)
+    assert tlm_converter.print.call_count == 1
+    assert tlm_converter.print.call_args_list[0].args == (expected_print_msg, )

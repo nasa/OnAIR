@@ -126,11 +126,10 @@ def main():
     arg_parser.add_argument('json_config', nargs='?', help='Config file to be written to')
     args = arg_parser.parse_args()
     
-    convertTlmToJson(args.text_config, args.json_config)
-    # try:
-    #     convertTlmToJson(str(args.text_config), str(args.json_config))
-    # except:
-    #     print ('failed to convert file to json')
+    try:
+        convertTlmToJson(args.text_config, args.json_config)
+    except:
+        print ('failed to convert file to json')
 
 if __name__ == '__main__':
     main()
