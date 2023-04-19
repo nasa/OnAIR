@@ -131,5 +131,8 @@ def main():
     except:
         print ('failed to convert file to json')
 
-if __name__ == '__main__':
-    main()
+def init():
+    if __name__ == '__main__':
+        main()
+
+init()

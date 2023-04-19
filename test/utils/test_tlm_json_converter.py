@@ -668,6 +668,7 @@ def test_tlm_json_converter_str2lst_prints_message_when_ast_literal_eval_receive
     assert tlm_converter.print.call_args_list[0].args == ("Unable to process string representation of list", )
     assert result == None
 
+# main tests
 def test_tlm_json_converter_main_trys_to_call_convertTlmToJson_with_parsed_args_and_does_not_print_error_msg_on_success(mocker):
     # Arrange
     fake_text_file = MagicMock()
@@ -732,3 +733,25 @@ def testtest_tlm_json_converter_main_prints_error_msg_when_call_to_convertTlmToJ
     assert tlm_converter.convertTlmToJson.call_args_list[0].args == (fake_text_file, fake_json_file)
     assert tlm_converter.print.call_count == 1
     assert tlm_converter.print.call_args_list[0].args == (expected_print_msg, )
+
+# init tests
+def testtest_tlm_json_converter_init_calls_main_when__name__equals__main__(mocker):
+    # Arrange
+    mocker.patch('utils.tlm_json_converter.main')
+    mocker.patch('utils.tlm_json_converter.__name__', '__main__')
+
+    # Act
+    tlm_converter.init()
+
+    # Assert
+    assert tlm_converter.main.call_count == 1
+
+def testtest_tlm_json_converter_init_does_not_call_main_when__name__does_not_equal__main__(mocker):
+    # Arrange
+    mocker.patch('utils.tlm_json_converter.main')
+
+    # Act
+    tlm_converter.init()
+
+    # Assert
+    assert tlm_converter.main.call_count == 0
