@@ -60,20 +60,27 @@ class TimeSynchronizer:
         sorted_data = []
 
         for time in total_times:
-            num_unclean_hdrs = len(self.indices_to_remove) + len(self.ordered_fused_headers) - 1 # unclean list, remove one of the added 'TIME' in clean
-            clean_array_of_data = ['-']*num_unclean_hdrs
-            for source in dataFrames[time].keys():
-                index_offset = self.offsets[source]
-                data = dataFrames[time][source]
-                for datum_index in range(len(data)):
-                    clean_array_of_data[datum_index + index_offset] = data[datum_index]
-
-            self.remove_time_datapoints(clean_array_of_data, copy.deepcopy(self.indices_to_remove))
-            clean_array_of_data.insert(0, time)
-            sorted_data.append(clean_array_of_data)
+            clean_data_array = self.initialize_clean_data_array(dataFrames, time)
+            sorted_data.append(clean_data_array)
 
         self.sim_data = sorted_data
 
+    def initialize_clean_data_array(self, dataFrames, time):
+        num_unclean_hdrs = len(self.indices_to_remove) + len(self.ordered_fused_headers) - 1 # unclean list, remove one of the added 'TIME' in clean
+        clean_data_array = ['-']*num_unclean_hdrs
+        for source in dataFrames[time].keys():
+            index_offset = self.offsets[source]
+            data = dataFrames[time][source]
+            self.copy_to_with_offset(clean_data_array, data, index_offset)
+
+        self.remove_time_datapoints(clean_data_array, copy.deepcopy(self.indices_to_remove))
+        clean_data_array.insert(0, time)
+
+        return clean_data_array
+    
+    def copy_to_with_offset(self, dest_array, src_array, offset):
+        for datum_index in range(len(src_array)):
+            dest_array[datum_index + offset] = src_array[datum_index]
 
     def remove_time_headers(self, hdrs_list):
         indices = []

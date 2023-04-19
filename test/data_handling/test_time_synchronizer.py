@@ -190,213 +190,232 @@ def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_empty_list_when_gi
     # Assert
     assert cut.sim_data == []
 
-def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_item_list_that_is_set_to_only_key_in_given_dataFrames_when_given_dataFrames_is_single_key_value_pair_and_len_indices_to_remove_is_0_and_len_ordered_fused_headers_is_1(mocker):
+def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_return_from_initialize_clean_data_array_when_arg_dataFrames_contains_one_element(mocker):
     # Arrange
     fake_dataFrame_key = MagicMock()
-    fake_data_key = MagicMock()
-    arg_dataFrames = {fake_dataFrame_key:{fake_data_key:[]}}
+    fake_data = MagicMock()
+    fake_clean_data_array = MagicMock()
 
-    fake_deep_copy = MagicMock()
-
-    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+    arg_dataFrames = {fake_dataFrame_key:fake_data}
 
     cut = TimeSynchronizer.__new__(TimeSynchronizer)
-    # NOTE: this accessed item in the cut helps set num_sources, but that is an usued variable that should be removed, after it is setting cut.ordered_sources no longer needs to be done
-    cut.ordered_sources = MagicMock()
-    cut.indices_to_remove = []
-    cut.ordered_fused_headers = [MagicMock()]
-    fake_offset = 0 # arbitrary 0
-    cut.offsets = {fake_data_key:fake_offset}
 
-    # NOTE: verify_clean_array_before_alteration is necessary because in the Assert phase of test the value passed in is altered afterwards by the cut and cannot be verified as sent in the state checked here
-    def verify_clean_array_before_alteration(data, indices_to_remove):
-        assert data == []
-        assert indices_to_remove == fake_deep_copy
-
-    mocker.patch.object(cut, 'remove_time_datapoints', side_effect=verify_clean_array_before_alteration)
+    mocker.patch.object(cut, 'initialize_clean_data_array', return_value=fake_clean_data_array)
 
     # Act
     cut.sort_data(arg_dataFrames)
 
     # Assert
-    assert len(cut.indices_to_remove) == 0
-    assert len(cut.ordered_fused_headers) == 1
-    assert time_synchronizer.copy.deepcopy.call_count == 1
-    assert time_synchronizer.copy.deepcopy.call_args_list[0].args == (cut.indices_to_remove, )
-    assert cut.remove_time_datapoints.call_count == 1
-    #assert cut.remove_time_datapoints.call_args_list[0].args == ([], fake_deep_copy), does not work due to first item alteration
-    assert cut.sim_data == [[fake_dataFrame_key]]
+    assert cut.initialize_clean_data_array.call_count == 1
+    assert cut.initialize_clean_data_array.call_args_list[0].args == (arg_dataFrames, fake_dataFrame_key)
+    assert cut.sim_data == [fake_clean_data_array]
 
-def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_item_list_that_is_set_to_only_key_in_given_dataFrames_when_given_dataFrames_is_single_key_value_pair_and_len_indices_to_remove_is_1_and_len_ordered_fused_headers_is_0(mocker):
+def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_returns_from_initialize_clean_data_array_when_arg_dataFrames_contains_multiple_elements(mocker):
     # Arrange
-    fake_dataFrame_key = MagicMock()
-    fake_data_key = MagicMock()
-    arg_dataFrames = {fake_dataFrame_key:{fake_data_key:[]}}
-
-    fake_deep_copy = MagicMock()
-
-    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+    num_elems = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
+    expected_dataFrame_keys = []
+    fake_clean_data_arrays = []
+    arg_dataFrames = {}
+    for i in range(num_elems):
+        key = str(MagicMock())
+        data = MagicMock()
+        clean_data_array = MagicMock()
+        expected_dataFrame_keys.append(key)
+        fake_clean_data_arrays.append(clean_data_array)
+        arg_dataFrames[key] = data
+    expected_dataFrame_keys.sort()
 
     cut = TimeSynchronizer.__new__(TimeSynchronizer)
-    # NOTE: this accessed item in the cut helps set num_sources, but that is an usued variable that should be removed, after it is setting cut.ordered_sources no longer needs to be done
-    cut.ordered_sources = MagicMock()
-    cut.indices_to_remove = [MagicMock()]
-    cut.ordered_fused_headers = []
-    fake_offset = 0 # arbitrary 0
-    cut.offsets = {fake_data_key:fake_offset}
 
-    # NOTE: verify_clean_array_before_alteration is necessary because in the Assert phase of test the value passed in is altered afterwards by the cut and cannot be verified as sent in the state checked here
-    def verify_clean_array_before_alteration(data, indices_to_remove):
-        assert data == []
-        assert indices_to_remove == fake_deep_copy
-
-    mocker.patch.object(cut, 'remove_time_datapoints', side_effect=verify_clean_array_before_alteration)
+    mocker.patch.object(cut, 'initialize_clean_data_array', side_effect=fake_clean_data_arrays)
 
     # Act
     cut.sort_data(arg_dataFrames)
 
     # Assert
-    assert len(cut.indices_to_remove) == 1
-    assert len(cut.ordered_fused_headers) == 0
-    assert time_synchronizer.copy.deepcopy.call_count == 1
-    assert time_synchronizer.copy.deepcopy.call_args_list[0].args == (cut.indices_to_remove, )
-    assert cut.remove_time_datapoints.call_count == 1
-    #assert cut.remove_time_datapoints.call_args_list[0].args == ([], fake_deep_copy), does not work due to first item alteration
-    assert cut.sim_data == [[fake_dataFrame_key]]
+    assert cut.initialize_clean_data_array.call_count == num_elems
+    for i in range(num_elems):
+        assert cut.initialize_clean_data_array.call_args_list[i].args == (arg_dataFrames, expected_dataFrame_keys[i])
+    assert cut.sim_data == fake_clean_data_arrays
 
-def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_list_that_is_set_to_only_key_in_given_dataFrames_and_a_clean_data_symbol_when_given_dataFrames_is_single_key_value_pair_and_len_indices_to_remove_is_1_and_len_ordered_fused_headers_is_1(mocker):
+# initialize_clean_data_array tests
+def test_TimeSynchronizer_initialize_clean_data_array_calls_remove_time_datapoints_and_returns_expected_list_when_dataFrames_time_is_empty(mocker):
     # Arrange
-    fake_dataFrame_key = MagicMock()
-    fake_data_key = MagicMock()
-    arg_dataFrames = {fake_dataFrame_key:{fake_data_key:[]}}
+    arg_time = MagicMock()
+    arg_dataFrames = {arg_time : {}}
 
-    fake_deep_copy = MagicMock()
-
-    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
-
-    expected_clean_data_symbol = '-'
+    rand_num_indicies = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    fake_indices_to_remove = [MagicMock()] * rand_num_indicies
+    rand_num_headers = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    fake_ordered_fused_headers = [MagicMock()] * rand_num_headers
 
     cut = TimeSynchronizer.__new__(TimeSynchronizer)
-    # NOTE: this accessed item in the cut helps set num_sources, but that is an usued variable that should be removed, after it is setting cut.ordered_sources no longer needs to be done
-    cut.ordered_sources = MagicMock()
-    cut.indices_to_remove = [MagicMock()]
-    cut.ordered_fused_headers = [MagicMock()]
-    fake_offset = 0 # arbitrary 0
-    cut.offsets = {fake_data_key:fake_offset}
+    cut.indices_to_remove = fake_indices_to_remove
+    cut.ordered_fused_headers = fake_ordered_fused_headers
 
-    # NOTE: verify_clean_array_before_alteration is necessary because in the Assert phase of test the value passed in is altered afterwards by the cut and cannot be verified as sent in the state checked here
-    def verify_clean_array_before_alteration(data, indices_to_remove):
-        assert data == [expected_clean_data_symbol]
-        assert indices_to_remove == fake_deep_copy
+    forced_return_deepcopy = MagicMock()
+    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=forced_return_deepcopy)
+    mocker.patch.object(cut, 'remove_time_datapoints')
+    mocker.patch.object(cut, 'copy_to_with_offset')
 
-    mocker.patch.object(cut, 'remove_time_datapoints', side_effect=verify_clean_array_before_alteration)
+    expected_result = [arg_time] + ['-'] * (rand_num_indicies + rand_num_headers - 1)
 
     # Act
-    cut.sort_data(arg_dataFrames)
+    result = cut.initialize_clean_data_array(arg_dataFrames, arg_time)
 
     # Assert
-    assert len(cut.indices_to_remove) == 1
-    assert len(cut.ordered_fused_headers) == 1
+    assert cut.copy_to_with_offset.call_count == 0
     assert time_synchronizer.copy.deepcopy.call_count == 1
-    assert time_synchronizer.copy.deepcopy.call_args_list[0].args == (cut.indices_to_remove, )
+    assert time_synchronizer.copy.deepcopy.call_args_list[0].args == (fake_indices_to_remove, )
     assert cut.remove_time_datapoints.call_count == 1
-    #assert cut.remove_time_datapoints.call_args_list[0].args == ([], fake_deep_copy), does not work due to first item alteration
-    assert cut.sim_data == [[fake_dataFrame_key, expected_clean_data_symbol]]
+    assert cut.remove_time_datapoints.call_args_list[0].args == (expected_result, forced_return_deepcopy)
+    assert result == expected_result
 
-def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_list_that_is_set_to_only_key_in_given_dataFrames_and_a_clean_data_symbol_when_given_dataFrames_is_single_key_value_pair_and_those_len_values_sum_is_greater_is_2_in_any_len_combination(mocker):
+def test_TimeSynchronizer_initialize_clean_data_array_loop_makes_expected_call_to_copy_to_with_offset_and_calls_remove_time_datapoints_and_returns_expected_list_when_dataFrames_time_contains_one_element(mocker):
     # Arrange
-    fake_dataFrame_key = MagicMock()
-    fake_data_key = MagicMock()
-    arg_dataFrames = {fake_dataFrame_key:{fake_data_key:[]}}
+    rand_num_indicies = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    fake_indices_to_remove = [MagicMock()] * rand_num_indicies
+    rand_num_headers = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    fake_ordered_fused_headers = [MagicMock()] * rand_num_headers
+    fake_key = MagicMock()
+    fake_data = MagicMock()
+    fake_offset = MagicMock()
+    fake_offsets = {fake_key : fake_offset}
 
-    fake_deep_copy = MagicMock()
-
-    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
-
-    expected_clean_data_symbol = '-'
+    arg_time = MagicMock()
+    arg_dataFrames = {arg_time : {fake_key : fake_data}}
 
     cut = TimeSynchronizer.__new__(TimeSynchronizer)
-    # NOTE: this accessed item in the cut helps set num_sources, but that is an usued variable that should be removed, after it is setting cut.ordered_sources no longer needs to be done
-    cut.ordered_sources = MagicMock()
-    num_fake_total = 2 # 2 is required for this test
-    num_fake_indices_to_remove = pytest.gen.randint(0, num_fake_total)
-    num_fake_order_fused_headers = num_fake_total - num_fake_indices_to_remove
-    cut.indices_to_remove = []
-    for i in range(num_fake_indices_to_remove):
-        cut.indices_to_remove.append(MagicMock())
-    cut.ordered_fused_headers = []
-    for i in range(num_fake_order_fused_headers):
-        cut.ordered_fused_headers.append(MagicMock())
-    fake_offset = 0 # arbitrary 0
-    cut.offsets = {fake_data_key:fake_offset}
+    cut.indices_to_remove = fake_indices_to_remove
+    cut.ordered_fused_headers = fake_ordered_fused_headers
+    cut.offsets = fake_offsets
 
-    # NOTE: verify_clean_array_before_alteration is necessary because in the Assert phase of test the value passed in is altered afterwards by the cut and cannot be verified as sent in the state checked here
-    def verify_clean_array_before_alteration(data, indices_to_remove):
-        assert data == [expected_clean_data_symbol] * (num_fake_total - 1)
-        assert indices_to_remove == fake_deep_copy
+    forced_return_deepcopy = MagicMock()
+    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=forced_return_deepcopy)
+    mocker.patch.object(cut, 'remove_time_datapoints')
+    mocker.patch.object(cut, 'copy_to_with_offset')
 
-    mocker.patch.object(cut, 'remove_time_datapoints', side_effect=verify_clean_array_before_alteration)
+    expected_result = [arg_time] + ['-'] * (rand_num_indicies + rand_num_headers - 1)
 
     # Act
-    cut.sort_data(arg_dataFrames)
+    result = cut.initialize_clean_data_array(arg_dataFrames, arg_time)
 
     # Assert
+    assert cut.copy_to_with_offset.call_count == 1
+    assert cut.copy_to_with_offset.call_args_list[0].args == (expected_result, fake_data, fake_offset)
     assert time_synchronizer.copy.deepcopy.call_count == 1
-    assert time_synchronizer.copy.deepcopy.call_args_list[0].args == (cut.indices_to_remove, )
+    assert time_synchronizer.copy.deepcopy.call_args_list[0].args == (fake_indices_to_remove, )
     assert cut.remove_time_datapoints.call_count == 1
-    #assert cut.remove_time_datapoints.call_args_list[0].args == ([], fake_deep_copy), does not work due to first item alteration
-    assert cut.sim_data == [[fake_dataFrame_key, expected_clean_data_symbol]]
+    assert cut.remove_time_datapoints.call_args_list[0].args == (expected_result, forced_return_deepcopy)
+    assert result == expected_result
 
-def test_TimeSynchronizer_sort_data_sets_instance_sim_data_to_list_of_a_single_list_that_is_set_to_only_key_in_given_dataFrames_and_source_data_at_indices_with_offset_data_and_clean_data_symbol_everywhere_else_per_len_of_indices_to_remove_plus_len_of_ordered_fused_headers_full_value_minus_1_when_given_dataFrames_is_single_key_value_pair_and_those_len_values_sum_is_greater_than_2(mocker):
+def test_TimeSynchronizer_initialize_clean_data_array_loop_makes_expected_call_to_copy_to_with_offset_and_calls_remove_time_datapoints_and_returns_expected_list_when_dataFrames_time_contains_many_elements(mocker):
     # Arrange
-    fake_dataFrame_key = MagicMock()
-    fake_data_key = MagicMock()
-    fake_source_data = []
-    arg_dataFrames = {fake_dataFrame_key:{fake_data_key:fake_source_data}}
+    rand_num_indicies = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    fake_indices_to_remove = [MagicMock()] * rand_num_indicies
+    rand_num_headers = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    fake_ordered_fused_headers = [MagicMock()] * rand_num_headers
+    num_elems_dataFrames = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    fake_key = []
+    fake_data = []
+    fake_offset = []
+    fake_offsets = {}
+    fake_frame = {}
+    for i in range(num_elems_dataFrames):
+        fake_key.append(MagicMock())
+        fake_data.append(MagicMock())
+        fake_offset.append(MagicMock())
+        fake_offsets[fake_key[i]] = fake_offset[i]
+        fake_frame[fake_key[i]] = fake_data[i]
 
-    fake_deep_copy = MagicMock()
-
-    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
-
-    expected_clean_data_symbol = '-'
+    arg_time = MagicMock()
+    arg_dataFrames = {arg_time : fake_frame}
 
     cut = TimeSynchronizer.__new__(TimeSynchronizer)
-    # NOTE: this accessed item in the cut helps set num_sources, but that is an usued variable that should be removed, after it is setting cut.ordered_sources no longer needs to be done
-    cut.ordered_sources = MagicMock()
-    num_fake_total = pytest.gen.randint(3, 20) # from 3, min required, to arbitrary 20
-    num_fake_indices_to_remove = pytest.gen.randint(0, num_fake_total)
-    num_fake_order_fused_headers = num_fake_total - num_fake_indices_to_remove
-    cut.indices_to_remove = []
-    for i in range(num_fake_indices_to_remove):
-        cut.indices_to_remove.append(MagicMock())
-    cut.ordered_fused_headers = []
-    for i in range(num_fake_order_fused_headers):
-        cut.ordered_fused_headers.append(MagicMock())
-    num_fake_source_data = pytest.gen.randint(2, num_fake_total) - 1 # arbitrary, from 1 to total items expected (0 has own test)
-    for i in range(num_fake_source_data):
-        fake_source_data.append(MagicMock())
-    fake_offset = pytest.gen.randint(0, (num_fake_total - num_fake_source_data - 1)) # slightly arbitrary, allowing room for all source data between 0 and total items minus 1 for proper indexing
-    cut.offsets = {fake_data_key:fake_offset}
+    cut.indices_to_remove = fake_indices_to_remove
+    cut.ordered_fused_headers = fake_ordered_fused_headers
+    cut.offsets = fake_offsets
 
-    num_prior_clean_data_symbols = [expected_clean_data_symbol]*(num_fake_total+(fake_offset-num_fake_total))
-    num_remaining_clean_data_symbols = [expected_clean_data_symbol]*(num_fake_total-(fake_offset+num_fake_source_data+1))
-    expected_data = num_prior_clean_data_symbols + fake_source_data + num_remaining_clean_data_symbols
-    # NOTE: verify_clean_array_before_alteration is necessary because in the Assert phase of test the value passed in is altered afterwards by the cut and cannot be verified as sent in the state checked here
-    def verify_clean_array_before_alteration(data, indices_to_remove):
-        assert data == expected_data
-        assert indices_to_remove == fake_deep_copy
+    forced_return_deepcopy = MagicMock()
+    mocker.patch('data_handling.time_synchronizer.copy.deepcopy', return_value=forced_return_deepcopy)
+    mocker.patch.object(cut, 'remove_time_datapoints')
+    mocker.patch.object(cut, 'copy_to_with_offset')
 
-    mocker.patch.object(cut, 'remove_time_datapoints', side_effect=verify_clean_array_before_alteration)
+    expected_result = [arg_time] + ['-'] * (rand_num_indicies + rand_num_headers - 1)
 
     # Act
-    cut.sort_data(arg_dataFrames)
+    result = cut.initialize_clean_data_array(arg_dataFrames, arg_time)
 
     # Assert
+    assert cut.copy_to_with_offset.call_count == num_elems_dataFrames
+    for i in range(num_elems_dataFrames):
+        assert cut.copy_to_with_offset.call_args_list[i].args == (expected_result, fake_data[i], fake_offset[i])
     assert time_synchronizer.copy.deepcopy.call_count == 1
-    assert time_synchronizer.copy.deepcopy.call_args_list[0].args == (cut.indices_to_remove, )
+    assert time_synchronizer.copy.deepcopy.call_args_list[0].args == (fake_indices_to_remove, )
     assert cut.remove_time_datapoints.call_count == 1
-    #assert cut.remove_time_datapoints.call_args_list[0].args == ([], fake_deep_copy), does not work due to first item alteration
-    assert cut.sim_data == [[fake_dataFrame_key] + expected_data]
+    assert cut.remove_time_datapoints.call_args_list[0].args == (expected_result, forced_return_deepcopy)
+    assert result == expected_result
+
+# copy_to_with_offset tests
+def test_TimeSynchronizer_copy_to_with_offset_does_nothing_when_src_array_is_empty():
+    # Arrange
+    arg_src_array = []
+    arg_offset = pytest.gen.randint(0, 10) # arbitray, from 0 to 10
+    len_dest_array = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    arg_dest_array = [MagicMock()] * len_dest_array
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    src_array_copy = arg_src_array.copy()
+    dest_array_copy = arg_dest_array.copy()
+
+    # Act
+    cut.copy_to_with_offset(arg_dest_array, arg_src_array, arg_offset)
+
+    # Assert
+    assert arg_src_array == src_array_copy
+    assert arg_dest_array == dest_array_copy
+
+def test_TimeSynchronizer_copy_to_with_offset_raises_error_when_len_dest_array_less_than_sum_of_len_src_array_and_offset():
+    # Arrange
+    len_src_array = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    arg_src_array = [MagicMock()] * len_src_array
+    arg_offset = pytest.gen.randint(0, 10) # arbitray, from 0 to 10
+    len_dest_array = pytest.gen.randint(0, len_src_array + arg_offset - 1) # arbitrary, at most size of src_array + offset - 1
+    arg_dest_array = [MagicMock()] * len_dest_array
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    # Act
+    with pytest.raises(IndexError) as e_info:
+        cut.copy_to_with_offset(arg_dest_array, arg_src_array, arg_offset)
+
+    # Assert
+    assert e_info.match('list assignment index out of range')
+
+def test_TimeSynchronizer_copy_to_with_offset_sets_expected_indices_in_arg_dest_array_to_expected_values_from_arg_src_array_according_to_arg_offset():
+    # Arrange
+    len_src_array = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    arg_src_array = [MagicMock()] * len_src_array
+    arg_offset = pytest.gen.randint(0, 10) # arbitray, from 0 to 10
+    len_dest_array = pytest.gen.randint(len_src_array + arg_offset, 50) # arbitrary, at least size of src_array + offset
+    arg_dest_array = [MagicMock()] * len_dest_array
+
+    cut = TimeSynchronizer.__new__(TimeSynchronizer)
+
+    src_array_copy = arg_src_array.copy()
+    dest_array_copy = arg_dest_array.copy()
+    expected_dest_array = arg_dest_array.copy()
+    for i in range(arg_offset, arg_offset + len_src_array):
+        expected_dest_array[i] = arg_src_array[i - arg_offset]
+
+    # Act
+    cut.copy_to_with_offset(arg_dest_array, arg_src_array, arg_offset)
+
+    # Assert
+    assert arg_src_array == src_array_copy
+    assert arg_dest_array != dest_array_copy
+    assert arg_dest_array == expected_dest_array
 
 # TODO: coverage does not require loops be done more than once, but it is good practice; however, this is a complex endeavor here and is should be done at a later time and/or refactored for easier testing
 # def test_TimeSynchronizer_sort_data_sets_multisource(mocker):
