@@ -14,7 +14,13 @@ test-onair:
     - python3.9 -m pip install -r requirements_pip.txt
     - pwd
     - python3.9 driver.py -t
-    - coverage report
-  #artifacts:
+    - coverage report    
+    - coverage xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
   #  paths:
   #    - cfs_fsw/build-sim/*
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
