@@ -4,8 +4,6 @@ Data driven learning class for managing all data driven AI components
 import importlib
 
 from src.util.data_conversion import *
-from src.data_driven_components.generic_component import AIPlugIn
-
 
 class DataDrivenLearning:
     def __init__(self, headers, _ai_plugins:list=[]):

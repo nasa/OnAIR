@@ -5,8 +5,6 @@ from mock import MagicMock
 import src.data_driven_components.kalman.kalman_plugin as kalman
 from src.data_driven_components.kalman.kalman_plugin import Plugin as Kalman
 
-import importlib
-
 # test init
 def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args_except_window_size(mocker):
     # Arrange

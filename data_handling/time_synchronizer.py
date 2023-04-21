@@ -3,13 +3,7 @@ TimeSynchronizer class
 Helper class used by driver.py to process and organize data
 """
 
-import time
-import ast
 import copy
-
-from collections import OrderedDict 
-
-from data_handling.parsers.parser_util import str2lst
 
 class TimeSynchronizer:
     def __init__(self, headers={}, dataFrames={}, test_configs={}):

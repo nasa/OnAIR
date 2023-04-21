@@ -4,9 +4,6 @@ import datetime
 from mock import MagicMock
 import sys
 
-import sys
-from mock import MagicMock
-
 def pytest_configure():
   seed = datetime.datetime.now().timestamp()
   pytest.gen = random.Random(seed)

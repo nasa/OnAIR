@@ -4,7 +4,6 @@ AdapterDataSource class
 Receives messages from SBN, serves as a data source for sim.py
 """
 
-import ctypes
 import threading
 import time
 import datetime

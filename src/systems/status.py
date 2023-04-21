@@ -2,8 +2,6 @@
 Status Class
 """
 
-import copy
-
 class Status:
     def __init__(self, name='MISSION', stat='---', conf=-1.0):
         self.name =  name

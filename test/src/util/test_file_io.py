@@ -1,6 +1,4 @@
 import pytest
-import random
-import datetime
 from mock import MagicMock
 import src.util.file_io
 

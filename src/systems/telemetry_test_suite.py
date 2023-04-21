@@ -5,10 +5,8 @@ Handles telemetry mnemonic testing
 """
 
 # from collections import Counter
-from data_handling.data_source import DataSource
 from src.systems.status import Status
 from collections import Counter
-
 
 class TelemetryTestSuite:
     def __init__(self, headers=[], tests=[]):

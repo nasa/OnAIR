@@ -10,10 +10,7 @@ cov.start()
 
 import os
 import sys
-import io
-import configparser
 import argparse
-import pathlib
 from datetime import datetime
 # from test_all import *
 from src.util.cleanup import *

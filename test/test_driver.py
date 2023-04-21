@@ -1,6 +1,5 @@
 """ Test Driver """
 import os
-import sys
 import unittest
 
 class TestDriver(unittest.TestCase):

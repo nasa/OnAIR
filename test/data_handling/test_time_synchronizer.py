@@ -1,6 +1,4 @@
 """ Test Time Sync Functionality """
-import os
-import unittest
 import pytest
 
 from mock import MagicMock
