@@ -66,6 +66,70 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     assert tlm_parser.str2lst.call_args_list[0].args == (fake_limits, )
     assert result == expected_result
 
+def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_only_one_label_and_limits_test_and_description_keys_do_not_exist(mocker):
+    # Arrange
+    arg_file_path = MagicMock()
+
+    fake_data = MagicMock()
+    fake_label = MagicMock()
+    fake_subsystem = MagicMock()
+    fake_organized_data = {}
+    fake_organized_data[fake_label] = {'subsystem' : fake_subsystem}
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst')
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = [fake_subsystem]
+    expected_result['test_assignments'] = [['NOOP']]
+    expected_result['description_assignments'] = [['No description']]
+
+    # Act
+    result = tlm_parser.parseTlmConfJson(arg_file_path)
+
+    # Assert
+    assert tlm_parser.parseJson.call_count == 1
+    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_parser.str2lst.call_count == 0
+    assert result == expected_result
+
+def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_multiple_labels_and_limits_test_and_description_keys_do_not_exist(mocker):
+    # Arrange
+    arg_file_path = MagicMock()
+
+    fake_data = MagicMock()
+    fake_organized_data = {}
+    fake_subsystems = []
+    num_labels = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
+    for i in range(num_labels):
+        fake_label = MagicMock()
+        fake_subsystem = MagicMock()
+        fake_subsystems.append(fake_subsystem)
+        fake_organized_data[fake_label] = {'subsystem' : fake_subsystem}
+
+    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('data_handling.parsers.tlm_json_parser.str2lst')
+
+    expected_result = {}
+    expected_result['subsystem_assignments'] = fake_subsystems
+    expected_result['test_assignments'] = [['NOOP']] * num_labels
+    expected_result['description_assignments'] = [['No description']] * num_labels
+
+    # Act
+    result = tlm_parser.parseTlmConfJson(arg_file_path)
+
+    # Assert
+    assert tlm_parser.parseJson.call_count == 1
+    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_parser.str2lst.call_count == 0
+    assert result == expected_result
+
 def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_only_one_label_and_order_key_does_exist(mocker):
     # Arrange
     arg_file_path = MagicMock()

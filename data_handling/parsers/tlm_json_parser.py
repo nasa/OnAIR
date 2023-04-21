@@ -13,13 +13,14 @@ def parseTlmConfJson(file_path):
     descriptions = []
     
     for label in reorg_data:
-        subsys = reorg_data[label]['subsystem']
-        temp = str2lst(reorg_data[label]['limits'])
+        curr_datapt = reorg_data[label]
+        subsys = curr_datapt['subsystem']
+        temp = str2lst(curr_datapt['limits']) if 'limits' in curr_datapt else []
         if temp == []:
-            mnemonics = [reorg_data[label]['test']]
+            mnemonics = [curr_datapt['test']] if 'test' in curr_datapt else ['NOOP']
         else:
-            mnemonics = [reorg_data[label]['test'], reorg_data[label]['limits']]
-        desc = reorg_data[label]['description']
+            mnemonics = [curr_datapt['test'], curr_datapt['limits']]
+        desc = curr_datapt['description'] if 'description' in curr_datapt else ['No description']
         
         labels.append(label)
         subsys_assignments.append(subsys)
