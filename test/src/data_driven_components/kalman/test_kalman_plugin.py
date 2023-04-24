@@ -187,22 +187,59 @@ def test_Kalman_update_mutates_frames_attribute_as_expected_when_both_frames_and
 def test_Kalman_update_pops_first_index_of_frames_data_points_when_window_size_is_exceeded():
     # Arrange
     len_fake_frames = pytest.gen.randint(6, 10) # arbitrary int greater than max len of arg_frame, from 6 to 10
-                                                # choosing to keep len of fake_frames greater than arg_frame in order to guarantee 'popping'
-    fake_frames = [[MagicMock()]] * len_fake_frames
+                                                # choosing to keep len of fake_frames greater than arg_frame in order to guarantee 'else' statement is reached
+    # fake_frames = [[MagicMock()]] * len_fake_frames
+    expected_result = []
+    fake_frames = []
+    for i in range(len_fake_frames):
+        fake_frame = [MagicMock()]
+        fake_frames.append([fake_frame])
+        expected_result.append([fake_frame])
     fake_window_size = 1 # arbitrary, chosen to guarantee 'popping'
 
     len_arg_frame = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
-    arg_frame = [MagicMock()] * len_arg_frame
+    arg_frame = []
+    for i in range(len_arg_frame):
+        arg_frame.append(MagicMock())
 
     cut = Kalman.__new__(Kalman)
     cut.frames = fake_frames
     cut.window_size = fake_window_size
 
-    expected_result = fake_frames.copy()
-
     for i in range(len_arg_frame):
         expected_result[i].append(arg_frame[i])
         expected_result[i].pop(0)
+
+    # Act
+    cut.update(arg_frame)
+
+    # Assert
+    assert cut.frames == expected_result
+
+def test_Kalman_update_will_not_pop_first_index_of_frames_data_points_when_window_size_is_never_exceeded():
+    # Arrange
+    len_fake_frames = pytest.gen.randint(6, 10) # arbitrary int greater than max len of arg_frame, from 6 to 10
+                                                # choosing to keep len of fake_frames greater than arg_frame in order to guarantee 'else' statement is reached
+    # fake_frames = [[MagicMock()]] * len_fake_frames
+    expected_result = []
+    fake_frames = []
+    for i in range(len_fake_frames):
+        fake_frame = [MagicMock()]
+        fake_frames.append([fake_frame])
+        expected_result.append([fake_frame])
+    fake_window_size = 99 # arbitrary, chosen to guarantee no 'popping' will occur
+
+    len_arg_frame = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
+    arg_frame = []
+    for i in range(len_arg_frame):
+        arg_frame.append(MagicMock())
+
+    cut = Kalman.__new__(Kalman)
+    cut.frames = fake_frames
+    cut.window_size = fake_window_size
+
+    for i in range(len_arg_frame):
+        expected_result[i].append(arg_frame[i])
 
     # Act
     cut.update(arg_frame)
