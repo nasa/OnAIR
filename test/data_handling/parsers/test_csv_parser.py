@@ -109,6 +109,64 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     # Arrange
     arg_rawDataFilepath = MagicMock()
     arg_metadataFilepath = MagicMock()
+    arg_dataFile = MagicMock()
+    arg_dataFiles = [arg_dataFile]
+    arg_configFiles = MagicMock()
+    arg_ss_breakdown = MagicMock()
+
+    fake_labels = {}
+    fake_data = {}
+    num_fake_data_keys = pytest.gen.randint(1, 10) # arbitrary, from 0 to 10
+    for j in range(num_fake_data_keys):
+        fake_data[MagicMock()] = {}
+    
+    fake_subsystem_assignments = MagicMock()
+    fake_test_assignments = MagicMock()
+    fake_description_assignments = MagicMock()
+    fake_configs = {}
+    fake_configs['subsystem_assignments'] = fake_subsystem_assignments
+    fake_configs['test_assignments'] = fake_test_assignments
+    fake_configs['description_assignments'] = fake_description_assignments
+
+    expected_binning_configs = {}
+    expected_binning_configs['subsystem_assignments'] = {}
+    expected_binning_configs['test_assignments'] = {}
+    expected_binning_configs['description_assignments'] = {}
+
+    fake_labels[arg_dataFile] = MagicMock()
+    for key in fake_data:
+        fake_data[key][arg_dataFile] = MagicMock()
+    expected_binning_configs['subsystem_assignments'][arg_dataFile] = fake_subsystem_assignments
+    expected_binning_configs['test_assignments'][arg_dataFile] = fake_test_assignments
+    expected_binning_configs['description_assignments'][arg_dataFile] = fake_description_assignments
+
+    cut = CSV.__new__(CSV)
+
+    mocker.patch('data_handling.parsers.csv_parser.str2lst', return_value=arg_dataFiles)
+    mocker.patch.object(cut, 'parse_csv_data', return_value=[fake_labels, fake_data])
+    mocker.patch.object(cut, 'parse_config_data_CSV', return_value=fake_configs)
+
+    # Act
+    cut.__init__(arg_rawDataFilepath, arg_metadataFilepath, arg_dataFiles, arg_configFiles, arg_ss_breakdown)
+
+    # Assert
+    assert cut.raw_data_filepath == arg_rawDataFilepath
+    assert cut.metadata_filepath == arg_metadataFilepath
+    assert cut.all_headers == fake_labels
+    assert cut.sim_data == fake_data
+    assert cut.binning_configs == expected_binning_configs
+    assert csv_parser.str2lst.call_count == 2
+    assert csv_parser.str2lst.call_args_list[0].args == (arg_configFiles, )
+    assert csv_parser.str2lst.call_args_list[1].args == (arg_dataFiles, )
+    assert cut.parse_config_data_CSV.call_count == 1
+    assert cut.parse_config_data_CSV.call_args_list[0].args == (arg_dataFile, arg_ss_breakdown)
+    assert cut.parse_csv_data.call_count == 1
+    assert cut.parse_csv_data.call_args_list[0].args == (arg_dataFile, )
+
+def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data_and_config_and_binning_configs_dicts_for_each_data_file_are_all_set_to_returned_config_values_when_given_dataFiles_and_configFiles_are_not_empty_strings_and_given_multiple_dataFiles(mocker):
+    # Arrange
+    arg_rawDataFilepath = MagicMock()
+    arg_metadataFilepath = MagicMock()
     arg_dataFiles = []
     arg_configFiles = MagicMock()
     arg_ss_breakdown = MagicMock()
@@ -132,7 +190,7 @@ def test_CSV__init__sets_instance_variables_as_expected_and_sets_labels_and_data
     expected_binning_configs['test_assignments'] = {}
     expected_binning_configs['description_assignments'] = {}
 
-    num_fake_dataFiles = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    num_fake_dataFiles = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
     for i in range(num_fake_dataFiles):
         fake_dataFile = MagicMock()
         fake_labels[fake_dataFile] = MagicMock()
