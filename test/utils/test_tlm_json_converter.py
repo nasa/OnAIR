@@ -259,14 +259,11 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_calls_mergeDicts_and_return
 # getJsonData tests
 def test_tlm_json_converter_getJsonData_returns_expected_data_when_label_equals_TIME():
     # Arrange
-    fake_test = MagicMock()
-    fake_limits = []
-    
     arg_label = 'TIME'
-    arg_mnemonics = [fake_test]
+    arg_mnemonics = [[MagicMock(), MagicMock()]]
     arg_description = MagicMock()
 
-    expected_result = {arg_label : {'conversion' : '', 'test' : str(fake_test), 'limits' : str(fake_limits), 'description' : str(arg_description)}}
+    expected_result = {arg_label : {'conversion' : '', str(arg_mnemonics[0][0]) : '[]', str(arg_mnemonics[0][1]) : '[]', 'description' : str(arg_description)}}
 
     # Act
     result = tlm_converter.getJsonData(arg_label, arg_mnemonics, arg_description)
@@ -286,7 +283,7 @@ def test_tlm_json_converter_getJsonData_returns_expected_data_when_label_is_not_
     arg_mnemonics = [arg_mnemonics]
     arg_description = MagicMock()
 
-    expected_result = {arg_label : {'conversion' : '', 'test' : str(fake_test), 'limits' : str([fake_limits]), 'description' : str(arg_description)}}
+    expected_result = {arg_label : {'conversion' : '', str(fake_test) : str([fake_limits]), 'description' : str(arg_description)}}
 
     # Act
     result = tlm_converter.getJsonData(arg_label, arg_mnemonics, arg_description)
