@@ -3,8 +3,8 @@
     "NONE": {
       "Time": {
         "conversion": "",
-        "test": "SYNC",
-        "limits": "['TIME']",
+        "test": "['SYNC', 'TIME']",
+        "limits": "[]",
         "description": "No description"
       },
       "THRUST": {

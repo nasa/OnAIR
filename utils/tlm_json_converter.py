@@ -39,7 +39,7 @@ def convertTlmDictToJsonDict(data):
 
 # helper function to organize data parsed from tlm file into desired json format
 def getJsonData(label, mnemonics, description):
-    if label == 'TIME':
+    if str.upper(label) == 'TIME':
         return {label : {'conversion' : '', 'test' : str(mnemonics[0]), 'limits' : '[]', 'description' : str(description)}}
     
     # attributes = label.split('.')
