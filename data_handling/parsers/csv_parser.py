@@ -59,7 +59,7 @@ class CSV(OnAirParser):
         return all_headers, all_data 
 
     def parse_config_data(self, configFile, ss_breakdown):
-        parsed_configs = extract_configs(self.metadata_filepath, [configFile], csv=True)
+        parsed_configs = extract_configs(self.metadata_filepath, configFile, csv=True)
         if ss_breakdown == False:
             num_elements = len(parsed_configs['subsystem_assignments'])
             parsed_configs['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
