@@ -3,52 +3,70 @@
     "NONE": {
       "Time": {
         "conversion": "",
-        "SYNC": "[]",
-        "TIME": "[]",
+        "tests": {
+          "SYNC": "[]",
+          "TIME": "[]"
+        },
         "description": "No description"
       },
       "THRUST": {
         "conversion": "",
-        "FEASIBILITY": "[-999999999999999, 999999999999999]",
+        "tests": {
+          "FEASIBILITY": "[-999999999999999, 999999999999999]"
+        },
         "description": "No description"
       },
       "ALTITUDE": {
         "conversion": "",
-        "FEASIBILITY": "[-999999999999999, 999999999999999]",
+        "tests": {
+          "FEASIBILITY": "[-999999999999999, 999999999999999]"
+        },
         "description": "No description"
       },
       "ACCELERATION": {
         "conversion": "",
-        "FEASIBILITY": "[-20.1111, 20.1111]",
+        "tests": {
+          "FEASIBILITY": "[-20.1111, 20.1111]"
+        },
         "description": "No description"
       },
       "SCIENCE_COLLECTION": {
         "conversion": "",
-        "FEASIBILITY": "[-0.9999, 1.1111]",
+        "tests": {
+          "FEASIBILITY": "[-0.9999, 1.1111]"
+        },
         "description": "No description"
       },
       "LABEL_ERROR_STATE": {
         "conversion": "",
-        "NOOP": "['LABEL']",
+        "tests": {
+          "NOOP": "['LABEL']"
+        },
         "description": "No description"
       }
     },
     "POWER": {
       "VOLTAGE": {
         "conversion": "",
-        "FEASIBILITY": "[12.9999, 18.1111]",
+        "tests": {
+          "FEASIBILITY": "[12.9999, 18.1111]"
+        },
         "description": "No description"
       },
       "CURRENT": {
         "conversion": "",
-        "FEASIBILITY": "[2.9999, 5.1111]",
+        "tests": {
+          "FEASIBILITY": "[2.9999, 5.1111]"
+        },
         "description": "No description"
       }
     },
     "THERMAL": {
       "TEMPERATURE": {
         "conversion": "",
-        "FEASIBILITY": "[9.9999, 90.1111]",
+        "tests": {
+          "FEASIBILITY": "[9.9999, 90.1111]"
+        },
         "description": "No description"
       }
     }
