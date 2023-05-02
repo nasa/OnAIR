@@ -26,7 +26,7 @@ def parseTlmConfJson(file_path):
         
         labels.append(label)
         subsys_assignments.append(subsys)
-        mnemonic_tests.append(mnemonics[0])
+        mnemonic_tests.append(mnemonics)
         descriptions.append(desc)
 
     # if given an order, reorder data to match

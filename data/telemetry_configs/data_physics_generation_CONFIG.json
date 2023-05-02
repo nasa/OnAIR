@@ -4,8 +4,7 @@
       "Time": {
         "conversion": "",
         "tests": {
-          "SYNC": "[]",
-          "TIME": "[]"
+          "SYNC": "[]"
         },
         "description": "No description"
       },
@@ -40,7 +39,7 @@
       "LABEL_ERROR_STATE": {
         "conversion": "",
         "tests": {
-          "NOOP": "['LABEL']"
+          "NOOP": "[]"
         },
         "description": "No description"
       }

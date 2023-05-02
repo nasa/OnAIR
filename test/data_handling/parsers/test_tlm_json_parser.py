@@ -49,7 +49,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
-    expected_result['test_assignments'] = [[fake_mnemonics, fake_limits]]
+    expected_result['test_assignments'] = [[[fake_mnemonics, fake_limits]]]
     expected_result['description_assignments'] = [fake_description]
 
     # Act
@@ -77,7 +77,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
-    expected_result['test_assignments'] = [['NOOP']]
+    expected_result['test_assignments'] = [[['NOOP']]]
     expected_result['description_assignments'] = [['No description']]
 
     # Act
@@ -109,7 +109,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
 
     expected_result = {}
     expected_result['subsystem_assignments'] = fake_subsystems
-    expected_result['test_assignments'] = [['NOOP']] * num_labels
+    expected_result['test_assignments'] = [[['NOOP']]] * num_labels
     expected_result['description_assignments'] = [['No description']] * num_labels
 
     # Act
@@ -142,7 +142,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
-    expected_result['test_assignments'] = [[fake_mnemonics, fake_limits]]
+    expected_result['test_assignments'] = [[[fake_mnemonics, fake_limits]]]
     expected_result['description_assignments'] = [fake_description]
 
     # Act
@@ -177,7 +177,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem] * num_elems
-    expected_result['test_assignments'] = [[fake_mnemonics, fake_limits]] * num_elems
+    expected_result['test_assignments'] = [[[fake_mnemonics, fake_limits]]] * num_elems
     expected_result['description_assignments'] = [fake_description] * num_elems
 
     # Act
@@ -238,7 +238,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['description_assignments'] = []
     for i in range(num_elems):
         expected_result['subsystem_assignments'].append(ordered_subsys[i])
-        expected_result['test_assignments'].append([ordered_mnemonics[i], ordered_limits[i]])
+        expected_result['test_assignments'].append([[ordered_mnemonics[i], ordered_limits[i]]])
         expected_result['description_assignments'].append(ordered_descs[i])
 
     # Act
@@ -299,7 +299,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['description_assignments'] = []
     for i in range(num_elems):
         expected_result['subsystem_assignments'].append(ordered_subsys[i])
-        expected_result['test_assignments'].append([ordered_mnemonics[i], ordered_limits[i]])
+        expected_result['test_assignments'].append([[ordered_mnemonics[i], ordered_limits[i]]])
         expected_result['description_assignments'].append(ordered_descs[i])
 
     # Act

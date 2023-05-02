@@ -5,8 +5,7 @@
       "TIME": {
         "conversion": "",
         "tests": {
-          "SYNC": "[]",
-          "TIME": "[]"
+          "SYNC": "[]"
         },
         "description": "No description"
       }
