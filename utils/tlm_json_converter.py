@@ -41,17 +41,11 @@ def convertTlmDictToJsonDict(data):
 def getJsonData(label, mnemonics, description):
     if str.upper(label) == 'TIME':
         return {label : {'conversion' : '', 'test' : str(mnemonics[0]), 'limits' : '[]', 'description' : str(description)}}
-    
-    # attributes = label.split('.')
-    # num_attr = len(attributes)
+
     test_attr = mnemonics[0][0]
     limits_attr = mnemonics[0][1:]
     json_data = {label : {'conversion' : '', 'test' : str(test_attr), 'limits' : str(limits_attr), 'description' : str(description)}}
-    # json_data = {attributes[num_attr-1] : {'conversion' : '', 'test' : str(test_attr), 'limits' : str(limits_attr), 'description' : str(description)}}
-    
-    # for attr in reversed(attributes[:num_attr-1]):
-        # json_data = {attr : json_data}
-    
+
     return json_data
 
 # parse tlm config files in original txt format

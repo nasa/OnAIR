@@ -40,7 +40,7 @@ class TimeSynchronizer:
         
         self.ordered_fused_tests = self.remove_time_datapoints(unclean_fused_tests, time_indices_for_removal)
         self.ordered_fused_headers.insert(0, 'TIME')
-        self.ordered_fused_tests.insert(0, [['SYNC', 'TIME']])
+        self.ordered_fused_tests.insert(0, [['NOOP']])
 
         self.indices_to_remove = time_indices_for_removal
         self.offsets = src_start_indices

@@ -4,7 +4,7 @@
     "CDH": {
       "TIME": {
         "conversion": "",
-        "test": "['SYNC', 'TIME']",
+        "test": "NOOP",
         "limits": "[]",
         "description": "No description"
       }

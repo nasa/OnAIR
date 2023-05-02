@@ -14,9 +14,8 @@ class TelemetryTestSuite:
         self.tests = tests
         self.latest_results = None
         self.epsilon = 0.00001 # should define this intelligently 
-        self.all_tests = {'SYNC' : self.sync,
-                         'STATE' : self.state,
-                   'FEASIBILITY' : self.feasibility, 
+        self.all_tests = {'STATE' : self.state,
+                          'FEASIBILITY' : self.feasibility,
                           'NOOP' : self.noop}
 
     ################################################
@@ -36,9 +35,6 @@ class TelemetryTestSuite:
             test_name = test[0]
             test_data = test[1:]
 
-            if test_name == 'SYNC':
-                test_data = [sync_data[var] for var in test_data if var in sync_data.keys()]
-
             stat, mass_assignments = self.all_tests[test_name](test_val, test_data, self.epsilon)
             status.append(stat) # tuple
 
@@ -55,20 +51,6 @@ class TelemetryTestSuite:
 
     ################################################
     ################   Test Suites  ################ 
-
-    def sync(self, val, test_params, epsilon):
-        return 'GREEN', [({'GREEN'}, 1.0)]
-        # mass_assignments = [] # list of tuples
-        # if len(test_params) == 0:
-        #     stat = 'RED'
-        #     mass_assignments.append(({stat}, 1.0))
-        #     return stat, mass_assignments
-        # if val == test_params[0]:
-        #     stat = 'GREEN'
-        #     mass_assignments.append(({stat}, 1.0))
-        #     return stat, mass_assignments
-
-        # return '---', mass_assignments
 
     def state(self, val, test_params, epsilon):
         mass_assignments = []
