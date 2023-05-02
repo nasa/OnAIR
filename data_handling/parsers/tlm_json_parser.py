@@ -1,6 +1,5 @@
 import ast
 import orjson
-import os
 
 # parse tlm config json file
 def parseTlmConfJson(file_path):
@@ -15,16 +14,19 @@ def parseTlmConfJson(file_path):
     for label in reorg_data:
         curr_datapt = reorg_data[label]
         subsys = curr_datapt['subsystem']
-        temp = str2lst(curr_datapt['limits']) if 'limits' in curr_datapt else []
-        if temp == []:
-            mnemonics = [curr_datapt['test']] if 'test' in curr_datapt else ['NOOP']
+
+        tests = curr_datapt['tests'] if 'tests' in curr_datapt else {}
+        if tests == {}:
+            mnemonics = [['NOOP']]
         else:
-            mnemonics = [curr_datapt['test'], curr_datapt['limits']]
+            mnemonics = []
+            for key in tests:
+                mnemonics.append([key, curr_datapt['tests'][key]])
         desc = curr_datapt['description'] if 'description' in curr_datapt else ['No description']
         
         labels.append(label)
         subsys_assignments.append(subsys)
-        mnemonic_tests.append(mnemonics)
+        mnemonic_tests.append(mnemonics[0])
         descriptions.append(desc)
 
     # if given an order, reorder data to match
