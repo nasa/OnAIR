@@ -59,7 +59,7 @@ def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_th
     expected_result = MagicMock()
 
     mocker.patch('src.util.data_conversion.type', return_value=str)
-    mocker.patch('src.util.data_conversion.float', side_effect=[Exception, expected_result])
+    mocker.patch('src.util.data_conversion.float', side_effect=[ValueError, expected_result])
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
@@ -86,7 +86,7 @@ def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_0_
     expected_replaced_i = MagicMock()
 
     mocker.patch('src.util.data_conversion.type', return_value=str)
-    mocker.patch('src.util.data_conversion.float', side_effect=[Exception, Exception])
+    mocker.patch('src.util.data_conversion.float', side_effect=[ValueError, Exception])
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
@@ -112,7 +112,7 @@ def test_data_conversion_flotify_input_default_arg_remove_str_is_False(mocker):
     expected_replaced_i = MagicMock()
 
     mocker.patch('src.util.data_conversion.type', return_value=str)
-    mocker.patch('src.util.data_conversion.float', side_effect=[Exception, Exception])
+    mocker.patch('src.util.data_conversion.float', side_effect=[ValueError, Exception])
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
@@ -132,7 +132,7 @@ def test_data_conversion_flotify_input_returns_empty_list_when_two_Exceptions_ar
     expected_replaced_i = MagicMock()
 
     mocker.patch('src.util.data_conversion.type', return_value=str)
-    mocker.patch('src.util.data_conversion.float', side_effect=[Exception, Exception])
+    mocker.patch('src.util.data_conversion.float', side_effect=[ValueError, Exception])
     mocker.patch.object(fake_item, 'replace', side_effect=[fake_item, fake_item, expected_replaced_i])
     
     # Act
@@ -192,7 +192,7 @@ def test_data_conversion_flotify_input_returns_expected_values_for_given__input_
             arg__input.append(fake_input)
             side_effects_for_type.append(str)
             resultant_float = MagicMock()
-            side_effects_for_float.append(Exception)
+            side_effects_for_float.append(ValueError)
             mocker.patch.object(fake_input, 'replace', side_effect=[fake_input, fake_input, fake_input])
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
@@ -201,7 +201,7 @@ def test_data_conversion_flotify_input_returns_expected_values_for_given__input_
             arg__input.append(fake_input)
             side_effects_for_type.append(str)
             resultant_float = MagicMock()
-            side_effects_for_float.append(Exception)
+            side_effects_for_float.append(ValueError)
             mocker.patch.object(fake_input, 'replace', side_effect=[fake_input, fake_input, fake_input])
             side_effects_for_float.append(Exception)
         else:
@@ -245,7 +245,7 @@ def test_data_conversion_flotify_input_returns_expected_values_for_given__input_
             arg__input.append(fake_input)
             side_effects_for_type.append(str)
             resultant_float = MagicMock()
-            side_effects_for_float.append(Exception)
+            side_effects_for_float.append(ValueError)
             mocker.patch.object(fake_input, 'replace', side_effect=[fake_input, fake_input, fake_input])
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
@@ -254,7 +254,7 @@ def test_data_conversion_flotify_input_returns_expected_values_for_given__input_
             arg__input.append(fake_input)
             side_effects_for_type.append(str)
             resultant_float = MagicMock()
-            side_effects_for_float.append(Exception)
+            side_effects_for_float.append(ValueError)
             mocker.patch.object(fake_input, 'replace', side_effect=[fake_input, fake_input, fake_input])
             side_effects_for_float.append(Exception)
             expected_result.append(0.0)
