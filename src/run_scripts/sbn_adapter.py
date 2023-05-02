@@ -25,17 +25,6 @@ msgID_lookup_table = {0x0885 : ["SAMPLE", msg_hdr.sample_data_tlm_t],
 def message_listener_thread():
     """Thread to listen for incoming messages from SBN"""
 
-    # TODO: this time format will not be right once we get the sample_app time function working
-    def add_time(secondary_header, current_buffer):
-        start_time = datetime.datetime(1969, 12, 31, 20) # January 1, 1980
-        seconds = secondary_header.Seconds
-        subseconds = secondary_header.Subseconds
-        curr_time = seconds + (2**(-32) * subseconds) # a subsecond is equal to 2^-32 second
-        time = start_time + datetime.timedelta(seconds=curr_time)
-        str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
-        current_buffer['data'][0] = str_time
-        return str_time
-
     while(True):
         generic_recv_msg_p = POINTER(sbn.sbn_data_generic_t)()
         sbn.recv_msg(generic_recv_msg_p)
@@ -51,19 +40,31 @@ def message_listener_thread():
         print(", ".join([field_name + ": " + str(getattr(recv_msg, field_name)) for field_name, field_type in recv_msg._fields_[1:]]))
 
         # TODO: Lock needed here?
-        current_buffer = AdapterDataSource.currentData[(AdapterDataSource.double_buffer_read_index + 1) %2]
-        
-        #gets seconds from header and adds to current buffer
-        add_time(recv_msg.TlmHeader.Secondary, current_buffer)
+        get_current_data(recv_msg, data_struct, app_name)
 
-        for field_name, field_type in data_struct._fields_[1:]:
-            header_name = app_name + "." + data_struct.__name__ + "." + str(field_name)
-            idx = current_buffer['headers'].index(header_name)
-            data = str(getattr(recv_msg, field_name))
-            current_buffer['data'][idx] = data
+def get_current_data(recv_msg, data_struct, app_name):
+    # TODO: Lock needed here?
+    current_buffer = AdapterDataSource.currentData[(AdapterDataSource.double_buffer_read_index + 1) %2]
+    secondary_header = recv_msg.TlmHeader.Secondary
 
-        with AdapterDataSource.new_data_lock:
-            AdapterDataSource.new_data = True
+    #gets seconds from header and adds to current buffer
+    start_time = datetime.datetime(1969, 12, 31, 20) # January 1, 1980
+    seconds = secondary_header.Seconds
+    subseconds = secondary_header.Subseconds
+    curr_time = seconds + (2**(-32) * subseconds) # a subsecond is equal to 2^-32 second
+    time = start_time + datetime.timedelta(seconds=curr_time)
+    str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
+    current_buffer['data'][0] = str_time
+
+    for field_name, field_type in data_struct._fields_[1:]:
+        header_name = app_name + "." + data_struct.__name__ + "." + str(field_name)
+        idx = current_buffer['headers'].index(header_name)
+        data = str(getattr(recv_msg, field_name))
+        current_buffer['data'][idx] = data
+
+    with AdapterDataSource.new_data_lock:
+        AdapterDataSource.new_data = True
+
 
 class AdapterDataSource(DataSource):
     # Data structure (shares code with binner.py)

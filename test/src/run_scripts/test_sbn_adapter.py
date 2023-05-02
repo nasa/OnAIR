@@ -47,13 +47,92 @@ def test_sbn_adapter_msgID_lookup_table_is_expected_value():
     # Assert
     assert sbn_adapter.msgID_lookup_table == expected_msgID_lookup_table
 
-def test_sbn_adapter_message_listener_thread_loops_indefinitely_with_no_fields_in_recv_msg_or_data_struct(mocker, setup_teardown):
+def test_sbn_adapter_message_listener_thread_loops_indefinitely_until_purposely_broken(mocker, setup_teardown):
     # Arrange
     fake_generic_recv_msg_p = MagicMock()
     fake_recv_msg_p = MagicMock()
 
     fake_sbn = MagicMock()
     fake_sbn.sbn_data_generic_t = PropertyMock()
+
+    fake_generic_recv_msg_p_contents = PropertyMock()
+    fake_generic_recv_msg_p_TlmHeader = PropertyMock()
+    fake_generic_recv_msg_p_Primary = PropertyMock()
+    
+    fake_generic_recv_msg_p.contents = fake_generic_recv_msg_p_contents
+    fake_generic_recv_msg_p.contents.TlmHeader = fake_generic_recv_msg_p_TlmHeader
+    fake_generic_recv_msg_p.contents.TlmHeader.Primary = fake_generic_recv_msg_p_Primary
+    fake_msgID = pytest.gen.choice(list(sbn_adapter.msgID_lookup_table.keys()))
+    fake_generic_recv_msg_p.contents.TlmHeader.Primary.StreamId = fake_msgID
+
+    # this exception will be used to forcefully exit the message_listener_thread function's while(True) loop
+    exception_message = 'forced loop exit'
+    exit_exception = Exception(exception_message)
+    
+    # sets return value of POINTER function to return fake_pointer an arbitrary number of times, then return exit_exception
+    num_loop_iterations = pytest.gen.randint(1, 10) # arbitrary, 1 to 10
+    side_effect_list = ([''] * num_loop_iterations) # one item for each loop
+    side_effect_list.append(exit_exception) # short-circuit exit while(True) loop
+
+    fake__fields_ = [["1st item placeholder"]]
+    num_fake_prints = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
+    fake_field_names = []
+    fake_attr_values = []
+    expected_print_string = ''
+    for i in range(num_fake_prints):
+        fake_attr_name = str(MagicMock())
+
+        print(f"fake_attr_name ", i, " ", fake_attr_name)
+        fake_attr_value = MagicMock()
+
+        print(f"fake_attr_value ", i, " ", fake_attr_value)
+        fake_field_names.append(fake_attr_name)
+        fake_attr_values.append(fake_attr_value)
+        fake__fields_.append([fake_attr_name, fake_attr_value])
+        expected_print_string  += fake_attr_name + ": " + str(fake_attr_value) + ", " 
+
+    fake_generic_recv_msg_p_contents._fields_ = fake__fields_
+    expected_print_string = expected_print_string[0:-2]
+
+    mocker.patch('src.run_scripts.sbn_adapter.sbn', fake_sbn)
+    pointer_side_effects = [FakeSbnDataGenericT, FakeDataStruct] * (num_loop_iterations + 1)
+    mocker.patch('src.run_scripts.sbn_adapter.POINTER', side_effect=pointer_side_effects)
+    mocker.patch.object(FakeSbnDataGenericT, '__new__', return_value=fake_generic_recv_msg_p)
+    mocker.patch.object(fake_sbn, 'recv_msg', return_value=None)
+    mocker.patch.object(FakeDataStruct, '__new__', return_value=fake_recv_msg_p)
+    mocker.patch('src.run_scripts.sbn_adapter.getattr', side_effect=fake_attr_values * (num_loop_iterations + 1))
+    mocker.patch('src.run_scripts.sbn_adapter.print', return_value=None)
+
+    mocker.patch('src.run_scripts.sbn_adapter.get_current_data', side_effect=side_effect_list)
+    
+    # Act
+    with pytest.raises(Exception) as e_info:
+        sbn_adapter.message_listener_thread()
+
+    # Assert
+    assert e_info.match(exception_message)
+    assert sbn_adapter.POINTER.call_count == (num_loop_iterations + 1) * 2
+    for i in range(num_loop_iterations + 1):
+        assert sbn_adapter.POINTER.call_args_list[i*2].args == (fake_sbn.sbn_data_generic_t, )
+        assert sbn_adapter.POINTER.call_args_list[(i*2)+1].args == (sbn_adapter.msgID_lookup_table[fake_msgID][1], )
+    assert FakeSbnDataGenericT.__new__.call_count == num_loop_iterations + 1
+    assert FakeDataStruct.__new__.call_count == num_loop_iterations + 1
+    assert fake_sbn.recv_msg.call_count == num_loop_iterations + 1
+    for i in range(num_loop_iterations + 1):
+        assert fake_sbn.recv_msg.call_args_list[i].args == (fake_generic_recv_msg_p, )
+    assert sbn_adapter.getattr.call_count == (num_loop_iterations + 1) * num_fake_prints
+    for i in range((num_loop_iterations + 1) * num_fake_prints):
+        assert sbn_adapter.getattr.call_args_list[i].args == (fake_generic_recv_msg_p_contents, fake_field_names[i % len(fake_field_names)])
+    assert sbn_adapter.print.call_count == num_loop_iterations + 1
+    for i in range(num_loop_iterations + 1):
+        assert sbn_adapter.print.call_args_list[i].args == (expected_print_string, )
+    assert sbn_adapter.get_current_data.call_count == num_loop_iterations + 1
+    for i in range(num_loop_iterations + 1):
+        assert sbn_adapter.get_current_data.call_args_list[i].args == (fake_generic_recv_msg_p_contents, sbn_adapter.msgID_lookup_table[fake_msgID][1], sbn_adapter.msgID_lookup_table[fake_msgID][0])
+  
+def test_get_current_data_with_no_fields_in_recv_msg_or_data_struct(mocker, setup_teardown):
+    # Arrange
+    fake_generic_recv_msg_p = MagicMock()
 
     fake_AdapterDataSource = MagicMock
     fake_AdapterDataSource.currentData = {}
@@ -64,113 +143,85 @@ def test_sbn_adapter_message_listener_thread_loops_indefinitely_with_no_fields_i
 
     fake_AdapterDataSource.currentData[0] = fake_current_buffer
 
-    fake_generic_recv_msg_p_contents = PropertyMock()
+    arg_recv_msg = PropertyMock()
     fake_generic_recv_msg_p_TlmHeader = PropertyMock()
     fake_generic_recv_msg_p_Primary = PropertyMock()
     fake_recv_msg_p_Secondary = PropertyMock()
     
-    fake_generic_recv_msg_p.contents = fake_generic_recv_msg_p_contents
+    fake_generic_recv_msg_p.contents = arg_recv_msg
     fake_generic_recv_msg_p.contents.TlmHeader = fake_generic_recv_msg_p_TlmHeader
     fake_generic_recv_msg_p.contents.TlmHeader.Primary = fake_generic_recv_msg_p_Primary
     fake_msgID = pytest.gen.choice(list(sbn_adapter.msgID_lookup_table.keys()))
     fake_generic_recv_msg_p.contents.TlmHeader.Primary.StreamId = fake_msgID
-    fake_generic_recv_msg_p_contents.TlmHeader.Secondary = fake_recv_msg_p_Secondary
-    fake_recv_msg_p_Secondary.Seconds = 0
-    fake_recv_msg_p_Secondary.Subseconds = 0
+    arg_recv_msg.TlmHeader.Secondary = fake_recv_msg_p_Secondary
+    fake_seconds = pytest.gen.randint(0,59)
+    fake_recv_msg_p_Secondary.Seconds = fake_seconds
+    fake_subseconds = pytest.gen.randint(0,999)
+    fake_recv_msg_p_Secondary.Subseconds = fake_subseconds
     fake_start_time = MagicMock()
     fake_timedelta = MagicMock()
     fake_time = MagicMock()
     fake_str_time = MagicMock()
 
-    # this exception will be used to forcefully exit the message_listener_thread function's while(True) loop
-    exception_message = 'forced loop exit'
-    exit_exception = Exception(exception_message)
-    
-    # sets return value of POINTER function to return fake_pointer an arbitrary number of times, then return exit_exception
-    num_loop_iterations = pytest.gen.randint(1, 10) # arbitrary, 1 to 10
-    side_effect_list = ([''] * num_loop_iterations) # one item for each loop
-    side_effect_list.append(exit_exception) # short-circuit exit while(True) loop
-
-    mocker.patch('src.run_scripts.sbn_adapter.sbn', fake_sbn)
-    pointer_side_effects = [FakeSbnDataGenericT, FakeDataStruct] * (num_loop_iterations + 1)
-    mocker.patch('src.run_scripts.sbn_adapter.POINTER', side_effect=pointer_side_effects)
-    mocker.patch.object(FakeSbnDataGenericT, '__new__', return_value=fake_generic_recv_msg_p)
-    mocker.patch.object(fake_sbn, 'recv_msg', return_value=None)
-    mocker.patch.object(FakeDataStruct, '__new__', return_value=fake_recv_msg_p)
-    mocker.patch('src.run_scripts.sbn_adapter.print', return_value=None)
     mocker.patch('src.run_scripts.sbn_adapter.AdapterDataSource',fake_AdapterDataSource)
     mocker.patch('src.run_scripts.sbn_adapter.datetime.datetime', return_value=fake_start_time)
     mocker.patch('src.run_scripts.sbn_adapter.datetime.timedelta', return_value=fake_timedelta)
     mocker.patch.object(fake_start_time, '__add__', return_value=fake_time)
     mocker.patch.object(fake_time, 'strftime', return_value=fake_str_time)
     fake_AdapterDataSource.new_data = False # not required, but helps verify it gets changed to True
-    mocker.patch.object(fake_AdapterDataSource.new_data_lock, '__enter__', side_effect=side_effect_list) # __enter__ is used by keyword 'with' in python
+    mocker.patch.object(fake_AdapterDataSource.new_data_lock, '__enter__') # __enter__ is used by keyword 'with' in python
+
+    arg_data_struct = sbn_adapter.msgID_lookup_table[fake_msgID][1]
+    arg_app_name = sbn_adapter.msgID_lookup_table[fake_msgID][0]
 
     # Act
-    with pytest.raises(Exception) as e_info:
-        sbn_adapter.message_listener_thread()
+    sbn_adapter.get_current_data(arg_recv_msg, arg_data_struct, arg_app_name)
 
     # Assert
-    assert e_info.match(exception_message)
-    assert sbn_adapter.POINTER.call_count == (num_loop_iterations + 1) * 2
-    for i in range(num_loop_iterations + 1):
-        assert sbn_adapter.POINTER.call_args_list[i*2].args == (fake_sbn.sbn_data_generic_t, )
-        assert sbn_adapter.POINTER.call_args_list[(i*2)+1].args == (sbn_adapter.msgID_lookup_table[fake_msgID][1], )
-    assert FakeSbnDataGenericT.__new__.call_count == num_loop_iterations + 1
-    assert FakeDataStruct.__new__.call_count == num_loop_iterations + 1
-    assert fake_sbn.recv_msg.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert fake_sbn.recv_msg.call_args_list[i].args == (fake_generic_recv_msg_p, )
-    assert sbn_adapter.print.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert sbn_adapter.print.call_args_list[i].args == ('', )
-    assert sbn_adapter.datetime.datetime.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert sbn_adapter.datetime.datetime.call_args_list[i].args == (1969, 12, 31, 20)
-    assert sbn_adapter.datetime.timedelta.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert sbn_adapter.datetime.timedelta.call_args_list[i].kwargs == {'seconds':0}
+    assert sbn_adapter.datetime.datetime.call_count ==  1
+    assert sbn_adapter.datetime.datetime.call_args_list[0].args == (1969, 12, 31, 20)
+    assert sbn_adapter.datetime.timedelta.call_count == 1
+    assert sbn_adapter.datetime.timedelta.call_args_list[0].kwargs == {'seconds':fake_seconds  + (2**(-32) * fake_subseconds)}
     # Although patched and does return value, fake_start_time.__add__ does not count but leaving comments here to show we would do this if able
     # assert fake_start_time.__add__.call_count == num_loop_iterations + 1
     # for i in range(num_loop_iterations + 1):
     #     assert fake_start_time.__add__.call_args_list[i].args == (fake_timedelta, )
-    assert fake_time.strftime.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert fake_time.strftime.call_args_list[i].args == ("%Y-%j-%H:%M:%S.%f", )
+    assert fake_time.strftime.call_count == 1
+    assert fake_time.strftime.call_args_list[0].args == ("%Y-%j-%H:%M:%S.%f", )
     assert fake_AdapterDataSource.new_data == True
     assert fake_current_buffer['data'][0] == fake_str_time
     
-def test_sbn_adapter_message_listener_thread_loops_indefinitely_with_fields_in_recv_msg_and_data_struct(mocker, setup_teardown):
+def test_get_current_data_with_fields_in_recv_msg_and_data_struct(mocker, setup_teardown):
     # Arrange
     fake_generic_recv_msg_p = MagicMock()
-    fake_recv_msg_p = MagicMock()
 
-    fake_sbn = MagicMock()
-    fake_sbn.sbn_data_generic_t = PropertyMock()
-
-    fake_AdapterDataSource = MagicMock
+    fake_AdapterDataSource = MagicMock()
     fake_AdapterDataSource.currentData = {}
     fake_AdapterDataSource.double_buffer_read_index = 1
     fake_AdapterDataSource.new_data_lock = PropertyMock()
+    fake_AdapterDataSource.new_data_lock.__enter__ = MagicMock()
+    fake_AdapterDataSource.new_data_lock.__exit__ = MagicMock()
     fake_current_buffer = {}
     fake_current_buffer['data'] = ['placeholder0', 'placeholder1']
     fake_headers_for_current_buffer = MagicMock()
     fake_current_buffer['headers'] = fake_headers_for_current_buffer
     fake_idx = 1
     fake_AdapterDataSource.currentData[0] = fake_current_buffer
-    fake_generic_recv_msg_p_contents = PropertyMock()
+    arg_recv_msg = PropertyMock()
     fake_generic_recv_msg_p_TlmHeader = PropertyMock()
     fake_generic_recv_msg_p_Primary = PropertyMock()
     fake_recv_msg_p_Secondary = PropertyMock()
     
-    fake_generic_recv_msg_p.contents = fake_generic_recv_msg_p_contents
+    fake_generic_recv_msg_p.contents = arg_recv_msg
     fake_generic_recv_msg_p.contents.TlmHeader = fake_generic_recv_msg_p_TlmHeader
     fake_generic_recv_msg_p.contents.TlmHeader.Primary = fake_generic_recv_msg_p_Primary
     fake_msgID = pytest.gen.choice(list(sbn_adapter.msgID_lookup_table.keys()))
     fake_generic_recv_msg_p.contents.TlmHeader.Primary.StreamId = fake_msgID
-    fake_generic_recv_msg_p_contents.TlmHeader.Secondary = fake_recv_msg_p_Secondary
-    fake_recv_msg_p_Secondary.Seconds = 0
-    fake_recv_msg_p_Secondary.Subseconds = 0
+    arg_recv_msg.TlmHeader.Secondary = fake_recv_msg_p_Secondary
+    fake_seconds = pytest.gen.randint(0,59)
+    fake_recv_msg_p_Secondary.Seconds = fake_seconds
+    fake_subseconds = pytest.gen.randint(0,999)
+    fake_recv_msg_p_Secondary.Subseconds = fake_subseconds
     fake_start_time = MagicMock()
     fake_timedelta = MagicMock()
     fake_time = MagicMock()
@@ -179,79 +230,46 @@ def test_sbn_adapter_message_listener_thread_loops_indefinitely_with_fields_in_r
     fake__fields_ = [["1st item placeholder"]]
     num_fake__fields_ = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
     fake_field_names = []
-    expected_print_string = ''
     for i in range(num_fake__fields_):
         fake_attr_name = str(MagicMock())
         fake_attr_value = MagicMock()
+        
         fake_field_names.append(fake_attr_name)
-        fake_generic_recv_msg_p_contents.__setattr__(fake_attr_name, fake_attr_value)
+        arg_recv_msg.__setattr__(fake_attr_name, fake_attr_value)
         sbn_adapter.msgID_lookup_table[fake_msgID][1].__setattr__(fake_attr_name, fake_attr_value)
         fake__fields_.append([fake_attr_name, fake_attr_value])
-        expected_print_string  += fake_attr_name + ": " + str(fake_attr_value) + ", " 
 
-    fake_generic_recv_msg_p_contents._fields_ = fake__fields_
+    arg_recv_msg._fields_ = fake__fields_
     sbn_adapter.msgID_lookup_table[fake_msgID][1]._fields_ = fake__fields_
-    expected_print_string = expected_print_string[0:-2]
 
-    # this exception will be used to forcefully exit the message_listener_thread function's while(True) loop
-    exception_message = 'forced loop exit'
-    exit_exception = Exception(exception_message)
-    
-    # sets return value of POINTER function to return fake_pointer an arbitrary number of times, then return exit_exception
-    num_loop_iterations = pytest.gen.randint(1, 10) # arbitrary, 1 to 10
-    side_effect_list = ([''] * num_loop_iterations) # one item for each loop
-    side_effect_list.append(exit_exception) # short-circuit exit while(True) loop
-    fake_field_names = fake_field_names * (num_loop_iterations + 1)
-
-    mocker.patch('src.run_scripts.sbn_adapter.sbn', fake_sbn)
-    pointer_side_effects = [FakeSbnDataGenericT, FakeDataStruct] * (num_loop_iterations + 1)
-    mocker.patch('src.run_scripts.sbn_adapter.POINTER', side_effect=pointer_side_effects)
-    mocker.patch.object(FakeSbnDataGenericT, '__new__', return_value=fake_generic_recv_msg_p)
-    mocker.patch.object(fake_sbn, 'recv_msg', return_value=None)
-    mocker.patch.object(FakeDataStruct, '__new__', return_value=fake_recv_msg_p)
-    mocker.patch('src.run_scripts.sbn_adapter.print', return_value=None)
     mocker.patch('src.run_scripts.sbn_adapter.AdapterDataSource',fake_AdapterDataSource)
     mocker.patch('src.run_scripts.sbn_adapter.datetime.datetime', return_value=fake_start_time)
     mocker.patch('src.run_scripts.sbn_adapter.datetime.timedelta', return_value=fake_timedelta)
     mocker.patch.object(fake_start_time, '__add__', return_value=fake_time)
     mocker.patch.object(fake_time, 'strftime', return_value=fake_str_time)
     fake_AdapterDataSource.new_data = False # not required, but helps verify it gets changed to True
-    mocker.patch.object(fake_AdapterDataSource.new_data_lock, '__enter__', side_effect=side_effect_list) # __enter__ is used by keyword 'with' in python
+    mocker.patch.object(fake_AdapterDataSource.new_data_lock, '__enter__') # __enter__ is used by keyword 'with' in python
     mocker.patch.object(fake_headers_for_current_buffer, 'index', return_value=fake_idx)
 
+    arg_data_struct = sbn_adapter.msgID_lookup_table[fake_msgID][1]
+    arg_app_name = sbn_adapter.msgID_lookup_table[fake_msgID][0]
+
     # Act
-    with pytest.raises(Exception) as e_info:
-        sbn_adapter.message_listener_thread()
+    sbn_adapter.get_current_data(arg_recv_msg, arg_data_struct, arg_app_name)
 
     # Assert
-    assert e_info.match(exception_message)
-    assert sbn_adapter.POINTER.call_count == (num_loop_iterations + 1) * 2
-    for i in range(num_loop_iterations + 1):
-        assert sbn_adapter.POINTER.call_args_list[i*2].args == (fake_sbn.sbn_data_generic_t, )
-        assert sbn_adapter.POINTER.call_args_list[(i*2)+1].args == (sbn_adapter.msgID_lookup_table[fake_msgID][1], )
-    assert FakeSbnDataGenericT.__new__.call_count == num_loop_iterations + 1
-    assert FakeDataStruct.__new__.call_count == num_loop_iterations + 1
-    assert fake_sbn.recv_msg.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert fake_sbn.recv_msg.call_args_list[i].args == (fake_generic_recv_msg_p, )
-    assert sbn_adapter.print.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert sbn_adapter.print.call_args_list[i].args == (expected_print_string, )
-    assert sbn_adapter.datetime.datetime.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert sbn_adapter.datetime.datetime.call_args_list[i].args == (1969, 12, 31, 20)
-    assert sbn_adapter.datetime.timedelta.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert sbn_adapter.datetime.timedelta.call_args_list[i].kwargs == {'seconds':0}
+    assert sbn_adapter.datetime.datetime.call_count == 1
+    assert sbn_adapter.datetime.datetime.call_args_list[0].args == (1969, 12, 31, 20)
+    assert sbn_adapter.datetime.timedelta.call_count == 1
+    assert sbn_adapter.datetime.timedelta.call_args_list[0].kwargs == {'seconds':fake_seconds  + (2**(-32) * fake_subseconds)}
     # Although patched and does return value, fake_start_time.__add__ does not count but leaving comments here to show we would do this if able
     # assert fake_start_time.__add__.call_count == num_loop_iterations + 1
     # for i in range(num_loop_iterations + 1):
     #     assert fake_start_time.__add__.call_args_list[i].args == (fake_timedelta, )
-    assert fake_time.strftime.call_count == num_loop_iterations + 1
-    for i in range(num_loop_iterations + 1):
-        assert fake_time.strftime.call_args_list[i].args == ("%Y-%j-%H:%M:%S.%f", )
-    assert fake_headers_for_current_buffer.index.call_count == (num_loop_iterations + 1) * num_fake__fields_
-    for i in range((num_loop_iterations + 1) * num_fake__fields_):
+    assert fake_time.strftime.call_count == 1
+    assert fake_time.strftime.call_args_list[0].args == ("%Y-%j-%H:%M:%S.%f", )
+    assert fake_headers_for_current_buffer.index.call_count == num_fake__fields_
+    for i in range(num_fake__fields_):
         assert fake_headers_for_current_buffer.index.call_args_list[i].args == (str((sbn_adapter.msgID_lookup_table[fake_msgID][0]) + "." + str(sbn_adapter.msgID_lookup_table[fake_msgID][1].__name__) + "." + fake_field_names[i]), )
     assert fake_AdapterDataSource.new_data == True
     assert fake_current_buffer['data'][0] == fake_str_time
