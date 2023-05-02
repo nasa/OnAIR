@@ -144,7 +144,7 @@ def test_TimeSynchronizer_init_sync_data_sets_instance_variables_to_the_expected
     fake_unclean_fused_tests = list(range(num_fake_headers)) + list(range(num_fake_headers))
     fake_unclean_fused_tests.sort()
 
-    expected_ordered_fused_tests = [[['SYNC', 'TIME']], fake_ordered_fused_tests[0]]
+    expected_ordered_fused_tests = [[['NOOP']], fake_ordered_fused_tests[0]]
     expected_ordered_fused_headers = ['TIME', fake_ordered_fused_headers[0]]
     expected_start_indices = {}
 

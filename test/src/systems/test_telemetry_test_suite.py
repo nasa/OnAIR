@@ -21,8 +21,7 @@ def test_TelemetryTestSuite__init__sets_the_expected_values_with_given_headers_a
     assert cut.tests == arg_tests
     assert cut.latest_results == None
     assert cut.epsilon == 1/100000 # production codes notes this value as needing intelligent definition
-    assert cut.all_tests == {'SYNC' : cut.sync,
-                            'STATE' : cut.state,
+    assert cut.all_tests == {'STATE' : cut.state,
                       'FEASIBILITY' : cut.feasibility, 
                              'NOOP' : cut.noop}
 
@@ -151,100 +150,19 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     cut.dataFields = {arg_header_index:expected_datafield}
     cut.epsilon = MagicMock()
     
-    # IMPORTANT: note, using sync function as an easy mock -- not really calling it here!!
-    mocker.patch.object(cut, 'sync', return_value=(fake_stat, fake_mass_assigments))
+    # IMPORTANT: note, using state function as an easy mock -- not really calling it here!!
+    mocker.patch.object(cut, 'state', return_value=(fake_stat, fake_mass_assigments))
     mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
     mocker.patch('src.systems.telemetry_test_suite.Status', return_value = expected_result)
 
-    cut.all_tests = {fake_tests[0][0]:cut.sync} # IMPORTANT: purposely set AFTER patch of cut's sync function
+    cut.all_tests = {fake_tests[0][0]:cut.state} # IMPORTANT: purposely set AFTER patch of cut's sync function
     
     # Act
     result = cut.run_tests(arg_header_index, arg_test_val, arg_sync_data)
 
     # Assert
-    assert cut.sync.call_count == 1
-    assert cut.sync.call_args_list[0].args == (arg_test_val, fake_tests[0][1:], cut.epsilon)
-    assert cut.calc_single_status.call_count == 1
-    assert cut.calc_single_status.call_args_list[0].args == ([fake_stat], )
-    assert telemetry_test_suite.Status.call_count == 1
-    assert telemetry_test_suite.Status.call_args_list[0].args == (expected_datafield, fake_bayesian[0], fake_bayesian[1])
-    assert result == expected_result
-  
-def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_header_index_appends_status_with_empty_data_var_not_in_sync_data_keys_when_given_header_index_leads_to_a_single_test_named_SYNC(mocker):
-    # Arrange
-    arg_header_index = MagicMock()
-    arg_test_val = MagicMock()
-    arg_sync_data = {}
-
-    fake_tests = [['SYNC']]
-    fake_var = MagicMock()
-    fake_tests[0].append(fake_var)
-    fake_stat = MagicMock()
-    fake_mass_assigments = MagicMock()
-    fake_bayesian = [MagicMock(),MagicMock()]
-
-    expected_datafield = MagicMock()
-    expected_result = telemetry_test_suite.Status.__new__(telemetry_test_suite.Status)
-
-    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
-    cut.tests = {arg_header_index:fake_tests}
-    cut.dataFields = {arg_header_index:expected_datafield}
-    cut.epsilon = MagicMock()
-    
-    mocker.patch.object(cut, 'sync', return_value=(fake_stat, fake_mass_assigments))
-    mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
-    mocker.patch('src.systems.telemetry_test_suite.Status', return_value = expected_result)
-
-    cut.all_tests = {fake_tests[0][0]:cut.sync} # IMPORTANT: purposely set AFTER patch of cut's sync function
-    
-    # Act
-    result = cut.run_tests(arg_header_index, arg_test_val, arg_sync_data)
-
-    # Assert
-    assert cut.sync.call_count == 1
-    assert cut.sync.call_args_list[0].args == (arg_test_val, [], cut.epsilon)
-    assert cut.calc_single_status.call_count == 1
-    assert cut.calc_single_status.call_args_list[0].args == ([fake_stat], )
-    assert telemetry_test_suite.Status.call_count == 1
-    assert telemetry_test_suite.Status.call_args_list[0].args == (expected_datafield, fake_bayesian[0], fake_bayesian[1])
-    assert result == expected_result
-    
-def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_header_index_appends_status_with_updated_data_var_in_sync_data_keys_when_given_header_index_leads_to_a_single_test_named_SYNC(mocker):
-    # Arrange
-    arg_header_index = MagicMock()
-    arg_test_val = MagicMock()
-    arg_sync_data = {}
-
-    fake_tests = [['SYNC']]
-    fake_var = MagicMock()
-    fake_tests[0].append(fake_var)
-    fake_updated_test_data = MagicMock()
-    fake_stat = MagicMock()
-    fake_mass_assigments = MagicMock()
-    fake_bayesian = [MagicMock(),MagicMock()]
-
-    arg_sync_data[fake_var] = fake_updated_test_data
-
-    expected_datafield = MagicMock()
-    expected_result = telemetry_test_suite.Status.__new__(telemetry_test_suite.Status)
-
-    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
-    cut.tests = {arg_header_index:fake_tests}
-    cut.dataFields = {arg_header_index:expected_datafield}
-    cut.epsilon = MagicMock()
-    
-    mocker.patch.object(cut, 'sync', return_value=(fake_stat, fake_mass_assigments))
-    mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
-    mocker.patch('src.systems.telemetry_test_suite.Status', return_value = expected_result)
-
-    cut.all_tests = {fake_tests[0][0]:cut.sync} # IMPORTANT: purposely set AFTER patch of cut's sync function
-    
-    # Act
-    result = cut.run_tests(arg_header_index, arg_test_val, arg_sync_data)
-
-    # Assert
-    assert cut.sync.call_count == 1
-    assert cut.sync.call_args_list[0].args == (arg_test_val, [fake_updated_test_data], cut.epsilon)
+    assert cut.state.call_count == 1
+    assert cut.state.call_args_list[0].args == (arg_test_val, fake_tests[0][1:], cut.epsilon)
     assert cut.calc_single_status.call_count == 1
     assert cut.calc_single_status.call_args_list[0].args == ([fake_stat], )
     assert telemetry_test_suite.Status.call_count == 1
@@ -276,35 +194,26 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     cut.dataFields = {arg_header_index:expected_datafield}
     cut.epsilon = MagicMock()
     
-    mocker.patch.object(cut, 'sync', return_value=(fake_stat, fake_mass_assigments))
+    mocker.patch.object(cut, 'state', return_value=(fake_stat, fake_mass_assigments))
     mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
     mocker.patch('src.systems.telemetry_test_suite.Status', return_value = expected_result)
 
-    cut.all_tests = {'SYNC':cut.sync} # IMPORTANT: purposely set AFTER patch of cut's sync function
+    cut.all_tests = {'STATE':cut.state} # IMPORTANT: purposely set AFTER patch of cut's state function
     
     # setup random input and results
     for i in range(num_fake_tests):
         fake_vars.append(MagicMock())
-        rand_type = pytest.gen.randint(0, 2) # 3 choices, from 0 to 2
-        if  rand_type == 0: # SYNC var exists
-            fake_tests.append(['SYNC', fake_vars[i]])
-            arg_sync_data[fake_vars[i]] = MagicMock()
-            fake_sync_vars.append([arg_sync_data[fake_vars[i]]])
-        elif rand_type == 1: # SYNC var not exists
-            fake_tests.append(['SYNC', fake_vars[i]])
-            fake_sync_vars.append([])
-        else:
-            fake_tests.append([str(MagicMock()), fake_vars[i]])
-            fake_sync_vars.append([fake_vars[i]])
-            cut.all_tests[fake_tests[i][0]] = cut.sync
+        fake_tests.append([str(MagicMock()), fake_vars[i]])
+        fake_sync_vars.append([fake_vars[i]])
+        cut.all_tests[fake_tests[i][0]] = cut.state
 
     # Act
     result = cut.run_tests(arg_header_index, arg_test_val, arg_sync_data)
 
     # Assert
-    assert cut.sync.call_count == num_fake_tests
+    assert cut.state.call_count == num_fake_tests
     for i in range(num_fake_tests):
-        assert cut.sync.call_args_list[i].args == (arg_test_val, fake_sync_vars[i], cut.epsilon)
+        assert cut.state.call_args_list[i].args == (arg_test_val, fake_sync_vars[i], cut.epsilon)
     assert cut.calc_single_status.call_count == 1
     assert cut.calc_single_status.call_args_list[0].args == (expected_stats, )
     assert telemetry_test_suite.Status.call_count == 1
@@ -344,21 +253,6 @@ def test_TelemetryTestSuite_get_latest_results_returns_None_when_latest_results_
 
     # Assert
     assert result == expected_result
-
-# sync tests
-def test_TelemetryTestSuite_sync_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0():
-    # Arrange
-    arg_val = MagicMock()
-    arg_test_params = MagicMock()
-    arg_epsilon = MagicMock()
-
-    cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
-
-    # Act
-    result = cut.sync(arg_val, arg_test_params, arg_epsilon)
-
-    # Assert
-    assert result == ('GREEN', [({'GREEN'}, 1.0)])
 
 # state tests
 def test_TelemetryTestSuite_state_returns_tuple_of_str_GREEN_and_list_containing_tuple_of_set_of_str_GREEN_and_1_pt_0_when_int_val_is_in_range_test_params_0():
