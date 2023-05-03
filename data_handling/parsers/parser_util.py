@@ -17,14 +17,12 @@ def extract_configs(configFilePath, configFile, csv = False):
             configs['subsystem_assignments'][i] = []
 
         test_assign = configs['test_assignments'][i]
-        if len(test_assign) > 1:
-            test = [test_assign[0]]
-            limits = str2lst(test_assign[1])
-            test_assign = test + limits
-        elif test_assign[0] != 'NOOP':
-            test_assign = str2lst(test_assign[0])
 
-        configs['test_assignments'][i] = [test_assign]
+        for j in range(len(test_assign)):
+            if len(test_assign[j]) > 1:
+                test = [test_assign[j][0]]
+                limits = str2lst(test_assign[j][1])
+                test_assign[j] = test + limits
 
     return configs
         
