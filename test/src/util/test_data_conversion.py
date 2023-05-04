@@ -27,6 +27,23 @@ def test_data_conversion_flotify_input_returns_empty_list_when_given__input_is_v
     # Assert
     assert result == []
 
+def test_data_conversion_flotify_input_raises_exception_when_float_returns_non_ValueError_exception(mocker):
+    # Arrange
+    arg__input = [str(MagicMock())] # list of single str list, 1 iteration
+    arg_remove_str = False
+
+    exception_message = str(MagicMock())
+    fake_exception = Exception(exception_message)
+
+    mocker.patch('builtins.float', side_effect=[fake_exception])
+
+    # Act
+    with pytest.raises(Exception) as e_info:
+        src.util.data_conversion.floatify_input(arg__input, arg_remove_str)
+
+    # Assert
+    assert e_info.match(exception_message)
+
 def test_data_conversion_flotify_input_returns_list_of_size_one_that_contains_the_call_to_float_when_no_Exception_is_thrown_and_given__input_is_str(mocker):
     # Arrange
     arg__input = []
