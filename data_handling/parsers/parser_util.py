@@ -7,9 +7,10 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
-import ast
 import os
 from data_handling.parsers.tlm_json_parser import parseTlmConfJson, str2lst
+from pandas import to_datetime
+import datetime
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_configs(configFilePath, configFile, csv = False):
@@ -56,8 +57,8 @@ def floatify_input(_input, remove_str=False):
             floatified.append(x)
         except ValueError:
             try:
-                x = i.replace('-', '').replace(':', '').replace('.', '')
-                floatified.append(float(x))
+                x = convert_str_to_timestamp(i)
+                floatified.append(x)
             except:
                 if remove_str == False:
                     floatified.append(0.0)
@@ -65,3 +66,11 @@ def floatify_input(_input, remove_str=False):
                     continue
                 continue
     return floatified
+
+def convert_str_to_timestamp(time_str):
+    try:
+        t = to_datetime(time_str)
+        return t.timestamp()
+    except:
+        t = datetime.datetime.strptime(time_str[:24], '%Y-%j-%H:%M:%S.%f')
+        return t.timestamp()
