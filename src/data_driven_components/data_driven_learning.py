@@ -23,7 +23,7 @@ class DataDrivenLearning:
         ]
 
     def update(self, curr_data, status):
-        input_data = floatify_input(curr_data)
+        input_data = curr_data
         output_data = status_to_oneHot(status)
         for plugin in self.ai_constructs:
             plugin.update(input_data)
