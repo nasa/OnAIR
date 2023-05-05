@@ -58,8 +58,8 @@ class CSV(OnAirParser):
         #Initialize the entire data dictionary
         all_data = {}
         for index, row in dataset.iterrows():
-            rowVals = list(row)
-            innerStructure = {dataFile : list(row)}
+            rowVals = floatify_input(list(row))
+            innerStructure = {dataFile : floatify_input(list(row))}
             #If a time header doesn't exist, just assume normal indexing
             if (timeIndex == -1):
                 all_data[index] = innerStructure

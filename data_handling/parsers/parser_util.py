@@ -47,3 +47,21 @@ def process_filepath(path, return_config=False, csv = False):
         if return_config == True:
             filename = filename.replace('.txt', '_CONFIG.txt')
         return filename
+
+def floatify_input(_input, remove_str=False):
+    floatified = []
+    for i in _input:
+        try:
+            x = float(i)
+            floatified.append(x)
+        except ValueError:
+            try:
+                x = i.replace('-', '').replace(':', '').replace('.', '')
+                floatified.append(float(x))
+            except:
+                if remove_str == False:
+                    floatified.append(0.0)
+                else:
+                    continue
+                continue
+    return floatified
