@@ -256,14 +256,14 @@ def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_d
   fake_mission_status = MagicMock()
   fake_status = MagicMock()
 
-  expected_print = "INTERPRETED MISSION STATUS: " + str(fake_status)
+  expected_print = "INTERPRETED SYSTEM STATUS: " + str(fake_status)
 
   arg_agent.mission_status = fake_mission_status
   mocker.patch('src.util.print_io.format_status', return_value=fake_status)
   mocker.patch('src.util.print_io.print')
 
   # Act
-  src.util.print_io.print_mission_status(arg_agent)
+  src.util.print_io.print_system_status(arg_agent)
   
   # Assert
   assert src.util.print_io.format_status.call_count == 1
@@ -279,14 +279,14 @@ def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_d
   fake_mission_status = MagicMock()
   fake_status = MagicMock()
 
-  expected_print = "INTERPRETED MISSION STATUS: " + str(fake_status)
+  expected_print = "INTERPRETED SYSTEM STATUS: " + str(fake_status)
 
   arg_agent.mission_status = fake_mission_status
   mocker.patch('src.util.print_io.format_status', return_value=fake_status)
   mocker.patch('src.util.print_io.print')
 
   # Act
-  src.util.print_io.print_mission_status(arg_agent, arg_data)
+  src.util.print_io.print_system_status(arg_agent, arg_data)
   
   # Assert
   assert src.util.print_io.format_status.call_count == 1
@@ -303,15 +303,15 @@ def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_d
   fake_status = MagicMock()
 
   expected_print = []
-  expected_print.append("CURRENT TLM: " + str(arg_data))
-  expected_print.append("INTERPRETED MISSION STATUS: " + str(fake_status))
+  expected_print.append("CURRENT DATA: " + str(arg_data))
+  expected_print.append("INTERPRETED SYSTEM STATUS: " + str(fake_status))
 
   arg_agent.mission_status = fake_mission_status
   mocker.patch('src.util.print_io.format_status', return_value=fake_status)
   mocker.patch('src.util.print_io.print')
 
   # Act
-  src.util.print_io.print_mission_status(arg_agent, arg_data)
+  src.util.print_io.print_system_status(arg_agent, arg_data)
   
   # Assert
   assert src.util.print_io.format_status.call_count == 1

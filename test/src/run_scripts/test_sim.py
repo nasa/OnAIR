@@ -334,7 +334,7 @@ def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Fla
     arg_IO_Flag = True
 
     mocker.patch('src.run_scripts.sim.print_sim_step')
-    mocker.patch('src.run_scripts.sim.print_mission_status')
+    mocker.patch('src.run_scripts.sim.print_system_status')
 
     cut = Simulator.__new__(Simulator)
     cut.agent = MagicMock()
@@ -345,8 +345,8 @@ def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Fla
     # Assert
     assert sim.print_sim_step.call_count == 1
     assert sim.print_sim_step.call_args_list[0].args == (arg_time_step + 1, )
-    assert sim.print_mission_status.call_count == 1
-    assert sim.print_mission_status.call_args_list[0].args == (cut.agent, cut.agent.vehicle_rep.curr_data, )
+    assert sim.print_system_status.call_count == 1
+    assert sim.print_system_status.call_args_list[0].args == (cut.agent, cut.agent.vehicle_rep.curr_data, )
 
 def test_Simulator_IO_check_does_nothing_when_given_IO_Flag_is_not_True(mocker):
     # Arrange
@@ -354,7 +354,7 @@ def test_Simulator_IO_check_does_nothing_when_given_IO_Flag_is_not_True(mocker):
     arg_IO_Flag = MagicMock()
 
     mocker.patch('src.run_scripts.sim.print_sim_step')
-    mocker.patch('src.run_scripts.sim.print_mission_status')
+    mocker.patch('src.run_scripts.sim.print_system_status')
 
     cut = Simulator.__new__(Simulator)
 
@@ -363,4 +363,4 @@ def test_Simulator_IO_check_does_nothing_when_given_IO_Flag_is_not_True(mocker):
 
     # Assert
     assert sim.print_sim_step.call_count == 0
-    assert sim.print_mission_status.call_count == 0
+    assert sim.print_system_status.call_count == 0
