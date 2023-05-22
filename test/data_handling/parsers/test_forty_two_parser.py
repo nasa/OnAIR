@@ -209,7 +209,10 @@ def test_FortyTwo_parse_frame_returns_expected_value_when_given_frame_with_data(
     fake_time = MagicMock()
     fake_data = [MagicMock()] * num_lines
 
-    expected_result = [str(fake_time).removeprefix('<MagicMock ')]
+    expected_result = str(fake_time)
+
+    if expected_result.startswith('<MagicMock '):
+      expected_result = [expected_result[len('<MagicMock '):]]
 
     arg_frame = str(fake_time)
     for fake_datum in fake_data:
