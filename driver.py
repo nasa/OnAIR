@@ -50,9 +50,6 @@ def main():
         OnAIR = ExecutionEngine(args.configfile, save_name, args.save)
         OnAIR.run_sim()
 
-    clean_all(os.environ['BASE_PATH']) 
-
-
 """ Runs all unit tests """
 def run_unit_tests(Coverage: cov):
     cov.start()
