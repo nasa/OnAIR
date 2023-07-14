@@ -65,3 +65,7 @@ or
 and
 
 `<browser_here> htmlcov/index.html` - browsable coverage (i.e., `firefox htmlcov/index.html`)
+
+## License and Copyright
+
+Please refer to [NOSA GSC-19165-1 OnAIR.pdf](NOSA%20GSC-19165-1%20OnAIR.pdf) and [COPYRIGHT](COPYRIGHT).
