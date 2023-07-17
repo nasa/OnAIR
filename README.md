@@ -1,5 +1,8 @@
 # The On-board Artificial Intelligence Research (OnAIR) Platform
 
+The On-board Artificial Intelligence Research (OnAIR) Platform is a framework that enables AI algorithms written in Python to interact with NASA's [cFS](https://github.com/nasa/cFS).
+It is intended to explore research concepts in autonomous operations in a simulated environment.
+
 ## Generating environment
 
 Create a conda environment with the necessary packages
