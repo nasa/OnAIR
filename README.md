@@ -7,7 +7,7 @@ It is intended to explore research concepts in autonomous operations in a simula
 
 Create a conda environment with the necessary packages
 
-    conda create --name onair --file requirements.txt
+    conda create --name onair --file requirements_pip.txt
 
 ## Running unit tests
 
