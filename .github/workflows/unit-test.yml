@@ -20,4 +20,6 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements_pip.txt ]; then pip install -r requirements_pip.txt; fi
     - name: Test with pytest
-      run: python -m coverage run --branch --source=src,data_handling,utils -m pytest ./test/
+      run: |
+        python -m coverage run --branch --source=src,data_handling,utils -m pytest ./test/
+        coverage report
