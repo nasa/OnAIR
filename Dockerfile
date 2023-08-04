@@ -56,12 +56,16 @@ RUN \
 RUN adduser onair_dev sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-USER onair_dev
+# Make OnAir requirements file accessible by onair_dev user
+COPY requirements_pip.txt /home/onair_dev/requirements_onair.txt
+RUN chown onair_dev /home/onair_dev/requirements_onair.txt
 
-# Install OnAIR deps
-COPY requirements_pip.txt ./requirements_onair.txt
-RUN python3.9 -m pip install --upgrade pip setuptools wheel
-RUN python3.9 -m pip install -r requirements_onair.txt
+USER onair_dev
 
 # Python stuff is being installed for the local user
 ENV PATH="${PATH}:/home/onair_dev/.local/bin"
+
+# Install OnAIR deps
+RUN python3.9 -m pip install --upgrade pip setuptools wheel
+RUN python3.9 -m pip install --user -r /home/onair_dev/requirements_onair.txt
+
