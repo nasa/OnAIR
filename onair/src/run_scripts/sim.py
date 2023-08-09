@@ -32,7 +32,7 @@ class Simulator:
         if SBN_Flag:
             # TODO: This is ugly, but sbn_client is only available when built for cFS...
             # ...from sbn_adapter import AdapterDataSource
-            sbn_adapter = importlib.import_module('src.run_scripts.sbn_adapter')
+            sbn_adapter = importlib.import_module('onair.src.run_scripts.sbn_adapter')
             AdapterDataSource = getattr(sbn_adapter, 'AdapterDataSource')
             self.simData = AdapterDataSource(parsedData.get_sim_data())
             self.simData.connect() # this also subscribes to the msgIDs

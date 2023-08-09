@@ -69,8 +69,8 @@ def run_unit_tests(Coverage: cov):
 
 """ Initializes global paths, used throughout execution """
 def init_global_paths(test=False):
-    run_path = 'src/test' if test == True else './'
-    results_path = 'src/test/results' if test == True else 'results/'
+    run_path = 'onair/src/test' if test == True else './'
+    results_path = 'onair/src/test/results' if test == True else 'results/'
 
     os.environ['BASE_PATH'] = os.path.dirname(os.path.realpath(__file__))
     os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)
