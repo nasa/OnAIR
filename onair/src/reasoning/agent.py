@@ -11,8 +11,8 @@
 Agent Class
 Deals with supervised learning for diagnosing statuses
 """
-from src.data_driven_components.data_driven_learning import DataDrivenLearning
-from src.reasoning.diagnosis import Diagnosis
+from ..data_driven_components.data_driven_learning import DataDrivenLearning
+from ..reasoning.diagnosis import Diagnosis
 
 class Agent:
     def __init__(self, vehicle):

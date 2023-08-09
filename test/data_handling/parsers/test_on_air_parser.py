@@ -10,8 +10,8 @@
 """ Test OnAir Parser Functionality """
 import pytest
 from mock import MagicMock
-import data_handling.parsers.on_air_parser as on_air_parser
-from data_handling.parsers.on_air_parser import OnAirParser
+import onair.data_handling.parsers.on_air_parser as on_air_parser
+from onair.data_handling.parsers.on_air_parser import OnAirParser
 
 
 class FakeOnAirParser(OnAirParser):
@@ -150,7 +150,7 @@ def test_OnAirParser__init__preprocesses_dataFiles_and_sets_binning_configs_when
   fake_str2lst_first_return = [MagicMock()]
 
   mocker.patch.object(pytest.cut, 'pre_process_data')
-  mocker.patch('data_handling.parsers.on_air_parser.str2lst', side_effect=[fake_str2lst_first_return, []])
+  mocker.patch('onair.data_handling.parsers.on_air_parser.str2lst', side_effect=[fake_str2lst_first_return, []])
   mocker.patch.object(pytest.cut, 'parse_config_data', return_value=[])
 
   # Act
@@ -190,7 +190,7 @@ def test_OnAirParser__init__preprocesses_dataFiles_and_processes_data_per_file_s
     fake_str2lst_second_return.append(MagicMock())
 
   mocker.patch.object(pytest.cut, 'pre_process_data')
-  mocker.patch('data_handling.parsers.on_air_parser.str2lst', side_effect=[fake_str2lst_first_return, fake_str2lst_second_return])
+  mocker.patch('onair.data_handling.parsers.on_air_parser.str2lst', side_effect=[fake_str2lst_first_return, fake_str2lst_second_return])
   mocker.patch.object(pytest.cut, 'parse_config_data', return_value=fake_configs)
   mocker.patch.object(pytest.cut, 'process_data_per_data_file')
 

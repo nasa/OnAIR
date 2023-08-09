@@ -13,7 +13,7 @@ Handles telemetry mnemonic testing
 """
 
 # from collections import Counter
-from src.systems.status import Status
+from .status import Status
 from collections import Counter
 
 class TelemetryTestSuite:

@@ -10,8 +10,8 @@
 """ Test DataDrivenLearning Functionality """
 import pytest
 from mock import MagicMock
-import src.data_driven_components.data_driven_learning as data_driven_learning
-from src.data_driven_components.data_driven_learning import DataDrivenLearning
+import onair.src.data_driven_components.data_driven_learning as data_driven_learning
+from onair.src.data_driven_components.data_driven_learning import DataDrivenLearning
 
 import importlib
 
@@ -99,7 +99,7 @@ def test_DataDrivenLearning_update_only_calls_flotify_input_with_given_curr_data
     arg_curr_data = MagicMock()
     arg_status = MagicMock()
 
-    mocker.patch('src.data_driven_components.data_driven_learning.status_to_oneHot')
+    mocker.patch('onair.src.data_driven_components.data_driven_learning.status_to_oneHot')
 
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
     cut.ai_constructs = []
@@ -117,7 +117,7 @@ def test_DataDrivenLearning_update_calls_flotify_input_with_given_curr_data_and_
     arg_curr_data = MagicMock()
     arg_status = MagicMock()
 
-    mocker.patch('src.data_driven_components.data_driven_learning.status_to_oneHot')
+    mocker.patch('onair.src.data_driven_components.data_driven_learning.status_to_oneHot')
 
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
     cut.ai_constructs = []

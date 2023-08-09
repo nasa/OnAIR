@@ -10,8 +10,8 @@
 """ Test Agent Functionality """
 import pytest
 from mock import MagicMock
-import src.reasoning.agent as agent
-from src.reasoning.agent import Agent
+import onair.src.reasoning.agent as agent
+from onair.src.reasoning.agent import Agent
 
 
 # __init__ tests
@@ -25,7 +25,7 @@ def test_Agent__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and
     fake_bayesian_status = MagicMock()
 
     mocker.patch.object(arg_vehicle, 'get_headers', return_value=fake_headers)
-    mocker.patch('src.reasoning.agent.DataDrivenLearning', return_value=fake_learning_systems)
+    mocker.patch('onair.src.reasoning.agent.DataDrivenLearning', return_value=fake_learning_systems)
     mocker.patch.object(arg_vehicle, 'get_status', return_value=fake_mission_status)
     mocker.patch.object(arg_vehicle, 'get_bayesian_status', return_value=fake_bayesian_status)
 

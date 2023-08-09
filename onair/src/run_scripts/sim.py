@@ -14,12 +14,12 @@ Helper class to create and run a simulation
 
 import importlib
 
-from src.reasoning.agent import Agent
-from src.systems.vehicle_rep import VehicleRepresentation
-from src.util.file_io import *
-from src.util.print_io import *
-from src.util.sim_io import *
-from data_handling.data_source import DataSource
+from ..reasoning.agent import Agent
+from ..systems.vehicle_rep import VehicleRepresentation
+from ..util.file_io import *
+from ..util.print_io import *
+from ..util.sim_io import *
+from ...data_handling.data_source import DataSource
 
 MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100

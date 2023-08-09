@@ -11,7 +11,7 @@
 import pytest
 from mock import MagicMock
 
-import src.util.data_conversion
+import onair.src.util.data_conversion
 
 from numpy import ndarray
     
@@ -20,14 +20,14 @@ def test_data_conversion_status_to_oneHot_returns_given_status_when_status_isins
     # Arrange
     arg_status = MagicMock()
 
-    mocker.patch('src.util.data_conversion.isinstance', return_value=True)
+    mocker.patch('onair.src.util.data_conversion.isinstance', return_value=True)
 
     # Act
-    result = src.util.data_conversion.status_to_oneHot(arg_status)
+    result = onair.src.util.data_conversion.status_to_oneHot(arg_status)
 
     # Assert
-    assert src.util.data_conversion.isinstance.call_count == 1
-    assert src.util.data_conversion.isinstance.call_args_list[0].args == (arg_status, ndarray)
+    assert onair.src.util.data_conversion.isinstance.call_count == 1
+    assert onair.src.util.data_conversion.isinstance.call_args_list[0].args == (arg_status, ndarray)
     assert result == arg_status
 
 def test_data_conversion_status_to_oneHot_returns_one_hot_set_to_list_of_four_zeros_and_the_value_of_the_classes_status_to_1_point_0(mocker):
@@ -39,12 +39,12 @@ def test_data_conversion_status_to_oneHot_returns_one_hot_set_to_list_of_four_ze
     expected_result = [0.0, 0.0, 0.0, 0.0]
     expected_result[fake_status] = 1.0
 
-    src.util.data_conversion.classes = {arg_status: fake_status}
+    onair.src.util.data_conversion.classes = {arg_status: fake_status}
 
-    mocker.patch('src.util.data_conversion.isinstance', return_value=False)
+    mocker.patch('onair.src.util.data_conversion.isinstance', return_value=False)
 
     # Act
-    result = src.util.data_conversion.status_to_oneHot(arg_status)
+    result = onair.src.util.data_conversion.status_to_oneHot(arg_status)
 
     # Assert
     assert result == expected_result

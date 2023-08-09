@@ -14,7 +14,7 @@ Source of the main function for the OnAIR repo
 import pytest
 import coverage
 # coverage started early to see all lines in all files (def and imports were being missed with programmatic runs)
-cov = coverage.Coverage(source=['src','data_handling','utils'], branch=True)
+cov = coverage.Coverage(source=['onair/src','onair/data_handling','onair/utils'], branch=True)
 cov.start()
 
 import os
@@ -22,9 +22,9 @@ import sys
 import argparse
 from datetime import datetime
 # from test_all import *
-from src.util.cleanup import *
+from onair.src.util.cleanup import *
 
-from src.run_scripts.execution_engine import ExecutionEngine
+from onair.src.run_scripts.execution_engine import ExecutionEngine
 
 cov.stop()
 

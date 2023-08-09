@@ -10,8 +10,8 @@
 """ Test Diagnosis Functionality """
 import pytest
 from mock import MagicMock
-import src.reasoning.diagnosis as diagnosis
-from src.reasoning.diagnosis import Diagnosis
+import onair.src.reasoning.diagnosis as diagnosis
+from onair.src.reasoning.diagnosis import Diagnosis
 
 
 # __init__ tests
@@ -125,8 +125,8 @@ def test_Diagnosis_perform_diagnosis_returns_dict_of_str_top_and_walkdown_of_ran
     forced_list_return_value = MagicMock()
     forced_random_choice_return_value = MagicMock()
     forced_walkdown_return_value = MagicMock()
-    mocker.patch('src.reasoning.diagnosis.list', return_value=forced_list_return_value)
-    mocker.patch('src.reasoning.diagnosis.random.choice', return_value=forced_random_choice_return_value)
+    mocker.patch('onair.src.reasoning.diagnosis.list', return_value=forced_list_return_value)
+    mocker.patch('onair.src.reasoning.diagnosis.random.choice', return_value=forced_random_choice_return_value)
     mocker.patch.object(cut, 'walkdown', return_value=forced_walkdown_return_value)
 
     # Act
@@ -159,7 +159,7 @@ def test_Diagnosis_walkdown_returns_expected_value_and_does_not_call_copy_deepco
     cut.has_kalman = True
     cut.kalman_results = fake_kalman_results
 
-    mocker.patch('src.reasoning.diagnosis.copy.deepcopy')
+    mocker.patch('onair.src.reasoning.diagnosis.copy.deepcopy')
 
     # Act
     result = cut.walkdown(arg_mnemonic_name, arg_used_mnemonics)
@@ -185,7 +185,7 @@ def test_Diagnosis_walkdown_returns_expected_value_and_calls_copy_deepcopy_funct
     cut.has_kalman = True
     cut.kalman_results = fake_kalman_results
 
-    mocker.patch('src.reasoning.diagnosis.copy.deepcopy')
+    mocker.patch('onair.src.reasoning.diagnosis.copy.deepcopy')
 
     # Act
     result = cut.walkdown(arg_mnemonic_name, arg_used_mnemonics)
@@ -212,7 +212,7 @@ def test_Diagnosis_walkdown_returns_NO_DIAGNOSIS_when_mnemonic_name_is_not_blank
     cut.has_kalman = True
     cut.kalman_results = fake_kalman_results
 
-    mocker.patch('src.reasoning.diagnosis.copy.deepcopy')
+    mocker.patch('onair.src.reasoning.diagnosis.copy.deepcopy')
 
     # Act
     result = cut.walkdown(arg_mnemonic_name, arg_used_mnemonics)
@@ -235,7 +235,7 @@ def test_Diagnosis_walkdown_returns_NO_DIAGNOSIS_when_mnemonic_name_is_not_blank
     cut.has_kalman = False
     cut.kalman_results = fake_kalman_results
 
-    mocker.patch('src.reasoning.diagnosis.copy.deepcopy')
+    mocker.patch('onair.src.reasoning.diagnosis.copy.deepcopy')
 
     # Act
     result = cut.walkdown(arg_mnemonic_name, arg_used_mnemonics)
@@ -258,7 +258,7 @@ def test_Diagnosis_walkdown_returns_NO_DIAGNOSIS_when_mnemonic_name_is_blank_and
     cut.has_kalman = True
     cut.kalman_results = fake_kalman_results
 
-    mocker.patch('src.reasoning.diagnosis.copy.deepcopy')
+    mocker.patch('onair.src.reasoning.diagnosis.copy.deepcopy')
 
     # Act
     result = cut.walkdown(arg_mnemonic_name, arg_used_mnemonics)

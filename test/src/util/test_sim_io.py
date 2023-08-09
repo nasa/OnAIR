@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 from mock import MagicMock
-import src.util.sim_io
+import onair.src.util.sim_io
 
 def test_sim_io_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empty(mocker):
   # Arrange
@@ -21,25 +21,25 @@ def test_sim_io_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empt
   fake_file = MagicMock()
   fake_file.configure_mock(**{'__enter__.return_value': fake_file_iterator})
 
-  mocker.patch('src.util.sim_io.os.environ.get', return_value=fake_system_filename)
-  mocker.patch('src.util.sim_io.os.path.join', return_value=fake_full_path)
+  mocker.patch('onair.src.util.sim_io.os.environ.get', return_value=fake_system_filename)
+  mocker.patch('onair.src.util.sim_io.os.path.join', return_value=fake_full_path)
   mocker.patch('builtins.open', return_value=fake_file)
 
   # Act
-  src.util.sim_io.render_diagnosis(arg_diagnosis_list)
+  onair.src.util.sim_io.render_diagnosis(arg_diagnosis_list)
 
   # Assert
   assert open.call_count == 2
   assert fake_file_iterator.write.call_count == 4
-  assert src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'diagnosis.txt')
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'diagnosis.txt')
   assert open.call_args_list[0].args == (fake_full_path,)
   assert open.call_args_list[0].kwargs == {'mode':'a'}
   assert fake_file_iterator.write.call_args_list[0].args == ('==========================================================\n',)
   assert fake_file_iterator.write.call_args_list[1].args == ('                        DIAGNOSIS                         \n',)
   assert fake_file_iterator.write.call_args_list[2].args == ('==========================================================\n',)
-  assert src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'diagnosis.csv')
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'diagnosis.csv')
   assert open.call_args_list[1].args == (fake_full_path,)
   assert open.call_args_list[1].kwargs == {'mode':'a'}
   assert fake_file_iterator.write.call_args_list[3].args == ('time_step, cohens_kappa, faults, subgraph\n',)
@@ -58,8 +58,8 @@ def test_sim_io_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_gi
   fake_str = MagicMock()
   fake_results_csv = MagicMock
 
-  mocker.patch('src.util.sim_io.os.environ.get', return_value=fake_system_filename)
-  mocker.patch('src.util.sim_io.os.path.join', return_value=fake_full_path)
+  mocker.patch('onair.src.util.sim_io.os.environ.get', return_value=fake_system_filename)
+  mocker.patch('onair.src.util.sim_io.os.path.join', return_value=fake_full_path)
   mocker.patch('builtins.open', return_value=fake_file)
 
   for i in range(5):
@@ -70,13 +70,13 @@ def test_sim_io_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_gi
     arg_diagnosis_list.append(fake_diag)
 
   # Act
-  src.util.sim_io.render_diagnosis(arg_diagnosis_list)
+  onair.src.util.sim_io.render_diagnosis(arg_diagnosis_list)
 
   # Assert
   assert open.call_count == 2
   assert fake_file_iterator.write.call_count == 4 + 5*5
-  assert src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'diagnosis.txt')
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'diagnosis.txt')
   assert open.call_args_list[0].args == (fake_full_path,)
   assert open.call_args_list[0].kwargs == {'mode':'a'}
   assert fake_file_iterator.write.call_args_list[0].args == ('==========================================================\n',)
@@ -89,8 +89,8 @@ def test_sim_io_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_gi
     assert fake_file_iterator.write.call_args_list[i*4 + 5].args == (fake_str,)
     assert fake_file_iterator.write.call_args_list[i*4 + 6].args == ('----------------------------------------------------------\n',)
   
-  assert src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'diagnosis.csv')
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'diagnosis.csv')
   assert open.call_args_list[1].args == (fake_full_path,)
   assert open.call_args_list[1].kwargs == {'mode':'a'}
   assert fake_file_iterator.write.call_args_list[i*4 + 7].args == ('time_step, cohens_kappa, faults, subgraph\n',)
@@ -118,24 +118,24 @@ def test_sim_io_render_viz_does_only_stattest_render_viz_does_status_sensor_and_
   expected_sensor_status_report['name'] = 'MISSION'
   expected_sensor_status_report['children'] = arg_sensor_data
 
-  mocker.patch('src.util.sim_io.os.environ.get', return_value=fake_system_filename)
-  mocker.patch('src.util.sim_io.os.path.join', return_value=fake_full_path)
+  mocker.patch('onair.src.util.sim_io.os.environ.get', return_value=fake_system_filename)
+  mocker.patch('onair.src.util.sim_io.os.path.join', return_value=fake_full_path)
   mocker.patch('builtins.open', return_value=fake_file)
-  mocker.patch('src.util.sim_io.json.dump')
+  mocker.patch('onair.src.util.sim_io.json.dump')
 
   # Act
-  src.util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name)
+  onair.src.util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name)
 
   # Assert
   assert open.call_count == 2
-  assert src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
   assert open.call_args_list[0].args == (fake_full_path, 'w')
-  assert src.util.sim_io.json.dump.call_args_list[0].args == (expected_status_report, fake_iterator)
-  assert src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
+  assert onair.src.util.sim_io.json.dump.call_args_list[0].args == (expected_status_report, fake_iterator)
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
   assert open.call_args_list[1].args == (fake_full_path, 'w')
-  assert src.util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
+  assert onair.src.util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
   
 def test_sim_io_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_as_None(mocker):
   # Arrange
@@ -158,24 +158,24 @@ def test_sim_io_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is
   expected_sensor_status_report['name'] = 'MISSION'
   expected_sensor_status_report['children'] = arg_sensor_data
 
-  mocker.patch('src.util.sim_io.os.environ.get', return_value=fake_system_filename)
-  mocker.patch('src.util.sim_io.os.path.join', return_value=fake_full_path)
+  mocker.patch('onair.src.util.sim_io.os.environ.get', return_value=fake_system_filename)
+  mocker.patch('onair.src.util.sim_io.os.path.join', return_value=fake_full_path)
   mocker.patch('builtins.open', return_value=fake_file)
-  mocker.patch('src.util.sim_io.json.dump')
+  mocker.patch('onair.src.util.sim_io.json.dump')
 
   # Act
-  src.util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name, arg_diagnosis)
+  onair.src.util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name, arg_diagnosis)
 
   # Assert
   assert open.call_count == 2
-  assert src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
   assert open.call_args_list[0].args == (fake_full_path, 'w')
-  assert src.util.sim_io.json.dump.call_args_list[0].args == (expected_status_report, fake_iterator)
-  assert src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
+  assert onair.src.util.sim_io.json.dump.call_args_list[0].args == (expected_status_report, fake_iterator)
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
   assert open.call_args_list[1].args == (fake_full_path, 'w')
-  assert src.util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
+  assert onair.src.util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
   
 def test_sim_io_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_given(mocker):
   # Arrange
@@ -199,30 +199,30 @@ def test_sim_io_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnos
   expected_sensor_status_report['name'] = 'MISSION'
   expected_sensor_status_report['children'] = arg_sensor_data
 
-  mocker.patch('src.util.sim_io.os.environ.get', return_value=fake_system_filename)
-  mocker.patch('src.util.sim_io.os.path.join', return_value=fake_full_path)
+  mocker.patch('onair.src.util.sim_io.os.environ.get', return_value=fake_system_filename)
+  mocker.patch('onair.src.util.sim_io.os.path.join', return_value=fake_full_path)
   mocker.patch('builtins.open', return_value=fake_file)
-  mocker.patch('src.util.sim_io.json.dump')
+  mocker.patch('onair.src.util.sim_io.json.dump')
   arg_diagnosis.configure_mock(**{'get_diagnosis_viz_json.return_value': fake_results})
 
   # Act
-  src.util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name, arg_diagnosis)
+  onair.src.util.sim_io.render_viz(arg_status_data, arg_sensor_data, arg_sim_name, arg_diagnosis)
 
   # Assert
   assert open.call_count == 3
-  assert src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[0].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[0].args == (fake_system_filename, 'system.json')
   assert open.call_args_list[0].args == (fake_full_path, 'w')
-  assert src.util.sim_io.json.dump.call_args_list[0].args == (expected_status_report, fake_iterator)
-  assert src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
+  assert onair.src.util.sim_io.json.dump.call_args_list[0].args == (expected_status_report, fake_iterator)
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
   assert open.call_args_list[1].args == (fake_full_path, 'w')
-  assert src.util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
+  assert onair.src.util.sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
   arg_diagnosis.get_diagnosis_viz_json.called_once()
-  assert src.util.sim_io.os.environ.get.call_args_list[2].args == (SAVE_PATH,)
-  assert src.util.sim_io.os.path.join.call_args_list[2].args == (fake_system_filename, 'results.json')
+  assert onair.src.util.sim_io.os.environ.get.call_args_list[2].args == (SAVE_PATH,)
+  assert onair.src.util.sim_io.os.path.join.call_args_list[2].args == (fake_system_filename, 'results.json')
   assert open.call_args_list[2].args == (fake_full_path, 'w')
-  assert src.util.sim_io.json.dump.call_args_list[2].args == (fake_results, fake_iterator)
+  assert onair.src.util.sim_io.json.dump.call_args_list[2].args == (fake_results, fake_iterator)
 
 def test_sim_io_print_dots_uses_mod_10_plus_one_dots_when_ts_mod_20_is_less_than_10(mocker):
   # Arrange
@@ -236,7 +236,7 @@ def test_sim_io_print_dots_uses_mod_10_plus_one_dots_when_ts_mod_20_is_less_than
   mocker.patch("builtins.print")
 
   # Act
-  src.util.sim_io.print_dots(arg_ts)
+  onair.src.util.sim_io.print_dots(arg_ts)
 
   # Assert
   print.assert_called_with('\033[95m' + dots_string + '\033[0m')
@@ -253,7 +253,7 @@ def test_sim_io_print_dots_uses_10_minus_mod_10_plus_one_dots_when_ts_mod_20_is_
   mocker.patch("builtins.print")
 
   # Act
-  src.util.sim_io.print_dots(arg_ts)
+  onair.src.util.sim_io.print_dots(arg_ts)
 
   # Assert
   print.assert_called_with('\033[95m' + dots_string + '\033[0m')
@@ -270,7 +270,7 @@ def test_sim_io_print_dots_uses_10_minus_mod_10_plus_one_dots_when_ts_mod_20_is_
   mocker.patch("builtins.print")
 
   # Act
-  src.util.sim_io.print_dots(arg_ts)
+  onair.src.util.sim_io.print_dots(arg_ts)
 
   # Assert
   print.assert_called_with('\033[95m' + dots_string + '\033[0m')

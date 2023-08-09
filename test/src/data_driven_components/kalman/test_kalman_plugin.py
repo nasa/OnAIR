@@ -11,8 +11,8 @@
 
 import pytest
 from mock import MagicMock
-import src.data_driven_components.kalman.kalman_plugin as kalman
-from src.data_driven_components.kalman.kalman_plugin import Plugin as Kalman
+import onair.src.data_driven_components.kalman.kalman_plugin as kalman
+from onair.src.data_driven_components.kalman.kalman_plugin import Plugin as Kalman
 
 # test init
 def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args_except_window_size(mocker):
@@ -31,9 +31,9 @@ def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_a
 
     forced_diag_return_value = MagicMock()
     forced_array_return_value = MagicMock()
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.simdkalman.KalmanFilter', Fake_KalmanFilter)
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.np.diag', return_value=forced_diag_return_value)
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.np.array', return_value=forced_array_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.simdkalman.KalmanFilter', Fake_KalmanFilter)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.diag', return_value=forced_diag_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.array', return_value=forced_array_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -69,9 +69,9 @@ def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_a
 
     forced_diag_return_value = MagicMock()
     forced_array_return_value = MagicMock()
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.simdkalman.KalmanFilter', Fake_KalmanFilter)
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.np.diag', return_value=forced_diag_return_value)
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.np.array', return_value=forced_array_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.simdkalman.KalmanFilter', Fake_KalmanFilter)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.diag', return_value=forced_diag_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.array', return_value=forced_array_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -280,8 +280,8 @@ def test_Kalman_mean_calculates_return_value_by_dividing_sum_by_len(mocker):
 
     forced_sum_return_value = pytest.gen.uniform(1.0, 10.0) # arbitrary, random float from 1.0 to 10.0
     forced_len_return_value = pytest.gen.uniform(1.0, 10.0) # arbitrary, random float from 1.0 to 10.0
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.sum', return_value=forced_sum_return_value)
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.len', return_value=forced_len_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.sum', return_value=forced_sum_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.len', return_value=forced_len_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -302,7 +302,7 @@ def test_Kalman_residual_calculates_return_value_by_finding_the_abs_difference_o
     arg_actual = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
 
     forced_abs_return_value = MagicMock()
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -320,7 +320,7 @@ def test_Kalman_std_dev_calculates_return_value_by_using_np_std_function_on_arg_
     arg_data = MagicMock()
 
     forced_std_return_value = MagicMock()
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.np.std', return_value=forced_std_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.std', return_value=forced_std_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -644,7 +644,7 @@ def test_Kalman_current_attribute_chunk_get_error_returns_true_when_abs_of_mean_
 
     mocker.patch.object(cut, 'generate_residuals_for_given_data', return_value=forced_generate_residuals_return_value)
     mocker.patch.object(cut, 'mean', return_value=forced_mean_return_value)
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
 
     # Act
     result = cut.current_attribute_chunk_get_error(arg_data)
@@ -670,7 +670,7 @@ def test_Kalman_current_attribute_chunk_get_error_returns_false_when_abs_of_mean
 
     mocker.patch.object(cut, 'generate_residuals_for_given_data', return_value=forced_generate_residuals_return_value)
     mocker.patch.object(cut, 'mean', return_value=forced_mean_return_value)
-    mocker.patch('src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
 
     # Act
     result = cut.current_attribute_chunk_get_error(arg_data)

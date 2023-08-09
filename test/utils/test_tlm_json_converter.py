@@ -10,7 +10,7 @@
 """ Test TLM Json Converter Functionality """
 import pytest
 from mock import MagicMock
-import utils.tlm_json_converter as tlm_converter
+import onair.utils.tlm_json_converter as tlm_converter
 
 # ----- Tests for conversion functions -----
 
@@ -27,10 +27,10 @@ def test_tlm_json_converter_convertTlmToJson_calls_expected_functions_with_expec
     forced_return_parse_tlm_conf = MagicMock()
     forced_return_convert_tlm_to_json = MagicMock()
 
-    mocker.patch('utils.tlm_json_converter.getConfigPath', side_effect=side_effect_list_get_config_path)
-    mocker.patch('utils.tlm_json_converter.parseTlmConfTxt', return_value=forced_return_parse_tlm_conf)
-    mocker.patch('utils.tlm_json_converter.convertTlmDictToJsonDict', return_value=forced_return_convert_tlm_to_json)
-    mocker.patch('utils.tlm_json_converter.writeToJson')
+    mocker.patch('onair.utils.tlm_json_converter.getConfigPath', side_effect=side_effect_list_get_config_path)
+    mocker.patch('onair.utils.tlm_json_converter.parseTlmConfTxt', return_value=forced_return_parse_tlm_conf)
+    mocker.patch('onair.utils.tlm_json_converter.convertTlmDictToJsonDict', return_value=forced_return_convert_tlm_to_json)
+    mocker.patch('onair.utils.tlm_json_converter.writeToJson')
 
     # Act
     tlm_converter.convertTlmToJson(arg_tlm, arg_json)
@@ -58,7 +58,7 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_returns_expected_dict_with_
 
     expected_result = {'subsystems' : {'NONE' : {}}, 'order' : []}
 
-    mocker.patch('utils.tlm_json_converter.getJsonData')
+    mocker.patch('onair.utils.tlm_json_converter.getJsonData')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -151,8 +151,8 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_returns_expected_dict_when_
     expected_result = {'subsystems' : {'NONE' : {}}, 'order' : [fake_labels[0]]}
 
     forced_return_get_json_data = MagicMock()
-    mocker.patch('utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
-    mocker.patch('utils.tlm_json_converter.mergeDicts')
+    mocker.patch('onair.utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('onair.utils.tlm_json_converter.mergeDicts')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -176,8 +176,8 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_calls_mergeDicts_and_return
     expected_result = {'subsystems' : {'NONE' : {}, fake_subsys_assigns[0][0] : {}}, 'order' : [fake_labels[0]]}
 
     forced_return_get_json_data = MagicMock()
-    mocker.patch('utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
-    mocker.patch('utils.tlm_json_converter.mergeDicts')
+    mocker.patch('onair.utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('onair.utils.tlm_json_converter.mergeDicts')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -211,8 +211,8 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_calls_mergeDicts_and_return
     expected_result['order'] = fake_labels
 
     forced_return_get_json_data = MagicMock()
-    mocker.patch('utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
-    mocker.patch('utils.tlm_json_converter.mergeDicts')
+    mocker.patch('onair.utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('onair.utils.tlm_json_converter.mergeDicts')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -252,8 +252,8 @@ def test_tlm_json_converter_convertTlmDictToJsonDict_calls_mergeDicts_and_return
     expected_result['order'] = fake_labels
 
     forced_return_get_json_data = MagicMock()
-    mocker.patch('utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
-    mocker.patch('utils.tlm_json_converter.mergeDicts')
+    mocker.patch('onair.utils.tlm_json_converter.getJsonData', return_value=forced_return_get_json_data)
+    mocker.patch('onair.utils.tlm_json_converter.mergeDicts')
 
     # Act
     result = tlm_converter.convertTlmDictToJsonDict(arg_data)
@@ -308,7 +308,7 @@ def test_tlm_json_converter_parseTlmConfTxt_returns_tuple_of_empty_lists_when_da
     fake_descriptor_file = MagicMock()
     fake_data_str = ''
 
-    mocker.patch('utils.tlm_json_converter.open', return_value=fake_descriptor_file)
+    mocker.patch('onair.utils.tlm_json_converter.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
     
@@ -341,10 +341,10 @@ def test_tlm_json_converter_parseTlmConfTxt_returns_tuple_of_4_expected_appended
 
     forced_returns_str2lst = [fake_subsystem_assignment, fake_test]
 
-    mocker.patch('utils.tlm_json_converter.open', return_value=fake_descriptor_file)
+    mocker.patch('onair.utils.tlm_json_converter.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('utils.tlm_json_converter.str2lst', side_effect=forced_returns_str2lst)
+    mocker.patch('onair.utils.tlm_json_converter.str2lst', side_effect=forced_returns_str2lst)
     
     # Act
     result = tlm_converter.parseTlmConfTxt(arg_configFilePath)
@@ -381,10 +381,10 @@ def test_tlm_json_converter_parseTlmConfTxt_returns_tuple_of_4_expected_appended
 
     forced_returns_literal_eval = [fake_subsystem_assignment, fake_test, fake_test2]
 
-    mocker.patch('utils.tlm_json_converter.open', return_value=fake_descriptor_file)
+    mocker.patch('onair.utils.tlm_json_converter.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('utils.tlm_json_converter.str2lst', side_effect=forced_returns_literal_eval)
+    mocker.patch('onair.utils.tlm_json_converter.str2lst', side_effect=forced_returns_literal_eval)
     
     # Act
     result = tlm_converter.parseTlmConfTxt(arg_configFilePath)
@@ -429,10 +429,10 @@ def test_tlm_json_converter_parseTlmConfTxt_returns_tuple_of_4_expected_appended
     expected_mnemonic_tests = [[fake_test]] * num_fake_dataPts
     expected_descriptions = [fake_description] * num_fake_dataPts
 
-    mocker.patch('utils.tlm_json_converter.open', return_value=fake_descriptor_file)
+    mocker.patch('onair.utils.tlm_json_converter.open', return_value=fake_descriptor_file)
     mocker.patch.object(fake_descriptor_file, 'read', return_value=fake_data_str)
     mocker.patch.object(fake_descriptor_file, 'close')
-    mocker.patch('utils.tlm_json_converter.str2lst', side_effect=forced_returns_str2lst)
+    mocker.patch('onair.utils.tlm_json_converter.str2lst', side_effect=forced_returns_str2lst)
     
     # Act
     result = tlm_converter.parseTlmConfTxt(arg_configFilePath)
@@ -459,9 +459,9 @@ def test_tlm_json_converter_getConfigPath_uses_os_functions_to_find_file_path(mo
 
     arg_file_name = MagicMock()
 
-    mocker.patch('utils.tlm_json_converter.__file__', fake__file__)
-    mocker.patch('utils.tlm_json_converter.os.path.dirname', return_value=fake_parent_dir)
-    mocker.patch('utils.tlm_json_converter.os.path.join', side_effect=[fake_data_dir, fake_configs_dir, fake_file_path])
+    mocker.patch('onair.utils.tlm_json_converter.__file__', fake__file__)
+    mocker.patch('onair.utils.tlm_json_converter.os.path.dirname', return_value=fake_parent_dir)
+    mocker.patch('onair.utils.tlm_json_converter.os.path.join', side_effect=[fake_data_dir, fake_configs_dir, fake_file_path])
 
     # Act
     result = tlm_converter.getConfigPath(arg_file_name)
@@ -622,9 +622,9 @@ def test_tlm_json_converter_writeJson_opens_given_path_and_writes_data_using_orj
     fake_file = MagicMock()
     fake_json_data = MagicMock()
 
-    mocker.patch('utils.tlm_json_converter.open', return_value=fake_file)
+    mocker.patch('onair.utils.tlm_json_converter.open', return_value=fake_file)
     mocker.patch.object(fake_file, 'write')
-    mocker.patch('utils.tlm_json_converter.orjson.dumps', return_value=fake_json_data)
+    mocker.patch('onair.utils.tlm_json_converter.orjson.dumps', return_value=fake_json_data)
     mocker.patch.object(fake_file, 'close')
 
     # Act
@@ -647,7 +647,7 @@ def test_tlm_json_converter_str2lst_returns_call_to_ast_literal_eval_which_recei
 
     expected_result = MagicMock()
     
-    mocker.patch('utils.tlm_json_converter.ast.literal_eval', return_value=expected_result)
+    mocker.patch('onair.utils.tlm_json_converter.ast.literal_eval', return_value=expected_result)
 
     # Act
     result = tlm_converter.str2lst(arg_string)
@@ -661,8 +661,8 @@ def test_tlm_json_converter_str2lst_prints_message_when_ast_literal_eval_receive
     # Arrange
     arg_string = str(MagicMock())
     
-    mocker.patch('utils.tlm_json_converter.ast.literal_eval', side_effect=Exception)
-    mocker.patch('utils.tlm_json_converter.print')
+    mocker.patch('onair.utils.tlm_json_converter.ast.literal_eval', side_effect=Exception)
+    mocker.patch('onair.utils.tlm_json_converter.print')
     
     # Act
     result = tlm_converter.str2lst(arg_string)
@@ -682,13 +682,13 @@ def test_tlm_json_converter_main_trys_to_call_convertTlmToJson_with_parsed_args_
     fake_arg_parser = MagicMock()
     fake_args = MagicMock()
 
-    mocker.patch('utils.tlm_json_converter.argparse.ArgumentParser', return_value=fake_arg_parser)
+    mocker.patch('onair.utils.tlm_json_converter.argparse.ArgumentParser', return_value=fake_arg_parser)
     mocker.patch.object(fake_arg_parser, 'add_argument')
     mocker.patch.object(fake_arg_parser, 'parse_args', return_value=fake_args)
     mocker.patch.object(fake_args, 'text_config', fake_text_file)
     mocker.patch.object(fake_args, 'json_config', fake_json_file)
-    mocker.patch('utils.tlm_json_converter.convertTlmToJson')
-    mocker.patch('utils.tlm_json_converter.print')
+    mocker.patch('onair.utils.tlm_json_converter.convertTlmToJson')
+    mocker.patch('onair.utils.tlm_json_converter.print')
 
     # Act
     tlm_converter.main()
@@ -714,13 +714,13 @@ def testtest_tlm_json_converter_main_prints_error_msg_when_call_to_convertTlmToJ
 
     fake_error = Exception('')
 
-    mocker.patch('utils.tlm_json_converter.argparse.ArgumentParser', return_value=fake_arg_parser)
+    mocker.patch('onair.utils.tlm_json_converter.argparse.ArgumentParser', return_value=fake_arg_parser)
     mocker.patch.object(fake_arg_parser, 'add_argument')
     mocker.patch.object(fake_arg_parser, 'parse_args', return_value=fake_args)
     mocker.patch.object(fake_args, 'text_config', fake_text_file)
     mocker.patch.object(fake_args, 'json_config', fake_json_file)
-    mocker.patch('utils.tlm_json_converter.convertTlmToJson', side_effect=fake_error)
-    mocker.patch('utils.tlm_json_converter.print')
+    mocker.patch('onair.utils.tlm_json_converter.convertTlmToJson', side_effect=fake_error)
+    mocker.patch('onair.utils.tlm_json_converter.print')
 
     expected_print_msg = 'failed to convert file to json'
 
@@ -743,8 +743,8 @@ def testtest_tlm_json_converter_main_prints_error_msg_when_call_to_convertTlmToJ
 # init tests
 def testtest_tlm_json_converter_init_calls_main_when__name__equals__main__(mocker):
     # Arrange
-    mocker.patch('utils.tlm_json_converter.main')
-    mocker.patch('utils.tlm_json_converter.__name__', '__main__')
+    mocker.patch('onair.utils.tlm_json_converter.main')
+    mocker.patch('onair.utils.tlm_json_converter.__name__', '__main__')
 
     # Act
     tlm_converter.init()
@@ -754,7 +754,7 @@ def testtest_tlm_json_converter_init_calls_main_when__name__equals__main__(mocke
 
 def testtest_tlm_json_converter_init_does_not_call_main_when__name__does_not_equal__main__(mocker):
     # Arrange
-    mocker.patch('utils.tlm_json_converter.main')
+    mocker.patch('onair.utils.tlm_json_converter.main')
 
     # Act
     tlm_converter.init()

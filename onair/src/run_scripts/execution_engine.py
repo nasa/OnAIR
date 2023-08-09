@@ -19,8 +19,8 @@ import shutil
 from distutils.dir_util import copy_tree
 from time import gmtime, strftime   
 
-from data_handling.time_synchronizer import TimeSynchronizer
-from src.run_scripts.sim import Simulator
+from ...data_handling.time_synchronizer import TimeSynchronizer
+from ..run_scripts.sim import Simulator
 
 class ExecutionEngine:
     def __init__(self, config_file='', run_name='', save_flag=False):

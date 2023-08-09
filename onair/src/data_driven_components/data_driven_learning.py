@@ -12,7 +12,7 @@ Data driven learning class for managing all data driven AI components
 """
 import importlib
 
-from src.util.data_conversion import *
+from ..util.data_conversion import *
 
 class DataDrivenLearning:
     def __init__(self, headers, _ai_plugins:list=[]):
