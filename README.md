@@ -56,7 +56,7 @@ Options that may be added to the command line test run. Use these at your own di
 `-p no:randomly` - ONLY required to stop random order testing IFF pytest-randomly installed
 
 ### To view testing line coverage after run:
-NOTE: you may or may not need the `python -m` at the start of these commands
+NOTE: you may or may not need the `python -m` to run coverage report or html
 
 `coverage report` - prints basic results in terminal
 
@@ -64,7 +64,7 @@ or
 
 `coverage html` - creates htmlcov/index.html, automatic when using driver.py for testing
 
-and
+then
 
 `<browser_here> htmlcov/index.html` - browsable coverage (i.e., `firefox htmlcov/index.html`)
 
