@@ -87,7 +87,7 @@ class ExecutionEngine:
         self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
 
     def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
-        parser = importlib.import_module('data_handling.parsers.' + parser_file_name)
+        parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
         parser_class = getattr(parser, parser_name) # This could be simplified if the parsers all extend a parser class... but this works for now
         tm_data_path = os.environ['RUN_PATH'] + dataFilePath
         tm_metadata_path = os.environ['RUN_PATH'] +  metadataFilePath

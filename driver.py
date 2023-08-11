@@ -39,7 +39,7 @@ def main():
     """
 
     arg_parser = argparse.ArgumentParser(description='')
-    arg_parser.add_argument('configfile', nargs='?', default='./config/default_config.ini', help='Config file to be used')
+    arg_parser.add_argument('configfile', nargs='?', default='./onair/config/default_config.ini', help='Config file to be used')
     arg_parser.add_argument('--save', '-s', action='store_true', help='Should log files be saved?')
     arg_parser.add_argument('--save_name', '--name', '-n', help='Name of saved log files')
     arg_parser.add_argument('--mute', '-m', action='store_true', help='Mute all non-error output')
