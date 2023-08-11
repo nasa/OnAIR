@@ -32,7 +32,7 @@ python driver.py -t
 
 For the equivalent of the driver.py run:
 ```
-python -m coverage run --branch --source=src,data_handling,utils -m pytest ./test/
+python -m coverage run --branch --source=onair -m pytest ./test/
 ```
 
 #### Command breakdown:
@@ -42,7 +42,7 @@ python -m coverage run --branch --source=src,data_handling,utils -m pytest ./tes
 
 `--branch` - includes code branching information in the coverage report
 
-`--source=src,data_handling,utils` - tells coverage where the code under test exists for reporting line hits
+`--source=onair` - tells coverage where the code under test exists for reporting line hits
 
 `-m pytest` - tells coverage what test runner (framework) to wrap
 
@@ -51,13 +51,12 @@ python -m coverage run --branch --source=src,data_handling,utils -m pytest ./tes
 #### A few optional settings
 Options that may be added to the command line test run. Use these at your own discretion.
 
-`PYTHONPATH=src` - sets env variable so tests can find src, but only use if tests won't run without
-
 `--disable-warnings` - removes the warning reports, but displays count (i.e., 124 passed, 1 warning in 0.65s)
 
 `-p no:randomly` - ONLY required to stop random order testing IFF pytest-randomly installed
 
 ### To view testing line coverage after run:
+NOTE: you may or may not need the `python -m` at the start of these commands
 
 `coverage report` - prints basic results in terminal
 
