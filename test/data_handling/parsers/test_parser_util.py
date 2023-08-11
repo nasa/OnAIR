@@ -12,7 +12,7 @@ import pytest
 import sys
 from importlib import reload
 from mock import MagicMock
-import data_handling.parsers.parser_util as parser_util
+import onair.data_handling.parsers.parser_util as parser_util
 
 # extract_configs tests
 def test_parser_util_extract_configs_raises_error_when_given_blank_configFile():
@@ -43,9 +43,9 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configs_le
                                 'description_assignments' : fake_descs}
     forced_return_len = 0
 
-    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
-    mocker.patch('data_handling.parsers.parser_util.len', return_value=forced_return_len)
-    mocker.patch('data_handling.parsers.parser_util.str2lst')
+    mocker.patch('onair.data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('onair.data_handling.parsers.parser_util.len', return_value=forced_return_len)
+    mocker.patch('onair.data_handling.parsers.parser_util.str2lst')
 
     # Act
     result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
@@ -73,8 +73,8 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configs_le
                                 'test_assignments' : fake_tests,
                                 'description_assignments' : fake_descs}
 
-    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
-    mocker.patch('data_handling.parsers.parser_util.str2lst')
+    mocker.patch('onair.data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('onair.data_handling.parsers.parser_util.str2lst')
 
     expected_ss_assigns = [[fake_ss_assign] for fake_ss_assign in fake_subsystem_assignments]
     expected_result = {}
@@ -107,8 +107,8 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
                                 'test_assignments' : fake_tests,
                                 'description_assignments' : fake_descs}
     
-    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
-    mocker.patch('data_handling.parsers.parser_util.str2lst')
+    mocker.patch('onair.data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('onair.data_handling.parsers.parser_util.str2lst')
 
     expected_ss_assigns = [[fake_ss_assign] for fake_ss_assign in fake_subsystem_assignments]
     expected_result = {}
@@ -144,8 +144,8 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
                                 'test_assignments' : fake_tests,
                                 'description_assignments' : fake_descs}
 
-    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
-    mocker.patch('data_handling.parsers.parser_util.str2lst')
+    mocker.patch('onair.data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('onair.data_handling.parsers.parser_util.str2lst')
 
     expected_ss_assigns = [[fake_ss_assign] for fake_ss_assign in fake_subsystem_assignments]
     expected_result = {}
@@ -182,8 +182,8 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
                                 'description_assignments' : fake_descs}
     forced_return_str2lst = [MagicMock()]
 
-    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
-    mocker.patch('data_handling.parsers.parser_util.str2lst', return_value=forced_return_str2lst)
+    mocker.patch('onair.data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('onair.data_handling.parsers.parser_util.str2lst', return_value=forced_return_str2lst)
 
     expected_ss_assigns = [[fake_ss_assign] for fake_ss_assign in fake_subsystem_assignments]
     expected_result = {}
@@ -246,8 +246,8 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
                                 'test_assignments' : fake_tests,
                                 'description_assignments' : fake_descs}
 
-    mocker.patch('data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
-    mocker.patch('data_handling.parsers.parser_util.str2lst')
+    mocker.patch('onair.data_handling.parsers.parser_util.parseTlmConfJson', return_value=forced_return_parse_tlm)
+    mocker.patch('onair.data_handling.parsers.parser_util.str2lst')
 
     expected_result = {}
     expected_result['subsystem_assignments'] = expected_subsystem_assignments
@@ -276,7 +276,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replac
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('onair.data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
@@ -297,7 +297,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replac
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('onair.data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
@@ -318,7 +318,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('onair.data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
@@ -339,7 +339,7 @@ def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('onair.data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
@@ -359,7 +359,7 @@ def test_parser_util_process_filepath_default_given_csv_is_False(mocker):
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('onair.data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path, arg_return_config)
@@ -378,7 +378,7 @@ def test_parser_util_process_filepath_default_given_return_config_is_False(mocke
         arg_path += str(MagicMock()) + fake_os_sep
     arg_path += fake_filename + '.txt'
 
-    mocker.patch('data_handling.parsers.parser_util.os.sep', fake_os_sep)
+    mocker.patch('onair.data_handling.parsers.parser_util.os.sep', fake_os_sep)
 
     # Act
     result = parser_util.process_filepath(arg_path)
@@ -445,8 +445,8 @@ def test_parser_util_flotify_input_returns_list_of_size_one_that_contains_the_se
 
     expected_result = MagicMock()
 
-    mocker.patch('data_handling.parsers.parser_util.float', side_effect=[ValueError])
-    mocker.patch('data_handling.parsers.parser_util.convert_str_to_timestamp', return_value=expected_result)
+    mocker.patch('onair.data_handling.parsers.parser_util.float', side_effect=[ValueError])
+    mocker.patch('onair.data_handling.parsers.parser_util.convert_str_to_timestamp', return_value=expected_result)
     
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
@@ -466,8 +466,8 @@ def test_parser_util_flotify_input_returns_list_of_size_one_that_contains_0_dot_
     fake_item = MagicMock()
     arg__input.append(fake_item) # list of one item, one iteration
 
-    mocker.patch('data_handling.parsers.parser_util.float', side_effect=[ValueError])
-    mocker.patch('data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=[Exception])
+    mocker.patch('onair.data_handling.parsers.parser_util.float', side_effect=[ValueError])
+    mocker.patch('onair.data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=[Exception])
     
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
@@ -486,8 +486,8 @@ def test_parser_util_flotify_input_default_arg_remove_str_is_False(mocker):
     fake_item = MagicMock()
     arg__input.append(fake_item) # list of one item, one iteration
 
-    mocker.patch('data_handling.parsers.parser_util.float', side_effect=[ValueError])
-    mocker.patch('data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=[Exception])
+    mocker.patch('onair.data_handling.parsers.parser_util.float', side_effect=[ValueError])
+    mocker.patch('onair.data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=[Exception])
     
     # Act
     result = parser_util.floatify_input(arg__input)
@@ -503,8 +503,8 @@ def test_parser_util_flotify_input_returns_empty_list_when_two_Exceptions_are_th
     fake_item = MagicMock()
     arg__input.append(fake_item) # list of one item, one iteration
 
-    mocker.patch('data_handling.parsers.parser_util.float', side_effect=[ValueError])
-    mocker.patch('data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=[Exception])
+    mocker.patch('onair.data_handling.parsers.parser_util.float', side_effect=[ValueError])
+    mocker.patch('onair.data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=[Exception])
     
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
@@ -525,7 +525,7 @@ def test_parser_util_flotify_input_returns_call_to_float_that_was_given___input_
 
     expected_result = MagicMock()
 
-    mocker.patch('data_handling.parsers.parser_util.float', return_value=expected_result)
+    mocker.patch('onair.data_handling.parsers.parser_util.float', return_value=expected_result)
     
     # Act
     result = parser_util.floatify_input(arg__input)
@@ -571,8 +571,8 @@ def test_parser_util_flotify_input_returns_expected_values_for_given__input_that
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
 
-    mocker.patch('data_handling.parsers.parser_util.float', side_effect=side_effects_for_float)
-    mocker.patch('data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=side_effects_for_convert_str)
+    mocker.patch('onair.data_handling.parsers.parser_util.float', side_effect=side_effects_for_float)
+    mocker.patch('onair.data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=side_effects_for_convert_str)
     
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
@@ -619,8 +619,8 @@ def test_parser_util_flotify_input_returns_expected_values_for_given__input_that
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
 
-    mocker.patch('data_handling.parsers.parser_util.float', side_effect=side_effects_for_float)
-    mocker.patch('data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=side_effects_for_convert_str)
+    mocker.patch('onair.data_handling.parsers.parser_util.float', side_effect=side_effects_for_float)
+    mocker.patch('onair.data_handling.parsers.parser_util.convert_str_to_timestamp', side_effect=side_effects_for_convert_str)
     
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
@@ -637,8 +637,8 @@ def test_parser_util_convert_str_to_timestamp_returns_to_datetime_timestamp_on_s
     fake_dt_module = MagicMock()
     fake_dt_dt = MagicMock()
 
-    mocker.patch('data_handling.parsers.parser_util.to_datetime', return_value=fake_datetime)
-    mocker.patch('data_handling.parsers.parser_util.datetime', fake_dt_module)
+    mocker.patch('onair.data_handling.parsers.parser_util.to_datetime', return_value=fake_datetime)
+    mocker.patch('onair.data_handling.parsers.parser_util.datetime', fake_dt_module)
     mocker.patch.object(fake_dt_module, 'datetime', fake_dt_dt)
     mocker.patch.object(fake_dt_dt, 'strptime')
     mocker.patch.object(fake_datetime, 'timestamp', return_value=fake_timestamp)
@@ -661,8 +661,8 @@ def test_parser_util_convert_str_to_timestamp_returns_datetime_strptime_timestam
     fake_dt_module = MagicMock()
     fake_dt_dt = MagicMock()
 
-    mocker.patch('data_handling.parsers.parser_util.to_datetime', side_effect=[Exception])
-    mocker.patch('data_handling.parsers.parser_util.datetime', fake_dt_module)
+    mocker.patch('onair.data_handling.parsers.parser_util.to_datetime', side_effect=[Exception])
+    mocker.patch('onair.data_handling.parsers.parser_util.datetime', fake_dt_module)
     mocker.patch.object(fake_dt_module, 'datetime', fake_dt_dt)
     mocker.patch.object(fake_dt_dt, 'strptime', return_value=fake_datetime)
     mocker.patch.object(fake_datetime, 'timestamp', return_value=fake_timestamp)
@@ -687,8 +687,8 @@ def test_parser_util_convert_str_to_timestamp_raises_error_when_both_to_datetime
     fake_dt_module = MagicMock()
     fake_dt_dt = MagicMock()
 
-    mocker.patch('data_handling.parsers.parser_util.to_datetime', side_effect=[Exception])
-    mocker.patch('data_handling.parsers.parser_util.datetime', fake_dt_module)
+    mocker.patch('onair.data_handling.parsers.parser_util.to_datetime', side_effect=[Exception])
+    mocker.patch('onair.data_handling.parsers.parser_util.datetime', fake_dt_module)
     mocker.patch.object(fake_dt_module, 'datetime', fake_dt_dt)
     mocker.patch.object(fake_dt_dt, 'strptime', side_effect=[Exception])
     mocker.patch.object(fake_datetime, 'timestamp')

@@ -14,12 +14,12 @@ Helper class to create and run a simulation
 
 import importlib
 
-from src.reasoning.agent import Agent
-from src.systems.vehicle_rep import VehicleRepresentation
-from src.util.file_io import *
-from src.util.print_io import *
-from src.util.sim_io import *
-from data_handling.data_source import DataSource
+from ..reasoning.agent import Agent
+from ..systems.vehicle_rep import VehicleRepresentation
+from ..util.file_io import *
+from ..util.print_io import *
+from ..util.sim_io import *
+from ...data_handling.data_source import DataSource
 
 MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100
@@ -32,7 +32,7 @@ class Simulator:
         if SBN_Flag:
             # TODO: This is ugly, but sbn_client is only available when built for cFS...
             # ...from sbn_adapter import AdapterDataSource
-            sbn_adapter = importlib.import_module('src.run_scripts.sbn_adapter')
+            sbn_adapter = importlib.import_module('onair.src.run_scripts.sbn_adapter')
             AdapterDataSource = getattr(sbn_adapter, 'AdapterDataSource')
             self.simData = AdapterDataSource(parsedData.get_sim_data())
             self.simData.connect() # this also subscribes to the msgIDs

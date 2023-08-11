@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import os
-from data_handling.parsers.tlm_json_parser import parseTlmConfJson, str2lst
+from .tlm_json_parser import parseTlmConfJson, str2lst
 from pandas import to_datetime
 import datetime
 

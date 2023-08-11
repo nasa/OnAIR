@@ -14,7 +14,7 @@ Source of the main function for the OnAIR repo
 import pytest
 import coverage
 # coverage started early to see all lines in all files (def and imports were being missed with programmatic runs)
-cov = coverage.Coverage(source=['src','data_handling','utils'], branch=True)
+cov = coverage.Coverage(source=['onair'], branch=True)
 cov.start()
 
 import os
@@ -22,9 +22,9 @@ import sys
 import argparse
 from datetime import datetime
 # from test_all import *
-from src.util.cleanup import *
+from onair.src.util.cleanup import *
 
-from src.run_scripts.execution_engine import ExecutionEngine
+from onair.src.run_scripts.execution_engine import ExecutionEngine
 
 cov.stop()
 
@@ -39,7 +39,7 @@ def main():
     """
 
     arg_parser = argparse.ArgumentParser(description='')
-    arg_parser.add_argument('configfile', nargs='?', default='./config/default_config.ini', help='Config file to be used')
+    arg_parser.add_argument('configfile', nargs='?', default='./onair/config/default_config.ini', help='Config file to be used')
     arg_parser.add_argument('--save', '-s', action='store_true', help='Should log files be saved?')
     arg_parser.add_argument('--save_name', '--name', '-n', help='Name of saved log files')
     arg_parser.add_argument('--mute', '-m', action='store_true', help='Mute all non-error output')
@@ -69,8 +69,8 @@ def run_unit_tests(Coverage: cov):
 
 """ Initializes global paths, used throughout execution """
 def init_global_paths(test=False):
-    run_path = 'src/test' if test == True else './'
-    results_path = 'src/test/results' if test == True else 'results/'
+    run_path = 'onair/src/test' if test == True else './'
+    results_path = 'onair/src/test/results' if test == True else 'results/'
 
     os.environ['BASE_PATH'] = os.path.dirname(os.path.realpath(__file__))
     os.environ['RUN_PATH'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), run_path)

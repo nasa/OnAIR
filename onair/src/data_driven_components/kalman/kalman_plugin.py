@@ -9,7 +9,7 @@
 
 import simdkalman
 import numpy as np
-from src.data_driven_components.generic_component import AIPlugIn
+from ...data_driven_components.generic_component import AIPlugIn
 
 class Plugin(AIPlugIn):
     def __init__(self, name, headers, window_size=3):

@@ -10,8 +10,8 @@
 """ Test DataDrivenLearning Functionality """
 import pytest
 from mock import MagicMock
-import src.data_driven_components.data_driven_learning as data_driven_learning
-from src.data_driven_components.data_driven_learning import DataDrivenLearning
+import onair.src.data_driven_components.data_driven_learning as data_driven_learning
+from onair.src.data_driven_components.data_driven_learning import DataDrivenLearning
 
 import importlib
 
@@ -56,7 +56,7 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
     # Assert
     assert importlib.import_module.call_count == num_fake_ai_plugins
     for i in range(num_fake_ai_plugins):
-        assert importlib.import_module.call_args_list[i].args == ('src.data_driven_components.' + arg__ai_plugins[i] + '.' + arg__ai_plugins[i] + '_plugin',)
+        assert importlib.import_module.call_args_list[i].args == ('onair.src.data_driven_components.' + arg__ai_plugins[i] + '.' + arg__ai_plugins[i] + '_plugin',)
 
 def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
     # Arrange
@@ -86,7 +86,7 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
     # Assert
     assert importlib.import_module.call_count == num_fake_ai_plugins
     for i in range(num_fake_ai_plugins):
-        assert importlib.import_module.call_args_list[i].args == (f'src.data_driven_components.{arg__ai_plugins[i]}.{arg__ai_plugins[i]}_plugin',)
+        assert importlib.import_module.call_args_list[i].args == (f'onair.src.data_driven_components.{arg__ai_plugins[i]}.{arg__ai_plugins[i]}_plugin',)
     assert fake_imported_module.Plugin.call_count == num_fake_ai_plugins
     for i in range(num_fake_ai_plugins):
         assert fake_imported_module.Plugin.call_args_list[i].args == (arg__ai_plugins[i], arg_headers)
@@ -99,7 +99,7 @@ def test_DataDrivenLearning_update_only_calls_flotify_input_with_given_curr_data
     arg_curr_data = MagicMock()
     arg_status = MagicMock()
 
-    mocker.patch('src.data_driven_components.data_driven_learning.status_to_oneHot')
+    mocker.patch('onair.src.data_driven_components.data_driven_learning.status_to_oneHot')
 
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
     cut.ai_constructs = []
@@ -117,7 +117,7 @@ def test_DataDrivenLearning_update_calls_flotify_input_with_given_curr_data_and_
     arg_curr_data = MagicMock()
     arg_status = MagicMock()
 
-    mocker.patch('src.data_driven_components.data_driven_learning.status_to_oneHot')
+    mocker.patch('onair.src.data_driven_components.data_driven_learning.status_to_oneHot')
 
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
     cut.ai_constructs = []

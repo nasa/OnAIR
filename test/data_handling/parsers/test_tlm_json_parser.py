@@ -10,7 +10,7 @@
 """ Test TLM Json Parser Functionality """
 import pytest
 from mock import MagicMock
-import data_handling.parsers.tlm_json_parser as tlm_parser
+import onair.data_handling.parsers.tlm_json_parser as tlm_parser
 
 # parseTlmConfJson tests
 def test_tlm_json_parser_parseTlmConfJson_returns_configs_with_empty_dicts_when_reorg_dict_is_empty(mocker):
@@ -20,8 +20,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_configs_with_empty_dicts_when_
     fake_data = MagicMock()
     fake_organized_data = {}
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = []
@@ -53,8 +53,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                        'tests' : {fake_mnemonics : fake_limits},
                                        'description' : fake_description}
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
@@ -81,8 +81,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     fake_organized_data = {}
     fake_organized_data[fake_label] = {'subsystem' : fake_subsystem}
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
@@ -113,8 +113,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
         fake_subsystems.append(fake_subsystem)
         fake_organized_data[fake_label] = {'subsystem' : fake_subsystem}
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = fake_subsystems
@@ -146,8 +146,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                        'tests' : {fake_mnemonics : fake_limits},
                                        'description' : fake_description}
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
@@ -181,8 +181,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                       'tests' : {fake_mnemonics : fake_limits},
                                       'description' : fake_description}
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem] * num_elems
@@ -238,8 +238,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                               'tests' : {fake_mnemonics[i] : fake_limits[i]},
                                               'description' : fake_description[i]}
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = []
@@ -299,8 +299,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                               'tests' : {fake_mnemonics[i] : fake_limits[i]},
                                               'description' : fake_description[i]}
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = []
@@ -381,7 +381,7 @@ def test_tlm_json_parser_str2lst_returns_call_to_ast_literal_eval_which_receive_
 
     expected_result = MagicMock()
     
-    mocker.patch('data_handling.parsers.tlm_json_parser.ast.literal_eval', return_value=expected_result)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.ast.literal_eval', return_value=expected_result)
 
     # Act
     result = tlm_parser.str2lst(arg_string)
@@ -395,8 +395,8 @@ def test_tlm_json_parser_str2lst_prints_message_when_ast_literal_eval_receives_g
     # Arrange
     arg_string = str(MagicMock())
     
-    mocker.patch('data_handling.parsers.tlm_json_parser.ast.literal_eval', side_effect=Exception)
-    mocker.patch('data_handling.parsers.tlm_json_parser.print')
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.ast.literal_eval', side_effect=Exception)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.print')
     
     # Act
     result = tlm_parser.str2lst(arg_string)
@@ -417,9 +417,9 @@ def test_tlm_json_parser_parseJson_opens_given_path_and_returns_data_returned_by
     fake_file_str = MagicMock()
     fake_file_data = MagicMock()
 
-    mocker.patch('data_handling.parsers.tlm_json_parser.open', return_value=fake_file)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.open', return_value=fake_file)
     mocker.patch.object(fake_file, 'read', return_value=fake_file_str)
-    mocker.patch('data_handling.parsers.tlm_json_parser.orjson.loads', return_value=fake_file_data)
+    mocker.patch('onair.data_handling.parsers.tlm_json_parser.orjson.loads', return_value=fake_file_data)
     mocker.patch.object(fake_file, 'close')
 
     # Act

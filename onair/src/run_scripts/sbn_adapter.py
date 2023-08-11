@@ -18,7 +18,7 @@ import time
 import datetime
 import os
 
-from data_handling.data_source import DataSource
+from ...data_handling.data_source import DataSource
 from ctypes import *
 import sbn_client as sbn
 import message_headers as msg_hdr

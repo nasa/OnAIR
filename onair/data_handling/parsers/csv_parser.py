@@ -14,9 +14,9 @@ CSV Parser
 import os
 import pandas as pd
 
-from data_handling.parsers.on_air_parser import OnAirParser
-from src.util.print_io import *
-from data_handling.parsers.parser_util import * 
+from .on_air_parser import OnAirParser
+from ...src.util.print_io import *
+from .parser_util import * 
 
 class CSV(OnAirParser):
     def pre_process_data(self, dataFiles):

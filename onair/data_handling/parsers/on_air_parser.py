@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 from abc import ABC, abstractmethod
-from data_handling.parsers.parser_util import * 
+from .parser_util import * 
 
 class OnAirParser(ABC):
     def __init__(self, rawDataFilepath = '', 

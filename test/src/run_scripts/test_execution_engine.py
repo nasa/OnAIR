@@ -10,8 +10,8 @@
 """ Test Execution Engine Functionality """
 import pytest
 from mock import MagicMock
-import src.run_scripts.execution_engine as execution_engine
-from src.run_scripts.execution_engine import ExecutionEngine
+import onair.src.run_scripts.execution_engine as execution_engine
+from onair.src.run_scripts.execution_engine import ExecutionEngine
 
 # __init__ tests
 def test_ExecutionEngine__init__sets_expected_values_but_does_no_calls_when_config_file_is_empty_string(mocker):
@@ -124,7 +124,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
-    mocker.patch('src.run_scripts.execution_engine.configparser.ConfigParser', return_value=fake_config)
+    mocker.patch('onair.src.run_scripts.execution_engine.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read')
     mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
 
@@ -178,7 +178,7 @@ def test_ExecutionEngine_parse_configs_bypasses_benmarks_when_access_raises_erro
     
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
-    mocker.patch('src.run_scripts.execution_engine.configparser.ConfigParser', return_value=fake_config)
+    mocker.patch('onair.src.run_scripts.execution_engine.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read')
     mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
 
@@ -227,10 +227,10 @@ def test_ExecutionEngine_parse_data_sets_the_processedSimData_to_the_TimeSynchro
     cut.telemetryFiles = MagicMock()
     cut.metaFiles = MagicMock()
 
-    mocker.patch('src.run_scripts.execution_engine.importlib.import_module', return_value=fake_parser)
-    mocker.patch('src.run_scripts.execution_engine.getattr', return_value=fake_parser_class)
-    mocker.patch.dict('src.run_scripts.execution_engine.os.environ', fake_environ)
-    mocker.patch('src.run_scripts.execution_engine.TimeSynchronizer', return_value=fake_processdSimData)
+    mocker.patch('onair.src.run_scripts.execution_engine.importlib.import_module', return_value=fake_parser)
+    mocker.patch('onair.src.run_scripts.execution_engine.getattr', return_value=fake_parser_class)
+    mocker.patch.dict('onair.src.run_scripts.execution_engine.os.environ', fake_environ)
+    mocker.patch('onair.src.run_scripts.execution_engine.TimeSynchronizer', return_value=fake_processdSimData)
 
     # Act
     cut.parse_data(arg_parser_name, arg_parser_file_name, arg_dataFilePath, arg_metadataFilePath, arg_subsystems_breakdown)
@@ -284,10 +284,10 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
     cut.telemetryFiles = MagicMock()
     cut.metaFiles = MagicMock()
 
-    mocker.patch('src.run_scripts.execution_engine.importlib.import_module', return_value=fake_parser)
-    mocker.patch('src.run_scripts.execution_engine.getattr', return_value=fake_parser_class)
-    mocker.patch.dict('src.run_scripts.execution_engine.os.environ', fake_environ)
-    mocker.patch('src.run_scripts.execution_engine.TimeSynchronizer', return_value=fake_processdSimData)
+    mocker.patch('onair.src.run_scripts.execution_engine.importlib.import_module', return_value=fake_parser)
+    mocker.patch('onair.src.run_scripts.execution_engine.getattr', return_value=fake_parser_class)
+    mocker.patch.dict('onair.src.run_scripts.execution_engine.os.environ', fake_environ)
+    mocker.patch('onair.src.run_scripts.execution_engine.TimeSynchronizer', return_value=fake_processdSimData)
 
     # Act
     cut.parse_data(arg_parser_name, arg_parser_file_name, arg_dataFilePath, arg_metadataFilePath)
@@ -314,11 +314,11 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_and_sets_bench
 
     print(fake__file__)
 
-    mocker.patch('src.run_scripts.execution_engine.Simulator', return_value=fake_sim)
-    mocker.patch('src.run_scripts.execution_engine.ast.literal_eval', side_effect=[fake_fls, fake_bi])
-    mocker.patch('src.run_scripts.execution_engine.__file__', fake__file__)
-    mocker.patch('src.run_scripts.execution_engine.os.path.realpath', return_value=fake_fp)
-    mocker.patch('src.run_scripts.execution_engine.os.path.dirname', return_value=fake_fp)
+    mocker.patch('onair.src.run_scripts.execution_engine.Simulator', return_value=fake_sim)
+    mocker.patch('onair.src.run_scripts.execution_engine.ast.literal_eval', side_effect=[fake_fls, fake_bi])
+    mocker.patch('onair.src.run_scripts.execution_engine.__file__', fake__file__)
+    mocker.patch('onair.src.run_scripts.execution_engine.os.path.realpath', return_value=fake_fp)
+    mocker.patch('onair.src.run_scripts.execution_engine.os.path.dirname', return_value=fake_fp)
     mocker.patch.object(fake_sim, 'set_benchmark_data')
 
     # Act
@@ -354,10 +354,10 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_s
 
     print(fake__file__)
 
-    mocker.patch('src.run_scripts.execution_engine.Simulator', return_value=fake_sim)
-    mocker.patch('src.run_scripts.execution_engine.ast.literal_eval', side_effect=Exception)
-    mocker.patch('src.run_scripts.execution_engine.os.path.realpath')
-    mocker.patch('src.run_scripts.execution_engine.os.path.dirname')
+    mocker.patch('onair.src.run_scripts.execution_engine.Simulator', return_value=fake_sim)
+    mocker.patch('onair.src.run_scripts.execution_engine.ast.literal_eval', side_effect=Exception)
+    mocker.patch('onair.src.run_scripts.execution_engine.os.path.realpath')
+    mocker.patch('onair.src.run_scripts.execution_engine.os.path.dirname')
     mocker.patch.object(fake_sim, 'set_benchmark_data')
 
     # Act
@@ -426,11 +426,11 @@ def test_ExecutionEngine_init_save_paths_makes_tmp_and_models_and_diagnosis_dire
 
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
-    mocker.patch.dict('src.run_scripts.execution_engine.os.environ', fake_environ)
-    mocker.patch('src.run_scripts.execution_engine.os.path.join', 
+    mocker.patch.dict('onair.src.run_scripts.execution_engine.os.environ', fake_environ)
+    mocker.patch('onair.src.run_scripts.execution_engine.os.path.join', 
     side_effect=[fake_tmp_save_path, fake_tmp_models_path, fake_tmp_diagnosis_path])
     mocker.patch.object(cut, 'delete_save_paths')
-    mocker.patch('src.run_scripts.execution_engine.os.mkdir')
+    mocker.patch('onair.src.run_scripts.execution_engine.os.mkdir')
     
     # Act
     cut.init_save_paths()
@@ -460,9 +460,9 @@ def test_ExecutionEngine_delete_save_paths_does_nothing_when_save_path_has_no_tm
 
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
-    mocker.patch.dict('src.run_scripts.execution_engine.os.environ', fake_environ)
-    mocker.patch('src.run_scripts.execution_engine.os.listdir', return_value=fake_dirs)
-    mocker.patch('src.run_scripts.execution_engine.shutil.rmtree')
+    mocker.patch.dict('onair.src.run_scripts.execution_engine.os.environ', fake_environ)
+    mocker.patch('onair.src.run_scripts.execution_engine.os.listdir', return_value=fake_dirs)
+    mocker.patch('onair.src.run_scripts.execution_engine.shutil.rmtree')
 
     # Act
     cut.delete_save_paths()
@@ -486,10 +486,10 @@ def test_ExecutionEngine_delete_save_paths_removes_tmp_tree_when_it_exists(mocke
         
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
-    mocker.patch.dict('src.run_scripts.execution_engine.os.environ', fake_environ)
-    mocker.patch('src.run_scripts.execution_engine.os.listdir', return_value=fake_dirs)
-    mocker.patch('src.run_scripts.execution_engine.shutil.rmtree')
-    mocker.patch('src.run_scripts.execution_engine.print')
+    mocker.patch.dict('onair.src.run_scripts.execution_engine.os.environ', fake_environ)
+    mocker.patch('onair.src.run_scripts.execution_engine.os.listdir', return_value=fake_dirs)
+    mocker.patch('onair.src.run_scripts.execution_engine.shutil.rmtree')
+    mocker.patch('onair.src.run_scripts.execution_engine.print')
 
     # Act
     cut.delete_save_paths()
@@ -516,10 +516,10 @@ def test_ExecutionEngine_delete_save_paths_prints_error_message_when_rmtree_rais
         
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
-    mocker.patch.dict('src.run_scripts.execution_engine.os.environ', fake_environ)
-    mocker.patch('src.run_scripts.execution_engine.os.listdir', return_value=fake_dirs)
-    mocker.patch('src.run_scripts.execution_engine.shutil.rmtree', side_effect=OSError(pytest.gen.randint(0,10),fake_error_message)) # 0 to 10 arbitrary error value for errno
-    mocker.patch('src.run_scripts.execution_engine.print')
+    mocker.patch.dict('onair.src.run_scripts.execution_engine.os.environ', fake_environ)
+    mocker.patch('onair.src.run_scripts.execution_engine.os.listdir', return_value=fake_dirs)
+    mocker.patch('onair.src.run_scripts.execution_engine.shutil.rmtree', side_effect=OSError(pytest.gen.randint(0,10),fake_error_message)) # 0 to 10 arbitrary error value for errno
+    mocker.patch('onair.src.run_scripts.execution_engine.print')
 
     # Act
     cut.delete_save_paths()
@@ -546,11 +546,11 @@ def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_prop
     
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
-    mocker.patch('src.run_scripts.execution_engine.gmtime', return_value=fake_gmtime)
-    mocker.patch('src.run_scripts.execution_engine.strftime', return_value=fake_complete_time)
-    mocker.patch.dict('src.run_scripts.execution_engine.os.environ', fake_environ)
-    mocker.patch('src.run_scripts.execution_engine.os.mkdir')
-    mocker.patch('src.run_scripts.execution_engine.copy_tree')
+    mocker.patch('onair.src.run_scripts.execution_engine.gmtime', return_value=fake_gmtime)
+    mocker.patch('onair.src.run_scripts.execution_engine.strftime', return_value=fake_complete_time)
+    mocker.patch.dict('onair.src.run_scripts.execution_engine.os.environ', fake_environ)
+    mocker.patch('onair.src.run_scripts.execution_engine.os.mkdir')
+    mocker.patch('onair.src.run_scripts.execution_engine.copy_tree')
 
     # Act
     cut.save_results(arg_save_name)
@@ -572,7 +572,7 @@ def test_ExecutionEngine_set_run_param_passes_given_arguments_to_setattr(mocker)
     arg_val = MagicMock()
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
-    mocker.patch('src.run_scripts.execution_engine.setattr')
+    mocker.patch('onair.src.run_scripts.execution_engine.setattr')
 
     # Act
     cut.set_run_param(arg_name, arg_val)

@@ -12,8 +12,8 @@ import pytest
 from mock import MagicMock
 
 
-import src.data_driven_components.generic_component.core as core
-from src.data_driven_components.generic_component.core import AIPlugIn
+import onair.src.data_driven_components.generic_component.core as core
+from onair.src.data_driven_components.generic_component.core import AIPlugIn
 
 class FakeAIPlugIn(AIPlugIn):
     def __init__(self, _name, _headers):
@@ -118,7 +118,7 @@ def test_AIPlugIn__init__sets_instance_values_to_given_args_when_given__headers_
 
     cut = FakeAIPlugIn.__new__(FakeAIPlugIn)
 
-    mocker.patch('src.data_driven_components.generic_component.core.len', return_value=pytest.gen.randint(1, 200)) # arbitrary, from 1 to 200 (but > 0)
+    mocker.patch('onair.src.data_driven_components.generic_component.core.len', return_value=pytest.gen.randint(1, 200)) # arbitrary, from 1 to 200 (but > 0)
 
     # Act
     cut.__init__(arg__name, arg__headers)

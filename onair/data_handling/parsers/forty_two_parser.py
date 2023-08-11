@@ -10,10 +10,10 @@
 """
 42 Parser
 """
-from data_handling.parsers.on_air_parser import OnAirParser
+from .on_air_parser import OnAirParser
 
-from src.util.print_io import *
-from data_handling.parsers.parser_util import * 
+from ...src.util.print_io import *
+from .parser_util import * 
 
 class FortyTwo(OnAirParser):
     def pre_process_data(self, dataFiles):

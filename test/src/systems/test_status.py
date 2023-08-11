@@ -11,7 +11,7 @@
 import pytest
 from mock import MagicMock
 
-from src.systems.status import Status
+from onair.src.systems.status import Status
 
 # tests for init
 def test_Status__init__with_empty_args_initializes_name_and_calls_set_status_with_default_values(mocker):
