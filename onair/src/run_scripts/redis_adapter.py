@@ -22,7 +22,8 @@ from ...data_handling.data_source import DataSource
 
 class AdapterDataSource(DataSource):
 
-    def __init__(self):
+    def __init__(self, data=[]):
+        super().__init__(data)
         self.address = 'localhost'
         self.port = 6379
         self.db = 0
@@ -55,7 +56,6 @@ class AdapterDataSource(DataSource):
 
         while not data_available:
             with self.new_data_lock:
-                print(self.new_data)
                 data_available = self.new_data
 
             if not data_available:
@@ -77,14 +77,14 @@ class AdapterDataSource(DataSource):
     def message_listener(self):
         """Loop for listening for messages on channel"""
         for message in self.pubsub.listen():
-            print("Received from REDIS:" + message)
+            print("Received from REDIS: ", message)
             if message['type'] == 'message':
                 data = json.loads(message['data'])
 
-                current_buffer = AdapterDataSource.currentData[(AdapterDataSource.double_buffer_read_index + 1) %2]
-                current_buffer['headers'] = list(data.keys())
-                current_buffer['data'] = list(data.values())
+                currentData = self.currentData[(self.double_buffer_read_index + 1) %2]
+                currentData['headers'] = list(data.keys())
+                currentData['data'] = list(data.values())
 
-                with AdapterDataSource.new_data_lock:
-                    AdapterDataSource.new_data = True
+                with self.new_data_lock:
+                    self.new_data = True
 
