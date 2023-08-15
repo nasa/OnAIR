@@ -16,6 +16,9 @@ from ..util.data_conversion import *
 
 class DataDrivenLearning:
     def __init__(self, headers, _ai_plugins:list=[]):
+        #If a single header is passed, it is passed a MagicMock object, so we are casting it to a list
+        if type(headers) is not list:
+            headers = [headers]
         assert(len(headers)>0)
         self.headers = headers
         self.ai_constructs = [
