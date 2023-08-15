@@ -1,6 +1,3 @@
-![Build](https://github.com/nasa/OnAIR/actions/workflows/unit-test.yml/badge.svg)
-[![CodeCov](https://codecov.io/gh/nasa/OnAIR/branch/main/graph/badge.svg?token=L0WVOTD5X9)](https://codecov.io/gh/nasa/OnAIR)
-
 # The On-board Artificial Intelligence Research (OnAIR) Platform
 
 The On-board Artificial Intelligence Research (OnAIR) Platform is a framework that enables AI algorithms written in Python to interact with NASA's [cFS](https://github.com/nasa/cFS).
