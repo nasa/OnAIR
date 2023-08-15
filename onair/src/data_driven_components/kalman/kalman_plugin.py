@@ -48,7 +48,7 @@ class Plugin(AIPlugIn):
                 if len(self.frames[data_point_index]) > self.window_size: # If after adding a point to the frame, that attribute is larger than the window_size, take out the first element
                     self.frames[data_point_index].pop(0) 
 
-    def render_diagnosis(self):
+    def render_reasoning(self):
         """
         System should return its diagnosis
         """

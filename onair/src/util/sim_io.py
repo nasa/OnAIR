@@ -15,7 +15,7 @@ Utility file for sim io
 import os
 import json 
 
-def render_diagnosis(diagnosis_list):
+def render_reasoning(diagnosis_list):
     with open(os.path.join(os.environ.get('ONAIR_DIAGNOSIS_SAVE_PATH'), 'diagnosis.txt'), mode='a') as out:
         out.write('==========================================================\n')
         out.write('                        DIAGNOSIS                         \n')

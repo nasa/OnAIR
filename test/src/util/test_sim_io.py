@@ -10,7 +10,7 @@
 from mock import MagicMock
 import onair.src.util.sim_io
 
-def test_sim_io_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empty(mocker):
+def test_sim_io_render_reasoning_writes_txt_and_csv_files_even_when_list_is_empty(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_DIAGNOSIS_SAVE_PATH'
   diag1 = MagicMock()
@@ -26,7 +26,7 @@ def test_sim_io_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empt
   mocker.patch('builtins.open', return_value=fake_file)
 
   # Act
-  onair.src.util.sim_io.render_diagnosis(arg_diagnosis_list)
+  onair.src.util.sim_io.render_reasoning(arg_diagnosis_list)
 
   # Assert
   assert open.call_count == 2
@@ -44,7 +44,7 @@ def test_sim_io_render_diagnosis_writes_txt_and_csv_files_even_when_list_is_empt
   assert open.call_args_list[1].kwargs == {'mode':'a'}
   assert fake_file_iterator.write.call_args_list[3].args == ('time_step, cohens_kappa, faults, subgraph\n',)
   
-def test_sim_io_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_given_diagnosis_in_list(mocker):
+def test_sim_io_render_reasoning_writes_txt_and_csv_files_with_entry_for_each_given_diagnosis_in_list(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_DIAGNOSIS_SAVE_PATH'
   diag1 = MagicMock()
@@ -70,7 +70,7 @@ def test_sim_io_render_diagnosis_writes_txt_and_csv_files_with_entry_for_each_gi
     arg_diagnosis_list.append(fake_diag)
 
   # Act
-  onair.src.util.sim_io.render_diagnosis(arg_diagnosis_list)
+  onair.src.util.sim_io.render_reasoning(arg_diagnosis_list)
 
   # Assert
   assert open.call_count == 2

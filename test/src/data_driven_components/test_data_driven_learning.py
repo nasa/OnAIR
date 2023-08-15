@@ -173,19 +173,19 @@ def test_DataDrivenLearning_apriori_training_calls_apriori_training_on_each_ai_c
         assert cut.ai_constructs[i].apriori_training.call_args_list[0].args == (arg_batch_data, )
     assert result == None
 
-# render_diagnosis tests
-def test_DataDrivenLearning_render_diagnosis_returns_empty_dict_when_instance_ai_constructs_is_empty(mocker):
+# render_reasoning tests
+def test_DataDrivenLearning_render_reasoning_returns_empty_dict_when_instance_ai_constructs_is_empty(mocker):
     # Arrange
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
     cut.ai_constructs = []
 
     # Act
-    result = cut.render_diagnosis()
+    result = cut.render_reasoning()
 
     # Assert
     assert result == {}
 
-def test_DataDrivenLearning_render_diagnosis_returns_dict_of_each_ai_construct_as_key_to_the_result_of_its_render_diagnosis_when_instance_ai_constructs_is_occupied(mocker):
+def test_DataDrivenLearning_render_reasoning_returns_dict_of_each_ai_construct_as_key_to_the_result_of_its_render_reasoning_when_instance_ai_constructs_is_occupied(mocker):
     # Arrange
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
     cut.ai_constructs = []
@@ -195,17 +195,17 @@ def test_DataDrivenLearning_render_diagnosis_returns_dict_of_each_ai_construct_a
     num_fake_ai_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_ai_constructs):
         fake_ai_construct = MagicMock()
-        forced_return_ai_construct_render_diagnosis = MagicMock()
+        forced_return_ai_construct_render_reasoning = MagicMock()
         cut.ai_constructs.append(fake_ai_construct)
-        mocker.patch.object(fake_ai_construct, 'render_diagnosis', return_value=forced_return_ai_construct_render_diagnosis)
+        mocker.patch.object(fake_ai_construct, 'render_reasoning', return_value=forced_return_ai_construct_render_reasoning)
         fake_ai_construct.component_name = MagicMock()
-        expected_result[fake_ai_construct.component_name] = forced_return_ai_construct_render_diagnosis
+        expected_result[fake_ai_construct.component_name] = forced_return_ai_construct_render_reasoning
 
     # Act
-    result = cut.render_diagnosis()
+    result = cut.render_reasoning()
 
     # Assert
     for i in range(num_fake_ai_constructs):
-        assert cut.ai_constructs[i].render_diagnosis.call_count == 1
-        assert cut.ai_constructs[i].render_diagnosis.call_args_list[0].args == ()
+        assert cut.ai_constructs[i].render_reasoning.call_count == 1
+        assert cut.ai_constructs[i].render_reasoning.call_args_list[0].args == ()
     assert result == expected_result

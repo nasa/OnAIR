@@ -25,7 +25,7 @@ class FakeAIPlugIn(AIPlugIn):
     def update(self):
         return None
 
-    def render_diagnosis(self):
+    def render_reasoning(self):
         return dict()
 
 class IncompleteFakeAIPlugIn(AIPlugIn):
@@ -42,8 +42,8 @@ class BadFakeAIPlugIn(AIPlugIn):
     def update(self):
         return super().update()
 
-    def render_diagnosis(self):
-        return super().render_diagnosis()
+    def render_reasoning(self):
+        return super().render_reasoning()
         
 # abstract methods tests
 def test_AIPlugIn_raises_error_because_of_unimplemented_abstract_methods():
@@ -56,7 +56,7 @@ def test_AIPlugIn_raises_error_because_of_unimplemented_abstract_methods():
     assert "Can't instantiate abstract class AIPlugIn with" in e_info.__str__()
     assert "apriori_training" in e_info.__str__()
     assert "update" in e_info.__str__()
-    assert "render_diagnosis" in e_info.__str__()
+    assert "render_reasoning" in e_info.__str__()
 
 # Incomplete plugin call tests
 def test_AIPlugIn_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
@@ -69,14 +69,14 @@ def test_AIPlugIn_raises_error_when_an_inherited_class_is_instantiated_because_a
     assert "Can't instantiate abstract class IncompleteFakeAIPlugIn with" in e_info.__str__()
     assert "apriori_training" in e_info.__str__()
     assert "update" in e_info.__str__()
-    assert "render_diagnosis" in e_info.__str__()
+    assert "render_reasoning" in e_info.__str__()
 
 def test_AIPlugIn_raises_error_when_an_inherited_class_calls_abstract_methods_in_parent():
     # Act
     cut = BadFakeAIPlugIn.__new__(BadFakeAIPlugIn)
 
     # populate list with the functions that should raise exceptions when called.
-    not_implemented_functions = [cut.update, cut.apriori_training, cut.render_diagnosis]
+    not_implemented_functions = [cut.update, cut.apriori_training, cut.render_reasoning]
     for fnc in not_implemented_functions:
         with pytest.raises(NotImplementedError) as e_info:
             fnc()
