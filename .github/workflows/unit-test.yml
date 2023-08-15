@@ -23,3 +23,5 @@ jobs:
       run: python -m coverage run --branch --source=src,data_handling,utils -m pytest ./test/
     - name: Coverage report
       run: coverage report
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
