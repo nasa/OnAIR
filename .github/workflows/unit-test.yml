@@ -2,7 +2,6 @@ name: Unit test run
 
 on:
   push:
-    branches: [main]
   pull_request: 
 
 jobs:
@@ -21,5 +20,7 @@ jobs:
         if [ -f requirements_pip.txt ]; then pip install -r requirements_pip.txt; fi
     - name: Test with pytest
       run: python -m coverage run -m pytest ./test/
+    - name: Coverage report
+      run: coverage report
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
