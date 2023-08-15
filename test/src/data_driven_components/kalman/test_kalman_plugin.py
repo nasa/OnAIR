@@ -255,7 +255,7 @@ def test_Kalman_update_will_not_pop_first_index_of_frames_data_points_when_windo
     assert cut.frames == expected_result
 
 # test render diagnosis
-def test_Kalman_render_diagnosis_returns_value_returned_by_frame_diagnosis_function(mocker):
+def test_Kalman_render_reasoning_returns_value_returned_by_frame_diagnosis_function(mocker):
     # Arrange
     fake_frames = MagicMock()
     fake_headers = MagicMock()
@@ -268,7 +268,7 @@ def test_Kalman_render_diagnosis_returns_value_returned_by_frame_diagnosis_funct
     mocker.patch.object(cut, 'frame_diagnosis', return_value=forced_frame_diagnose_return)
     
     # Act
-    result = cut.render_diagnosis()
+    result = cut.render_reasoning()
 
     # Assert
     assert result == forced_frame_diagnose_return

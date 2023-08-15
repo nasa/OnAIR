@@ -43,7 +43,7 @@ class AIPlugIn(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def render_diagnosis(self):
+    def render_reasoning(self):
         """
         System should return its diagnosis
         """

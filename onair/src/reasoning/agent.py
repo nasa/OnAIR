@@ -29,7 +29,7 @@ class Agent:
 
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """
-        learning_system_results = self.learning_systems.render_diagnosis() 
+        learning_system_results = self.learning_systems.render_reasoning() 
         diagnosis = Diagnosis(time_step, 
                               learning_system_results,
                               self.bayesian_status,

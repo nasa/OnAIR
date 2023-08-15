@@ -32,10 +32,10 @@ class DataDrivenLearning:
         for plugin in self.ai_constructs:
             plugin.apriori_training(batch_data)
 
-    def render_diagnosis(self):
+    def render_reasoning(self):
         diagnoses = {}
         for plugin in self.ai_constructs:
-            diagnoses[plugin.component_name] = plugin.render_diagnosis()
+            diagnoses[plugin.component_name] = plugin.render_reasoning()
         return diagnoses
 
 
