@@ -2,8 +2,8 @@ name: Unit test run
 
 on:
   push:
-  pull_request: 
     branches: [main]
+  pull_request: 
 
 jobs:
   build:
