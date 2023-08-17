@@ -87,3 +87,4 @@ class AdapterDataSource(DataSource):
 
     def has_data(self):
         return self.new_data
+    
