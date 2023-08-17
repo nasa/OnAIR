@@ -49,15 +49,14 @@ class AdapterDataSource(DataSource):
             listen_thread = threading.Thread(target=self.message_listener)
             listen_thread.start()
 
-
     def get_next(self):
         """Provides the latest data from REDIS channel"""
         data_available = False
 
         while not data_available:
             with self.new_data_lock:
-                data_available = self.new_data
-
+                data_available = self.has_data()
+                
             if not data_available:
                 time.sleep(0.01)
 
@@ -67,7 +66,6 @@ class AdapterDataSource(DataSource):
             self.double_buffer_read_index = (self.double_buffer_read_index + 1) % 2
             read_index = self.double_buffer_read_index
 
-        print("Reading buffer: {}".format(read_index))
         return self.currentData[read_index]['data']
 
     def has_more(self):
@@ -77,7 +75,6 @@ class AdapterDataSource(DataSource):
     def message_listener(self):
         """Loop for listening for messages on channel"""
         for message in self.pubsub.listen():
-            print("Received from REDIS: ", message)
             if message['type'] == 'message':
                 data = json.loads(message['data'])
 
@@ -88,3 +85,5 @@ class AdapterDataSource(DataSource):
                 with self.new_data_lock:
                     self.new_data = True
 
+    def has_data(self):
+        return self.new_data

@@ -11,7 +11,6 @@ import pytest
 from mock import MagicMock, PropertyMock
 import onair.src.run_scripts.redis_adapter as redis_adapter
 from onair.src.run_scripts.redis_adapter import AdapterDataSource
-from importlib import reload
 import redis
 import threading
 
@@ -115,35 +114,46 @@ def test_redis_adapter_AdapterDataSource_subscribe_message_does_nothing_on_False
 
 # get_next tests
 
-def test_redis_adapter_AdapterDataSource_get_next_when_new_data_is_true():
+def test_redis_adapter_AdapterDataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_0():
     # Arrange
     # Renew AdapterDataSource to ensure test independence
     cut = AdapterDataSource.__new__(AdapterDataSource)
     cut.new_data = True
     cut.new_data_lock = MagicMock()
-    cut.double_buffer_read_index = pytest.gen.randint(0,1)
+    cut.double_buffer_read_index = 0
     pre_call_index = cut.double_buffer_read_index
     expected_result = MagicMock()
     cut.currentData = []
-    if pre_call_index == 0:
-        cut.currentData.append({'data': MagicMock()})
-        cut.currentData.append({'data': expected_result})
-    else:
-        cut.currentData.append({'data': MagicMock()})
-        cut.currentData.append({'data': expected_result})
+    cut.currentData.append({'data': MagicMock()})
+    cut.currentData.append({'data': expected_result})
 
     # Act
     result = cut.get_next()
 
     # Assert
     assert cut.new_data == False
-    if pre_call_index == 0:
-        assert cut.double_buffer_read_index == 1
-    elif pre_call_index == 1:
-        assert cut.double_buffer_read_index == 0
-    else:
-        assert False
+    assert cut.double_buffer_read_index == 1
+    assert result == expected_result
 
+def test_redis_adapter_AdapterDataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_1():
+    # Arrange
+    # Renew AdapterDataSource to ensure test independence
+    cut = AdapterDataSource.__new__(AdapterDataSource)
+    cut.new_data = True
+    cut.new_data_lock = MagicMock()
+    cut.double_buffer_read_index = 1
+    pre_call_index = cut.double_buffer_read_index
+    expected_result = MagicMock()
+    cut.currentData = []
+    cut.currentData.append({'data': expected_result})
+    cut.currentData.append({'data': MagicMock()})
+
+    # Act
+    result = cut.get_next()
+
+    # Assert
+    assert cut.new_data == False
+    assert cut.double_buffer_read_index == 0
     assert result == expected_result
 
 def test_redis_adapter_AdapterDataSource_get_next_when_called_multiple_times_when_new_data_is_true():
@@ -151,23 +161,31 @@ def test_redis_adapter_AdapterDataSource_get_next_when_called_multiple_times_whe
     # Renew AdapterDataSource to ensure test independence
     cut = AdapterDataSource.__new__(AdapterDataSource)
     cut.double_buffer_read_index = pytest.gen.randint(0,1)
+    cut.new_data_lock = MagicMock()
+    cut.currentData = [MagicMock(), MagicMock()]
     pre_call_index = cut.double_buffer_read_index
+    expected_data = []
 
     # Act
     results = []
     num_calls = pytest.gen.randint(2,10) # arbitrary, 2 to 10
     for i in range(num_calls):
         cut.new_data = True
+        fake_new_data = MagicMock()
+        if cut.double_buffer_read_index == 0:
+            cut.currentData[1] = {'data': fake_new_data}
+        else:
+            cut.currentData[0] = {'data': fake_new_data}
+        expected_data.append(fake_new_data)
         results.append(cut.get_next())
 
     # Assert
     assert cut.new_data == False
     for i in range(num_calls):
-        results[i] = cut.currentData[pre_call_index]['data']
-        pre_call_index = (pre_call_index + 1) % 2
-    assert cut.double_buffer_read_index == pre_call_index
+        results[i] = expected_data[i]
+    assert cut.double_buffer_read_index == (num_calls + pre_call_index) % 2
     
-def test_redis_adapter_AdapterDataSource_get_next_behavior_when_new_data_is_false_then_true(mocker):
+def test_redis_adapter_AdapterDataSource_get_next_waits_until_data_is_available(mocker):
     # Arrange
     # Renew AdapterDataSource to ensure test independence
     cut = AdapterDataSource.__new__(AdapterDataSource)
@@ -175,27 +193,27 @@ def test_redis_adapter_AdapterDataSource_get_next_behavior_when_new_data_is_fals
     cut.double_buffer_read_index = pytest.gen.randint(0,1)
     pre_call_index = cut.double_buffer_read_index
     expected_result = MagicMock()
+    cut.new_data = None
     cut.currentData = []
     if pre_call_index == 0:
         cut.currentData.append({'data': MagicMock()})
         cut.currentData.append({'data': expected_result})
     else:
-        cut.currentData.append({'data': MagicMock()})
         cut.currentData.append({'data': expected_result})
+        cut.currentData.append({'data': MagicMock()})
 
     num_falses = pytest.gen.randint(1, 10)
     side_effect_list = [False] * num_falses
     side_effect_list.append(True)
 
-    print(side_effect_list)
-    cut.new_data = PropertyMock()
-    cut.new_data.side_effect=side_effect_list
+    mocker.patch.object(cut, 'has_data', side_effect=side_effect_list)
     mocker.patch('onair.src.run_scripts.redis_adapter.time.sleep')
 
     # Act
     result = cut.get_next()
 
     # Assert
+    assert cut.has_data.call_count == num_falses + 1
     assert redis_adapter.time.sleep.call_count == num_falses
     assert cut.new_data == False
     if pre_call_index == 0:
@@ -207,8 +225,77 @@ def test_redis_adapter_AdapterDataSource_get_next_behavior_when_new_data_is_fals
 
     assert result == expected_result
 
-
 # has_more tests
-def test_redis_adapter_AdapterDataSource_has_more_returns_True():
+def test_redis_adapter_AdapterDataSource_has_more_always_returns_True():
     cut = AdapterDataSource.__new__(AdapterDataSource)
-    assert cut.has_more
+    assert cut.has_more() == True
+
+# message_listener tests
+def test_redis_adapter_AdapterDataSource_message_listener_does_not_load_json_when_receive_type_is_not_message(mocker):
+    # Arrange
+    cut = AdapterDataSource.__new__(AdapterDataSource)
+    ignored_message_types = ['subscribe', 'unsubscribe', 'psubscribe', 'punsubscribe', 'pmessage']
+    fake_message = {}
+    fake_message['type'] = pytest.gen.choice(ignored_message_types)
+
+    cut.pubsub = MagicMock()
+    mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
+    mocker.patch('onair.src.run_scripts.redis_adapter.json.loads')
+
+    # Act
+    cut.message_listener()
+
+    # Assert
+    assert redis_adapter.json.loads.call_count == 0
+
+def test_redis_adapter_AdapterDataSource_message_listener_loads_message_info_when_receive_type_is_message(mocker):
+    # Arrange
+    cut = AdapterDataSource.__new__(AdapterDataSource)
+    cut.new_data_lock = MagicMock()
+    cut.new_data = None
+    cut.double_buffer_read_index = pytest.gen.randint(0,1)
+    cut.currentData = [{}, {}]
+    cut.pubsub = MagicMock()
+
+    fake_message = {}
+    fake_message_data = {}
+    fake_message['type'] = 'message'
+    fake_message['data'] = fake_message_data
+    fake_data = {}
+
+    expected_index = (cut.double_buffer_read_index + 1) % 2
+    expected_data_headers = []
+    expected_data_values = []
+
+    num_fake_data = pytest.gen.randint(1,10)
+    for i in range(num_fake_data):
+        fake_data_header = str(MagicMock())
+        fake_data_value = MagicMock()
+        fake_data[fake_data_header] = fake_data_value
+        expected_data_headers.append(fake_data_header)
+        expected_data_values.append(fake_data_value)
+    mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
+    mocker.patch('onair.src.run_scripts.redis_adapter.json.loads', return_value=fake_data)
+
+    # Act
+    cut.message_listener()
+
+    # Assert
+    assert redis_adapter.json.loads.call_count == 1
+    assert redis_adapter.json.loads.call_args_list[0].args == (fake_message_data,)
+    assert cut.currentData[expected_index]['headers'] == expected_data_headers
+    assert cut.currentData[expected_index]['data'] == expected_data_values
+    assert cut.new_data == True
+
+# has_data tests
+def test_redis_adapter_AdapterDataSource_has_data_returns_instance_new_data():
+    cut = AdapterDataSource.__new__(AdapterDataSource)
+    expected_result = MagicMock()
+    cut.new_data = expected_result
+
+    result = cut.has_data()
+
+    assert result == expected_result
+
+
+
