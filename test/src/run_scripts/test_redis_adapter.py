@@ -297,5 +297,3 @@ def test_redis_adapter_AdapterDataSource_has_data_returns_instance_new_data():
 
     assert result == expected_result
 
-
-
