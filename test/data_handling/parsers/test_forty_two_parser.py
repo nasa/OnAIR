@@ -31,7 +31,7 @@ def test_FortyTwo_pre_process_data_sets_labels_and_data_to_values_returned_from_
     fake_data = MagicMock()
     forced_return_parse_sim_data = (fake_labels, fake_data)
 
-    mocker.patch("onair.data_handling.parsers.forty_two_parser.str2lst", return_value=forced_return_str2lst)
+    mocker.patch(forty_two_parser.__name__ + '.str2lst', return_value=forced_return_str2lst)
     mocker.patch.object(pytest.cut, "parse_sim_data", return_value=forced_return_parse_sim_data)
 
     # Act
