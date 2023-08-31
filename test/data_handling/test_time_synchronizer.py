@@ -9,8 +9,8 @@
 
 """ Test Time Sync Functionality """
 import pytest
-
 from mock import MagicMock
+
 import onair.data_handling.time_synchronizer as time_synchronizer
 from onair.data_handling.time_synchronizer import TimeSynchronizer
 
@@ -261,7 +261,7 @@ def test_TimeSynchronizer_initialize_clean_data_array_calls_remove_time_datapoin
     cut.ordered_fused_headers = fake_ordered_fused_headers
 
     forced_return_deepcopy = MagicMock()
-    mocker.patch('onair.data_handling.time_synchronizer.copy.deepcopy', return_value=forced_return_deepcopy)
+    mocker.patch(time_synchronizer.__name__ + '.copy.deepcopy', return_value=forced_return_deepcopy)
     mocker.patch.object(cut, 'remove_time_datapoints')
     mocker.patch.object(cut, 'copy_to_with_offset')
 
@@ -298,7 +298,7 @@ def test_TimeSynchronizer_initialize_clean_data_array_loop_makes_expected_call_t
     cut.offsets = fake_offsets
 
     forced_return_deepcopy = MagicMock()
-    mocker.patch('onair.data_handling.time_synchronizer.copy.deepcopy', return_value=forced_return_deepcopy)
+    mocker.patch(time_synchronizer.__name__ + '.copy.deepcopy', return_value=forced_return_deepcopy)
     mocker.patch.object(cut, 'remove_time_datapoints')
     mocker.patch.object(cut, 'copy_to_with_offset')
 
@@ -344,7 +344,7 @@ def test_TimeSynchronizer_initialize_clean_data_array_loop_makes_expected_call_t
     cut.offsets = fake_offsets
 
     forced_return_deepcopy = MagicMock()
-    mocker.patch('onair.data_handling.time_synchronizer.copy.deepcopy', return_value=forced_return_deepcopy)
+    mocker.patch(time_synchronizer.__name__ + '.copy.deepcopy', return_value=forced_return_deepcopy)
     mocker.patch.object(cut, 'remove_time_datapoints')
     mocker.patch.object(cut, 'copy_to_with_offset')
 
@@ -436,7 +436,7 @@ def test_TimeSynchronizer_copy_to_with_offset_sets_expected_indices_in_arg_dest_
 
 #     fake_deep_copy = MagicMock()
 
-#     mocker.patch('onair.data_handling.time_synchronizer.copy.deepcopy', return_value=fake_deep_copy)
+#     mocker.patch(time_synchronizer.__name__ + '.copy.deepcopy', return_value=fake_deep_copy)
 
 #     expected_clean_data_symbol = '-'
 

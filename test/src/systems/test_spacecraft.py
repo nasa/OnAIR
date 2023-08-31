@@ -10,7 +10,8 @@
 """ Test VehicleRepresentation Functionality """
 import pytest
 from mock import MagicMock
-import onair.src.systems.vehicle_rep as vehicle
+
+import onair.src.systems.vehicle_rep as vehicle_rep
 from onair.src.systems.vehicle_rep import VehicleRepresentation
 
 # __init__ tests
@@ -27,15 +28,15 @@ def test_VehicleRepresentation__init__asserts_when_len_given_headers_is_not_eq_t
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
-    mocker.patch('onair.src.systems.vehicle_rep.len', side_effect=fake_len)
+    mocker.patch(vehicle_rep.__name__ + '.len', side_effect=fake_len)
     # Act
     with pytest.raises(AssertionError) as e_info:
         cut.__init__(arg_headers, arg_tests)
     
     # Assert
-    assert vehicle.len.call_count == 2
+    assert vehicle_rep.len.call_count == 2
     call_list = set({})
-    [call_list.add(vehicle.len.call_args_list[i].args) for i in range(len(vehicle.len.call_args_list))]
+    [call_list.add(vehicle_rep.len.call_args_list[i].args) for i in range(len(vehicle_rep.len.call_args_list))]
     assert call_list == {(arg_headers, ), (arg_tests, )}
     assert e_info.match('')
 
@@ -50,20 +51,20 @@ def test_VehicleRepresentation__init__sets_status_to_Status_with_str_MISSION_and
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
-    mocker.patch('onair.src.systems.vehicle_rep.len', return_value=fake_len)
-    mocker.patch('onair.src.systems.vehicle_rep.Status', return_value=fake_status)
-    mocker.patch('onair.src.systems.vehicle_rep.TelemetryTestSuite', return_value=fake_test_suite)
+    mocker.patch(vehicle_rep.__name__ + '.len', return_value=fake_len)
+    mocker.patch(vehicle_rep.__name__ + '.Status', return_value=fake_status)
+    mocker.patch(vehicle_rep.__name__ + '.TelemetryTestSuite', return_value=fake_test_suite)
     
     # Act
     cut.__init__(arg_headers, arg_tests)
 
     # Assert
-    assert vehicle.Status.call_count == 1
-    assert vehicle.Status.call_args_list[0].args == ('MISSION', )
+    assert vehicle_rep.Status.call_count == 1
+    assert vehicle_rep.Status.call_args_list[0].args == ('MISSION', )
     assert cut.status == fake_status
     assert cut.headers == arg_headers
-    assert vehicle.TelemetryTestSuite.call_count == 1
-    assert vehicle.TelemetryTestSuite.call_args_list[0].args == (arg_headers, arg_tests)
+    assert vehicle_rep.TelemetryTestSuite.call_count == 1
+    assert vehicle_rep.TelemetryTestSuite.call_args_list[0].args == (arg_headers, arg_tests)
     assert cut.test_suite == fake_test_suite
     assert cut.curr_data == ['-'] * fake_len
 
@@ -72,16 +73,16 @@ def test_VehicleRepresentation__init__default_given_headers_and_tests_are_both_e
     # Arrange
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
 
-    mocker.patch('onair.src.systems.vehicle_rep.Status')
-    mocker.patch('onair.src.systems.vehicle_rep.TelemetryTestSuite')
+    mocker.patch(vehicle_rep.__name__ + '.Status')
+    mocker.patch(vehicle_rep.__name__ + '.TelemetryTestSuite')
     
     # Act
     cut.__init__()
 
     # Assert
     assert cut.headers == []
-    assert vehicle.TelemetryTestSuite.call_count == 1
-    assert vehicle.TelemetryTestSuite.call_args_list[0].args == ([], [])
+    assert vehicle_rep.TelemetryTestSuite.call_count == 1
+    assert vehicle_rep.TelemetryTestSuite.call_args_list[0].args == ([], [])
     assert cut.curr_data == ['-'] * 0
 
 # update tests

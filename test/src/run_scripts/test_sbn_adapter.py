@@ -9,7 +9,9 @@
 
 import pytest
 from mock import MagicMock, PropertyMock
+
 import onair.src.run_scripts.sbn_adapter as sbn_adapter
+
 from importlib import reload
 import sys
 
@@ -103,16 +105,16 @@ def test_sbn_adapter_message_listener_thread_loops_indefinitely_until_purposely_
     fake_generic_recv_msg_p_contents._fields_ = fake__fields_
     expected_print_string = expected_print_string[0:-2]
 
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn', fake_sbn)
+    mocker.patch(sbn_adapter.__name__ + '.sbn', fake_sbn)
     pointer_side_effects = [FakeSbnDataGenericT, FakeDataStruct] * (num_loop_iterations + 1)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.POINTER', side_effect=pointer_side_effects)
+    mocker.patch(sbn_adapter.__name__ + '.POINTER', side_effect=pointer_side_effects)
     mocker.patch.object(FakeSbnDataGenericT, '__new__', return_value=fake_generic_recv_msg_p)
     mocker.patch.object(fake_sbn, 'recv_msg', return_value=None)
     mocker.patch.object(FakeDataStruct, '__new__', return_value=fake_recv_msg_p)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.getattr', side_effect=fake_attr_values * (num_loop_iterations + 1))
-    mocker.patch('onair.src.run_scripts.sbn_adapter.print', return_value=None)
+    mocker.patch(sbn_adapter.__name__ + '.getattr', side_effect=fake_attr_values * (num_loop_iterations + 1))
+    mocker.patch(sbn_adapter.__name__ + '.print', return_value=None)
 
-    mocker.patch('onair.src.run_scripts.sbn_adapter.get_current_data', side_effect=side_effect_list)
+    mocker.patch(sbn_adapter.__name__ + '.get_current_data', side_effect=side_effect_list)
     
     # Act
     with pytest.raises(Exception) as e_info:
@@ -172,9 +174,9 @@ def test_get_current_data_with_no_fields_in_recv_msg_or_data_struct(mocker, setu
     fake_time = MagicMock()
     fake_str_time = MagicMock()
 
-    mocker.patch('onair.src.run_scripts.sbn_adapter.AdapterDataSource',fake_AdapterDataSource)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.datetime.datetime', return_value=fake_start_time)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.datetime.timedelta', return_value=fake_timedelta)
+    mocker.patch(sbn_adapter.__name__ + '.AdapterDataSource',fake_AdapterDataSource)
+    mocker.patch(sbn_adapter.__name__ + '.datetime.datetime', return_value=fake_start_time)
+    mocker.patch(sbn_adapter.__name__ + '.datetime.timedelta', return_value=fake_timedelta)
     mocker.patch.object(fake_start_time, '__add__', return_value=fake_time)
     mocker.patch.object(fake_time, 'strftime', return_value=fake_str_time)
     fake_AdapterDataSource.new_data = False # not required, but helps verify it gets changed to True
@@ -251,9 +253,9 @@ def test_get_current_data_with_fields_in_recv_msg_and_data_struct(mocker, setup_
     arg_recv_msg._fields_ = fake__fields_
     sbn_adapter.msgID_lookup_table[fake_msgID][1]._fields_ = fake__fields_
 
-    mocker.patch('onair.src.run_scripts.sbn_adapter.AdapterDataSource',fake_AdapterDataSource)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.datetime.datetime', return_value=fake_start_time)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.datetime.timedelta', return_value=fake_timedelta)
+    mocker.patch(sbn_adapter.__name__ + '.AdapterDataSource',fake_AdapterDataSource)
+    mocker.patch(sbn_adapter.__name__ + '.datetime.datetime', return_value=fake_start_time)
+    mocker.patch(sbn_adapter.__name__ + '.datetime.timedelta', return_value=fake_timedelta)
     mocker.patch.object(fake_start_time, '__add__', return_value=fake_time)
     mocker.patch.object(fake_time, 'strftime', return_value=fake_str_time)
     fake_AdapterDataSource.new_data = False # not required, but helps verify it gets changed to True
@@ -361,15 +363,15 @@ def test_sbn_adapter_AdapterDataSource_connect_when_msgID_lookup_table_has_zero_
     fake_msgID_lookup_table = MagicMock()
     fake_msgID_lookup_table_keys = []
 
-    mocker.patch('onair.src.run_scripts.sbn_adapter.time.sleep')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.os.chdir')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.sbn_load_and_init')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.message_listener_thread', fake_listener_thread)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.threading.Thread', return_value=fake_listener_thread)
+    mocker.patch(sbn_adapter.__name__ + '.time.sleep')
+    mocker.patch(sbn_adapter.__name__ + '.os.chdir')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.sbn_load_and_init')
+    mocker.patch(sbn_adapter.__name__ + '.message_listener_thread', fake_listener_thread)
+    mocker.patch(sbn_adapter.__name__ + '.threading.Thread', return_value=fake_listener_thread)
     mocker.patch.object(fake_listener_thread, 'start')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.msgID_lookup_table', fake_msgID_lookup_table)
+    mocker.patch(sbn_adapter.__name__ + '.msgID_lookup_table', fake_msgID_lookup_table)
     mocker.patch.object(fake_msgID_lookup_table, 'keys', return_value=fake_msgID_lookup_table_keys)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.subscribe')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.subscribe')
     
     cut = AdapterDataSource.__new__(AdapterDataSource)
 
@@ -400,15 +402,15 @@ def test_sbn_adapter_AdapterDataSource_connect_when_msgID_lookup_table_has_one_k
     fake_msgID = MagicMock()
     fake_msgID_lookup_table_keys = [fake_msgID]
 
-    mocker.patch('onair.src.run_scripts.sbn_adapter.time.sleep')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.os.chdir')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.sbn_load_and_init')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.message_listener_thread', fake_listener_thread)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.threading.Thread', return_value=fake_listener_thread)
+    mocker.patch(sbn_adapter.__name__ + '.time.sleep')
+    mocker.patch(sbn_adapter.__name__ + '.os.chdir')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.sbn_load_and_init')
+    mocker.patch(sbn_adapter.__name__ + '.message_listener_thread', fake_listener_thread)
+    mocker.patch(sbn_adapter.__name__ + '.threading.Thread', return_value=fake_listener_thread)
     mocker.patch.object(fake_listener_thread, 'start')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.msgID_lookup_table', fake_msgID_lookup_table)
+    mocker.patch(sbn_adapter.__name__ + '.msgID_lookup_table', fake_msgID_lookup_table)
     mocker.patch.object(fake_msgID_lookup_table, 'keys', return_value=fake_msgID_lookup_table_keys)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.subscribe')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.subscribe')
     
     cut = AdapterDataSource.__new__(AdapterDataSource)
 
@@ -442,15 +444,15 @@ def test_sbn_adapter_AdapterDataSource_connect_when_msgID_lookup_table_has_multi
     for i in range(num_keys):
         fake_msgID_lookup_table_keys.append(MagicMock())
 
-    mocker.patch('onair.src.run_scripts.sbn_adapter.time.sleep')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.os.chdir')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.sbn_load_and_init')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.message_listener_thread', fake_listener_thread)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.threading.Thread', return_value=fake_listener_thread)
+    mocker.patch(sbn_adapter.__name__ + '.time.sleep')
+    mocker.patch(sbn_adapter.__name__ + '.os.chdir')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.sbn_load_and_init')
+    mocker.patch(sbn_adapter.__name__ + '.message_listener_thread', fake_listener_thread)
+    mocker.patch(sbn_adapter.__name__ + '.threading.Thread', return_value=fake_listener_thread)
     mocker.patch.object(fake_listener_thread, 'start')
-    mocker.patch('onair.src.run_scripts.sbn_adapter.msgID_lookup_table', fake_msgID_lookup_table)
+    mocker.patch(sbn_adapter.__name__ + '.msgID_lookup_table', fake_msgID_lookup_table)
     mocker.patch.object(fake_msgID_lookup_table, 'keys', return_value=fake_msgID_lookup_table_keys)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.subscribe')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.subscribe')
     
     cut = AdapterDataSource.__new__(AdapterDataSource)
 
@@ -481,7 +483,7 @@ def test_sbn_adapter_AdapterDataSource_subscribe_message_when_msgid_is_not_a_lis
     AdapterDataSource = sbn_adapter.AdapterDataSource
     arg_msgid = MagicMock()
     
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.subscribe')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.subscribe')
 
     cut = AdapterDataSource.__new__(AdapterDataSource)
 
@@ -498,7 +500,7 @@ def test_sbn_adapter_AdapterDataSource_subscribe_message_when_msgid_is_an_empty_
     AdapterDataSource = sbn_adapter.AdapterDataSource
     arg_msgid = []
     
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.subscribe')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.subscribe')
 
     cut = AdapterDataSource.__new__(AdapterDataSource)
 
@@ -514,7 +516,7 @@ def test_sbn_adapter_AdapterDataSource_subscribe_message_when_msgid_is_a_list_wi
     AdapterDataSource = sbn_adapter.AdapterDataSource
     arg_msgid = [MagicMock()]
     
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.subscribe')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.subscribe')
 
     cut = AdapterDataSource.__new__(AdapterDataSource)
 
@@ -534,7 +536,7 @@ def test_sbn_adapter_AdapterDataSource_subscribe_message_when_msgid_is_a_list_of
     for i in range(list_length):
         arg_msgid.append(MagicMock())
     
-    mocker.patch('onair.src.run_scripts.sbn_adapter.sbn.subscribe')
+    mocker.patch(sbn_adapter.__name__ + '.sbn.subscribe')
 
     cut = AdapterDataSource.__new__(AdapterDataSource)
 
@@ -602,7 +604,7 @@ def test_sbn_adapter_AdapterDataSource_get_next_behavior_when_new_data_is_false_
     side_effect_list.append(True)
 
     AdapterDataSource.new_data = PropertyMock(side_effect=side_effect_list)
-    mocker.patch('onair.src.run_scripts.sbn_adapter.time.sleep')
+    mocker.patch(sbn_adapter.__name__ + '.time.sleep')
 
     # Act
     result = cut.get_next()

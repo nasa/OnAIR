@@ -10,7 +10,8 @@
 """ Test TLM Json Parser Functionality """
 import pytest
 from mock import MagicMock
-import onair.data_handling.parsers.tlm_json_parser as tlm_parser
+
+import onair.data_handling.parsers.tlm_json_parser as tlm_json_parser
 
 # parseTlmConfJson tests
 def test_tlm_json_parser_parseTlmConfJson_returns_configs_with_empty_dicts_when_reorg_dict_is_empty(mocker):
@@ -20,8 +21,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_configs_with_empty_dicts_when_
     fake_data = MagicMock()
     fake_organized_data = {}
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
+    mocker.patch(tlm_json_parser.__name__ + '.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = []
@@ -29,13 +30,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_configs_with_empty_dicts_when_
     expected_result['description_assignments'] = []
 
     # Act
-    result = tlm_parser.parseTlmConfJson(arg_file_path)
+    result = tlm_json_parser.parseTlmConfJson(arg_file_path)
 
     # Assert
-    assert tlm_parser.parseJson.call_count == 1
-    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
-    assert tlm_parser.reorganizeTlmDict.call_count == 1
-    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_json_parser.parseJson.call_count == 1
+    assert tlm_json_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_json_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_json_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
     assert result == expected_result
 
 def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_only_one_label_and_order_key_does_not_exist(mocker):
@@ -53,8 +54,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                        'tests' : {fake_mnemonics : fake_limits},
                                        'description' : fake_description}
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
+    mocker.patch(tlm_json_parser.__name__ + '.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
@@ -62,13 +63,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['description_assignments'] = [fake_description]
 
     # Act
-    result = tlm_parser.parseTlmConfJson(arg_file_path)
+    result = tlm_json_parser.parseTlmConfJson(arg_file_path)
 
     # Assert
-    assert tlm_parser.parseJson.call_count == 1
-    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
-    assert tlm_parser.reorganizeTlmDict.call_count == 1
-    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_json_parser.parseJson.call_count == 1
+    assert tlm_json_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_json_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_json_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
     assert result == expected_result
 
 def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_only_one_label_and_limits_test_and_description_keys_do_not_exist(mocker):
@@ -81,8 +82,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     fake_organized_data = {}
     fake_organized_data[fake_label] = {'subsystem' : fake_subsystem}
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
+    mocker.patch(tlm_json_parser.__name__ + '.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
@@ -90,13 +91,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['description_assignments'] = [['No description']]
 
     # Act
-    result = tlm_parser.parseTlmConfJson(arg_file_path)
+    result = tlm_json_parser.parseTlmConfJson(arg_file_path)
 
     # Assert
-    assert tlm_parser.parseJson.call_count == 1
-    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
-    assert tlm_parser.reorganizeTlmDict.call_count == 1
-    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_json_parser.parseJson.call_count == 1
+    assert tlm_json_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_json_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_json_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
     assert result == expected_result
 
 def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_multiple_labels_and_limits_test_and_description_keys_do_not_exist(mocker):
@@ -113,8 +114,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
         fake_subsystems.append(fake_subsystem)
         fake_organized_data[fake_label] = {'subsystem' : fake_subsystem}
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
+    mocker.patch(tlm_json_parser.__name__ + '.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = fake_subsystems
@@ -122,13 +123,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['description_assignments'] = [['No description']] * num_labels
 
     # Act
-    result = tlm_parser.parseTlmConfJson(arg_file_path)
+    result = tlm_json_parser.parseTlmConfJson(arg_file_path)
 
     # Assert
-    assert tlm_parser.parseJson.call_count == 1
-    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
-    assert tlm_parser.reorganizeTlmDict.call_count == 1
-    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_json_parser.parseJson.call_count == 1
+    assert tlm_json_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_json_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_json_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
     assert result == expected_result
 
 def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_only_one_label_and_order_key_does_exist(mocker):
@@ -146,8 +147,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                        'tests' : {fake_mnemonics : fake_limits},
                                        'description' : fake_description}
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
+    mocker.patch(tlm_json_parser.__name__ + '.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem]
@@ -155,13 +156,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['description_assignments'] = [fake_description]
 
     # Act
-    result = tlm_parser.parseTlmConfJson(arg_file_path)
+    result = tlm_json_parser.parseTlmConfJson(arg_file_path)
 
     # Assert
-    assert tlm_parser.parseJson.call_count == 1
-    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
-    assert tlm_parser.reorganizeTlmDict.call_count == 1
-    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_json_parser.parseJson.call_count == 1
+    assert tlm_json_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_json_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_json_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
     assert result == expected_result
 
 def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_more_than_one_label_and_order_key_does_not_exist(mocker):
@@ -181,8 +182,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                       'tests' : {fake_mnemonics : fake_limits},
                                       'description' : fake_description}
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
+    mocker.patch(tlm_json_parser.__name__ + '.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = [fake_subsystem] * num_elems
@@ -190,13 +191,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['description_assignments'] = [fake_description] * num_elems
 
     # Act
-    result = tlm_parser.parseTlmConfJson(arg_file_path)
+    result = tlm_json_parser.parseTlmConfJson(arg_file_path)
 
     # Assert
-    assert tlm_parser.parseJson.call_count == 1
-    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
-    assert tlm_parser.reorganizeTlmDict.call_count == 1
-    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_json_parser.parseJson.call_count == 1
+    assert tlm_json_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_json_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_json_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
     assert result == expected_result
 
 def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_more_than_one_label_and_order_key_does_exist(mocker):
@@ -238,8 +239,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                               'tests' : {fake_mnemonics[i] : fake_limits[i]},
                                               'description' : fake_description[i]}
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
+    mocker.patch(tlm_json_parser.__name__ + '.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = []
@@ -251,13 +252,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
         expected_result['description_assignments'].append(ordered_descs[i])
 
     # Act
-    result = tlm_parser.parseTlmConfJson(arg_file_path)
+    result = tlm_json_parser.parseTlmConfJson(arg_file_path)
 
     # Assert
-    assert tlm_parser.parseJson.call_count == 1
-    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
-    assert tlm_parser.reorganizeTlmDict.call_count == 1
-    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_json_parser.parseJson.call_count == 1
+    assert tlm_json_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_json_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_json_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
     assert result == expected_result
 
 def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reorg_dict_contains_more_than_one_label_and_limits_are_interpreted_as_empty_lists(mocker):
@@ -299,8 +300,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
                                               'tests' : {fake_mnemonics[i] : fake_limits[i]},
                                               'description' : fake_description[i]}
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.parseJson', return_value=fake_data)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.reorganizeTlmDict', return_value=fake_organized_data)
+    mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
+    mocker.patch(tlm_json_parser.__name__ + '.reorganizeTlmDict', return_value=fake_organized_data)
 
     expected_result = {}
     expected_result['subsystem_assignments'] = []
@@ -312,13 +313,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
         expected_result['description_assignments'].append(ordered_descs[i])
 
     # Act
-    result = tlm_parser.parseTlmConfJson(arg_file_path)
+    result = tlm_json_parser.parseTlmConfJson(arg_file_path)
 
     # Assert
-    assert tlm_parser.parseJson.call_count == 1
-    assert tlm_parser.parseJson.call_args_list[0].args == (arg_file_path, )
-    assert tlm_parser.reorganizeTlmDict.call_count == 1
-    assert tlm_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
+    assert tlm_json_parser.parseJson.call_count == 1
+    assert tlm_json_parser.parseJson.call_args_list[0].args == (arg_file_path, )
+    assert tlm_json_parser.reorganizeTlmDict.call_count == 1
+    assert tlm_json_parser.reorganizeTlmDict.call_args_list[0].args == (fake_data, )
     assert result == expected_result
 
 # reorganizeTlmDict tests
@@ -330,7 +331,7 @@ def test_tlm_json_parser_reorganizeTlmDict_raises_error_when_arg_data_does_not_c
 
     # Assert
     with pytest.raises(KeyError) as e_info:
-        result = tlm_parser.reorganizeTlmDict(arg_data)
+        result = tlm_json_parser.reorganizeTlmDict(arg_data)
 
     # Act
     assert e_info.match('subsystems')
@@ -343,7 +344,7 @@ def test_tlm_json_parser_reorganizeTlmDict_returns_empty_dict_when_arg_data_subs
     arg_data.update({'subsystems' : {}})
 
     # Assert
-    result = tlm_parser.reorganizeTlmDict(arg_data)
+    result = tlm_json_parser.reorganizeTlmDict(arg_data)
 
     # Act
     assert result == {}
@@ -369,7 +370,7 @@ def test_tlm_json_parser_reorganizeTlmDict_returns_expected_dict_when_arg_data_s
             expected_result[fake_label]['subsystem'] = ss
 
     # Assert
-    result = tlm_parser.reorganizeTlmDict(arg_data)
+    result = tlm_json_parser.reorganizeTlmDict(arg_data)
 
     # Act
     assert result == expected_result
@@ -381,31 +382,31 @@ def test_tlm_json_parser_str2lst_returns_call_to_ast_literal_eval_which_receive_
 
     expected_result = MagicMock()
     
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.ast.literal_eval', return_value=expected_result)
+    mocker.patch(tlm_json_parser.__name__ + '.ast.literal_eval', return_value=expected_result)
 
     # Act
-    result = tlm_parser.str2lst(arg_string)
+    result = tlm_json_parser.str2lst(arg_string)
 
     # Assert
-    assert tlm_parser.ast.literal_eval.call_count == 1
-    assert tlm_parser.ast.literal_eval.call_args_list[0].args == (arg_string, )
+    assert tlm_json_parser.ast.literal_eval.call_count == 1
+    assert tlm_json_parser.ast.literal_eval.call_args_list[0].args == (arg_string, )
     assert result == expected_result
 
 def test_tlm_json_parser_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_raises_exception(mocker):
     # Arrange
     arg_string = str(MagicMock())
     
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.ast.literal_eval', side_effect=Exception)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.print')
+    mocker.patch(tlm_json_parser.__name__ + '.ast.literal_eval', side_effect=Exception)
+    mocker.patch(tlm_json_parser.__name__ + '.print')
     
     # Act
-    result = tlm_parser.str2lst(arg_string)
+    result = tlm_json_parser.str2lst(arg_string)
 
     # Assert
-    assert tlm_parser.ast.literal_eval.call_count == 1
-    assert tlm_parser.ast.literal_eval.call_args_list[0].args == (arg_string, )
-    assert tlm_parser.print.call_count == 1
-    assert tlm_parser.print.call_args_list[0].args == ("Unable to process string representation of list", )
+    assert tlm_json_parser.ast.literal_eval.call_count == 1
+    assert tlm_json_parser.ast.literal_eval.call_args_list[0].args == (arg_string, )
+    assert tlm_json_parser.print.call_count == 1
+    assert tlm_json_parser.print.call_args_list[0].args == ("Unable to process string representation of list", )
     assert result == None
 
 # parseJson tests
@@ -417,19 +418,19 @@ def test_tlm_json_parser_parseJson_opens_given_path_and_returns_data_returned_by
     fake_file_str = MagicMock()
     fake_file_data = MagicMock()
 
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.open', return_value=fake_file)
+    mocker.patch(tlm_json_parser.__name__ + '.open', return_value=fake_file)
     mocker.patch.object(fake_file, 'read', return_value=fake_file_str)
-    mocker.patch('onair.data_handling.parsers.tlm_json_parser.orjson.loads', return_value=fake_file_data)
+    mocker.patch(tlm_json_parser.__name__ + '.orjson.loads', return_value=fake_file_data)
     mocker.patch.object(fake_file, 'close')
 
     # Act
-    result = tlm_parser.parseJson(arg_path)
+    result = tlm_json_parser.parseJson(arg_path)
     
     # Assert
-    assert tlm_parser.open.call_count == 1
-    assert tlm_parser.open.call_args_list[0].args == (arg_path, 'rb')
+    assert tlm_json_parser.open.call_count == 1
+    assert tlm_json_parser.open.call_args_list[0].args == (arg_path, 'rb')
     assert fake_file.read.call_count == 1
-    assert tlm_parser.orjson.loads.call_count == 1
-    assert tlm_parser.orjson.loads.call_args_list[0].args == (fake_file_str, )
+    assert tlm_json_parser.orjson.loads.call_count == 1
+    assert tlm_json_parser.orjson.loads.call_args_list[0].args == (fake_file_str, )
     assert fake_file.close.call_count == 1
     assert result == fake_file_data

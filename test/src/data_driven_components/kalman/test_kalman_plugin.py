@@ -8,10 +8,10 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 """ Test Kalman Plugin Functionality """
-
 import pytest
 from mock import MagicMock
-import onair.src.data_driven_components.kalman.kalman_plugin as kalman
+
+import onair.src.data_driven_components.kalman.kalman_plugin as kalman_plugin
 from onair.src.data_driven_components.kalman.kalman_plugin import Plugin as Kalman
 
 # test init
@@ -31,9 +31,9 @@ def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_a
 
     forced_diag_return_value = MagicMock()
     forced_array_return_value = MagicMock()
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.simdkalman.KalmanFilter', Fake_KalmanFilter)
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.diag', return_value=forced_diag_return_value)
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.array', return_value=forced_array_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.simdkalman.KalmanFilter', Fake_KalmanFilter)
+    mocker.patch(kalman_plugin.__name__ + '.np.diag', return_value=forced_diag_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.np.array', return_value=forced_array_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -69,9 +69,9 @@ def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_a
 
     forced_diag_return_value = MagicMock()
     forced_array_return_value = MagicMock()
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.simdkalman.KalmanFilter', Fake_KalmanFilter)
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.diag', return_value=forced_diag_return_value)
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.array', return_value=forced_array_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.simdkalman.KalmanFilter', Fake_KalmanFilter)
+    mocker.patch(kalman_plugin.__name__ + '.np.diag', return_value=forced_diag_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.np.array', return_value=forced_array_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -280,8 +280,8 @@ def test_Kalman_mean_calculates_return_value_by_dividing_sum_by_len(mocker):
 
     forced_sum_return_value = pytest.gen.uniform(1.0, 10.0) # arbitrary, random float from 1.0 to 10.0
     forced_len_return_value = pytest.gen.uniform(1.0, 10.0) # arbitrary, random float from 1.0 to 10.0
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.sum', return_value=forced_sum_return_value)
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.len', return_value=forced_len_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.sum', return_value=forced_sum_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.len', return_value=forced_len_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -289,10 +289,10 @@ def test_Kalman_mean_calculates_return_value_by_dividing_sum_by_len(mocker):
     result = cut.mean(arg_values)
 
     # Assert
-    assert kalman.sum.call_count == 1
-    assert kalman.sum.call_args_list[0].args == (arg_values, )
-    assert kalman.len.call_count == 1
-    assert kalman.len.call_args_list[0].args == (arg_values, )
+    assert kalman_plugin.sum.call_count == 1
+    assert kalman_plugin.sum.call_args_list[0].args == (arg_values, )
+    assert kalman_plugin.len.call_count == 1
+    assert kalman_plugin.len.call_args_list[0].args == (arg_values, )
     assert result == forced_sum_return_value/forced_len_return_value
 
 # test residual
@@ -302,7 +302,7 @@ def test_Kalman_residual_calculates_return_value_by_finding_the_abs_difference_o
     arg_actual = pytest.gen.uniform(-10.0, 10.0) # arbitrary, random float from -10.0 to 10.0
 
     forced_abs_return_value = MagicMock()
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.abs', return_value=forced_abs_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -311,8 +311,8 @@ def test_Kalman_residual_calculates_return_value_by_finding_the_abs_difference_o
 
     # Assert
     assert result == forced_abs_return_value
-    assert kalman.abs.call_count == 1
-    assert kalman.abs.call_args_list[0].args == (arg_actual - arg_predicted, )
+    assert kalman_plugin.abs.call_count == 1
+    assert kalman_plugin.abs.call_args_list[0].args == (arg_actual - arg_predicted, )
 
 # test std_dev
 def test_Kalman_std_dev_calculates_return_value_by_using_np_std_function_on_arg_data(mocker):
@@ -320,7 +320,7 @@ def test_Kalman_std_dev_calculates_return_value_by_using_np_std_function_on_arg_
     arg_data = MagicMock()
 
     forced_std_return_value = MagicMock()
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.np.std', return_value=forced_std_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.np.std', return_value=forced_std_return_value)
 
     cut = Kalman.__new__(Kalman)
 
@@ -329,8 +329,8 @@ def test_Kalman_std_dev_calculates_return_value_by_using_np_std_function_on_arg_
 
     # Assert
     assert result == forced_std_return_value
-    assert kalman.np.std.call_count == 1
-    assert kalman.np.std.call_args_list[0].args == (arg_data, )
+    assert kalman_plugin.np.std.call_count == 1
+    assert kalman_plugin.np.std.call_args_list[0].args == (arg_data, )
 
 # test predict
 def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_data_is_empty_and_initial_val_equals_None(mocker):
@@ -644,7 +644,7 @@ def test_Kalman_current_attribute_chunk_get_error_returns_true_when_abs_of_mean_
 
     mocker.patch.object(cut, 'generate_residuals_for_given_data', return_value=forced_generate_residuals_return_value)
     mocker.patch.object(cut, 'mean', return_value=forced_mean_return_value)
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.abs', return_value=forced_abs_return_value)
 
     # Act
     result = cut.current_attribute_chunk_get_error(arg_data)
@@ -655,9 +655,9 @@ def test_Kalman_current_attribute_chunk_get_error_returns_true_when_abs_of_mean_
     assert cut.generate_residuals_for_given_data.call_args_list[0].args == (arg_data, )
     assert cut.mean.call_count == 1
     assert cut.mean.call_args_list[0].args == (forced_generate_residuals_return_value, )
-    assert kalman.abs.call_count == 2
-    assert kalman.abs.call_args_list[0].args == (forced_mean_return_value, )
-    assert kalman.abs.call_args_list[1].args == (forced_abs_return_value, )
+    assert kalman_plugin.abs.call_count == 2
+    assert kalman_plugin.abs.call_args_list[0].args == (forced_mean_return_value, )
+    assert kalman_plugin.abs.call_args_list[1].args == (forced_abs_return_value, )
     
 def test_Kalman_current_attribute_chunk_get_error_returns_false_when_abs_of_mean_residuals_less_than_one_point_five(mocker):
     # Arrange
@@ -670,7 +670,7 @@ def test_Kalman_current_attribute_chunk_get_error_returns_false_when_abs_of_mean
 
     mocker.patch.object(cut, 'generate_residuals_for_given_data', return_value=forced_generate_residuals_return_value)
     mocker.patch.object(cut, 'mean', return_value=forced_mean_return_value)
-    mocker.patch('onair.src.data_driven_components.kalman.kalman_plugin.abs', return_value=forced_abs_return_value)
+    mocker.patch(kalman_plugin.__name__ + '.abs', return_value=forced_abs_return_value)
 
     # Act
     result = cut.current_attribute_chunk_get_error(arg_data)
@@ -681,9 +681,9 @@ def test_Kalman_current_attribute_chunk_get_error_returns_false_when_abs_of_mean
     assert cut.generate_residuals_for_given_data.call_args_list[0].args == (arg_data, )
     assert cut.mean.call_count == 1
     assert cut.mean.call_args_list[0].args == (forced_generate_residuals_return_value, )
-    assert kalman.abs.call_count == 2
-    assert kalman.abs.call_args_list[0].args == (forced_mean_return_value, )
-    assert kalman.abs.call_args_list[1].args == (forced_abs_return_value, )
+    assert kalman_plugin.abs.call_count == 2
+    assert kalman_plugin.abs.call_args_list[0].args == (forced_mean_return_value, )
+    assert kalman_plugin.abs.call_args_list[1].args == (forced_abs_return_value, )
 
 # test frame_diagnosis
 def test_Kalman_frame_diagnosis_returns_empty_list_when_args_frame_and_headers_are_empty():
