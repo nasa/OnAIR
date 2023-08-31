@@ -1,4 +1,0 @@
-TIME [] ['SYNC','TIME']
-A [] ['FEASIBILITY',-1.0,0.0,10.0,15.0]
-B [] ['NOOP']
-C [] ['FEASIBILITY',-1.0,0.0,10.0,15.0]
