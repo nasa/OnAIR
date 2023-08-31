@@ -6,11 +6,12 @@
 #
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
-
 import pytest
-from mock import MagicMock, PropertyMock
+from mock import MagicMock
+
 import onair.src.run_scripts.redis_adapter as redis_adapter
 from onair.src.run_scripts.redis_adapter import AdapterDataSource
+
 import redis
 import threading
 
@@ -207,7 +208,7 @@ def test_redis_adapter_AdapterDataSource_get_next_waits_until_data_is_available(
     side_effect_list.append(True)
 
     mocker.patch.object(cut, 'has_data', side_effect=side_effect_list)
-    mocker.patch('onair.src.run_scripts.redis_adapter.time.sleep')
+    mocker.patch(redis_adapter.__name__ + '.time.sleep')
 
     # Act
     result = cut.get_next()
@@ -240,7 +241,7 @@ def test_redis_adapter_AdapterDataSource_message_listener_does_not_load_json_whe
 
     cut.pubsub = MagicMock()
     mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
-    mocker.patch('onair.src.run_scripts.redis_adapter.json.loads')
+    mocker.patch(redis_adapter.__name__ + '.json.loads')
 
     # Act
     cut.message_listener()
@@ -275,7 +276,7 @@ def test_redis_adapter_AdapterDataSource_message_listener_loads_message_info_whe
         expected_data_headers.append(fake_data_header)
         expected_data_values.append(fake_data_value)
     mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
-    mocker.patch('onair.src.run_scripts.redis_adapter.json.loads', return_value=fake_data)
+    mocker.patch(redis_adapter.__name__ + '.json.loads', return_value=fake_data)
 
     # Act
     cut.message_listener()
