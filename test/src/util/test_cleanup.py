@@ -6,9 +6,9 @@
 #
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
-
 import pytest
 from mock import MagicMock
+
 import onair.src.util.cleanup as cleanup
 
 # test_setup_folders
@@ -16,8 +16,8 @@ def test_cleanup_setup_folders_creates_dir_when_given_results_path_does_not_exis
   # Arrange
   arg_results_path = str(MagicMock())
 
-  mocker.patch('onair.src.util.cleanup.os.path.isdir', return_value=False)
-  mocker.patch('onair.src.util.cleanup.os.mkdir')
+  mocker.patch(cleanup.__name__ + '.os.path.isdir', return_value=False)
+  mocker.patch(cleanup.__name__ + '.os.mkdir')
 
   # Act
   cleanup.setup_folders(arg_results_path)
@@ -31,8 +31,8 @@ def test_cleanup_setup_folders_does_not_create_dir_when_it_already_exists(mocker
   # Arrange
   arg_results_path = str(MagicMock())
 
-  mocker.patch('onair.src.util.cleanup.os.path.isdir', return_value=True)
-  mocker.patch('onair.src.util.cleanup.os.mkdir')
+  mocker.patch(cleanup.__name__ + '.os.path.isdir', return_value=True)
+  mocker.patch(cleanup.__name__ + '.os.mkdir')
 
   # Act
   cleanup.setup_folders(arg_results_path)

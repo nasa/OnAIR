@@ -10,6 +10,7 @@
 """ Test Status Functionality """
 import pytest
 from mock import MagicMock
+
 import onair.src.systems.telemetry_test_suite as telemetry_test_suite
 from onair.src.systems.telemetry_test_suite import TelemetryTestSuite
 
@@ -125,7 +126,7 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     cut.dataFields = {arg_header_index:expected_datafield}
 
     mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
-    mocker.patch('onair.src.systems.telemetry_test_suite.Status', return_value = expected_result)
+    mocker.patch(telemetry_test_suite.__name__ + '.Status', return_value = expected_result)
 
     # Act
     result = cut.run_tests(arg_header_index, arg_test_val, arg_sync_data)
@@ -161,7 +162,7 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     # IMPORTANT: note, using state function as an easy mock -- not really calling it here!!
     mocker.patch.object(cut, 'state', return_value=(fake_stat, fake_mass_assigments))
     mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
-    mocker.patch('onair.src.systems.telemetry_test_suite.Status', return_value = expected_result)
+    mocker.patch(telemetry_test_suite.__name__ + '.Status', return_value = expected_result)
 
     cut.all_tests = {fake_tests[0][0]:cut.state} # IMPORTANT: purposely set AFTER patch of cut's sync function
     
@@ -204,7 +205,7 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     
     mocker.patch.object(cut, 'state', return_value=(fake_stat, fake_mass_assigments))
     mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
-    mocker.patch('onair.src.systems.telemetry_test_suite.Status', return_value = expected_result)
+    mocker.patch(telemetry_test_suite.__name__ + '.Status', return_value = expected_result)
 
     cut.all_tests = {'STATE':cut.state} # IMPORTANT: purposely set AFTER patch of cut's state function
     
@@ -820,7 +821,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
-    mocker.patch('onair.src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
     
     # Act
@@ -841,7 +842,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
-    mocker.patch('onair.src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
     
     # Act
@@ -868,7 +869,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
-    mocker.patch('onair.src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
     
     # Act
@@ -895,7 +896,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
-    mocker.patch('onair.src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
     
     # Act
@@ -924,7 +925,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_str_RED_and_1_pt
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
-    mocker.patch('onair.src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
     
     # Act
@@ -952,7 +953,7 @@ def test_TelemetryTestSuite_calc_single_status_default_given_mode_is_str_strict(
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
-    mocker.patch('onair.src.systems.telemetry_test_suite.Counter', return_value=fake_occurrences)
+    mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
     
     # Act

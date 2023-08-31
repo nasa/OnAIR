@@ -150,7 +150,7 @@ def test_DataSource_has_more_returns_True_when_index_is_less_than_data_len(mocke
     cut.index = pytest.gen.randint(0, 5) # arbitrary, from 0 to 5
     cut.data = MagicMock()
 
-    mocker.patch('onair.data_handling.data_source.len', return_value=cut.index+pytest.gen.randint(1, 100)) # arbitrary, from 1 to 100 more data than index
+    mocker.patch(data_source.__name__ + '.len', return_value=cut.index+pytest.gen.randint(1, 100)) # arbitrary, from 1 to 100 more data than index
 
     # Act
     result = cut.has_more()
@@ -166,7 +166,7 @@ def test_DataSource_has_more_returns_False_when_index_eq_data_len(mocker):
     cut.index = pytest.gen.randint(0, 5) # arbitrary, from 0 to 5
     cut.data = MagicMock()
 
-    mocker.patch('onair.data_handling.data_source.len', return_value=cut.index)
+    mocker.patch(data_source.__name__ + '.len', return_value=cut.index)
 
     # Act
     result = cut.has_more()
@@ -182,7 +182,7 @@ def test_DataSource_has_more_returns_False_when_index_greater_than_data_len(mock
     cut.index = pytest.gen.randint(1, 5) # arbitrary, from 1 to 5 (min 1 to be able to subtract)
     cut.data = MagicMock()
 
-    mocker.patch('onair.data_handling.data_source.len', return_value=cut.index-1)
+    mocker.patch(data_source.__name__ + '.len', return_value=cut.index-1)
 
     # Act
     result = cut.has_more()

@@ -10,8 +10,10 @@
 """ Test Simulator Functionality """ 
 import pytest
 from mock import MagicMock
+
 import onair.src.run_scripts.sim as sim
 from onair.src.run_scripts.sim import Simulator
+
 from math import ceil, floor
 
 # __init__ tests
@@ -42,11 +44,11 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     cut = Simulator.__new__(Simulator)
 
     mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
-    mocker.patch('onair.src.run_scripts.sim.vehicle', return_value=fake_vehicle)
-    mocker.patch('onair.src.run_scripts.sim.importlib.import_module', return_value=fake_sbn_adapter)
-    mocker.patch('onair.src.run_scripts.sim.getattr', return_value=FakeDataAdapterSource)
+    mocker.patch(sim.__name__ + '.vehicle', return_value=fake_vehicle)
+    mocker.patch(sim.__name__ + '.importlib.import_module', return_value=fake_sbn_adapter)
+    mocker.patch(sim.__name__ + '.getattr', return_value=FakeDataAdapterSource)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
-    mocker.patch('onair.src.run_scripts.sim.Agent', return_value=fake_agent)
+    mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
     cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
@@ -77,10 +79,10 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
     cut = Simulator.__new__(Simulator)
 
     mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
-    mocker.patch('onair.src.run_scripts.sim.VehicleRepresentation', return_value=fake_vehicle)
+    mocker.patch(sim.__name__ + '.VehicleRepresentation', return_value=fake_vehicle)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
-    mocker.patch('onair.src.run_scripts.sim.DataSource', return_value=fake_simData)
-    mocker.patch('onair.src.run_scripts.sim.Agent', return_value=fake_agent)
+    mocker.patch(sim.__name__ + '.DataSource', return_value=fake_simData)
+    mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
     cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
@@ -122,11 +124,11 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     cut = Simulator.__new__(Simulator)
 
     mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
-    mocker.patch('onair.src.run_scripts.sim.VehicleRepresentation', return_value=fake_vehicle)
-    mocker.patch('onair.src.run_scripts.sim.importlib.import_module', return_value=fake_sbn_adapter)
-    mocker.patch('onair.src.run_scripts.sim.getattr', return_value=FakeDataAdapterSource)
+    mocker.patch(sim.__name__ + '.VehicleRepresentation', return_value=fake_vehicle)
+    mocker.patch(sim.__name__ + '.importlib.import_module', return_value=fake_sbn_adapter)
+    mocker.patch(sim.__name__ + '.getattr', return_value=FakeDataAdapterSource)
     mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
-    mocker.patch('onair.src.run_scripts.sim.Agent', return_value=fake_agent)
+    mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
     cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
@@ -152,8 +154,8 @@ def test_Simulator_run_sim_simData_never_has_more_so_loop_does_not_run_and_diagn
     fake_diagnosis = MagicMock()
     fake_time_step = 0
 
-    mocker.patch('onair.src.run_scripts.sim.print_sim_header')
-    mocker.patch('onair.src.run_scripts.sim.print_msg')
+    mocker.patch(sim.__name__ + '.print_sim_header')
+    mocker.patch(sim.__name__ + '.print_msg')
     mocker.patch.object(cut.simData, 'has_more', return_value=False)
     mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
 
@@ -177,8 +179,8 @@ def test_Simulator_run_sim_prints_header_when_given_IO_Flag_is_equal_to_True(moc
 
     fake_diagnosis = MagicMock()
 
-    mocker.patch('onair.src.run_scripts.sim.print_sim_header')
-    mocker.patch('onair.src.run_scripts.sim.print_msg')
+    mocker.patch(sim.__name__ + '.print_sim_header')
+    mocker.patch(sim.__name__ + '.print_msg')
     mocker.patch.object(cut.simData, 'has_more', return_value=False)
     mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
 
@@ -199,8 +201,8 @@ def test_Simulator_run_sim_prints_wait_message_when_given_IO_Flag_is_the_str_str
 
     fake_diagnosis = MagicMock()
 
-    mocker.patch('onair.src.run_scripts.sim.print_sim_header')
-    mocker.patch('onair.src.run_scripts.sim.print_msg')
+    mocker.patch(sim.__name__ + '.print_sim_header')
+    mocker.patch(sim.__name__ + '.print_msg')
     mocker.patch.object(cut.simData, 'has_more', return_value=False)
     mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
 
@@ -223,8 +225,8 @@ def test_Simulator_run_sim_runs_until_time_step_2050_when_simData_always_has_mor
     fake_next = MagicMock()
     fake_IO_Flag = MagicMock()
 
-    mocker.patch('onair.src.run_scripts.sim.print_sim_header')
-    mocker.patch('onair.src.run_scripts.sim.print_msg')
+    mocker.patch(sim.__name__ + '.print_sim_header')
+    mocker.patch(sim.__name__ + '.print_msg')
     mocker.patch.object(cut.simData, 'has_more', return_value=True)
     mocker.patch.object(cut.simData, 'get_next', return_value=fake_next)
     mocker.patch.object(cut.agent, 'reason')
@@ -261,8 +263,8 @@ def test_Simulator_run_sim_diagnose_always_performed_when_fault_is_on_first_time
     fake_next = MagicMock()
     fake_IO_Flag = MagicMock()
 
-    mocker.patch('onair.src.run_scripts.sim.print_sim_header')
-    mocker.patch('onair.src.run_scripts.sim.print_msg')
+    mocker.patch(sim.__name__ + '.print_sim_header')
+    mocker.patch(sim.__name__ + '.print_msg')
     mocker.patch.object(cut.simData, 'has_more', side_effect=[True, False]) # single loop
     mocker.patch.object(cut.simData, 'get_next', return_value=fake_next)
     mocker.patch.object(cut.agent, 'reason')
@@ -292,8 +294,8 @@ def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_conse
     fake_next = MagicMock()
     fake_IO_Flag = MagicMock()
 
-    mocker.patch('onair.src.run_scripts.sim.print_sim_header')
-    mocker.patch('onair.src.run_scripts.sim.print_msg')
+    mocker.patch(sim.__name__ + '.print_sim_header')
+    mocker.patch(sim.__name__ + '.print_msg')
     mocker.patch.object(cut.simData, 'has_more',  return_value=True) # True runs all time_steps
     mocker.patch.object(cut.simData, 'get_next', return_value=fake_next)
     mocker.patch.object(cut.agent, 'reason')
@@ -342,8 +344,8 @@ def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Fla
     arg_time_step = pytest.gen.randint(0, 100) # arbitrary from 0 to 100
     arg_IO_Flag = True
 
-    mocker.patch('onair.src.run_scripts.sim.print_sim_step')
-    mocker.patch('onair.src.run_scripts.sim.print_system_status')
+    mocker.patch(sim.__name__ + '.print_sim_step')
+    mocker.patch(sim.__name__ + '.print_system_status')
 
     cut = Simulator.__new__(Simulator)
     cut.agent = MagicMock()
@@ -362,8 +364,8 @@ def test_Simulator_IO_check_does_nothing_when_given_IO_Flag_is_not_True(mocker):
     arg_time_step = pytest.gen.randint(0, 100) # arbitrary from 0 to 100
     arg_IO_Flag = MagicMock()
 
-    mocker.patch('onair.src.run_scripts.sim.print_sim_step')
-    mocker.patch('onair.src.run_scripts.sim.print_system_status')
+    mocker.patch(sim.__name__ + '.print_sim_step')
+    mocker.patch(sim.__name__ + '.print_system_status')
 
     cut = Simulator.__new__(Simulator)
 
