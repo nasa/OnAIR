@@ -37,9 +37,9 @@ class ExecutionEngine:
         # Init Paths 
         self.dataFilePath = ''
         self.metadataFilePath = ''
-        self.benchmarkFilePath = ''
         self.metaFiles = ''
         self.telemetryFiles = ''
+        self.benchmarkFilePath = ''
         self.benchmarkFiles = ''
         self.benchmarkIndices = ''
 
@@ -63,28 +63,37 @@ class ExecutionEngine:
         # print("Using config file: {}".format(config_filepath))
 
         config = configparser.ConfigParser()
-        config.read(config_filepath)
-        ## Sort Data: Telementry Data & Configuration
-        self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
-        self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
-        self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for vehicle telemetry
-        self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Vehicle telemetry data
+        if len(config.read(config_filepath)) == 0:
+            raise FileNotFoundError(f"Config file at '{config_filepath}' could not be read.")
+        
+        try:
+            ## Sort Required Data: Telementry Data & Configuration
+            self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
+            self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
+            self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for vehicle telemetry
+            self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Vehicle telemetry data
+
+            ## Sort Required Data: Names
+            self.parser_file_name = config['DEFAULT']['ParserFileName']
+            self.parser_name = config['DEFAULT']['ParserName']
+            self.sim_name = config['DEFAULT']['SimName']
+        except KeyError as e:
+            new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
+            raise KeyError(new_message) from e
+
+        ## Sort Optional Data: Flags
+        self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
+        self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
+        self.SBN_Flag = config['RUN_FLAGS'].getboolean('SBN_Flag')
+        self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
+        
+        ## Sort Optional Data: Benchmarks
         try:
             self.benchmarkFilePath = config['DEFAULT']['BenchmarkFilePath']
             self.benchmarkFiles = config['DEFAULT']['BenchmarkFiles'] # Vehicle telemetry data
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
-        ## Sort Data: Names
-        self.parser_file_name = config['DEFAULT']['ParserFileName']
-        self.parser_name = config['DEFAULT']['ParserName']
-        self.sim_name = config['DEFAULT']['SimName']
-
-        ## Sort Data: Flags
-        self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
-        self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
-        self.SBN_Flag = config['RUN_FLAGS'].getboolean('SBN_Flag')
-        self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
 
     def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
         parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)

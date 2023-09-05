@@ -99,6 +99,26 @@ def test_ExecutionEngine__init__accepts_no_arguments_using_defaults_instead_with
     assert cut.init_save_paths.call_count == 0
 
 # parse_configs tests
+def test_ExecutionEngine_parse_configs_raises_FileNotFoundError_when_config_cannot_be_read(mocker):
+    # Arrange
+    arg_bad_config_filepath = MagicMock()
+
+    fake_config = MagicMock()
+    fake_config_read_result = MagicMock()
+    fake_config_read_result.__len__.return_value = 0
+
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+
+    mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
+    mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
+   
+    # Act
+    with pytest.raises(FileNotFoundError) as e_info:
+        cut.parse_configs(arg_bad_config_filepath)
+
+    # Assert
+    assert e_info.match(f"Config file at '{arg_bad_config_filepath}' could not be read.")
+
 def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     # Arrange
     arg_config_filepath = MagicMock()
@@ -118,6 +138,8 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     fake_dict_for_Config = {'DEFAULT':fake_default, 'RUN_FLAGS':fake_run_flags}
     fake_config = MagicMock()
     fake_config.__getitem__.side_effect = fake_dict_for_Config.__getitem__
+    fake_config_read_result = MagicMock()
+    fake_config_read_result.__len__.return_value = 1
     fake_IO_flags = MagicMock()
     fake_Dev_flags = MagicMock()
     fake_SBN_flags = MagicMock()
@@ -126,7 +148,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
-    mocker.patch.object(fake_config, 'read')
+    mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
     mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
 
     # Act
@@ -155,7 +177,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     assert fake_run_flags.getboolean.call_args_list[3].args == ('Viz_Flag', )
     assert cut.Viz_Flag == fake_Viz_flags
 
-def test_ExecutionEngine_parse_configs_bypasses_benmarks_when_access_raises_error(mocker):
+def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_error(mocker):
     # Arrange
     arg_config_filepath = MagicMock()
 
@@ -172,6 +194,8 @@ def test_ExecutionEngine_parse_configs_bypasses_benmarks_when_access_raises_erro
     fake_dict_for_Config = {'DEFAULT':fake_default, 'RUN_FLAGS':fake_run_flags}
     fake_config = MagicMock()
     fake_config.__getitem__.side_effect = fake_dict_for_Config.__getitem__
+    fake_config_read_result = MagicMock()
+    fake_config_read_result.__len__.return_value = 1
     fake_IO_flags = MagicMock()
     fake_Dev_flags = MagicMock()
     fake_SBN_flags = MagicMock()
@@ -180,7 +204,7 @@ def test_ExecutionEngine_parse_configs_bypasses_benmarks_when_access_raises_erro
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
-    mocker.patch.object(fake_config, 'read')
+    mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
     mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
 
     # Act
@@ -190,6 +214,43 @@ def test_ExecutionEngine_parse_configs_bypasses_benmarks_when_access_raises_erro
     assert hasattr(cut, 'benchmarkFilePath') == False
     assert hasattr(cut, 'benchmarkFiles') == False
     assert hasattr(cut, 'benchmarkIndices') == False
+
+def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_when_a_required_key_is_not_in_config(mocker):
+    # Arrange
+    arg_config_filepath = MagicMock()
+
+    fake_default = {'TelemetryDataFilePath':MagicMock(),
+                    'TelemetryMetadataFilePath':MagicMock(),
+                    'MetaFiles':MagicMock(),
+                    'TelemetryFiles':MagicMock(),
+                    'BenchmarkFilePath':MagicMock(),
+                    'BenchmarkFiles':MagicMock(),
+                    'BenchmarkIndices':MagicMock(),
+                    'ParserFileName':MagicMock(),
+                    'ParserName':MagicMock(),
+                    'SimName':MagicMock(),
+                    }
+    required_keys = [item for item in list(fake_default.keys()) if 'Benchmark' not in item]
+    missing_key = pytest.gen.choice(required_keys)
+    del fake_default[missing_key]
+    fake_run_flags = MagicMock()
+    fake_dict_for_Config = {'DEFAULT':fake_default, 'RUN_FLAGS':fake_run_flags}
+    fake_config = MagicMock()
+    fake_config.__getitem__.side_effect = fake_dict_for_Config.__getitem__
+    fake_config_read_result = MagicMock()
+    fake_config_read_result.__len__.return_value = 1
+    
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+
+    mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
+    mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
+
+    # Act
+    with pytest.raises(KeyError) as e_info:
+        cut.parse_configs(arg_config_filepath)
+
+    # Assert
+    assert e_info.match(f"Config file: '{arg_config_filepath}', missing key: {missing_key}")
 
 # parse_data tests
 def test_ExecutionEngine_parse_data_sets_the_processedSimData_to_the_TimeSynchronizer_which_was_given_the_sim_data_received_from_parsed_data(mocker):
