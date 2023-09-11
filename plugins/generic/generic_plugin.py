@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import numpy as np
-from core import AIPlugIn
+from onair.src.data_driven_components.generic_component.core import AIPlugIn
 
 class Plugin(AIPlugIn):
     def __init__(self, _name, _headers):
