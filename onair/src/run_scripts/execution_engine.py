@@ -18,6 +18,7 @@ import ast
 import shutil
 from distutils.dir_util import copy_tree
 from time import gmtime, strftime   
+import ast
 
 from ...data_handling.time_synchronizer import TimeSynchronizer
 from ..run_scripts.sim import Simulator
@@ -49,6 +50,9 @@ class ExecutionEngine:
         self.sim_name = ''
         self.processedSimData = None
         self.sim = None
+        
+        # Init plugins
+        self.plugin_list = ['']
 
         self.save_flag = save_flag
         self.save_name = run_name
@@ -94,6 +98,17 @@ class ExecutionEngine:
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
+        ## Sort Data: Names
+        self.parser_file_name = config['DEFAULT']['ParserFileName']
+        self.parser_name = config['DEFAULT']['ParserName']
+        self.sim_name = config['DEFAULT']['SimName']
+        self.plugin_list = ast.literal_eval(config['DEFAULT']['PluginList'])
+
+        ## Sort Data: Flags
+        self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
+        self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
+        self.SBN_Flag = config['RUN_FLAGS'].getboolean('SBN_Flag')
+        self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')        
 
     def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
         parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
@@ -104,7 +119,7 @@ class ExecutionEngine:
         self.processedSimData = TimeSynchronizer(*parsed_data.get_sim_data())
 
     def setup_sim(self):
-        self.sim = Simulator(self.sim_name, self.processedSimData, self.SBN_Flag)
+        self.sim = Simulator(self.sim_name, self.processedSimData, self.plugin_list, self.SBN_Flag)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath

@@ -15,12 +15,13 @@ import onair.src.data_driven_components.data_driven_learning as data_driven_lear
 from onair.src.data_driven_components.data_driven_learning import DataDrivenLearning
 
 import importlib
+from typing import Dict
 
 # __init__ tests
 def test_DataDrivenLearning__init__sets_instance_headers_to_given_headers_and_does_nothing_else_when_given__ai_plugins_is_empty(mocker):
     # Arrange
     arg_headers = []
-    arg__ai_plugins = []
+    arg__ai_plugins = {}
 
     num_fake_headers = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 headers (0 has own test)
     for i in range(num_fake_headers):
@@ -34,50 +35,34 @@ def test_DataDrivenLearning__init__sets_instance_headers_to_given_headers_and_do
     # Assert
     assert cut.headers == arg_headers
 
-def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins(mocker):
-    # Arrange
-    arg_headers = []
-    arg__ai_plugins = []
-
-    num_fake_headers = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 headers (0 has own test)
-    for i in range(num_fake_headers):
-        arg_headers.append(MagicMock())
-    fake_imported_module = MagicMock()
-    num_fake_ai_plugins = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_ai_plugins):
-        arg__ai_plugins.append(str(MagicMock()))
-
-    mocker.patch('importlib.import_module', return_value=fake_imported_module)
-
-    cut = DataDrivenLearning.__new__(DataDrivenLearning)
-
-    # Act
-    cut.__init__(arg_headers, arg__ai_plugins)
-
-    # Assert
-    assert importlib.import_module.call_count == num_fake_ai_plugins
-    for i in range(num_fake_ai_plugins):
-        assert importlib.import_module.call_args_list[i].args == ('onair.src.data_driven_components.' + arg__ai_plugins[i] + '.' + arg__ai_plugins[i] + '_plugin',)
-
 def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
     # Arrange
     arg_headers = []
-    arg__ai_plugins = []
+    arg__ai_plugins = {}
+    fake_spec_list = []
+    fake_module_list = []
 
     num_fake_headers = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 headers (0 has own test)
     for i in range(num_fake_headers):
         arg_headers.append(MagicMock())
-    fake_imported_module = MagicMock()
     num_fake_ai_plugins = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_ai_plugins):
-        arg__ai_plugins.append(str(MagicMock()))
+        arg__ai_plugins[str(MagicMock())] = str(MagicMock())
+        fake_spec_list.append(MagicMock())
+        fake_module_list.append(MagicMock())
+        
 
     expected_ai_constructs = []
     for i in range(num_fake_ai_plugins):
         expected_ai_constructs.append(MagicMock())
 
-    mocker.patch('importlib.import_module', return_value=fake_imported_module)
-    mocker.patch.object(fake_imported_module, 'Plugin', side_effect=expected_ai_constructs)
+    # mocker.patch('importlib.import_module', return_value=fake_imported_module)
+    mocker.patch('importlib.util.spec_from_file_location',side_effect=fake_spec_list)
+    mocker.patch('importlib.util.module_from_spec',side_effect=fake_module_list)
+    for spec in fake_spec_list:
+        mocker.patch.object(spec,'loader.exec_module')
+    for i, module in enumerate(fake_module_list):
+        mocker.patch.object(module,'Plugin',return_value=expected_ai_constructs[i])
 
     cut = DataDrivenLearning.__new__(DataDrivenLearning)
 
@@ -85,13 +70,19 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
     cut.__init__(arg_headers, arg__ai_plugins)
 
     # Assert
-    assert importlib.import_module.call_count == num_fake_ai_plugins
+    assert importlib.util.spec_from_file_location.call_count == len(arg__ai_plugins)
+    assert importlib.util.module_from_spec.call_count == len(fake_spec_list)
+
     for i in range(num_fake_ai_plugins):
-        assert importlib.import_module.call_args_list[i].args == (f'onair.src.data_driven_components.{arg__ai_plugins[i]}.{arg__ai_plugins[i]}_plugin',)
-    assert fake_imported_module.Plugin.call_count == num_fake_ai_plugins
-    for i in range(num_fake_ai_plugins):
-        assert fake_imported_module.Plugin.call_args_list[i].args == (arg__ai_plugins[i], arg_headers)
-        
+        fake_name = list(arg__ai_plugins.keys())[i]
+        fake_path = arg__ai_plugins[fake_name]
+        assert importlib.util.spec_from_file_location.call_args_list[i].args == (fake_name,fake_path)
+        assert importlib.util.module_from_spec.call_args_list[i].args == (fake_spec_list[i],)
+        assert fake_spec_list[i].loader.exec_module.call_count == 1
+        assert fake_spec_list[i].loader.exec_module.call_args_list[0].args == (fake_module_list[i],)
+        assert fake_module_list[i].Plugin.call_count == 1
+        assert fake_module_list[i].Plugin.call_args_list[0].args == (fake_name,arg_headers)
+
     assert cut.ai_constructs == expected_ai_constructs
 
 # update tests
