@@ -13,7 +13,7 @@ from pandas import to_datetime
 import datetime
 
 ## Method to extract configuration data and return 3 dictionaries
-def extract_configs(configFilePath, configFile, csv = False):
+def extract_configs(configFilePath, configFile):
     assert configFile != ''
 
     configs = parseTlmConfJson(configFilePath + configFile)
@@ -35,19 +35,6 @@ def extract_configs(configFilePath, configFile, csv = False):
                 test_assign[j] = test + limits
 
     return configs
-        
-def process_filepath(path, return_config=False, csv = False):
-    if csv:
-        filename =  path.split(os.sep)[-1].replace('_CONFIG', '')
-        filename = filename.replace('.txt', '.csv')
-        if return_config == True:
-            filename = filename.replace('.csv', '_CONFIG.txt')
-        return filename
-    else:
-        filename =  path.split(os.sep)[-1].replace('_CONFIG', '')
-        if return_config == True:
-            filename = filename.replace('.txt', '_CONFIG.txt')
-        return filename
 
 def floatify_input(_input, remove_str=False):
     floatified = []

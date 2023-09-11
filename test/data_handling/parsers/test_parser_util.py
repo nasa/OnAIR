@@ -18,11 +18,10 @@ def test_parser_util_extract_configs_raises_error_when_given_blank_configFile():
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = ''
-    arg_csv = MagicMock()
 
     # Act
     with pytest.raises(AssertionError) as e_info:
-        result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
+        result = parser_util.extract_configs(arg_configFilePath, arg_configFile)
 
     # Assert
     assert e_info.match('')
@@ -31,7 +30,6 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configs_le
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = MagicMock()
-    arg_csv = MagicMock()
 
     fake_subsystem_assignments = MagicMock()
     fake_tests = MagicMock()
@@ -47,7 +45,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configs_le
     mocker.patch(parser_util.__name__ + '.str2lst')
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
@@ -61,7 +59,6 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configs_le
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = MagicMock()
-    arg_csv = MagicMock()
 
     fake_subsystem_assignments = [MagicMock()]
     fake_test_assign = MagicMock()
@@ -82,7 +79,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configs_le
     expected_result['description_assignments'] = fake_descs.copy()
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
@@ -94,7 +91,6 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = MagicMock()
-    arg_csv = MagicMock()
 
     len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
     fake_subsystem_assignments = [MagicMock()] * len_configs
@@ -116,7 +112,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
     expected_result['description_assignments'] = fake_descs.copy()
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
@@ -128,7 +124,6 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = MagicMock() 
-    arg_csv = MagicMock()
 
     len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
     num_noops = pytest.gen.randint(2, 10)
@@ -153,7 +148,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
     expected_result['description_assignments'] = fake_descs.copy()
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
@@ -165,7 +160,6 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = MagicMock()
-    arg_csv = MagicMock()
 
     len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
     fake_subsystem_assignments = [MagicMock()] * len_configs
@@ -201,7 +195,7 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_len_config
         expected_result['test_assignments'].append(expected_test_assign)
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
@@ -215,7 +209,6 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     # Arrange
     arg_configFilePath = MagicMock()
     arg_configFile = MagicMock()
-    arg_csv = MagicMock()
 
     len_configs = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (0 and 1 have own tests)
     fake_subsystem_assignments = []
@@ -254,136 +247,12 @@ def test_parser_util_extract_configs_returns_expected_dicts_dict_when_configFile
     expected_result['description_assignments'] = fake_descs.copy()
 
     # Act
-    result = parser_util.extract_configs(arg_configFilePath, arg_configFile, arg_csv)
+    result = parser_util.extract_configs(arg_configFilePath, arg_configFile)
 
     # Assert
     assert parser_util.parseTlmConfJson.call_count == 1
     assert parser_util.parseTlmConfJson.call_args_list[0].args == (arg_configFilePath + arg_configFile, )
     assert result == expected_result
-
-# process_filepath
-def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replaced_by_csv_when_given_csv_resolves_to_True_and_given_return_config_is_not_True(mocker):
-    # Arrange
-    fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
-
-    arg_path = ""
-    arg_return_config = False if pytest.gen.randint(0, 1) == 1 else 0
-    arg_csv = True if pytest.gen.randint(0, 1) == 1 else MagicMock()
-
-    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + fake_os_sep
-    arg_path += fake_filename + '.txt'
-
-    mocker.patch(parser_util.__name__ + '.os.sep', fake_os_sep)
-
-    # Act
-    result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
-
-    # Assert
-    assert result == fake_filename + '.csv'
-
-def test_parser_util_process_filepath_returns_filename_from_path_with_txt_replaced_by__CONFIG_dot_txt_when_given_csv_resolves_to_True_and_given_return_config_is_True(mocker):
-    # Arrange
-    fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
-
-    arg_path = ""
-    arg_return_config = True
-    arg_csv = True if pytest.gen.randint(0, 1) == 1 else MagicMock()
-
-    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + fake_os_sep
-    arg_path += fake_filename + '.txt'
-
-    mocker.patch(parser_util.__name__ + '.os.sep', fake_os_sep)
-
-    # Act
-    result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
-
-    # Assert
-    assert result == fake_filename + '_CONFIG.txt'
-
-def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_not_True(mocker):
-    # Arrange
-    fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
-
-    arg_path = ""
-    arg_return_config = False if pytest.gen.randint(0, 1) == 1 else 0
-    arg_csv = False if pytest.gen.randint(0, 1) == 1 else 0
-
-    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + fake_os_sep
-    arg_path += fake_filename + '.txt'
-
-    mocker.patch(parser_util.__name__ + '.os.sep', fake_os_sep)
-
-    # Act
-    result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
-
-    # Assert
-    assert result == fake_filename + '.txt'
-
-def test_parser_util_process_filepath_returns_filename_from_path_when_given_csv_resolves_to_False_and_given_return_config_is_True(mocker):
-    # Arrange
-    fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
-
-    arg_path = ""
-    arg_return_config = True
-    arg_csv = False if pytest.gen.randint(0, 1) == 1 else 0
-
-    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + fake_os_sep
-    arg_path += fake_filename + '.txt'
-
-    mocker.patch(parser_util.__name__ + '.os.sep', fake_os_sep)
-
-    # Act
-    result = parser_util.process_filepath(arg_path, arg_return_config, arg_csv)
-
-    # Assert
-    assert result == fake_filename + '_CONFIG.txt'
-
-def test_parser_util_process_filepath_default_given_csv_is_False(mocker):
-    # Arrange
-    fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
-
-    arg_path = ""
-    arg_return_config = True
-
-    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + fake_os_sep
-    arg_path += fake_filename + '.txt'
-
-    mocker.patch(parser_util.__name__ + '.os.sep', fake_os_sep)
-
-    # Act
-    result = parser_util.process_filepath(arg_path, arg_return_config)
-
-    # Assert
-    assert result == fake_filename + '_CONFIG.txt'
-
-def test_parser_util_process_filepath_default_given_return_config_is_False(mocker):
-    # Arrange
-    fake_filename = str(MagicMock())
-    fake_os_sep = pytest.gen.choice(chr(47) + chr(92)) # representative separators, 47 = '/', 92 = '\'
-
-    arg_path = ""
-
-    for i in range(pytest.gen.randint(0, 10)): # arbitrary, from 0 to 10 directories in front of filename
-        arg_path += str(MagicMock()) + fake_os_sep
-    arg_path += fake_filename + '.txt'
-
-    mocker.patch(parser_util.__name__ + '.os.sep', fake_os_sep)
-
-    # Act
-    result = parser_util.process_filepath(arg_path)
-
-    # Assert
-    assert result == fake_filename + '.txt'
 
 # floatify_input tests
 def test_parser_util_flotify_input_returns_empty_list_when_given__input_is_vacant(mocker):
