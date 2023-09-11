@@ -10,17 +10,22 @@
 """
 Data driven learning class for managing all data driven AI components
 """
-import importlib
+import importlib.util
 
 from ..util.data_conversion import *
 
 class DataDrivenLearning:
-    def __init__(self, headers, _ai_plugins:list=[]):
+    def __init__(self, headers, _ai_plugins={}):
         assert(len(headers)>0)
         self.headers = headers
-        self.ai_constructs = [
-            importlib.import_module('onair.src.data_driven_components.' + plugin_name + '.' + f'{plugin_name}_plugin').Plugin(plugin_name, headers) for plugin_name in _ai_plugins
-        ]
+        self.ai_constructs = []
+        
+        for module_name in list(_ai_plugins.keys()):
+            spec = importlib.util.spec_from_file_location(module_name, _ai_plugins[module_name])
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            self.ai_constructs.append(module.Plugin(module_name,headers))
+        
 
     def update(self, curr_data, status):
         input_data = curr_data

@@ -69,6 +69,7 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
     arg_simType = MagicMock()
     arg_parsedData = MagicMock()
     arg_SBN_Flag = False if (pytest.gen.randint(0,1) == 0) else None
+    arg_plugin_list = MagicMock()
 
     fake_vehicle_metadata = [MagicMock(), MagicMock()]
     fake_vehicle = MagicMock()
@@ -85,7 +86,7 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
-    cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
+    cut.__init__(arg_simType, arg_parsedData, arg_plugin_list, arg_SBN_Flag)
 
     # Assert
     assert cut.simulator == arg_simType
@@ -94,7 +95,7 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
     assert sim.DataSource.call_count == 1
     assert sim.DataSource.call_args_list[0].args == (fake_sim_data, )
     assert sim.Agent.call_count == 1
-    assert sim.Agent.call_args_list[0].args == (fake_vehicle, )
+    assert sim.Agent.call_args_list[0].args == (arg_plugin_list, fake_vehicle)
     assert cut.agent == fake_agent
 
 def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
@@ -120,6 +121,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     fake_sbn_adapter = MagicMock()
     fake_simData = MagicMock()
     fake_agent = MagicMock()
+    fake_plugin_list = MagicMock()
 
     cut = Simulator.__new__(Simulator)
 
@@ -131,7 +133,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
-    cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
+    cut.__init__(arg_simType, arg_parsedData, fake_plugin_list, arg_SBN_Flag)
 
     # Assert
     assert cut.simulator == arg_simType
@@ -141,7 +143,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     assert FakeDataAdapterSource.sim_data == fake_sim_data
     assert FakeDataAdapterSource.connect_call_count == 1
     assert sim.Agent.call_count == 1
-    assert sim.Agent.call_args_list[0].args == (fake_vehicle, )
+    assert sim.Agent.call_args_list[0].args == (fake_plugin_list,fake_vehicle)
     assert cut.agent == fake_agent
 
 # run_sim tests
