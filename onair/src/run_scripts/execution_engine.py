@@ -19,7 +19,6 @@ import shutil
 from distutils.dir_util import copy_tree
 from time import gmtime, strftime
 
-from ...data_handling.time_synchronizer import TimeSynchronizer
 from ..run_scripts.sim import Simulator
 
 class ExecutionEngine:
@@ -47,9 +46,9 @@ class ExecutionEngine:
         self.parser_file_name = ''
         self.parser_name = ''
         self.sim_name = ''
-        self.processedSimData = None
+        self.simDataParser = None
         self.sim = None
-        
+
         # Init plugins
         self.plugin_list = ['']
 
@@ -108,18 +107,19 @@ class ExecutionEngine:
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
-        
+
 
     def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
         parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
         parser_class = getattr(parser, parser_name) # This could be simplified if the parsers all extend a parser class... but this works for now
         tm_data_path = os.environ['RUN_PATH'] + dataFilePath
         tm_metadata_path = os.environ['RUN_PATH'] +  metadataFilePath
-        parsed_data = parser_class(tm_data_path, tm_metadata_path, self.telemetryFiles, self.metaFiles, subsystems_breakdown)
-        self.processedSimData = TimeSynchronizer(*parsed_data.get_sim_data())
+        # TODO: This will be changed on an OnAIR Data Source
+        data_parser = parser_class(tm_data_path, tm_metadata_path, self.telemetryFiles, self.metaFiles, subsystems_breakdown)
+        self.simDataParser = data_parser
 
     def setup_sim(self):
-        self.sim = Simulator(self.sim_name, self.processedSimData, self.plugin_list, self.SBN_Flag)
+        self.sim = Simulator(self.sim_name, self.simDataParser, self.plugin_list, self.SBN_Flag)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath
@@ -169,8 +169,3 @@ class ExecutionEngine:
 
     def ast_parse_eval(self, config_list):
         return ast.parse(config_list, mode='eval')
-
-
-
-
-

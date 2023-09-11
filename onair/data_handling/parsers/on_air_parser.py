@@ -35,11 +35,12 @@ class OnAirParser(ABC):
 
           configs = self.parse_config_data(str2lst(configFiles)[0], ss_breakdown)
 
+          # TODO: this shouldn't iterate
           for data_file in str2lst(dataFiles):
               self.process_data_per_data_file(data_file)
-              self.binning_configs['subsystem_assignments'][data_file] = configs['subsystem_assignments']
-              self.binning_configs['test_assignments'][data_file] = configs['test_assignments']
-              self.binning_configs['description_assignments'][data_file] = configs['description_assignments']
+              self.binning_configs['subsystem_assignments'] = configs['subsystem_assignments']
+              self.binning_configs['test_assignments'] = configs['test_assignments']
+              self.binning_configs['description_assignments'] = configs['description_assignments']
 
     @abstractmethod
     def pre_process_data(self, dataFiles):
