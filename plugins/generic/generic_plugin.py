@@ -11,13 +11,13 @@ import numpy as np
 from onair.src.data_driven_components.ai_plugin_abstract.core import AIPlugIn
 
 class Plugin(AIPlugIn):
-    def apriori_training(self):
+    def apriori_training(self,batch_data=[]):
         """
         Given data, system should learn any priors necessary for realtime diagnosis.
         """
         pass
             
-    def update(self):
+    def update(self,frame=[]):
         """
         Given streamed data point, system should update internally
         """
