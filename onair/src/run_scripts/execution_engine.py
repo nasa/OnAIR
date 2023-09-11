@@ -98,17 +98,8 @@ class ExecutionEngine:
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
-        ## Sort Data: Names
-        self.parser_file_name = config['DEFAULT']['ParserFileName']
-        self.parser_name = config['DEFAULT']['ParserName']
-        self.sim_name = config['DEFAULT']['SimName']
-        self.plugin_list = ast.literal_eval(config['DEFAULT']['PluginList'])
-
-        ## Sort Data: Flags
-        self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
-        self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
-        self.SBN_Flag = config['RUN_FLAGS'].getboolean('SBN_Flag')
-        self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')        
+        ## Sort Data: Plugins
+        self.plugin_list = ast.literal_eval(config['DEFAULT']['PluginList'])      
 
     def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
         parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
