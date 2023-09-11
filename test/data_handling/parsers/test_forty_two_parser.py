@@ -252,7 +252,6 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
     arg_config_file = MagicMock()
 
     fake_metadata_filepath = MagicMock()
-    fake_filename = MagicMock()
     fake_subsystem_assignments = [MagicMock()]
     fake_tests = MagicMock()
     fake_descs = MagicMock()
@@ -264,7 +263,6 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
                                         'description_assignments' : fake_descs}
 
     mocker.patch(forty_two_parser.__name__ + '.extract_configs', return_value=forced_return_extract_configs)
-    mocker.patch(forty_two_parser.__name__ + '.process_filepath', return_value=fake_filename)
 
     expected_result = { 'subsystem_assignments' : [['MISSION']],
                         'test_assignments' : fake_tests,
@@ -283,7 +281,6 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
     arg_config_file = MagicMock()
 
     fake_metadata_filepath = MagicMock()
-    fake_filename = MagicMock()
     num_ss_assignments = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
     fake_subsystem_assignments = [MagicMock()] * num_ss_assignments
     fake_tests = MagicMock()
@@ -294,10 +291,8 @@ def test_FortyTwo_parse_config_data_returns_expected_result_when_ss_breakdown_is
     forced_return_extract_configs = { 'subsystem_assignments' : fake_subsystem_assignments,
                                         'test_assignments' : fake_tests,
                                         'description_assignments' : fake_descs}
-    forced_return_process_filepath = fake_filename
     
     mocker.patch(forty_two_parser.__name__ + '.extract_configs', return_value=forced_return_extract_configs)
-    mocker.patch(forty_two_parser.__name__ + '.process_filepath', return_value=forced_return_process_filepath)
 
     expected_result = { 'subsystem_assignments' : [['MISSION']] * num_ss_assignments,
                         'test_assignments' : fake_tests,
