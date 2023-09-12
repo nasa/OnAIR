@@ -187,6 +187,7 @@ def test_OnAirParser__init__preprocesses_dataFiles_and_processes_data_per_file_s
   fake_str2lst_second_return = []
   num_fake_dataFiles = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
 
+  # TODO: Soon this will just be 1
   for i in range(num_fake_dataFiles):
     fake_str2lst_second_return.append(MagicMock())
 
@@ -213,9 +214,9 @@ def test_OnAirParser__init__preprocesses_dataFiles_and_processes_data_per_file_s
   assert pytest.cut.process_data_per_data_file.call_count == num_fake_dataFiles
   for i in range(num_fake_dataFiles):
     assert pytest.cut.process_data_per_data_file.call_args_list[i].args == (fake_str2lst_second_return[i], )
-    assert pytest.cut.binning_configs['subsystem_assignments'][fake_str2lst_second_return[i]] == fake_configs['subsystem_assignments']
-    assert pytest.cut.binning_configs['test_assignments'][fake_str2lst_second_return[i]] == fake_configs['test_assignments']
-    assert pytest.cut.binning_configs['description_assignments'][fake_str2lst_second_return[i]] == fake_configs['description_assignments']
+    assert pytest.cut.binning_configs['subsystem_assignments'] == fake_configs['subsystem_assignments']
+    assert pytest.cut.binning_configs['test_assignments'] == fake_configs['test_assignments']
+    assert pytest.cut.binning_configs['description_assignments'] == fake_configs['description_assignments']
  
 # pre_process_data tests
 

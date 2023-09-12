@@ -38,11 +38,7 @@ class CSV(OnAirParser):
         #Find the 'Time' header in the list in order to match 42 file formatting 
         # Converting
         upperCaseStringHeaders = [x.upper().strip() for x in all_headers if isinstance(x, str)]
-        #Search for TIME header in list of uppercase string headers, if it's not there it should return a valueerror, set index to -1
-        try:
-            timeIndex = upperCaseStringHeaders.index('TIME')
-        except ValueError:
-            timeIndex = -1
+
         #Initialize the entire data dictionary
         all_data = []
         for index, row in dataset.iterrows():
