@@ -38,10 +38,12 @@ def test_ExecutionEngine__init__sets_expected_values_but_does_no_calls_when_conf
     assert cut.SBN_Flag == False
     assert cut.Viz_Flag == False
     assert cut.dataFilePath == ''
+    assert cut.telemetryFile == ''
+    assert cut.fullTelemetryFileName == ''
     assert cut.metadataFilePath == ''
+    assert cut.metaFile == ''
+    assert cut.fullMetaDataFileName == ''
     assert cut.benchmarkFilePath == ''
-    assert cut.metaFiles == ''
-    assert cut.telemetryFiles == ''
     assert cut.benchmarkFiles == ''
     assert cut.benchmarkIndices == ''
     assert cut.parser_file_name == ''
@@ -267,9 +269,9 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     arg_config_filepath = MagicMock()
 
     fake_default = {'TelemetryDataFilePath':MagicMock(),
+                    'TelemetryFile':MagicMock(),
                     'TelemetryMetadataFilePath':MagicMock(),
-                    'MetaFiles':MagicMock(),
-                    'TelemetryFiles':MagicMock(),
+                    'MetaFile':MagicMock(),
                     'BenchmarkFilePath':MagicMock(),
                     'BenchmarkFiles':MagicMock(),
                     'BenchmarkIndices':MagicMock(),
@@ -323,9 +325,9 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     assert execution_engine.configparser.ConfigParser.call_count == 1
     assert fake_config.read.call_count == 1
     assert cut.dataFilePath == fake_default['TelemetryDataFilePath']
+    assert cut.telemetryFile == fake_default['TelemetryFile']
     assert cut.metadataFilePath == fake_default['TelemetryMetadataFilePath']
-    assert cut.metaFiles == fake_default['MetaFiles']
-    assert cut.telemetryFiles == fake_default['TelemetryFiles']
+    assert cut.metaFile == fake_default['MetaFile']
     assert cut.benchmarkFilePath == fake_default['BenchmarkFilePath']
     assert cut.benchmarkFiles == fake_default['BenchmarkFiles']
     assert cut.benchmarkIndices == fake_default['BenchmarkIndices']
@@ -349,9 +351,9 @@ def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_er
 
     # NOTE: not including the benchmark strings causes the exception
     fake_default = {'TelemetryDataFilePath':MagicMock(),
+                    'TelemetryFile':MagicMock(),
                     'TelemetryMetadataFilePath':MagicMock(),
-                    'MetaFiles':MagicMock(),
-                    'TelemetryFiles':MagicMock(),
+                    'MetaFile':MagicMock(),
                     'ParserFileName':MagicMock(),
                     'ParserName':MagicMock(),
                     'SimName':MagicMock(),
@@ -394,17 +396,54 @@ def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_er
     assert hasattr(cut, 'benchmarkFiles') == False
     assert hasattr(cut, 'benchmarkIndices') == False
 
+def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_when_a_required_key_is_not_in_config(mocker):
+    # Arrange
+    arg_config_filepath = MagicMock()
+
+    fake_default = {'TelemetryDataFilePath':MagicMock(),
+                    'TelemetryFile':MagicMock(),
+                    'TelemetryMetadataFilePath':MagicMock(),
+                    'MetaFile':MagicMock(),
+                    'BenchmarkFilePath':MagicMock(),
+                    'BenchmarkFiles':MagicMock(),
+                    'BenchmarkIndices':MagicMock(),
+                    'ParserFileName':MagicMock(),
+                    'ParserName':MagicMock(),
+                    'SimName':MagicMock(),
+                    }
+    required_keys = [item for item in list(fake_default.keys()) if 'Benchmark' not in item]
+    missing_key = pytest.gen.choice(required_keys)
+    del fake_default[missing_key]
+    fake_run_flags = MagicMock()
+    fake_dict_for_Config = {'DEFAULT':fake_default, 'RUN_FLAGS':fake_run_flags}
+    fake_config = MagicMock()
+    fake_config.__getitem__.side_effect = fake_dict_for_Config.__getitem__
+    fake_config_read_result = MagicMock()
+    fake_config_read_result.__len__.return_value = 1
+    
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+
+    mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
+    mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
+
+    # Act
+    with pytest.raises(KeyError) as e_info:
+        cut.parse_configs(arg_config_filepath)
+
+    # Assert
+    assert e_info.match(f"Config file: '{arg_config_filepath}', missing key: {missing_key}")
+
 # parse_data tests
 def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mocker):
     # Arrange
     arg_parser_name = MagicMock()
     arg_parser_file_name = MagicMock()
-    arg_dataFilePath = str(MagicMock())
-    arg_metadataFilePath = str(MagicMock())
+    arg_dataFile = str(MagicMock())
+    arg_metadataFile = str(MagicMock())
     arg_subsystems_breakdown = MagicMock()
 
     class FakeParser:
-        def __init__(self, data_path, metadata_path, tlm_files, metaFiles, subsystems_breakdown):
+        def __init__(self, data_file, metad_file, subsystems_breakdown):
             pass
 
     fake_parser = MagicMock()
@@ -415,10 +454,8 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     fake_parsed_data = MagicMock()
 
     cut = ExecutionEngine.__new__(ExecutionEngine)
-    cut.telemetryFiles = MagicMock()
-    cut.metaFiles = MagicMock()
-    cut.telemetryFiles = MagicMock()
-    cut.metaFiles = MagicMock()
+    cut.telemetryFile = MagicMock()
+    cut.metaFile = MagicMock()
 
     mocker.patch(execution_engine.__name__ + '.importlib.import_module', return_value=fake_parser)
     mocker.patch(execution_engine.__name__ + '.getattr', return_value=fake_parser_class)
@@ -426,7 +463,7 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     mocker.patch.object(fake_parser_class, '__new__', return_value=fake_parser_class_instance)
 
     # Act
-    cut.parse_data(arg_parser_name, arg_parser_file_name, arg_dataFilePath, arg_metadataFilePath, arg_subsystems_breakdown)
+    cut.parse_data(arg_parser_name, arg_parser_file_name, arg_dataFile, arg_metadataFile, arg_subsystems_breakdown)
 
     # Assert
     assert execution_engine.importlib.import_module.call_count == 1
@@ -435,7 +472,7 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     assert execution_engine.getattr.call_args_list[0].args == (fake_parser, arg_parser_name,)
     assert cut.simDataParser == fake_parser_class_instance
     assert fake_parser_class.__new__.call_count == 1
-    assert fake_parser_class.__new__.call_args_list[0].args == (fake_parser_class, fake_run_path + arg_dataFilePath, fake_run_path + arg_metadataFilePath, cut.telemetryFiles, cut.metaFiles, arg_subsystems_breakdown, )
+    assert fake_parser_class.__new__.call_args_list[0].args == (fake_parser_class, fake_run_path + arg_dataFile, fake_run_path + arg_metadataFile, arg_subsystems_breakdown, )
 
     # subsystems_breakdown
 
@@ -443,21 +480,17 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
     # Arrange
     arg_parser_name = MagicMock()
     arg_parser_file_name = MagicMock()
-    arg_dataFilePath = MagicMock()
-    arg_metadataFilePath = str(MagicMock())
+    arg_dataFile = MagicMock()
+    arg_metadataFile = str(MagicMock())
 
     class FakeParser:
-        init_data_path = None
-        init_metadata_path = None
-        init_tlm_files = None
-        init_metaFiles = None
+        init_data_file = None
+        init_meta_data_file = None
         init_subsystems_breakdown = None
 
-        def __init__(self, data_path, metadata_path, tlm_files, metaFiles, subsystems_breakdown):
-            FakeParser.init_data_path = data_path
-            FakeParser.init_metadata_path = metadata_path
-            FakeParser.init_tlm_files = tlm_files
-            FakeParser.init_metaFiles = metaFiles
+        def __init__(self, data_file, meta_file, subsystems_breakdown):
+            FakeParser.init_data_file = data_file
+            FakeParser.init_meta_data_file = meta_file
             FakeParser.init_subsystems_breakdown = subsystems_breakdown
 
     fake_parser = MagicMock()
@@ -476,7 +509,7 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
 
     # Act
-    cut.parse_data(arg_parser_name, arg_parser_file_name, arg_dataFilePath, arg_metadataFilePath)
+    cut.parse_data(arg_parser_name, arg_parser_file_name, arg_dataFile, arg_metadataFile)
 
     # Assert
     assert FakeParser.init_subsystems_breakdown == False
