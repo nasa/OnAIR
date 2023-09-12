@@ -63,5 +63,4 @@ class CSV(OnAirParser):
         return self.sim_data
 
     def get_vehicle_metadata(self):
-        print(self.binning_configs['test_assignments'])
         return self.all_headers, self.binning_configs['test_assignments']

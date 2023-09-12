@@ -350,3 +350,37 @@ def test_CSV_get_sim_data_returns_tuple_of_all_headers_and_sim_data_and_binning_
 
     # Assert
     assert result == expected_result
+
+# CSV get_just_data tests
+def test_CSV_get_just_data_returns_list_of_data_frames(setup_teardown):
+    # Arrange
+    fake_sim_data = MagicMock()
+
+    expected_result = (fake_sim_data)
+
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.get_just_data()
+
+    # Assert
+    assert result == expected_result
+
+# CSV get_vehicle_metadata tests
+def test_CSV_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assignments(setup_teardown):
+    # Arrange
+    fake_all_headers = MagicMock()
+    fake_test_assignments = MagicMock()
+    fake_binning_configs = {}
+    fake_binning_configs['test_assignments'] = fake_test_assignments
+
+    expected_result = (fake_all_headers, fake_test_assignments)
+
+    pytest.cut.all_headers = fake_all_headers
+    pytest.cut.binning_configs = fake_binning_configs
+
+    # Act
+    result = pytest.cut.get_vehicle_metadata()
+
+    # Assert
+    assert result == expected_result
