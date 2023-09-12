@@ -100,7 +100,7 @@ def test_CSV_process_data_per_data_file_sets_instance_all_headers_item_data_file
     assert pytest.cut.sim_data[fake_key][arg_data_file] == fake_key_data_file_item
 
 # CSV parse_csv_data tests
-def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_key_to_empty_list_and_empty_dict_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_empty(mocker, setup_teardown):
+def test_CSV_parse_csv_data_returns_tuple_of_empty_lists_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_empty(mocker, setup_teardown):
     # Arrange
     arg_dataFile = MagicMock()
 
@@ -117,7 +117,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
     fake_second_data_set.columns = MagicMock()
     fake_second_data_set.columns.values = set()
 
-    expected_result = ({arg_dataFile: []}, {})
+    expected_result = ([], [])
 
     mocker.patch(csv_parser.__name__ + '.os.path.join', return_value=forced_return_os_path_join)
     mocker.patch(csv_parser.__name__ + '.pd.read_csv', return_value=fake_initial_data_set)
@@ -142,49 +142,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_ke
     assert fake_initial_data_set.loc.__getitem__.call_args_list[0].args[0][1] == ~forced_return_contains
     assert result == expected_result
 
-def test_CSV_parse_csv_data_returns_tuple_of_dict_with_only_given_dataFile_as_key_to_empty_list_of_dataset_columns_values_and_empty_dict_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_empty(mocker, setup_teardown):
-    # Arrange
-    arg_dataFile = MagicMock()
-
-    fake_raw_data_filepath = MagicMock()
-    forced_return_os_path_join = MagicMock()
-    fake_initial_data_set = MagicMock()
-    fake_initial_data_set.loc = MagicMock()
-    fake_columns_str = MagicMock()
-    fake_columns = MagicMock()
-    fake_columns.str = fake_columns_str
-    fake_initial_data_set.columns = fake_columns
-    forced_return_contains = MagicMock()
-    fake_second_data_set = MagicMock()
-    fake_second_data_set.columns = MagicMock()
-    fake_second_data_set.columns.values = set()
-
-    expected_result = ({arg_dataFile: []}, {})
-
-    mocker.patch(csv_parser.__name__ + '.os.path.join', return_value=forced_return_os_path_join)
-    mocker.patch(csv_parser.__name__ + '.pd.read_csv', return_value=fake_initial_data_set)
-    mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
-    mocker.patch.object(fake_initial_data_set, 'loc.__getitem__', return_value=fake_second_data_set)
-    mocker.patch.object(fake_second_data_set, 'iterrows', return_value=[])
-
-    pytest.cut.raw_data_filepath = fake_raw_data_filepath
-
-    # Act
-    result = pytest.cut.parse_csv_data(arg_dataFile)
-
-    # Assert
-    assert csv_parser.os.path.join.call_count == 1
-    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_filepath, arg_dataFile)
-    assert csv_parser.pd.read_csv.call_count == 1
-    assert csv_parser.pd.read_csv.call_args_list[0].args == (forced_return_os_path_join, )
-    assert csv_parser.pd.read_csv.call_args_list[0].kwargs == {'delimiter':',', 'header':0, 'dtype':str}
-    assert fake_columns_str.contains.call_count == 1
-    assert fake_columns_str.contains.call_args_list[0].args == ('^Unnamed', )
-    assert fake_initial_data_set.loc.__getitem__.call_args_list[0].args[0][0] == slice(None, None, None)
-    assert fake_initial_data_set.loc.__getitem__.call_args_list[0].args[0][1] == ~forced_return_contains
-    assert result == expected_result
-
-def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_empty_list_of_dataset_columns_values_and_dict_of_row_values_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_iterator(mocker, setup_teardown):
+def test_CSV_parse_csv_data_returns_tuple_of_empty_list_of_headers_and_list_of_row_values_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_iterator(mocker, setup_teardown):
     # Arrange
     arg_dataFile = MagicMock()
 
@@ -202,17 +160,17 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     fake_second_data_set.columns = MagicMock()
     fake_second_data_set.columns.values = set()
     fake_iterrows = []
-    expected_result_dict = {}
+    expected_result_list = []
     num_fake_rows = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 iterrows
     for i in range(num_fake_rows):
         fake_row_values = []
         for j in range(pytest.gen.randint(1,10)): # arbitrary, from 1 to 10 row values
             fake_row_values.append(pytest.gen.randint(1, 10)) # arbitrary, from 1 to 10 as a value in row
         fake_iterrows.append([i, fake_row_values])
-        expected_result_dict[i] = {arg_dataFile:fake_row_values}
+        expected_result_list.append(fake_row_values)
     forced_return_iterrows = iter(fake_iterrows)
     
-    expected_result = ({arg_dataFile: []}, expected_result_dict)
+    expected_result = ([], expected_result_list)
 
     mocker.patch(csv_parser.__name__ + '.os.path.join', return_value=forced_return_os_path_join)
     mocker.patch(csv_parser.__name__ + '.pd.read_csv', return_value=fake_initial_data_set)
@@ -235,7 +193,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     assert fake_columns_str.contains.call_args_list[0].args == ('^Unnamed', )
     assert result == expected_result
 
-def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_list_of_dataset_columns_values_and_dict_of_row_values_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_iterator_and_column_names_exist_and_TIME_is_not_a_column_name(mocker, setup_teardown):
+def test_CSV_parse_csv_data_returns_tuple_of_list_of_headers_and_list_of_data_frames_call_to_iterrows_returns_iterator_and_column_names_exist(mocker, setup_teardown):
     # Arrange
     arg_dataFile = MagicMock()
 
@@ -252,83 +210,20 @@ def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_
     fake_second_data_set = MagicMock()
     fake_second_data_set.columns = MagicMock()
     fake_second_data_set.columns.values = []
-    for i in range(pytest.gen.randint(1,10)):
-        fake_second_data_set.columns.values.append(str(MagicMock()))
+    num_fake_columns = pytest.gen.randint(1,10) # arbitrary
+
     fake_iterrows = []
-    expected_result_dict = {}
+    expected_result_dict = []
     num_fake_rows = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 iterrows
     for i in range(num_fake_rows):
         fake_row_values = []
-        for j in range(pytest.gen.randint(1,10)): # arbitrary, from 1 to 10 row values
+        for j in range(num_fake_columns):
             fake_row_values.append(pytest.gen.randint(1, 10)) # arbitrary, from 1 to 10 as a value in row
-        fake_iterrows.append([i, fake_row_values])
-        expected_result_dict[i] = {arg_dataFile:fake_row_values}
+        fake_iterrows.append([fake_row_values, fake_row_values])
+        expected_result_dict.append(fake_row_values)
     forced_return_iterrows = iter(fake_iterrows)
     
-    expected_result = ({arg_dataFile: fake_second_data_set.columns.values}, expected_result_dict)
-
-    mocker.patch(csv_parser.__name__ + '.os.path.join', return_value=forced_return_os_path_join)
-    mocker.patch(csv_parser.__name__ + '.pd.read_csv', return_value=fake_initial_data_set)
-    mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
-    mocker.patch.object(fake_loc, '__getitem__', return_value=fake_second_data_set)
-    mocker.patch.object(fake_second_data_set, 'iterrows', return_value=forced_return_iterrows)
-
-    pytest.cut.raw_data_filepath = fake_raw_data_filepath
-
-    # Act
-    result = pytest.cut.parse_csv_data(arg_dataFile)
-
-    # Assert
-    assert csv_parser.os.path.join.call_count == 1
-    assert csv_parser.os.path.join.call_args_list[0].args == (fake_raw_data_filepath, arg_dataFile)
-    assert csv_parser.pd.read_csv.call_count == 1
-    assert csv_parser.pd.read_csv.call_args_list[0].args == (forced_return_os_path_join, )
-    assert csv_parser.pd.read_csv.call_args_list[0].kwargs == {'delimiter':',', 'header':0, 'dtype':str}
-    assert fake_columns_str.contains.call_count == 1
-    assert fake_columns_str.contains.call_args_list[0].args == ('^Unnamed', )
-    assert result == expected_result
-
-def test_CSV_parse_csv_data_returns_tuple_of_dict_with_given_dataFile_as_key_to_list_of_dataset_columns_values_and_dict_of_time_row_values_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_iterator_and_column_names_exist_and_TIME_exists_as_a_column_name(mocker, setup_teardown):
-    # Arrange
-    arg_dataFile = MagicMock()
-
-    fake_raw_data_filepath = MagicMock()
-    forced_return_os_path_join = MagicMock()
-    fake_initial_data_set = MagicMock()
-    fake_loc = MagicMock()
-    fake_initial_data_set.loc = fake_loc
-    fake_columns_str = MagicMock()
-    fake_columns = MagicMock()
-    fake_columns.str = fake_columns_str
-    fake_initial_data_set.columns = fake_columns
-    forced_return_contains = MagicMock()
-    fake_second_data_set = MagicMock()
-    fake_second_data_set.columns = MagicMock()
-    fake_second_data_set.columns.values = []
-    num_fake_columns = pytest.gen.randint(2,10) # arbitrary, from 2 to 10 so at least one column can be TIME
-    fake_time_column_location = pytest.gen.randint(0,num_fake_columns - 1) # from 0 to 1 less than total columns
-    for i in range(num_fake_columns):
-        if i == fake_time_column_location:
-            fake_second_data_set.columns.values.append('TIME')
-        else:
-            fake_second_data_set.columns.values.append(str(MagicMock()))
-    fake_iterrows = []
-    expected_result_dict = {}
-    num_fake_rows = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 iterrows
-    counter = 0
-    for i in range(num_fake_rows):
-        fake_row_values = []
-        for j in range(pytest.gen.randint(fake_time_column_location + 1,10)): # at least have num values up to time column location
-            if j == fake_time_column_location:
-                fake_row_values.append(counter) # set as counter so all times are different
-                counter += 1
-            else:
-                fake_row_values.append(pytest.gen.randint(1, 10)) # arbitrary, from 1 to 10 as a value in row
-        fake_iterrows.append([fake_row_values[fake_time_column_location], fake_row_values])
-        expected_result_dict[i] = {arg_dataFile:fake_row_values}
-    forced_return_iterrows = iter(fake_iterrows)
-    
-    expected_result = ({arg_dataFile: fake_second_data_set.columns.values}, expected_result_dict)
+    expected_result = (fake_second_data_set.columns.values, expected_result_dict)
 
     mocker.patch(csv_parser.__name__ + '.os.path.join', return_value=forced_return_os_path_join)
     mocker.patch(csv_parser.__name__ + '.pd.read_csv', return_value=fake_initial_data_set)

@@ -20,7 +20,7 @@ from math import ceil, floor
 def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
     # Arrange
     arg_simType = MagicMock()
-    arg_parsedData = MagicMock()
+    arg_dataParser = MagicMock()
     arg_SBN_Flag = True if (pytest.gen.randint(0,1) == 0) else MagicMock()
 
     class FakeDataAdapterSource:
@@ -43,15 +43,15 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
 
     cut = Simulator.__new__(Simulator)
 
-    mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
+    mocker.patch.object(arg_dataParser, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
     mocker.patch(sim.__name__ + '.vehicle', return_value=fake_vehicle)
     mocker.patch(sim.__name__ + '.importlib.import_module', return_value=fake_sbn_adapter)
     mocker.patch(sim.__name__ + '.getattr', return_value=FakeDataAdapterSource)
-    mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
+    mocker.patch.object(arg_dataParser, 'get_just_data', return_value=fake_sim_data)
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
-    cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
+    cut.__init__(arg_simType, arg_dataParser, arg_SBN_Flag)
 
     # Assert
     assert cut.simulator == arg_simType
@@ -67,7 +67,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
 def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_False(mocker):
     # Arrange
     arg_simType = MagicMock()
-    arg_parsedData = MagicMock()
+    arg_dataParser = MagicMock()
     arg_SBN_Flag = False if (pytest.gen.randint(0,1) == 0) else None
 
     fake_vehicle_metadata = [MagicMock(), MagicMock()]
@@ -78,14 +78,14 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
 
     cut = Simulator.__new__(Simulator)
 
-    mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
+    mocker.patch.object(arg_dataParser, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
     mocker.patch(sim.__name__ + '.VehicleRepresentation', return_value=fake_vehicle)
-    mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
+    mocker.patch.object(arg_dataParser, 'get_just_data', return_value=fake_sim_data)
     mocker.patch(sim.__name__ + '.DataSource', return_value=fake_simData)
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
-    cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
+    cut.__init__(arg_simType, arg_dataParser, arg_SBN_Flag)
 
     # Assert
     assert cut.simulator == arg_simType
@@ -100,7 +100,7 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
 def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
     # Arrange
     arg_simType = MagicMock()
-    arg_parsedData = MagicMock()
+    arg_dataParser = MagicMock()
     arg_SBN_Flag = True if (pytest.gen.randint(0,1) == 0) else MagicMock()
 
     class FakeDataAdapterSource:
@@ -123,15 +123,15 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
 
     cut = Simulator.__new__(Simulator)
 
-    mocker.patch.object(arg_parsedData, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
+    mocker.patch.object(arg_dataParser, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
     mocker.patch(sim.__name__ + '.VehicleRepresentation', return_value=fake_vehicle)
     mocker.patch(sim.__name__ + '.importlib.import_module', return_value=fake_sbn_adapter)
     mocker.patch(sim.__name__ + '.getattr', return_value=FakeDataAdapterSource)
-    mocker.patch.object(arg_parsedData, 'get_sim_data', return_value=fake_sim_data)
+    mocker.patch.object(arg_dataParser, 'get_just_data', return_value=fake_sim_data)
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
-    cut.__init__(arg_simType, arg_parsedData, arg_SBN_Flag)
+    cut.__init__(arg_simType, arg_dataParser, arg_SBN_Flag)
 
     # Assert
     assert cut.simulator == arg_simType
