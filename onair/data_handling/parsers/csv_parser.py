@@ -19,19 +19,15 @@ from ...src.util.print_io import *
 from .parser_util import * 
 
 class CSV(OnAirParser):
-    def pre_process_data(self, dataFiles):
-        pass
-
-    # TODO: This should go away, only one data file
-    def process_data_per_data_file(self, data_file):
+    def process_data_file(self, data_file):
         labels, data = self.parse_csv_data(data_file)
         self.all_headers = labels
         self.sim_data = data
 
 ##### INITIAL PROCESSING ####
-    def parse_csv_data(self, dataFile):
+    def parse_csv_data(self, data_file):
         #Read in the data set
-        dataset = pd.read_csv(os.path.join(self.raw_data_filepath, dataFile), delimiter=',', header=0, dtype=str)
+        dataset = pd.read_csv(data_file, delimiter=',', header=0, dtype=str)
         dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
 
         all_headers = list(dataset.columns.values)
@@ -47,15 +43,14 @@ class CSV(OnAirParser):
 
         return all_headers, all_data 
 
-    def parse_config_data(self, configFile, ss_breakdown):
-        parsed_configs = extract_configs(self.metadata_filepath, configFile)
+    def parse_meta_data_file(self, meta_data_file, ss_breakdown):
+        parsed_configs = extract_meta_data(meta_data_file)
         if ss_breakdown == False:
             num_elements = len(parsed_configs['subsystem_assignments'])
             parsed_configs['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
         return parsed_configs
 
 ##### GETTERS ##################################
-
     def get_sim_data(self):
         return self.all_headers, self.sim_data, self.binning_configs
 

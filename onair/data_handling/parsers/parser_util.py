@@ -13,10 +13,10 @@ from pandas import to_datetime
 import datetime
 
 ## Method to extract configuration data and return 3 dictionaries
-def extract_configs(configFilePath, configFile):
-    assert configFile != ''
+def extract_meta_data(meta_data_file):
+    assert meta_data_file != ''
 
-    configs = parseTlmConfJson(configFilePath + configFile)
+    configs = parseTlmConfJson(meta_data_file)
 
     configs_len = len(configs['subsystem_assignments'])
 

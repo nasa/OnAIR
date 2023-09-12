@@ -11,53 +11,33 @@ from abc import ABC, abstractmethod
 from .parser_util import * 
 
 class OnAirParser(ABC):
-    def __init__(self, rawDataFilepath = '', 
-                    metadataFilepath = '', 
-                            dataFiles = '', 
-                          configFiles = '', 
-                        ss_breakdown = False):
-      """An initial parsing needs to happen in order to use the parser classes
-          This means that, if you want to use this class to parse in real time, 
-          it needs to at least have seen one sample of the anticipated format """
+    def __init__(self, data_file, meta_file, ss_breakdown = False):
+        """An initial parsing needs to happen in order to use the parser classes
+            This means that, if you want to use this class to parse in real time,
+            it needs to at least have seen one sample of the anticipated format """
 
-      self.raw_data_filepath = rawDataFilepath
-      self.metadata_filepath = metadataFilepath
-      self.all_headers = {}
-      self.sim_data = {}
-      self.binning_configs = {}
+        self.raw_data_file = data_file
+        self.meta_data_file = meta_file
+        self.all_headers = {}
+        self.sim_data = {}
+        self.binning_configs = {}
 
-      if (dataFiles != '') and (configFiles != ''):
-          self.pre_process_data(dataFiles)
-  
-          self.binning_configs['subsystem_assignments'] = {}
-          self.binning_configs['test_assignments'] = {}
-          self.binning_configs['description_assignments'] = {}
+        configs = self.parse_meta_data_file(self.meta_data_file, ss_breakdown)
+        self.binning_configs['subsystem_assignments'] = configs['subsystem_assignments']
+        self.binning_configs['test_assignments'] = configs['test_assignments']
+        self.binning_configs['description_assignments'] = configs['description_assignments']
 
-          configs = self.parse_config_data(str2lst(configFiles)[0], ss_breakdown)
-
-          # TODO: this shouldn't iterate
-          for data_file in str2lst(dataFiles):
-              self.process_data_per_data_file(data_file)
-              self.binning_configs['subsystem_assignments'] = configs['subsystem_assignments']
-              self.binning_configs['test_assignments'] = configs['test_assignments']
-              self.binning_configs['description_assignments'] = configs['description_assignments']
+        self.process_data_file(self.raw_data_file)
 
     @abstractmethod
-    def pre_process_data(self, dataFiles):
-        """
-        Adjust dataFiles before parsing into binning_configs
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def process_data_per_data_file(self, data_file):
+    def process_data_file(self, data_file):
         """
         Adjust each individual data_file before parsing into binning_configs
         """
         raise NotImplementedError
 
     @abstractmethod
-    def parse_config_data(self, configFile, ss_breakdown):
+    def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         """
         Create the configs that will be used to populate the binning_configs for the data files
         """
