@@ -399,26 +399,17 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     # Arrange
     arg_parser_name = MagicMock()
     arg_parser_file_name = MagicMock()
-    arg_dataFilePath = MagicMock()
+    arg_dataFilePath = str(MagicMock())
     arg_metadataFilePath = str(MagicMock())
     arg_subsystems_breakdown = MagicMock()
 
     class FakeParser:
-        init_data_path = None
-        init_metadata_path = None
-        init_tlm_files = None
-        init_metaFiles = None
-        init_subsystems_breakdown = None
-
         def __init__(self, data_path, metadata_path, tlm_files, metaFiles, subsystems_breakdown):
-            FakeParser.init_data_path = data_path
-            FakeParser.init_metadata_path = metadata_path
-            FakeParser.init_tlm_files = tlm_files
-            FakeParser.init_metaFiles = metaFiles
-            FakeParser.init_subsystems_breakdown = subsystems_breakdown
+            pass
 
     fake_parser = MagicMock()
     fake_parser_class = FakeParser
+    fake_parser_class_instance = MagicMock()
     fake_run_path = str(MagicMock())
     fake_environ = {'RUN_PATH':fake_run_path}
     fake_parsed_data = MagicMock()
@@ -426,10 +417,13 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.telemetryFiles = MagicMock()
     cut.metaFiles = MagicMock()
+    cut.telemetryFiles = MagicMock()
+    cut.metaFiles = MagicMock()
 
     mocker.patch(execution_engine.__name__ + '.importlib.import_module', return_value=fake_parser)
     mocker.patch(execution_engine.__name__ + '.getattr', return_value=fake_parser_class)
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
+    mocker.patch.object(fake_parser_class, '__new__', return_value=fake_parser_class_instance)
 
     # Act
     cut.parse_data(arg_parser_name, arg_parser_file_name, arg_dataFilePath, arg_metadataFilePath, arg_subsystems_breakdown)
@@ -439,12 +433,11 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     assert execution_engine.importlib.import_module.call_args_list[0].args == ('data_handling.parsers.' + arg_parser_file_name, )
     assert execution_engine.getattr.call_count == 1
     assert execution_engine.getattr.call_args_list[0].args == (fake_parser, arg_parser_name,)
-    assert FakeParser.init_data_path == fake_run_path + arg_dataFilePath
-    assert FakeParser.init_metadata_path == fake_run_path + arg_metadataFilePath
-    assert FakeParser.init_tlm_files == cut.telemetryFiles
-    assert FakeParser.init_metaFiles == cut.metaFiles
-    assert FakeParser.init_subsystems_breakdown == arg_subsystems_breakdown
-    assert cut.simDataParser == fake_parser_class
+    assert cut.simDataParser == fake_parser_class_instance
+    assert fake_parser_class.__new__.call_count == 1
+    assert fake_parser_class.__new__.call_args_list[0].args == (fake_parser_class, fake_run_path + arg_dataFilePath, fake_run_path + arg_metadataFilePath, cut.telemetryFiles, cut.metaFiles, arg_subsystems_breakdown, )
+
+    # subsystems_breakdown
 
 def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_default_is_False(mocker):
     # Arrange
@@ -481,7 +474,6 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
     mocker.patch(execution_engine.__name__ + '.importlib.import_module', return_value=fake_parser)
     mocker.patch(execution_engine.__name__ + '.getattr', return_value=fake_parser_class)
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
-    mocker.patch(execution_engine.__name__ + '.TimeSynchronizer', return_value=fake_processdSimData)
 
     # Act
     cut.parse_data(arg_parser_name, arg_parser_file_name, arg_dataFilePath, arg_metadataFilePath)
