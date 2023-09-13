@@ -206,7 +206,13 @@ def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_er
     fake_Dev_flags = MagicMock()
     fake_SBN_flags = MagicMock()
     fake_Viz_flags = MagicMock()
-    fake_plugin_dict = dict(MagicMock())
+    fake_plugin_dict = MagicMock()
+    
+    fake_keys = MagicMock()
+    fake_keys2 = MagicMock()
+
+    fake_keys.__len__.return_value = 1
+    fake_keys2.__iter__.return_value = iter(list([0,0]))
     
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
@@ -214,6 +220,8 @@ def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_er
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
     mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
     mocker.patch('ast.literal_eval',return_value=fake_plugin_dict)
+    mocker.patch.object(fake_plugin_dict, 'keys', return_value=fake_keys2)
+
 
     # Act
     cut.parse_configs(arg_config_filepath)

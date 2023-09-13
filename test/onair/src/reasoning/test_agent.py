@@ -33,7 +33,7 @@ def test_Agent__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and
     cut = Agent.__new__(Agent)
 
     # Act
-    result = cut.__init__(fake_plugin_list, arg_vehicle)
+    result = cut.__init__(arg_vehicle, fake_plugin_list)
 
     # Assert
     assert cut.vehicle_rep == arg_vehicle

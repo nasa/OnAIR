@@ -95,7 +95,7 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
     assert sim.DataSource.call_count == 1
     assert sim.DataSource.call_args_list[0].args == (fake_sim_data, )
     assert sim.Agent.call_count == 1
-    assert sim.Agent.call_args_list[0].args == (arg_plugin_list, fake_vehicle)
+    assert sim.Agent.call_args_list[0].args == (fake_vehicle, arg_plugin_list)
     assert cut.agent == fake_agent
 
 def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
@@ -143,7 +143,7 @@ def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data
     assert FakeDataAdapterSource.sim_data == fake_sim_data
     assert FakeDataAdapterSource.connect_call_count == 1
     assert sim.Agent.call_count == 1
-    assert sim.Agent.call_args_list[0].args == (fake_plugin_list,fake_vehicle)
+    assert sim.Agent.call_args_list[0].args == (fake_vehicle, fake_plugin_list)
     assert cut.agent == fake_agent
 
 # run_sim tests

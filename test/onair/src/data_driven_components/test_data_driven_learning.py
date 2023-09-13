@@ -35,6 +35,19 @@ def test_DataDrivenLearning__init__sets_instance_headers_to_given_headers_and_do
     # Assert
     assert cut.headers == arg_headers
 
+def test_DataDrivenLearning__init__throws_AttributeError_when_given_module_file_has_no_attribute_Plugin(mocker):
+    # Arrange
+    fake_module_name = MagicMock()
+    arg_headers = []
+
+    arg__ai_plugins = {MagicMock()}
+
+    
+
+    # Act
+
+    # Assert
+
 def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
     # Arrange
     arg_headers = []

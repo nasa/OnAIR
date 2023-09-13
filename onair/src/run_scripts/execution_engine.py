@@ -98,8 +98,15 @@ class ExecutionEngine:
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
-        ## Sort Data: Plugins
-        self.plugin_list = ast.literal_eval(config['DEFAULT']['PluginList'])      
+        ## Plugins
+        temp_plugin_list = ast.literal_eval(config['DEFAULT']['PluginList'])
+        if len(temp_plugin_list.keys()) == 0:
+            raise AttributeError(f'No plugins have been specified in the config. Please specify a plugin in the PluginList dictionary with key of form plugin_name and value of form path/to/plugin')
+        for plugin_name in temp_plugin_list.keys():
+            if not(os.path.exists(temp_plugin_list[plugin_name])):
+                raise FileNotFoundError(f'Path given for {plugin_name} does not exist or is formatted incorrectly.')
+        self.plugin_list = temp_plugin_list
+        
 
     def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
         parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)

@@ -39,7 +39,7 @@ class Simulator:
             
         else:
             self.simData = DataSource(parsedData.get_sim_data())
-        self.agent = Agent(plugin_list,vehicle)
+        self.agent = Agent(vehicle, plugin_list)
 
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
         if IO_Flag == True: print_sim_header()

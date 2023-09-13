@@ -16,15 +16,18 @@ from ..util.data_conversion import *
 
 class DataDrivenLearning:
     def __init__(self, headers, _ai_plugins={}):
-        assert(len(headers)>0)
+        assert(len(headers)>0), 'Headers are required'
         self.headers = headers
         self.ai_constructs = []
-        
         for module_name in list(_ai_plugins.keys()):
-            spec = importlib.util.spec_from_file_location(module_name, _ai_plugins[module_name])
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            self.ai_constructs.append(module.Plugin(module_name,headers))
+            try:
+                spec = importlib.util.spec_from_file_location(module_name, _ai_plugins[module_name])
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                self.ai_constructs.append(module.Plugin(module_name,headers))
+            except AttributeError:
+                raise Exception(f'Path passed for module {module_name} is not pointing to a usable module file. Double check that the config points to a Python file with a class Plugin.')
+                        
         
 
     def update(self, curr_data, status):
