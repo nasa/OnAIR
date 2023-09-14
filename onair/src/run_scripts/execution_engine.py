@@ -64,48 +64,51 @@ class ExecutionEngine:
             self.setup_sim()
 
     def parse_configs(self, config_filepath):
-        # print("Using config file: {}".format(config_filepath))
-
         config = configparser.ConfigParser()
+
         if len(config.read(config_filepath)) == 0:
             raise FileNotFoundError(f"Config file at '{config_filepath}' could not be read.")
         
         try:
-            ## Sort Required Data: Telementry Data & Configuration
+            ## Parse Required Data: Telementry Data & Configuration
             self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
             self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
             self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for vehicle telemetry
             self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Vehicle telemetry data
 
-            ## Sort Required Data: Names
+            ## Parse Required Data: Names
             self.parser_file_name = config['DEFAULT']['ParserFileName']
             self.parser_name = config['DEFAULT']['ParserName']
             self.sim_name = config['DEFAULT']['SimName']
+
+            ## Parse Required Data: Plugin name to path dict
+            config_plugin_list = config['DEFAULT']['PluginList']
+            ast_plugin_list = ast.parse(config_plugin_list, mode='eval')
+            if isinstance(ast_plugin_list.body, ast.Dict) and len(ast_plugin_list.body.keys) > 0:
+                temp_plugin_list = ast.literal_eval(config_plugin_list)
+            else:
+                raise ValueError(f"{config_plugin_list} is an invalid PluginList. It must be a dict of at least 1 key/value pair.")
+            for plugin_name in temp_plugin_list.values():
+                if not(os.path.exists(plugin_name)):
+                    raise FileNotFoundError(f"In config file '{config_filepath}', path '{plugin_name}' does not exist or is formatted incorrectly.")
+            self.plugin_list = temp_plugin_list
         except KeyError as e:
             new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
             raise KeyError(new_message) from e
 
-        ## Sort Optional Data: Flags
+        ## Parse Optional Data: Flags
         self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
         self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
         self.SBN_Flag = config['RUN_FLAGS'].getboolean('SBN_Flag')
         self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
         
-        ## Sort Optional Data: Benchmarks
+        ## Parse Optional Data: Benchmarks
         try:
             self.benchmarkFilePath = config['DEFAULT']['BenchmarkFilePath']
             self.benchmarkFiles = config['DEFAULT']['BenchmarkFiles'] # Vehicle telemetry data
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
-        ## Plugins
-        temp_plugin_list = ast.literal_eval(config['DEFAULT']['PluginList'])
-        if len(temp_plugin_list.keys()) == 0:
-            raise AttributeError(f'No plugins have been specified in the config. Please specify a plugin in the PluginList dictionary with key of form plugin_name and value of form path/to/plugin')
-        for plugin_name in temp_plugin_list.keys():
-            if not(os.path.exists(temp_plugin_list[plugin_name])):
-                raise FileNotFoundError(f'Path given for {plugin_name} does not exist or is formatted incorrectly.')
-        self.plugin_list = temp_plugin_list
         
 
     def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):

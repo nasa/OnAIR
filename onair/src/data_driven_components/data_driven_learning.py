@@ -21,16 +21,11 @@ class DataDrivenLearning:
         self.headers = headers
         self.ai_constructs = []
         for module_name in list(_ai_plugins.keys()):
-            try:
-                spec = importlib.util.spec_from_file_location(module_name, _ai_plugins[module_name])
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-                self.ai_constructs.append(module.Plugin(module_name,headers))
-            except AttributeError:
-                raise Exception(f'Path passed for module {module_name} is not pointing to a usable module file. Double check that the config points to a Python file with a class Plugin.')
-                        
-        
-
+            spec = importlib.util.spec_from_file_location(module_name, _ai_plugins[module_name])
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            self.ai_constructs.append(module.Plugin(module_name,headers))
+    
     def update(self, curr_data, status):
         input_data = curr_data
         output_data = status_to_oneHot(status)
