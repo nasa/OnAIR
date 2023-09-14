@@ -25,7 +25,7 @@ MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100
 
 class Simulator:
-    def __init__(self, simType, parsedData, SBN_Flag):
+    def __init__(self, simType, parsedData, plugin_list, SBN_Flag):
         self.simulator = simType
         vehicle = VehicleRepresentation(*parsedData.get_vehicle_metadata())
 
@@ -39,7 +39,7 @@ class Simulator:
             
         else:
             self.simData = DataSource(parsedData.get_sim_data())
-        self.agent = Agent(vehicle)
+        self.agent = Agent(vehicle, plugin_list)
 
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
         if IO_Flag == True: print_sim_header()

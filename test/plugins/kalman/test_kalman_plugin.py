@@ -10,9 +10,10 @@
 """ Test Kalman Plugin Functionality """
 import pytest
 from mock import MagicMock
+import onair
 
-import onair.src.data_driven_components.kalman.kalman_plugin as kalman_plugin
-from onair.src.data_driven_components.kalman.kalman_plugin import Plugin as Kalman
+from plugins.kalman_plugin import kalman_plugin
+from plugins.kalman_plugin import Plugin as Kalman
 
 # test init
 def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args_except_window_size(mocker):

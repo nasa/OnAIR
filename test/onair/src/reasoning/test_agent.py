@@ -23,6 +23,7 @@ def test_Agent__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and
     fake_learning_systems = MagicMock()
     fake_mission_status = MagicMock()
     fake_bayesian_status = MagicMock()
+    fake_plugin_list = MagicMock()
 
     mocker.patch.object(arg_vehicle, 'get_headers', return_value=fake_headers)
     mocker.patch(agent.__name__ + '.DataDrivenLearning', return_value=fake_learning_systems)
@@ -32,14 +33,14 @@ def test_Agent__init__sets_vehicle_rep_to_given_vehicle_and_learning_systems_and
     cut = Agent.__new__(Agent)
 
     # Act
-    result = cut.__init__(arg_vehicle)
+    result = cut.__init__(arg_vehicle, fake_plugin_list)
 
     # Assert
     assert cut.vehicle_rep == arg_vehicle
     assert arg_vehicle.get_headers.call_count == 1
     assert arg_vehicle.get_headers.call_args_list[0].args == ()
     assert agent.DataDrivenLearning.call_count == 1
-    assert agent.DataDrivenLearning.call_args_list[0].args == (fake_headers, )
+    assert agent.DataDrivenLearning.call_args_list[0].args == (fake_headers, fake_plugin_list)
     assert cut.learning_systems == fake_learning_systems
     assert arg_vehicle.get_status.call_count == 1
     assert arg_vehicle.get_status.call_args_list[0].args == ()

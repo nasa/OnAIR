@@ -18,6 +18,7 @@ import ast
 import shutil
 from distutils.dir_util import copy_tree
 from time import gmtime, strftime   
+import ast
 
 from ...data_handling.time_synchronizer import TimeSynchronizer
 from ..run_scripts.sim import Simulator
@@ -49,6 +50,9 @@ class ExecutionEngine:
         self.sim_name = ''
         self.processedSimData = None
         self.sim = None
+        
+        # Init plugins
+        self.plugin_list = ['']
 
         self.save_flag = save_flag
         self.save_name = run_name
@@ -60,40 +64,52 @@ class ExecutionEngine:
             self.setup_sim()
 
     def parse_configs(self, config_filepath):
-        # print("Using config file: {}".format(config_filepath))
-
         config = configparser.ConfigParser()
+
         if len(config.read(config_filepath)) == 0:
             raise FileNotFoundError(f"Config file at '{config_filepath}' could not be read.")
         
         try:
-            ## Sort Required Data: Telementry Data & Configuration
+            ## Parse Required Data: Telementry Data & Configuration
             self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
             self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
             self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for vehicle telemetry
             self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Vehicle telemetry data
 
-            ## Sort Required Data: Names
+            ## Parse Required Data: Names
             self.parser_file_name = config['DEFAULT']['ParserFileName']
             self.parser_name = config['DEFAULT']['ParserName']
             self.sim_name = config['DEFAULT']['SimName']
+
+            ## Parse Required Data: Plugin name to path dict
+            config_plugin_list = config['DEFAULT']['PluginList']
+            ast_plugin_list = ast.parse(config_plugin_list, mode='eval')
+            if isinstance(ast_plugin_list.body, ast.Dict) and len(ast_plugin_list.body.keys) > 0:
+                temp_plugin_list = ast.literal_eval(config_plugin_list)
+            else:
+                raise ValueError(f"{config_plugin_list} is an invalid PluginList. It must be a dict of at least 1 key/value pair.")
+            for plugin_name in temp_plugin_list.values():
+                if not(os.path.exists(plugin_name)):
+                    raise FileNotFoundError(f"In config file '{config_filepath}', path '{plugin_name}' does not exist or is formatted incorrectly.")
+            self.plugin_list = temp_plugin_list
         except KeyError as e:
             new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
             raise KeyError(new_message) from e
 
-        ## Sort Optional Data: Flags
+        ## Parse Optional Data: Flags
         self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
         self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
         self.SBN_Flag = config['RUN_FLAGS'].getboolean('SBN_Flag')
         self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
         
-        ## Sort Optional Data: Benchmarks
+        ## Parse Optional Data: Benchmarks
         try:
             self.benchmarkFilePath = config['DEFAULT']['BenchmarkFilePath']
             self.benchmarkFiles = config['DEFAULT']['BenchmarkFiles'] # Vehicle telemetry data
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
+        
 
     def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
         parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
@@ -104,7 +120,7 @@ class ExecutionEngine:
         self.processedSimData = TimeSynchronizer(*parsed_data.get_sim_data())
 
     def setup_sim(self):
-        self.sim = Simulator(self.sim_name, self.processedSimData, self.SBN_Flag)
+        self.sim = Simulator(self.sim_name, self.processedSimData, self.plugin_list, self.SBN_Flag)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath
