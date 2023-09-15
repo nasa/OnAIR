@@ -174,7 +174,7 @@ def test_ExecutionEngine_parse_configs_raises_ValueError_when_PluginList_from_co
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
-    mocker.patch(execution_engine.__name__ + '.ast.parse', return_value=fake_plugin_list)
+    mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_list)
     mocker.patch(execution_engine.__name__ + '.isinstance', return_value=False)
 
     # Act
@@ -183,9 +183,8 @@ def test_ExecutionEngine_parse_configs_raises_ValueError_when_PluginList_from_co
 
     # Assert
     assert e_info.match(f"{fake_plugin_list} is an invalid PluginList. It must be a dict of at least 1 key/value pair.")
-    assert execution_engine.ast.parse.call_count == 1
-    assert execution_engine.ast.parse.call_args_list[0].args == (fake_plugin_list,)
-    assert execution_engine.ast.parse.call_args_list[0].kwargs == {'mode':'eval'}
+    assert cut.ast_parse_eval.call_count == 1
+    assert cut.ast_parse_eval.call_args_list[0].args == (fake_plugin_list,)
     assert execution_engine.isinstance.call_count == 1
     assert execution_engine.isinstance.call_args_list[0].args == (fake_plugin_list.body, execution_engine.ast.Dict, )
 
@@ -209,7 +208,7 @@ def test_ExecutionEngine_parse_configs_raises_ValueError_when_PluginList_from_co
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
-    mocker.patch(execution_engine.__name__ + '.ast.parse', return_value=fake_plugin_list)
+    mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_list)
     mocker.patch(execution_engine.__name__ + '.isinstance', return_value=True)
 
     # Act
@@ -218,9 +217,8 @@ def test_ExecutionEngine_parse_configs_raises_ValueError_when_PluginList_from_co
 
     # Assert
     assert e_info.match(f"{fake_plugin_list} is an invalid PluginList. It must be a dict of at least 1 key/value pair.")
-    assert execution_engine.ast.parse.call_count == 1
-    assert execution_engine.ast.parse.call_args_list[0].args == (fake_plugin_list,)
-    assert execution_engine.ast.parse.call_args_list[0].kwargs == {'mode':'eval'}
+    assert cut.ast_parse_eval.call_count == 1
+    assert cut.ast_parse_eval.call_args_list[0].args == (fake_plugin_list,)
     assert execution_engine.isinstance.call_count == 1
     assert execution_engine.isinstance.call_args_list[0].args == (fake_plugin_list.body, execution_engine.ast.Dict, )
 
@@ -247,7 +245,7 @@ def test_ExecutionEngine_parse_configs_raises_FileNotFoundError_when_given_plugi
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
-    mocker.patch(execution_engine.__name__ + '.ast.parse', return_value=fake_plugin_list)
+    mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_list)
     mocker.patch(execution_engine.__name__ + '.isinstance', return_value=True)
     mocker.patch(execution_engine.__name__ + '.ast.literal_eval', return_value=fake_temp_plugin_list)
     mocker.patch.object(fake_temp_plugin_list, 'values', return_value=fake_temp_iter)
@@ -258,9 +256,8 @@ def test_ExecutionEngine_parse_configs_raises_FileNotFoundError_when_given_plugi
 
     # Assert
     assert e_info.match(f"In config file '{arg_config_filepath}', path '{fake_plugin_name}' does not exist or is formatted incorrectly.")
-    assert execution_engine.ast.parse.call_count == 1
-    assert execution_engine.ast.parse.call_args_list[0].args == (fake_plugin_list,)
-    assert execution_engine.ast.parse.call_args_list[0].kwargs == {'mode':'eval'}
+    assert cut.ast_parse_eval.call_count == 1
+    assert cut.ast_parse_eval.call_args_list[0].args == (fake_plugin_list,)
     assert execution_engine.isinstance.call_count == 1
     assert execution_engine.isinstance.call_args_list[0].args == (fake_plugin_list.body, execution_engine.ast.Dict, )
 
@@ -311,7 +308,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
     mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
-    mocker.patch(execution_engine.__name__ + '.ast.parse', return_value=fake_plugin_list)
+    mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_list)
     mocker.patch(execution_engine.__name__ + '.isinstance', return_value=True)
     mocker.patch(execution_engine.__name__ + '.ast.literal_eval', return_value=fake_temp_plugin_list)
     mocker.patch.object(fake_temp_plugin_list, 'values', return_value=fake_temp_iter)
@@ -789,3 +786,22 @@ def test_ExecutionEngine_set_run_param_passes_given_arguments_to_setattr(mocker)
     # Assert
     assert execution_engine.setattr.call_count == 1
     assert execution_engine.setattr.call_args_list[0].args == (cut, arg_name, arg_val, )
+
+# ast_parse_eval tests
+def test_ExecutionEngine_ast_parse_eval_returns_call_to_ast_parse_with_mode_eval(mocker):
+    # Arrange
+    arg_config_list = MagicMock()
+    expected_result = MagicMock()
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+
+    mocker.patch(execution_engine.__name__ + ".ast.parse", return_value=expected_result)
+
+    # Act
+    result = cut.ast_parse_eval(arg_config_list)
+
+    # Assert
+    assert result == expected_result
+    assert execution_engine.ast.parse.call_count == 1
+    assert execution_engine.ast.parse.call_args_list[0].args == (arg_config_list, )
+    assert execution_engine.ast.parse.call_args_list[0].kwargs == {'mode':'eval'}
+
