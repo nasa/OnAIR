@@ -126,9 +126,9 @@ def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_whe
     arg_config_filepath = MagicMock()
 
     fake_default = {'TelemetryDataFilePath':MagicMock(),
+                    'TelemetryFile':MagicMock(),
                     'TelemetryMetadataFilePath':MagicMock(),
-                    'MetaFiles':MagicMock(),
-                    'TelemetryFiles':MagicMock(),
+                    'MetaFile':MagicMock(),
                     'BenchmarkFilePath':MagicMock(),
                     'BenchmarkFiles':MagicMock(),
                     'BenchmarkIndices':MagicMock(),
@@ -504,8 +504,8 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
     fake_processdSimData = MagicMock()
 
     cut = ExecutionEngine.__new__(ExecutionEngine)
-    cut.telemetryFiles = MagicMock()
-    cut.metaFiles = MagicMock()
+    cut.telemetryFile = MagicMock()
+    cut.metaFile = MagicMock()
 
     mocker.patch(execution_engine.__name__ + '.importlib.import_module', return_value=fake_parser)
     mocker.patch(execution_engine.__name__ + '.getattr', return_value=fake_parser_class)
