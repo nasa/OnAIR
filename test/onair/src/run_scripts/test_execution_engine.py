@@ -164,11 +164,12 @@ def test_ExecutionEngine_parse_configs_raises_ValueError_when_PluginList_from_co
     arg_config_filepath = MagicMock()
 
     fake_config = MagicMock()
+    fake_paths_and_filenames = str(MagicMock)
     fake_plugin_list = MagicMock()
     fake_plugin_list.body = MagicMock()
     fake_default_item = MagicMock()
     fake_config.__getitem__.return_value = fake_default_item
-    fake_default_item.__getitem__.side_effect = [None] * 7 + [fake_plugin_list]
+    fake_default_item.__getitem__.side_effect = [fake_paths_and_filenames] * 4 + [None] * 3 + [fake_plugin_list]
     fake_config_read_result = MagicMock()
     fake_config_read_result.__len__.return_value = 1
 
@@ -195,13 +196,14 @@ def test_ExecutionEngine_parse_configs_raises_ValueError_when_PluginList_from_co
     arg_config_filepath = MagicMock()
 
     fake_config = MagicMock()
+    fake_paths_and_filenames = str(MagicMock)
     fake_plugin_list = MagicMock()
     fake_plugin_list.body = MagicMock()
     fake_plugin_list.body.keys = MagicMock()
     fake_plugin_list.body.keys.__len__.return_value = 0
     fake_default_item = MagicMock()
     fake_config.__getitem__.return_value = fake_default_item
-    fake_default_item.__getitem__.side_effect = [None] * 7 + [fake_plugin_list]
+    fake_default_item.__getitem__.side_effect = [fake_paths_and_filenames] * 4 + [None] * 3 + [fake_plugin_list]
     fake_config_read_result = MagicMock()
     fake_config_read_result.__len__.return_value = 1
 
@@ -229,6 +231,7 @@ def test_ExecutionEngine_parse_configs_raises_FileNotFoundError_when_given_plugi
     arg_config_filepath = MagicMock()
 
     fake_config = MagicMock()
+    fake_paths_and_filenames = str(MagicMock)
     fake_plugin_list = MagicMock()
     fake_plugin_list.body = MagicMock()
     fake_plugin_list.body.keys = MagicMock()
@@ -238,7 +241,7 @@ def test_ExecutionEngine_parse_configs_raises_FileNotFoundError_when_given_plugi
     fake_temp_iter = iter([fake_plugin_name])
     fake_default_item = MagicMock()
     fake_config.__getitem__.return_value = fake_default_item
-    fake_default_item.__getitem__.side_effect = [None] * 7 + [fake_plugin_list]
+    fake_default_item.__getitem__.side_effect = [fake_paths_and_filenames] * 4 + [None] * 3 + [fake_plugin_list]
     fake_config_read_result = MagicMock()
     fake_config_read_result.__len__.return_value = 1
 
