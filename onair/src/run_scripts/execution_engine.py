@@ -17,8 +17,7 @@ import importlib
 import ast
 import shutil
 from distutils.dir_util import copy_tree
-from time import gmtime, strftime   
-import ast
+from time import gmtime, strftime
 
 from ...data_handling.time_synchronizer import TimeSynchronizer
 from ..run_scripts.sim import Simulator
@@ -83,7 +82,7 @@ class ExecutionEngine:
 
             ## Parse Required Data: Plugin name to path dict
             config_plugin_list = config['DEFAULT']['PluginList']
-            ast_plugin_list = ast.parse(config_plugin_list, mode='eval')
+            ast_plugin_list = self.ast_parse_eval(config_plugin_list)
             if isinstance(ast_plugin_list.body, ast.Dict) and len(ast_plugin_list.body.keys) > 0:
                 temp_plugin_list = ast.literal_eval(config_plugin_list)
             else:
@@ -165,9 +164,11 @@ class ExecutionEngine:
         os.mkdir(save_path)
         copy_tree(os.environ['ONAIR_TMP_SAVE_PATH'], save_path)
 
-    """ Getters and setters """
     def set_run_param(self, name, val):
         setattr(self, name, val)
+
+    def ast_parse_eval(self, config_list):
+        return ast.parse(config_list, mode='eval')
 
 
 
