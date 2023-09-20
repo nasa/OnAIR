@@ -19,7 +19,6 @@ import shutil
 from distutils.dir_util import copy_tree
 from time import gmtime, strftime
 
-from ...data_handling.time_synchronizer import TimeSynchronizer
 from ..run_scripts.sim import Simulator
 
 class ExecutionEngine:
@@ -36,9 +35,11 @@ class ExecutionEngine:
         
         # Init Paths 
         self.dataFilePath = ''
+        self.telemetryFile = ''
+        self.fullTelemetryFileName = ''
         self.metadataFilePath = ''
-        self.metaFiles = ''
-        self.telemetryFiles = ''
+        self.metaFile = ''
+        self.fullMetaDataFileName = ''
         self.benchmarkFilePath = ''
         self.benchmarkFiles = ''
         self.benchmarkIndices = ''
@@ -47,9 +48,9 @@ class ExecutionEngine:
         self.parser_file_name = ''
         self.parser_name = ''
         self.sim_name = ''
-        self.processedSimData = None
+        self.simDataParser = None
         self.sim = None
-        
+
         # Init plugins
         self.plugin_list = ['']
 
@@ -59,7 +60,7 @@ class ExecutionEngine:
         if config_file != '':
             self.init_save_paths()
             self.parse_configs(config_file)
-            self.parse_data(self.parser_name, self.parser_file_name, self.dataFilePath, self.metadataFilePath)
+            self.parse_data(self.parser_name, self.parser_file_name, self.fullTelemetryFileName, self.fullMetaDataFileName)
             self.setup_sim()
 
     def parse_configs(self, config_filepath):
@@ -71,9 +72,11 @@ class ExecutionEngine:
         try:
             ## Parse Required Data: Telementry Data & Configuration
             self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
+            self.telemetryFile = config['DEFAULT']['TelemetryFile'] # Vehicle telemetry data
+            self.fullTelemetryFileName = os.path.join(self.dataFilePath, self.telemetryFile)
             self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
-            self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for vehicle telemetry
-            self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Vehicle telemetry data
+            self.metaFile = config['DEFAULT']['MetaFile'] # Config for vehicle telemetry
+            self.fullMetaDataFileName = os.path.join(self.metadataFilePath, self.metaFile)
 
             ## Parse Required Data: Names
             self.parser_file_name = config['DEFAULT']['ParserFileName']
@@ -108,18 +111,19 @@ class ExecutionEngine:
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
-        
 
-    def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
+    def parse_data(self, parser_name, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
         parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
         parser_class = getattr(parser, parser_name) # This could be simplified if the parsers all extend a parser class... but this works for now
-        tm_data_path = os.environ['RUN_PATH'] + dataFilePath
-        tm_metadata_path = os.environ['RUN_PATH'] +  metadataFilePath
-        parsed_data = parser_class(tm_data_path, tm_metadata_path, self.telemetryFiles, self.metaFiles, subsystems_breakdown)
-        self.processedSimData = TimeSynchronizer(*parsed_data.get_sim_data())
+        # TODO: should this us os.path.join?
+        tm_data_path = os.environ['RUN_PATH'] + data_file_name
+        tm_metadata_path = os.environ['RUN_PATH'] +  metadata_file_name
+        # TODO: This will be changed on an OnAIR Data Source
+        data_parser = parser_class(tm_data_path, tm_metadata_path, subsystems_breakdown)
+        self.simDataParser = data_parser
 
     def setup_sim(self):
-        self.sim = Simulator(self.sim_name, self.processedSimData, self.plugin_list, self.SBN_Flag)
+        self.sim = Simulator(self.sim_name, self.simDataParser, self.plugin_list, self.SBN_Flag)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath
@@ -169,8 +173,3 @@ class ExecutionEngine:
 
     def ast_parse_eval(self, config_list):
         return ast.parse(config_list, mode='eval')
-
-
-
-
-
