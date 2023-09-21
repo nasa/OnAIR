@@ -68,23 +68,6 @@ def test_VehicleRepresentation__init__sets_status_to_Status_with_str_MISSION_and
     assert cut.test_suite == fake_test_suite
     assert cut.curr_data == ['-'] * fake_len
 
-# NOTE: commonly each optional arg is tested, but because their sizes must be equal testing both at once
-def test_VehicleRepresentation__init__default_given_headers_and_tests_are_both_empty_list(mocker):
-    # Arrange
-    cut = VehicleRepresentation.__new__(VehicleRepresentation)
-
-    mocker.patch(vehicle_rep.__name__ + '.Status')
-    mocker.patch(vehicle_rep.__name__ + '.TelemetryTestSuite')
-    
-    # Act
-    cut.__init__()
-
-    # Assert
-    assert cut.headers == []
-    assert vehicle_rep.TelemetryTestSuite.call_count == 1
-    assert vehicle_rep.TelemetryTestSuite.call_args_list[0].args == ([], [])
-    assert cut.curr_data == ['-'] * 0
-
 # update tests
 def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_frame_is_vacant_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange

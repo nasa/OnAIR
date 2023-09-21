@@ -92,8 +92,7 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
     assert cut.simulator == arg_simType
     assert sim.VehicleRepresentation.call_count == 1
     assert sim.VehicleRepresentation.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
-    assert sim.DataSource.call_count == 1
-    assert sim.DataSource.call_args_list[0].args == (fake_sim_data, )
+    assert cut.simData == arg_dataParser
     assert sim.Agent.call_count == 1
     assert sim.Agent.call_args_list[0].args == (fake_vehicle, arg_plugin_list)
     assert cut.agent == fake_agent

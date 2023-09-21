@@ -28,6 +28,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_configs_with_empty_dicts_when_
     expected_result['subsystem_assignments'] = []
     expected_result['test_assignments'] = []
     expected_result['description_assignments'] = []
+    expected_result['data_labels'] = []
 
     # Act
     result = tlm_json_parser.parseTlmConfJson(arg_file_path)
@@ -61,6 +62,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['subsystem_assignments'] = [fake_subsystem]
     expected_result['test_assignments'] = [[[fake_mnemonics, fake_limits]]]
     expected_result['description_assignments'] = [fake_description]
+    expected_result['data_labels'] = [fake_label]
 
     # Act
     result = tlm_json_parser.parseTlmConfJson(arg_file_path)
@@ -89,6 +91,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['subsystem_assignments'] = [fake_subsystem]
     expected_result['test_assignments'] = [[['NOOP']]]
     expected_result['description_assignments'] = [['No description']]
+    expected_result['data_labels'] = [fake_label]
 
     # Act
     result = tlm_json_parser.parseTlmConfJson(arg_file_path)
@@ -107,11 +110,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     fake_data = MagicMock()
     fake_organized_data = {}
     fake_subsystems = []
+    fake_labels = []
     num_labels = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
     for i in range(num_labels):
         fake_label = MagicMock()
         fake_subsystem = MagicMock()
         fake_subsystems.append(fake_subsystem)
+        fake_labels.append(fake_label)
         fake_organized_data[fake_label] = {'subsystem' : fake_subsystem}
 
     mocker.patch(tlm_json_parser.__name__ + '.parseJson', return_value=fake_data)
@@ -121,6 +126,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['subsystem_assignments'] = fake_subsystems
     expected_result['test_assignments'] = [[['NOOP']]] * num_labels
     expected_result['description_assignments'] = [['No description']] * num_labels
+    expected_result['data_labels'] = fake_labels
 
     # Act
     result = tlm_json_parser.parseTlmConfJson(arg_file_path)
@@ -154,6 +160,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['subsystem_assignments'] = [fake_subsystem]
     expected_result['test_assignments'] = [[[fake_mnemonics, fake_limits]]]
     expected_result['description_assignments'] = [fake_description]
+    expected_result['data_labels'] = [fake_label]
 
     # Act
     result = tlm_json_parser.parseTlmConfJson(arg_file_path)
@@ -171,13 +178,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
 
     fake_data = MagicMock()
     num_elems = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10
-    fake_label = [MagicMock() for i in range(num_elems)]
+    fake_labels = [MagicMock() for i in range(num_elems)]
     fake_subsystem = MagicMock()
     fake_limits = MagicMock()
     fake_mnemonics = MagicMock()
     fake_description = MagicMock()
     fake_organized_data = {}
-    for label in fake_label:
+    for label in fake_labels:
         fake_organized_data[label] = {'subsystem' : fake_subsystem,
                                       'tests' : {fake_mnemonics : fake_limits},
                                       'description' : fake_description}
@@ -189,6 +196,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['subsystem_assignments'] = [fake_subsystem] * num_elems
     expected_result['test_assignments'] = [[[fake_mnemonics, fake_limits]]] * num_elems
     expected_result['description_assignments'] = [fake_description] * num_elems
+    expected_result['data_labels'] = fake_labels
 
     # Act
     result = tlm_json_parser.parseTlmConfJson(arg_file_path)
@@ -232,7 +240,8 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     ordered_mnemonics = [y for x, y in sorted(zip(ordering_list, fake_mnemonics))]
     ordered_limits = [y for x, y in sorted(zip(ordering_list, fake_limits))]
     ordered_descs = [y for x, y in sorted(zip(ordering_list, fake_description))]
-    
+    ordered_labels = [y for x, y in sorted(zip(ordering_list, fake_label))]
+
     fake_organized_data = {}
     for i in range(num_elems):
         fake_organized_data[fake_label[i]] = {'subsystem' : fake_subsystem[i],
@@ -246,6 +255,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['subsystem_assignments'] = []
     expected_result['test_assignments'] = []
     expected_result['description_assignments'] = []
+    expected_result['data_labels'] = ordered_labels
     for i in range(num_elems):
         expected_result['subsystem_assignments'].append(ordered_subsys[i])
         expected_result['test_assignments'].append([[ordered_mnemonics[i], ordered_limits[i]]])
@@ -293,6 +303,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     ordered_mnemonics = [y for x, y in sorted(zip(ordering_list, fake_mnemonics))]
     ordered_limits = [y for x, y in sorted(zip(ordering_list, fake_limits))]
     ordered_descs = [y for x, y in sorted(zip(ordering_list, fake_description))]
+    ordered_labels = [y for x, y in sorted(zip(ordering_list, fake_label))]
     
     fake_organized_data = {}
     for i in range(num_elems):
@@ -307,6 +318,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     expected_result['subsystem_assignments'] = []
     expected_result['test_assignments'] = []
     expected_result['description_assignments'] = []
+    expected_result['data_labels'] = ordered_labels
     for i in range(num_elems):
         expected_result['subsystem_assignments'].append(ordered_subsys[i])
         expected_result['test_assignments'].append([[ordered_mnemonics[i], ordered_limits[i]]])

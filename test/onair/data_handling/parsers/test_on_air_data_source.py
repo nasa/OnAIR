@@ -22,6 +22,15 @@ class FakeOnAirDataSource(OnAirDataSource):
     def parse_meta_data_file(self, configFile, ss_breakdown):
         super().parse_meta_data_file(configFile, ss_breakdown)
 
+    def get_next(self):
+        return super().get_next()
+
+    def has_more(self):
+        return super().has_more()
+
+    def has_data(self):
+        return super().has_data()
+
 class IncompleteOnAirDataSource(OnAirDataSource):
     pass
 
@@ -31,6 +40,15 @@ class BadFakeOnAirDataSource(OnAirDataSource):
 
     def parse_meta_data_file(self, configFile, ss_breakdown):
         return super().parse_meta_data_file(configFile, ss_breakdown)
+
+    def get_next(self):
+        return super().get_next()
+
+    def has_more(self):
+        return super().has_more()
+
+    def has_data(self):
+        return super().has_data()
 
 @pytest.fixture
 def setup_teardown():
@@ -48,6 +66,7 @@ def test_OnAirDataSource__init__sets_instance_variables_as_expected_and_calls_pa
     fake_configs['subsystem_assignments'] = MagicMock()
     fake_configs['test_assignments'] = MagicMock()
     fake_configs['description_assignments'] = MagicMock()
+    fake_configs['data_labels'] = MagicMock()
 
     mocker.patch.object(pytest.cut, 'parse_meta_data_file', return_value=fake_configs)
     mocker.patch.object(pytest.cut, 'process_data_file')
@@ -58,7 +77,7 @@ def test_OnAirDataSource__init__sets_instance_variables_as_expected_and_calls_pa
     # Assert
     assert pytest.cut.raw_data_file == arg_rawDataFile
     assert pytest.cut.meta_data_file == arg_metadataFile
-    assert pytest.cut.all_headers == {}
+    assert pytest.cut.all_headers == fake_configs['data_labels']
     assert pytest.cut.sim_data == {}
     assert pytest.cut.parse_meta_data_file.call_count == 1
     assert pytest.cut.parse_meta_data_file.call_args_list[0].args == (arg_metadataFile, arg_ss_breakdown, )
