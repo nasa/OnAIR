@@ -289,3 +289,89 @@ def test_CSV_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assig
 
     # Assert
     assert result == expected_result
+
+# CSV get_next test
+def test_CSV_get_next_increments_index_and_returns_current_frame_of_data(setup_teardown):
+    # Arrange
+    fake_frame_index = 10
+    fake_sim_data = []
+    for i in range(fake_frame_index + 1):
+        fake_sim_data.append(MagicMock())
+
+    expected_result = fake_sim_data[fake_frame_index]
+
+    pytest.cut.frame_index = fake_frame_index
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.get_next()
+
+    # Assert
+    assert result == expected_result
+    assert pytest.cut.frame_index == fake_frame_index + 1
+
+# CSV has_more test
+def test_CSV_has_more_returns_true_when_index_less_than_number_of_frames(setup_teardown):
+    # Arrange
+    fake_frame_index = 10
+    fake_sim_data = []
+    for i in range(fake_frame_index + 1):
+        fake_sim_data.append(MagicMock())
+
+    expected_result = True
+
+    pytest.cut.frame_index = 5
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.has_more()
+
+    # Assert
+    assert result == expected_result
+
+def test_CSV_has_more_returns_false_when_index_equal_than_number_of_frames(setup_teardown):
+    # Arrange
+    fake_frame_index = 10
+    fake_sim_data = []
+    for i in range(fake_frame_index):
+        fake_sim_data.append(MagicMock())
+
+    expected_result = False
+
+    pytest.cut.frame_index = fake_frame_index
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.has_more()
+
+    # Assert
+    assert result == expected_result
+
+# CSV has_data test
+def test_CSV_has_data_returns_true_sim_data_is_non_empty(setup_teardown):
+    # Arrange
+    fake_sim_data = MagicMock()
+
+    expected_result = True
+
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.has_data()
+
+    # Assert
+    assert result == expected_result
+
+def test_CSV_has_data_returns_false_sim_data_is_empty(setup_teardown):
+    # Arrange
+    fake_sim_data = []
+
+    expected_result = False
+
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.has_data()
+
+    # Assert
+    assert result == expected_result

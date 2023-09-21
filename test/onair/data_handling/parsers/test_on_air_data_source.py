@@ -99,6 +99,9 @@ def test_OnAirDataSource_raises_error_because_of_unimplemented_abstract_methods(
     assert "Can't instantiate abstract class OnAirDataSource with" in e_info.__str__()
     assert "process_data_file" in e_info.__str__()
     assert "parse_meta_data_file" in e_info.__str__()
+    assert "get_next" in e_info.__str__()
+    assert "has_more" in e_info.__str__()
+    assert "has_data" in e_info.__str__()
 
 # Incomplete plugin call tests
 def test_OnAirDataSource_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
@@ -111,6 +114,9 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_is_instantiated_be
     assert "Can't instantiate abstract class IncompleteOnAirDataSource with" in e_info.__str__()
     assert "process_data_file" in e_info.__str__()
     assert "parse_meta_data_file" in e_info.__str__()
+    assert "get_next" in e_info.__str__()
+    assert "has_more" in e_info.__str__()
+    assert "has_data" in e_info.__str__()
 
 def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_process_data_file():
     # Act
@@ -128,4 +134,31 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_met
     # populate list with the functions that should raise exceptions when called.
     with pytest.raises(NotImplementedError) as e_info:
         cut.parse_meta_data_file(None, None)
+    assert "NotImplementedError" in e_info.__str__()
+
+def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_get_next():
+    # Act
+    cut = BadFakeOnAirDataSource.__new__(BadFakeOnAirDataSource)
+
+    # populate list with the functions that should raise exceptions when called.
+    with pytest.raises(NotImplementedError) as e_info:
+        cut.get_next()
+    assert "NotImplementedError" in e_info.__str__()
+
+def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_has_more():
+    # Act
+    cut = BadFakeOnAirDataSource.__new__(BadFakeOnAirDataSource)
+
+    # populate list with the functions that should raise exceptions when called.
+    with pytest.raises(NotImplementedError) as e_info:
+        cut.has_more()
+    assert "NotImplementedError" in e_info.__str__()
+
+def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_has_data():
+    # Act
+    cut = BadFakeOnAirDataSource.__new__(BadFakeOnAirDataSource)
+
+    # populate list with the functions that should raise exceptions when called.
+    with pytest.raises(NotImplementedError) as e_info:
+        cut.has_data()
     assert "NotImplementedError" in e_info.__str__()

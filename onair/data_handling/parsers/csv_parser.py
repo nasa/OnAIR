@@ -67,6 +67,8 @@ class CSV(OnAirDataSource):
         return self.frame_index < len(self.sim_data)
 
     # Return whether or not there is data
+    # TODO: This function may be removed with future clean-up
     def has_data(self):
         if self.sim_data == []:
             return False
+        return True
