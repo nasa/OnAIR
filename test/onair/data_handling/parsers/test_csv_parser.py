@@ -31,7 +31,7 @@ def test_CSV_process_data_file_sets_instance_all_headers_item_data_file_to_retur
 
     mocker.patch.object(pytest.cut, "parse_csv_data", return_value=forced_return_parse_csv_data)
 
-    # OnAirParser initialize normally sets all headers, so unit test must set this instead
+    # OnAirDataSource initialize normally sets all headers, so unit test must set this instead
     pytest.cut.all_headers = {}
 
     # Act
@@ -53,7 +53,7 @@ def test_CSV_process_data_file_sets_instance_all_headers_item_data_file_to_retur
 
     mocker.patch.object(pytest.cut, "parse_csv_data", return_value=forced_return_parse_csv_data)
 
-    # OnAirParser initialize normally sets all headers and sim_data, so unit test must set this instead
+    # OnAirDataSource initialize normally sets all headers and sim_data, so unit test must set this instead
     pytest.cut.all_headers = {}
     pytest.cut.sim_data = {}
 
@@ -77,7 +77,7 @@ def test_CSV_process_data_file_sets_instance_all_headers_item_data_file_to_retur
 
     mocker.patch.object(pytest.cut, "parse_csv_data", return_value=forced_return_parse_csv_data)
 
-    # OnAirParser initialize normally sets all headers and sim_data, so unit test must set this instead
+    # OnAirDataSource initialize normally sets all headers and sim_data, so unit test must set this instead
     pytest.cut.all_headers = {}
     pytest.cut.sim_data = {fake_key:{}}
 

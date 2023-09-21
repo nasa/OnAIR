@@ -76,7 +76,7 @@ def get_current_data(recv_msg, data_struct, app_name):
 
 
 class AdapterDataSource(DataSource):
-    # Data structure (shares code with binner.py)
+    # Data structure
     # TODO: Make init data structure better
     currentData = []
 

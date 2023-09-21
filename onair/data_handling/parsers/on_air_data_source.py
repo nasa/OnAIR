@@ -10,7 +10,7 @@
 from abc import ABC, abstractmethod
 from .parser_util import * 
 
-class OnAirParser(ABC):
+class OnAirDataSource(ABC):
     def __init__(self, data_file, meta_file, ss_breakdown = False):
         """An initial parsing needs to happen in order to use the parser classes
             This means that, if you want to use this class to parse in real time,
@@ -18,7 +18,9 @@ class OnAirParser(ABC):
 
         self.raw_data_file = data_file
         self.meta_data_file = meta_file
-        self.all_headers = {}
+
+
+        self.all_headers = []
         self.sim_data = {}
         self.binning_configs = {}
 
@@ -26,19 +28,42 @@ class OnAirParser(ABC):
         self.binning_configs['subsystem_assignments'] = configs['subsystem_assignments']
         self.binning_configs['test_assignments'] = configs['test_assignments']
         self.binning_configs['description_assignments'] = configs['description_assignments']
+        self.all_headers = configs['data_labels']
 
         self.process_data_file(self.raw_data_file)
-
-    @abstractmethod
-    def process_data_file(self, data_file):
-        """
-        Adjust each individual data_file before parsing into binning_configs
-        """
-        raise NotImplementedError
 
     @abstractmethod
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         """
         Create the configs that will be used to populate the binning_configs for the data files
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def process_data_file(self, data_file):
+        """
+        TODO: Comment
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_next(self):
+        """
+        Return a frame of data
+        """
+        raise NotImplementedError
+
+    # TODO: has_more and has_data are too confusing
+    @abstractmethod
+    def has_more(self):
+        """
+        Used by file-based data to indicate if there are more frames (True) or if the end of the file has been reached (False)
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def has_data(self):
+        """
+        Used by live telemetry sources to indicate if new data has come in
         """
         raise NotImplementedError

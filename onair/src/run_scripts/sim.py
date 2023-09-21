@@ -27,7 +27,6 @@ DIAGNOSIS_INTERVAL = 100
 class Simulator:
     def __init__(self, simType, dataParser, plugin_list, SBN_Flag):
         self.simulator = simType
-        vehicle = VehicleRepresentation(*dataParser.get_vehicle_metadata())
 
         if SBN_Flag:
             # TODO: This is ugly, but sbn_client is only available when built for cFS...
@@ -38,8 +37,11 @@ class Simulator:
             self.simData.connect() # this also subscribes to the msgIDs
             
         else:
-            # TODO: this will soon just be the dataParser
-            self.simData = DataSource(dataParser.get_just_data())
+            #self.simData = DataSource(dataParser.get_just_data())
+            self.simData = dataParser
+
+        headers, tests = dataParser.get_vehicle_metadata()
+        vehicle = VehicleRepresentation(headers, tests)
         self.agent = Agent(vehicle, plugin_list)
 
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
@@ -50,8 +52,9 @@ class Simulator:
         last_diagnosis = time_step
         last_fault = time_step
 
+        print("HEY, are we run_sim or not?")
         while self.simData.has_more() and time_step < MAX_STEPS:
-
+            #print("This is the loop")
             next = self.simData.get_next()
             self.agent.reason(next)
             self.IO_check(time_step, IO_Flag)
