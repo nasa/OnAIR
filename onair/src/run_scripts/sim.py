@@ -52,9 +52,7 @@ class Simulator:
         last_diagnosis = time_step
         last_fault = time_step
 
-        print("HEY, are we run_sim or not?")
         while self.simData.has_more() and time_step < MAX_STEPS:
-            #print("This is the loop")
             next = self.simData.get_next()
             self.agent.reason(next)
             self.IO_check(time_step, IO_Flag)

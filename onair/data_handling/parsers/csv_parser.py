@@ -55,8 +55,6 @@ class CSV(OnAirDataSource):
         return self.sim_data
 
     def get_vehicle_metadata(self):
-        print("get_vehicle_metadata")
-        print(self.all_headers)
         return self.all_headers, self.binning_configs['test_assignments']
 
     # Get the data at self.index and increment the index
