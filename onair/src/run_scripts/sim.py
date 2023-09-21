@@ -19,7 +19,6 @@ from ..systems.vehicle_rep import VehicleRepresentation
 from ..util.file_io import *
 from ..util.print_io import *
 from ..util.sim_io import *
-from ...data_handling.data_source import DataSource
 
 MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100

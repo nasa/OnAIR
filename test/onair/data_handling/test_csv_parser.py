@@ -11,8 +11,8 @@
 import pytest
 from mock import MagicMock
 
-import onair.data_handling.parsers.csv_parser as csv_parser
-from onair.data_handling.parsers.csv_parser import CSV
+import onair.data_handling.csv_parser as csv_parser
+from onair.data_handling.csv_parser import CSV
 
 @pytest.fixture
 def setup_teardown():

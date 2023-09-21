@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 """
-AdapterDataSource class
+SBN_Adapter class
 
 Receives messages from SBN, serves as a data source for sim.py
 """
@@ -18,7 +18,7 @@ import time
 import datetime
 import os
 
-from ...data_handling.data_source import DataSource
+from ...data_handling.on_air_data_source import OnAirDataSource
 from ctypes import *
 import sbn_client as sbn
 import message_headers as msg_hdr
@@ -75,7 +75,7 @@ def get_current_data(recv_msg, data_struct, app_name):
         AdapterDataSource.new_data = True
 
 
-class AdapterDataSource(DataSource):
+class AdapterDataSource(OnAirDataSource):
     # Data structure
     # TODO: Make init data structure better
     currentData = []

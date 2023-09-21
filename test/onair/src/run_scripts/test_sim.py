@@ -82,7 +82,6 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
     mocker.patch.object(arg_dataParser, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
     mocker.patch(sim.__name__ + '.VehicleRepresentation', return_value=fake_vehicle)
     mocker.patch.object(arg_dataParser, 'get_just_data', return_value=fake_sim_data)
-    mocker.patch(sim.__name__ + '.DataSource', return_value=fake_simData)
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act

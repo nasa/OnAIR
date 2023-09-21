@@ -11,8 +11,8 @@
 import pytest
 from mock import MagicMock
 
-import onair.data_handling.parsers.on_air_data_source as on_air_data_source
-from onair.data_handling.parsers.on_air_data_source import OnAirDataSource
+import onair.data_handling.on_air_data_source as on_air_data_source
+from onair.data_handling.on_air_data_source import OnAirDataSource
 
 
 class FakeOnAirDataSource(OnAirDataSource):

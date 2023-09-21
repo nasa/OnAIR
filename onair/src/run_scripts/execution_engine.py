@@ -113,7 +113,7 @@ class ExecutionEngine:
             pass
 
     def parse_data(self, parser_name, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
-        parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
+        parser = importlib.import_module('onair.data_handling.' + parser_file_name)
         parser_class = getattr(parser, parser_name) # This could be simplified if the parsers all extend a parser class... but this works for now
         # TODO: This will be changed on an OnAIR Data Source
         data_parser = parser_class(data_file_name, metadata_file_name, subsystems_breakdown)

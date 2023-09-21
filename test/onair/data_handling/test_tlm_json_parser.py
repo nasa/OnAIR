@@ -11,7 +11,7 @@
 import pytest
 from mock import MagicMock
 
-import onair.data_handling.parsers.tlm_json_parser as tlm_json_parser
+import onair.data_handling.tlm_json_parser as tlm_json_parser
 
 # parseTlmConfJson tests
 def test_tlm_json_parser_parseTlmConfJson_returns_configs_with_empty_dicts_when_reorg_dict_is_empty(mocker):
