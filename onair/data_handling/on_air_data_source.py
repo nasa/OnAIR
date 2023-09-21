@@ -60,10 +60,3 @@ class OnAirDataSource(ABC):
         Used by file-based data to indicate if there are more frames (True) or if the end of the file has been reached (False)
         """
         raise NotImplementedError
-
-    @abstractmethod
-    def has_data(self):
-        """
-        Used by live telemetry sources to indicate if new data has come in
-        """
-        raise NotImplementedError

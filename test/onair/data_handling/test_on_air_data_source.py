@@ -28,9 +28,6 @@ class FakeOnAirDataSource(OnAirDataSource):
     def has_more(self):
         return super().has_more()
 
-    def has_data(self):
-        return super().has_data()
-
 class IncompleteOnAirDataSource(OnAirDataSource):
     pass
 
@@ -46,9 +43,6 @@ class BadFakeOnAirDataSource(OnAirDataSource):
 
     def has_more(self):
         return super().has_more()
-
-    def has_data(self):
-        return super().has_data()
 
 @pytest.fixture
 def setup_teardown():
@@ -101,7 +95,6 @@ def test_OnAirDataSource_raises_error_because_of_unimplemented_abstract_methods(
     assert "parse_meta_data_file" in e_info.__str__()
     assert "get_next" in e_info.__str__()
     assert "has_more" in e_info.__str__()
-    assert "has_data" in e_info.__str__()
 
 # Incomplete plugin call tests
 def test_OnAirDataSource_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
@@ -116,7 +109,6 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_is_instantiated_be
     assert "parse_meta_data_file" in e_info.__str__()
     assert "get_next" in e_info.__str__()
     assert "has_more" in e_info.__str__()
-    assert "has_data" in e_info.__str__()
 
 def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_process_data_file():
     # Act
@@ -152,13 +144,4 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_met
     # populate list with the functions that should raise exceptions when called.
     with pytest.raises(NotImplementedError) as e_info:
         cut.has_more()
-    assert "NotImplementedError" in e_info.__str__()
-
-def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_has_data():
-    # Act
-    cut = BadFakeOnAirDataSource.__new__(BadFakeOnAirDataSource)
-
-    # populate list with the functions that should raise exceptions when called.
-    with pytest.raises(NotImplementedError) as e_info:
-        cut.has_data()
     assert "NotImplementedError" in e_info.__str__()

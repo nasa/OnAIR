@@ -346,32 +346,3 @@ def test_CSV_has_more_returns_false_when_index_equal_than_number_of_frames(setup
 
     # Assert
     assert result == expected_result
-
-# CSV has_data test
-def test_CSV_has_data_returns_true_sim_data_is_non_empty(setup_teardown):
-    # Arrange
-    fake_sim_data = MagicMock()
-
-    expected_result = True
-
-    pytest.cut.sim_data = fake_sim_data
-
-    # Act
-    result = pytest.cut.has_data()
-
-    # Assert
-    assert result == expected_result
-
-def test_CSV_has_data_returns_false_sim_data_is_empty(setup_teardown):
-    # Arrange
-    fake_sim_data = []
-
-    expected_result = False
-
-    pytest.cut.sim_data = fake_sim_data
-
-    # Act
-    result = pytest.cut.has_data()
-
-    # Assert
-    assert result == expected_result
