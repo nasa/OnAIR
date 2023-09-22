@@ -30,8 +30,6 @@ class CSV(OnAirDataSource):
         dataset = pd.read_csv(data_file, delimiter=',', header=0, dtype=str)
         dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
 
-        # all_headers = list(dataset.columns.values)
-
         #Initialize the entire data dictionary
         all_data = []
         for index, row in dataset.iterrows():

@@ -19,7 +19,6 @@ class OnAirDataSource(ABC):
         self.raw_data_file = data_file
         self.meta_data_file = meta_file
 
-
         self.all_headers = []
         self.sim_data = {}
         self.binning_configs = {}
@@ -42,7 +41,7 @@ class OnAirDataSource(ABC):
     @abstractmethod
     def process_data_file(self, data_file):
         """
-        TODO: Comment
+        Read data frames from the specified file.
         """
         raise NotImplementedError
 
@@ -53,7 +52,6 @@ class OnAirDataSource(ABC):
         """
         raise NotImplementedError
 
-    # TODO: has_more and has_data are too confusing
     @abstractmethod
     def has_more(self):
         """
