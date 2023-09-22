@@ -24,20 +24,9 @@ MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100
 
 class Simulator:
-    def __init__(self, simType, dataParser, plugin_list, SBN_Flag):
+    def __init__(self, simType, dataParser, plugin_list):
         self.simulator = simType
-
-        if SBN_Flag:
-            # TODO: This is ugly, but sbn_client is only available when built for cFS...
-            # ...from sbn_adapter import AdapterDataSource
-            sbn_adapter = importlib.import_module('onair.src.run_scripts.sbn_adapter')
-            AdapterDataSource = getattr(sbn_adapter, 'AdapterDataSource')
-            self.simData = AdapterDataSource(dataParser.get_just_data())
-            self.simData.connect() # this also subscribes to the msgIDs
-            
-        else:
-            #self.simData = DataSource(dataParser.get_just_data())
-            self.simData = dataParser
+        self.simData = dataParser
 
         headers, tests = dataParser.get_vehicle_metadata()
         vehicle = VehicleRepresentation(headers, tests)
