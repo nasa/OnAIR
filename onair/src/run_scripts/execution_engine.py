@@ -46,7 +46,6 @@ class ExecutionEngine:
         # Init parsing/sim info
         self.parser_file_name = ''
         self.parser_name = ''
-        self.sim_name = ''
         self.simDataParser = None
         self.sim = None
 
@@ -80,7 +79,6 @@ class ExecutionEngine:
             ## Parse Required Data: Names
             self.parser_file_name = config['DEFAULT']['ParserFileName']
             self.parser_name = config['DEFAULT']['ParserName']
-            self.sim_name = config['DEFAULT']['SimName']
 
             ## Parse Required Data: Plugin name to path dict
             config_plugin_list = config['DEFAULT']['PluginList']
@@ -117,7 +115,7 @@ class ExecutionEngine:
         self.simDataParser = data_parser
 
     def setup_sim(self):
-        self.sim = Simulator(self.sim_name, self.simDataParser, self.plugin_list)
+        self.sim = Simulator(self.simDataParser, self.plugin_list)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath

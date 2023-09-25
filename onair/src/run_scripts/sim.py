@@ -24,8 +24,7 @@ MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100
 
 class Simulator:
-    def __init__(self, simType, dataParser, plugin_list):
-        self.simulator = simType
+    def __init__(self, dataParser, plugin_list):
         self.simData = dataParser
 
         headers, tests = dataParser.get_vehicle_metadata()
