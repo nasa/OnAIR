@@ -57,6 +57,7 @@ def parseTlmConfJson(file_path):
     configs['subsystem_assignments'] = subsys_assignments
     configs['test_assignments'] = mnemonic_tests
     configs['description_assignments'] = descriptions
+    configs['data_labels'] = labels
     
     return configs
 

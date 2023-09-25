@@ -35,7 +35,6 @@ def test_ExecutionEngine__init__sets_expected_values_but_does_no_calls_when_conf
     assert cut.run_name == arg_run_name
     assert cut.IO_Flag == False
     assert cut.Dev_Flag == False
-    assert cut.SBN_Flag == False
     assert cut.Viz_Flag == False
     assert cut.dataFilePath == ''
     assert cut.telemetryFile == ''
@@ -298,7 +297,6 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     fake_config_read_result.__len__.return_value = 1
     fake_IO_flags = MagicMock()
     fake_Dev_flags = MagicMock()
-    fake_SBN_flags = MagicMock()
     fake_Viz_flags = MagicMock()
     fake_plugin_dict= MagicMock()
     fake_keys = MagicMock()
@@ -312,7 +310,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
-    mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
+    mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_Viz_flags])
     mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_list)
     mocker.patch(execution_engine.__name__ + '.isinstance', return_value=True)
     mocker.patch(execution_engine.__name__ + '.ast.literal_eval', return_value=fake_temp_plugin_list)
@@ -338,14 +336,12 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     assert cut.parser_name == fake_default['ParserName']
     assert cut.sim_name == fake_default['SimName']
     assert cut.plugin_list == fake_temp_plugin_list
-    assert fake_run_flags.getboolean.call_count == 4
+    assert fake_run_flags.getboolean.call_count == 3
     assert fake_run_flags.getboolean.call_args_list[0].args == ('IO_Flag', )
     assert cut.IO_Flag == fake_IO_flags
     assert fake_run_flags.getboolean.call_args_list[1].args == ('Dev_Flag', )
     assert cut.Dev_Flag == fake_Dev_flags
-    assert fake_run_flags.getboolean.call_args_list[2].args == ('SBN_Flag', )
-    assert cut.SBN_Flag == fake_SBN_flags
-    assert fake_run_flags.getboolean.call_args_list[3].args == ('Viz_Flag', )
+    assert fake_run_flags.getboolean.call_args_list[2].args == ('Viz_Flag', )
     assert cut.Viz_Flag == fake_Viz_flags
 
 def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_error(mocker):
@@ -370,7 +366,6 @@ def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_er
     fake_config_read_result.__len__.return_value = 1
     fake_IO_flags = MagicMock()
     fake_Dev_flags = MagicMock()
-    fake_SBN_flags = MagicMock()
     fake_Viz_flags = MagicMock()
     fake_plugin_dict = MagicMock()
     fake_keys = MagicMock()
@@ -384,7 +379,7 @@ def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_er
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
-    mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_SBN_flags, fake_Viz_flags])
+    mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_Viz_flags])
     mocker.patch('ast.literal_eval',return_value=fake_plugin_dict)
     mocker.patch.object(fake_plugin_dict, 'keys', return_value=fake_keys)
     mocker.patch.object(fake_plugin_dict, '__getitem__', return_value=fake_path)
@@ -446,14 +441,12 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     arg_subsystems_breakdown = MagicMock()
 
     class FakeParser:
-        def __init__(self, data_file, metad_file, subsystems_breakdown):
+        def __init__(self, data_file, metadata_file, subsystems_breakdown):
             pass
 
     fake_parser = MagicMock()
     fake_parser_class = FakeParser
     fake_parser_class_instance = MagicMock()
-    fake_run_path = str(MagicMock())
-    fake_environ = {'RUN_PATH':fake_run_path}
     fake_parsed_data = MagicMock()
 
     cut = ExecutionEngine.__new__(ExecutionEngine)
@@ -462,7 +455,6 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
 
     mocker.patch(execution_engine.__name__ + '.importlib.import_module', return_value=fake_parser)
     mocker.patch(execution_engine.__name__ + '.getattr', return_value=fake_parser_class)
-    mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
     mocker.patch.object(fake_parser_class, '__new__', return_value=fake_parser_class_instance)
 
     # Act
@@ -475,7 +467,7 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     assert execution_engine.getattr.call_args_list[0].args == (fake_parser, arg_parser_name,)
     assert cut.simDataParser == fake_parser_class_instance
     assert fake_parser_class.__new__.call_count == 1
-    assert fake_parser_class.__new__.call_args_list[0].args == (fake_parser_class, fake_run_path + arg_dataFile, fake_run_path + arg_metadataFile, arg_subsystems_breakdown, )
+    assert fake_parser_class.__new__.call_args_list[0].args == (fake_parser_class, arg_dataFile, arg_metadataFile, arg_subsystems_breakdown, )
 
     # subsystems_breakdown
 
@@ -523,7 +515,6 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_and_sets_bench
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.sim_name = MagicMock()
     cut.simDataParser = MagicMock()
-    cut.SBN_Flag = MagicMock()
     cut.benchmarkFiles = MagicMock()
     cut.benchmarkFilePath = MagicMock()
     cut.benchmarkIndices = MagicMock()
@@ -549,7 +540,7 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_and_sets_bench
 
     # Assert
     assert execution_engine.Simulator.call_count == 1
-    assert execution_engine.Simulator.call_args_list[0].args == (cut.sim_name, cut.simDataParser, cut.plugin_list, cut.SBN_Flag)
+    assert execution_engine.Simulator.call_args_list[0].args == (cut.sim_name, cut.simDataParser, cut.plugin_list)
     assert cut.sim == fake_sim
     assert execution_engine.ast.literal_eval.call_count == 2
     assert execution_engine.ast.literal_eval.call_args_list[0].args == (cut.benchmarkFiles, )
@@ -564,7 +555,6 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_s
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.sim_name = MagicMock()
     cut.simDataParser = MagicMock()
-    cut.SBN_Flag = MagicMock()
     cut.benchmarkFiles = MagicMock()
     cut.benchmarkFilePath = MagicMock()
     cut.benchmarkIndices = MagicMock()
@@ -589,7 +579,7 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_s
 
     # Assert
     assert execution_engine.Simulator.call_count == 1
-    assert execution_engine.Simulator.call_args_list[0].args == (cut.sim_name, cut.simDataParser,  cut.plugin_list, cut.SBN_Flag)
+    assert execution_engine.Simulator.call_args_list[0].args == (cut.sim_name, cut.simDataParser,  cut.plugin_list)
     assert cut.sim == fake_sim
     assert execution_engine.ast.literal_eval.call_count == 1
     assert execution_engine.ast.literal_eval.call_args_list[0].args == (cut.benchmarkFiles, )

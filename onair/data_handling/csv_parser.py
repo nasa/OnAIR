@@ -14,15 +14,15 @@ CSV Parser
 import os
 import pandas as pd
 
-from .on_air_parser import OnAirParser
-from ...src.util.print_io import *
+from .on_air_data_source import OnAirDataSource
+from ..src.util.print_io import *
 from .parser_util import * 
 
-class CSV(OnAirParser):
+class CSV(OnAirDataSource):
+
     def process_data_file(self, data_file):
-        labels, data = self.parse_csv_data(data_file)
-        self.all_headers = labels
-        self.sim_data = data
+        self.sim_data = self.parse_csv_data(data_file)
+        self.frame_index = 0
 
 ##### INITIAL PROCESSING ####
     def parse_csv_data(self, data_file):
@@ -30,25 +30,20 @@ class CSV(OnAirParser):
         dataset = pd.read_csv(data_file, delimiter=',', header=0, dtype=str)
         dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
 
-        all_headers = list(dataset.columns.values)
-        #Find the 'Time' header in the list in order to match 42 file formatting 
-        # Converting
-        upperCaseStringHeaders = [x.upper().strip() for x in all_headers if isinstance(x, str)]
-
         #Initialize the entire data dictionary
         all_data = []
         for index, row in dataset.iterrows():
             rowVals = floatify_input(list(row))
             all_data.append(floatify_input(list(row)))
 
-        return all_headers, all_data 
+        return all_data
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
-        parsed_configs = extract_meta_data(meta_data_file)
+        parsed_meta_data = extract_meta_data(meta_data_file)
         if ss_breakdown == False:
-            num_elements = len(parsed_configs['subsystem_assignments'])
-            parsed_configs['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
-        return parsed_configs
+            num_elements = len(parsed_meta_data['subsystem_assignments'])
+            parsed_meta_data['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
+        return parsed_meta_data
 
 ##### GETTERS ##################################
     def get_sim_data(self):
@@ -59,3 +54,12 @@ class CSV(OnAirParser):
 
     def get_vehicle_metadata(self):
         return self.all_headers, self.binning_configs['test_assignments']
+
+    # Get the data at self.index and increment the index
+    def get_next(self):
+        self.frame_index = self.frame_index + 1
+        return self.sim_data[self.frame_index - 1]
+
+    # Return whether or not the index has finished traveling through the data
+    def has_more(self):
+        return self.frame_index < len(self.sim_data)

@@ -30,7 +30,6 @@ class ExecutionEngine:
         # Init Flags 
         self.IO_Flag = False
         self.Dev_Flag = False
-        self.SBN_Flag = False
         self.Viz_Flag = False
         
         # Init Paths 
@@ -101,7 +100,6 @@ class ExecutionEngine:
         ## Parse Optional Data: Flags
         self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
         self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
-        self.SBN_Flag = config['RUN_FLAGS'].getboolean('SBN_Flag')
         self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
         
         ## Parse Optional Data: Benchmarks
@@ -113,17 +111,13 @@ class ExecutionEngine:
             pass
 
     def parse_data(self, parser_name, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
-        parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
+        parser = importlib.import_module('onair.data_handling.' + parser_file_name)
         parser_class = getattr(parser, parser_name) # This could be simplified if the parsers all extend a parser class... but this works for now
-        # TODO: should this us os.path.join?
-        tm_data_path = os.environ['RUN_PATH'] + data_file_name
-        tm_metadata_path = os.environ['RUN_PATH'] +  metadata_file_name
-        # TODO: This will be changed on an OnAIR Data Source
-        data_parser = parser_class(tm_data_path, tm_metadata_path, subsystems_breakdown)
+        data_parser = parser_class(data_file_name, metadata_file_name, subsystems_breakdown)
         self.simDataParser = data_parser
 
     def setup_sim(self):
-        self.sim = Simulator(self.sim_name, self.simDataParser, self.plugin_list, self.SBN_Flag)
+        self.sim = Simulator(self.sim_name, self.simDataParser, self.plugin_list)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath

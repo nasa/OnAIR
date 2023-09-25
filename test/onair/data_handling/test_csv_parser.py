@@ -11,8 +11,8 @@
 import pytest
 from mock import MagicMock
 
-import onair.data_handling.parsers.csv_parser as csv_parser
-from onair.data_handling.parsers.csv_parser import CSV
+import onair.data_handling.csv_parser as csv_parser
+from onair.data_handling.csv_parser import CSV
 
 @pytest.fixture
 def setup_teardown():
@@ -20,76 +20,23 @@ def setup_teardown():
     yield 'setup_teardown'
 
 # process_data_per_data_file tests
-def test_CSV_process_data_file_sets_instance_all_headers_item_data_file_to_returned_labels_item_data_file_when_returned_data_is_empty(mocker, setup_teardown):
+def test_CSV_process_data_file_sets_sim_data_to_parse_csv_data_return_and_frame_index_to_zero(mocker, setup_teardown):
     # Arrange
     arg_data_file = MagicMock()
 
-    fake_label_data_file_item = MagicMock()
-    fake_labels = {arg_data_file:fake_label_data_file_item}
-    fake_data = []
-    forced_return_parse_csv_data = [fake_labels, fake_data]
+    forced_return_parse_csv_data = MagicMock()
 
     mocker.patch.object(pytest.cut, "parse_csv_data", return_value=forced_return_parse_csv_data)
-
-    # OnAirParser initialize normally sets all headers, so unit test must set this instead
-    pytest.cut.all_headers = {}
 
     # Act
     pytest.cut.process_data_file(arg_data_file)
 
     # Assert
-    assert pytest.cut.all_headers[arg_data_file] == fake_label_data_file_item
-
-def test_CSV_process_data_file_sets_instance_all_headers_item_data_file_to_returned_labels_item_data_file_and_when_data_key_is_not_in_sim_data_sets_item_key_to_dict_and_key_item_data_file_item_to_data_key_item_data_file_item(mocker, setup_teardown):
-    # Arrange
-    arg_data_file = MagicMock()
-
-    fake_label_data_file_item = MagicMock()
-    fake_labels = {arg_data_file:fake_label_data_file_item}
-    fake_key_data_file_item = MagicMock()
-    fake_key = MagicMock()
-    fake_data = {fake_key:{arg_data_file:fake_key_data_file_item}}
-    forced_return_parse_csv_data = [fake_labels, fake_data]
-
-    mocker.patch.object(pytest.cut, "parse_csv_data", return_value=forced_return_parse_csv_data)
-
-    # OnAirParser initialize normally sets all headers and sim_data, so unit test must set this instead
-    pytest.cut.all_headers = {}
-    pytest.cut.sim_data = {}
-
-    # Act
-    pytest.cut.process_data_file(arg_data_file)
-
-    # Assert
-    assert pytest.cut.all_headers[arg_data_file] == fake_label_data_file_item
-    assert pytest.cut.sim_data[fake_key][arg_data_file] == fake_key_data_file_item
-
-def test_CSV_process_data_file_sets_instance_all_headers_item_data_file_to_returned_labels_item_data_file_and_when_data_key_is_already_in_sim_data_sets_item_key_to_dict_and_key_item_data_file_item_to_data_key_item_data_file_item(mocker, setup_teardown):
-    # Arrange
-    arg_data_file = MagicMock()
-
-    fake_label_data_file_item = MagicMock()
-    fake_labels = {arg_data_file:fake_label_data_file_item}
-    fake_key_data_file_item = MagicMock()
-    fake_key = MagicMock()
-    fake_data = {fake_key:{arg_data_file:fake_key_data_file_item}}
-    forced_return_parse_csv_data = [fake_labels, fake_data]
-
-    mocker.patch.object(pytest.cut, "parse_csv_data", return_value=forced_return_parse_csv_data)
-
-    # OnAirParser initialize normally sets all headers and sim_data, so unit test must set this instead
-    pytest.cut.all_headers = {}
-    pytest.cut.sim_data = {fake_key:{}}
-
-    # Act
-    pytest.cut.process_data_file(arg_data_file)
-
-    # Assert
-    assert pytest.cut.all_headers[arg_data_file] == fake_label_data_file_item
-    assert pytest.cut.sim_data[fake_key][arg_data_file] == fake_key_data_file_item
+    assert pytest.cut.sim_data == forced_return_parse_csv_data
+    assert pytest.cut.frame_index == 0
 
 # CSV parse_csv_data tests
-def test_CSV_parse_csv_data_returns_tuple_of_empty_lists_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_empty(mocker, setup_teardown):
+def test_CSV_parse_csv_data_returns_empty_list_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_empty(mocker, setup_teardown):
     # Arrange
     arg_dataFile = MagicMock()
 
@@ -104,7 +51,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_empty_lists_when_parsed_dataset_fro
     fake_second_data_set.columns = MagicMock()
     fake_second_data_set.columns.values = set()
 
-    expected_result = ([], [])
+    expected_result = []
 
     mocker.patch(csv_parser.__name__ + '.pd.read_csv', return_value=fake_initial_data_set)
     mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
@@ -124,7 +71,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_empty_lists_when_parsed_dataset_fro
     assert fake_initial_data_set.loc.__getitem__.call_args_list[0].args[0][1] == ~forced_return_contains
     assert result == expected_result
 
-def test_CSV_parse_csv_data_returns_tuple_of_empty_list_of_headers_and_list_of_row_values_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_iterator(mocker, setup_teardown):
+def test_CSV_parse_csv_data_returns_list_of_row_values_when_parsed_dataset_from_given_dataFile_call_to_iterrows_returns_iterator(mocker, setup_teardown):
     # Arrange
     arg_dataFile = MagicMock()
 
@@ -150,7 +97,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_empty_list_of_headers_and_list_of_r
         expected_result_list.append(fake_row_values)
     forced_return_iterrows = iter(fake_iterrows)
     
-    expected_result = ([], expected_result_list)
+    expected_result = expected_result_list
 
     mocker.patch(csv_parser.__name__ + '.pd.read_csv', return_value=fake_initial_data_set)
     mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
@@ -168,7 +115,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_empty_list_of_headers_and_list_of_r
     assert fake_columns_str.contains.call_args_list[0].args == ('^Unnamed', )
     assert result == expected_result
 
-def test_CSV_parse_csv_data_returns_tuple_of_list_of_headers_and_list_of_data_frames_call_to_iterrows_returns_iterator_and_column_names_exist(mocker, setup_teardown):
+def test_CSV_parse_csv_data_returns_list_of_data_frames_call_to_iterrows_returns_iterator_and_column_names_exist(mocker, setup_teardown):
     # Arrange
     arg_dataFile = MagicMock()
 
@@ -196,7 +143,7 @@ def test_CSV_parse_csv_data_returns_tuple_of_list_of_headers_and_list_of_data_fr
         expected_result_dict.append(fake_row_values)
     forced_return_iterrows = iter(fake_iterrows)
     
-    expected_result = (fake_second_data_set.columns.values, expected_result_dict)
+    expected_result = expected_result_dict
 
     mocker.patch(csv_parser.__name__ + '.pd.read_csv', return_value=fake_initial_data_set)
     mocker.patch.object(fake_columns_str, 'contains', return_value=forced_return_contains)
@@ -339,6 +286,63 @@ def test_CSV_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assig
 
     # Act
     result = pytest.cut.get_vehicle_metadata()
+
+    # Assert
+    assert result == expected_result
+
+# CSV get_next test
+def test_CSV_get_next_increments_index_and_returns_current_frame_of_data(setup_teardown):
+    # Arrange
+    fake_frame_index = 10
+    fake_sim_data = []
+    for i in range(fake_frame_index + 1):
+        fake_sim_data.append(MagicMock())
+
+    expected_result = fake_sim_data[fake_frame_index]
+
+    pytest.cut.frame_index = fake_frame_index
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.get_next()
+
+    # Assert
+    assert result == expected_result
+    assert pytest.cut.frame_index == fake_frame_index + 1
+
+# CSV has_more test
+def test_CSV_has_more_returns_true_when_index_less_than_number_of_frames(setup_teardown):
+    # Arrange
+    fake_frame_index = 10
+    fake_sim_data = []
+    for i in range(fake_frame_index + 1):
+        fake_sim_data.append(MagicMock())
+
+    expected_result = True
+
+    pytest.cut.frame_index = 5
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.has_more()
+
+    # Assert
+    assert result == expected_result
+
+def test_CSV_has_more_returns_false_when_index_equal_than_number_of_frames(setup_teardown):
+    # Arrange
+    fake_frame_index = 10
+    fake_sim_data = []
+    for i in range(fake_frame_index):
+        fake_sim_data.append(MagicMock())
+
+    expected_result = False
+
+    pytest.cut.frame_index = fake_frame_index
+    pytest.cut.sim_data = fake_sim_data
+
+    # Act
+    result = pytest.cut.has_more()
 
     # Assert
     assert result == expected_result

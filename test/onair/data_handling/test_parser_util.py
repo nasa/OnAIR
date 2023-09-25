@@ -11,7 +11,7 @@
 import pytest
 from mock import MagicMock
 
-import onair.data_handling.parsers.parser_util as parser_util
+import onair.data_handling.parser_util as parser_util
 
 # extract_meta_data tests
 def test_parser_util_extract_meta_data_raises_error_when_given_blank_meta_data_file():
