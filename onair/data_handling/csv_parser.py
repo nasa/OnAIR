@@ -39,11 +39,7 @@ class DataSource(OnAirDataSource):
         return all_data
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
-        parsed_meta_data = extract_meta_data(meta_data_file)
-        if ss_breakdown == False:
-            num_elements = len(parsed_meta_data['subsystem_assignments'])
-            parsed_meta_data['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
-        return parsed_meta_data
+        return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
 
 ##### GETTERS ##################################
 

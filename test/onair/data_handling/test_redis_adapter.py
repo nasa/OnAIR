@@ -307,84 +307,26 @@ def test_redis_adapter_DataSource_has_data_returns_instance_new_data():
 
     assert result == expected_result
 
-# redis_adapter parse_meta_data tests # TODO: need to be moved to a util function
-def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_file_given_metadata_file_and_csv_set_to_True_when_given_ss_breakdown_does_not_resolve_to_False(mocker):
+# redis_adapter parse_meta_data tests
+def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_handle_ss_breakdown(mocker):
     # Arrange
     cut = DataSource.__new__(DataSource)
     arg_configFile = MagicMock()
-    arg_ss_breakdown = True if pytest.gen.randint(0, 1) else MagicMock()
+    arg_ss_breakdown = MagicMock()
 
     expected_result = MagicMock()
 
-    mocker.patch(redis_adapter.__name__ + '.extract_meta_data', return_value=expected_result)
+    mocker.patch(redis_adapter.__name__ + '.extract_meta_data_handle_ss_breakdown', return_value=expected_result)
     mocker.patch(redis_adapter.__name__ + '.len')
 
     # Act
-    result = cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown)
+    result = cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown, )
 
     # Assert
-    assert redis_adapter.extract_meta_data.call_count == 1
-    assert redis_adapter.extract_meta_data.call_args_list[0].args == (arg_configFile, )
+    assert redis_adapter.extract_meta_data_handle_ss_breakdown.call_count == 1
+    assert redis_adapter.extract_meta_data_handle_ss_breakdown.call_args_list[0].args == (arg_configFile, arg_ss_breakdown)
     assert redis_adapter.len.call_count == 0
     assert result == expected_result
-
-def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_file_given_metadata_file_and_csv_set_to_True_with_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_empty_list_when_len_of_call_value_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_is_0_when_given_ss_breakdown_evaluates_to_False(mocker):
-    # Arrange
-    cut = DataSource.__new__(DataSource)
-    arg_configFile = MagicMock()
-    arg_ss_breakdown = False if pytest.gen.randint(0, 1) else 0
-
-    forced_return_extract_meta_data = {}
-    forced_return_len = 0
-    fake_empty_processed_filepath = MagicMock()
-    forced_return_extract_meta_data['subsystem_assignments'] = fake_empty_processed_filepath
-
-    expected_result = []
-
-    mocker.patch(redis_adapter.__name__ + '.extract_meta_data', return_value=forced_return_extract_meta_data)
-    mocker.patch(redis_adapter.__name__ + '.len', return_value=forced_return_len)
-
-    # Act
-    result = cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown)
-
-    # Assert
-    assert redis_adapter.extract_meta_data.call_count == 1
-    assert redis_adapter.extract_meta_data.call_args_list[0].args == (arg_configFile, )
-    assert redis_adapter.len.call_count == 1
-    assert redis_adapter.len.call_args_list[0].args == (fake_empty_processed_filepath, )
-    assert result['subsystem_assignments'] == expected_result
-
-def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_given_metadata_file_and_csv_set_to_True_with_dict_def_subsystem_assignments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_single_item_list_str_MISSION_for_each_item_when_given_ss_breakdown_evaluates_to_False(mocker):
-    # Arrange
-    cut = DataSource.__new__(DataSource)
-    arg_configFile = MagicMock()
-    arg_ss_breakdown = False if pytest.gen.randint(0, 1) else 0
-
-    forced_return_extract_meta_data = {}
-    forced_return_process_filepath = MagicMock()
-    fake_processed_filepath = []
-    num_fake_processed_filepaths = pytest.gen.randint(1,10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_processed_filepaths):
-        fake_processed_filepath.append(i)
-    forced_return_extract_meta_data['subsystem_assignments'] = fake_processed_filepath
-    forced_return_len = num_fake_processed_filepaths
-
-    expected_result = []
-    for i in range(num_fake_processed_filepaths):
-        expected_result.append(['MISSION'])
-
-    mocker.patch(redis_adapter.__name__ + '.extract_meta_data', return_value=forced_return_extract_meta_data)
-    mocker.patch(redis_adapter.__name__ + '.len', return_value=forced_return_len)
-
-    # Act
-    result = cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown)
-
-    # Assert
-    assert redis_adapter.extract_meta_data.call_count == 1
-    assert redis_adapter.extract_meta_data.call_args_list[0].args == (arg_configFile, )
-    assert redis_adapter.len.call_count == 1
-    assert redis_adapter.len.call_args_list[0].args == (fake_processed_filepath, )
-    assert result['subsystem_assignments'] == expected_result
 
 # redis_adapter get_vehicle_metadata tests
 def test_redis_adapter_DataSource_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assignments():
