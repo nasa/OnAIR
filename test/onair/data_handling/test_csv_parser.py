@@ -12,11 +12,11 @@ import pytest
 from mock import MagicMock
 
 import onair.data_handling.csv_parser as csv_parser
-from onair.data_handling.csv_parser import CSV
+from onair.data_handling.csv_parser import DataSource
 
 @pytest.fixture
 def setup_teardown():
-    pytest.cut = CSV.__new__(CSV)
+    pytest.cut = DataSource.__new__(DataSource)
     yield 'setup_teardown'
 
 # process_data_per_data_file tests
