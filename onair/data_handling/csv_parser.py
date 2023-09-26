@@ -14,11 +14,11 @@ CSV Parser
 import os
 import pandas as pd
 
-from .on_air_data_source import OnAirDataSource
-from ..src.util.print_io import *
-from .parser_util import * 
+from onair.data_handling.on_air_data_source import OnAirDataSource
+from onair.src.util.print_io import *
+from onair.data_handling.parser_util import *
 
-class CSV(OnAirDataSource):
+class DataSource(OnAirDataSource):
 
     def process_data_file(self, data_file):
         self.sim_data = self.parse_csv_data(data_file)
