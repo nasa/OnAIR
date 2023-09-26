@@ -46,11 +46,6 @@ class DataSource(OnAirDataSource):
         return parsed_meta_data
 
 ##### GETTERS ##################################
-    def get_sim_data(self):
-        return self.all_headers, self.sim_data, self.binning_configs
-
-    def get_just_data(self):
-        return self.sim_data
 
     def get_vehicle_metadata(self):
         return self.all_headers, self.binning_configs['test_assignments']
