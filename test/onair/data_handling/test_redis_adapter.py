@@ -9,24 +9,33 @@
 import pytest
 from mock import MagicMock
 
-import onair.src.run_scripts.redis_adapter as redis_adapter
-from onair.src.run_scripts.redis_adapter import AdapterDataSource
+import onair.data_handling.redis_adapter as redis_adapter
+from onair.data_handling.redis_adapter import DataSource
+from onair.data_handling.on_air_data_source import OnAirDataSource
 
 import redis
 import threading
 
 # __init__ tests
-def test_redis_adapter_AdapterDataSource__init__sets_all_3_redis_arguments_for_later_use():
+def test_redis_adapter_DataSource__init__sets_all_3_redis_arguments_for_later_use(mocker):
     # Arrange
     expected_address = 'localhost'
     expected_port = 6379
     expected_db = 0
     expected_server = None
 
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    arg_data_file = MagicMock()
+    arg_meta_file = MagicMock()
+    arg_ss_breakdown = MagicMock()
+
+    fake_super = MagicMock()
+
+    cut = DataSource.__new__(DataSource)
+
+    mocker.patch.object(OnAirDataSource, '__init__', new=MagicMock())
 
     # Act
-    cut.__init__()
+    cut.__init__(arg_data_file, arg_meta_file, arg_ss_breakdown)
 
     # Assert
     assert cut.address == expected_address
@@ -35,14 +44,14 @@ def test_redis_adapter_AdapterDataSource__init__sets_all_3_redis_arguments_for_l
     assert cut.server == expected_server
 
 # connect tests
-def test_redis_adapter_AdapterDataSource_connect_establishes_server_with_initialized_attributes(mocker):
+def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_attributes(mocker):
     # Arrange
     expected_address = MagicMock()
     expected_port = MagicMock()
     expected_db = MagicMock()
     fake_server = MagicMock()
     
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    cut = DataSource.__new__(DataSource)
     cut.address = expected_address
     cut.port = expected_port
     cut.db = expected_db
@@ -58,14 +67,14 @@ def test_redis_adapter_AdapterDataSource_connect_establishes_server_with_initial
     assert cut.server == fake_server
 
 # subscribe_message tests
-def test_redis_adapter_AdapterDataSource_subscribe_message_and_thread_start_success_when_server_available(mocker):
+def test_redis_adapter_DataSource_subscribe_message_and_thread_start_success_when_server_available(mocker):
     # Arrange
     arg_channel = str(MagicMock())
     fake_server = MagicMock()
     fake_pubsub = MagicMock()
     fake_subscription = MagicMock()
     fake_thread = MagicMock()
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    cut = DataSource.__new__(DataSource)
     cut.server = fake_server
 
     mocker.patch.object(fake_server, 'ping', return_value=True)
@@ -87,14 +96,14 @@ def test_redis_adapter_AdapterDataSource_subscribe_message_and_thread_start_succ
     assert fake_thread.start.call_count == 1
     assert cut.pubsub == fake_pubsub
 
-def test_redis_adapter_AdapterDataSource_subscribe_message_does_nothing_on_False(mocker):
+def test_redis_adapter_DataSource_subscribe_message_does_nothing_on_False(mocker):
     # Arrange
     arg_channel = str(MagicMock())
     fake_server = MagicMock()
     initial_pubsub = MagicMock()
     fake_subscription = MagicMock()
     fake_thread = MagicMock()
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    cut = DataSource.__new__(DataSource)
     cut.server = fake_server
     cut.pubsub = initial_pubsub
 
@@ -115,10 +124,10 @@ def test_redis_adapter_AdapterDataSource_subscribe_message_does_nothing_on_False
 
 # get_next tests
 
-def test_redis_adapter_AdapterDataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_0():
+def test_redis_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_0():
     # Arrange
-    # Renew AdapterDataSource to ensure test independence
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    # Renew DataSource to ensure test independence
+    cut = DataSource.__new__(DataSource)
     cut.new_data = True
     cut.new_data_lock = MagicMock()
     cut.double_buffer_read_index = 0
@@ -136,10 +145,10 @@ def test_redis_adapter_AdapterDataSource_get_next_returns_expected_data_when_new
     assert cut.double_buffer_read_index == 1
     assert result == expected_result
 
-def test_redis_adapter_AdapterDataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_1():
+def test_redis_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_1():
     # Arrange
-    # Renew AdapterDataSource to ensure test independence
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    # Renew DataSource to ensure test independence
+    cut = DataSource.__new__(DataSource)
     cut.new_data = True
     cut.new_data_lock = MagicMock()
     cut.double_buffer_read_index = 1
@@ -157,10 +166,10 @@ def test_redis_adapter_AdapterDataSource_get_next_returns_expected_data_when_new
     assert cut.double_buffer_read_index == 0
     assert result == expected_result
 
-def test_redis_adapter_AdapterDataSource_get_next_when_called_multiple_times_when_new_data_is_true():
+def test_redis_adapter_DataSource_get_next_when_called_multiple_times_when_new_data_is_true():
     # Arrange
-    # Renew AdapterDataSource to ensure test independence
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    # Renew DataSource to ensure test independence
+    cut = DataSource.__new__(DataSource)
     cut.double_buffer_read_index = pytest.gen.randint(0,1)
     cut.new_data_lock = MagicMock()
     cut.currentData = [MagicMock(), MagicMock()]
@@ -186,10 +195,10 @@ def test_redis_adapter_AdapterDataSource_get_next_when_called_multiple_times_whe
         results[i] = expected_data[i]
     assert cut.double_buffer_read_index == (num_calls + pre_call_index) % 2
     
-def test_redis_adapter_AdapterDataSource_get_next_waits_until_data_is_available(mocker):
+def test_redis_adapter_DataSource_get_next_waits_until_data_is_available(mocker):
     # Arrange
-    # Renew AdapterDataSource to ensure test independence
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    # Renew DataSource to ensure test independence
+    cut = DataSource.__new__(DataSource)
     cut.new_data_lock = MagicMock()
     cut.double_buffer_read_index = pytest.gen.randint(0,1)
     pre_call_index = cut.double_buffer_read_index
@@ -227,14 +236,14 @@ def test_redis_adapter_AdapterDataSource_get_next_waits_until_data_is_available(
     assert result == expected_result
 
 # has_more tests
-def test_redis_adapter_AdapterDataSource_has_more_always_returns_True():
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+def test_redis_adapter_DataSource_has_more_always_returns_True():
+    cut = DataSource.__new__(DataSource)
     assert cut.has_more() == True
 
 # message_listener tests
-def test_redis_adapter_AdapterDataSource_message_listener_does_not_load_json_when_receive_type_is_not_message(mocker):
+def test_redis_adapter_DataSource_message_listener_does_not_load_json_when_receive_type_is_not_message(mocker):
     # Arrange
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    cut = DataSource.__new__(DataSource)
     ignored_message_types = ['subscribe', 'unsubscribe', 'psubscribe', 'punsubscribe', 'pmessage']
     fake_message = {}
     fake_message['type'] = pytest.gen.choice(ignored_message_types)
@@ -249,9 +258,9 @@ def test_redis_adapter_AdapterDataSource_message_listener_does_not_load_json_whe
     # Assert
     assert redis_adapter.json.loads.call_count == 0
 
-def test_redis_adapter_AdapterDataSource_message_listener_loads_message_info_when_receive_type_is_message(mocker):
+def test_redis_adapter_DataSource_message_listener_loads_message_info_when_receive_type_is_message(mocker):
     # Arrange
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+    cut = DataSource.__new__(DataSource)
     cut.new_data_lock = MagicMock()
     cut.new_data = None
     cut.double_buffer_read_index = pytest.gen.randint(0,1)
@@ -289,8 +298,8 @@ def test_redis_adapter_AdapterDataSource_message_listener_loads_message_info_whe
     assert cut.new_data == True
 
 # has_data tests
-def test_redis_adapter_AdapterDataSource_has_data_returns_instance_new_data():
-    cut = AdapterDataSource.__new__(AdapterDataSource)
+def test_redis_adapter_DataSource_has_data_returns_instance_new_data():
+    cut = DataSource.__new__(DataSource)
     expected_result = MagicMock()
     cut.new_data = expected_result
 
@@ -298,3 +307,115 @@ def test_redis_adapter_AdapterDataSource_has_data_returns_instance_new_data():
 
     assert result == expected_result
 
+# redis_adapter parse_meta_data tests # TODO: need to be moved to a util function
+def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_file_given_metadata_file_and_csv_set_to_True_when_given_ss_breakdown_does_not_resolve_to_False(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    arg_configFile = MagicMock()
+    arg_ss_breakdown = True if pytest.gen.randint(0, 1) else MagicMock()
+
+    expected_result = MagicMock()
+
+    mocker.patch(redis_adapter.__name__ + '.extract_meta_data', return_value=expected_result)
+    mocker.patch(redis_adapter.__name__ + '.len')
+
+    # Act
+    result = cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown)
+
+    # Assert
+    assert redis_adapter.extract_meta_data.call_count == 1
+    assert redis_adapter.extract_meta_data.call_args_list[0].args == (arg_configFile, )
+    assert redis_adapter.len.call_count == 0
+    assert result == expected_result
+
+def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_file_given_metadata_file_and_csv_set_to_True_with_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_empty_list_when_len_of_call_value_dict_def_of_subsystem_assigments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_is_0_when_given_ss_breakdown_evaluates_to_False(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    arg_configFile = MagicMock()
+    arg_ss_breakdown = False if pytest.gen.randint(0, 1) else 0
+
+    forced_return_extract_meta_data = {}
+    forced_return_len = 0
+    fake_empty_processed_filepath = MagicMock()
+    forced_return_extract_meta_data['subsystem_assignments'] = fake_empty_processed_filepath
+
+    expected_result = []
+
+    mocker.patch(redis_adapter.__name__ + '.extract_meta_data', return_value=forced_return_extract_meta_data)
+    mocker.patch(redis_adapter.__name__ + '.len', return_value=forced_return_len)
+
+    # Act
+    result = cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown)
+
+    # Assert
+    assert redis_adapter.extract_meta_data.call_count == 1
+    assert redis_adapter.extract_meta_data.call_args_list[0].args == (arg_configFile, )
+    assert redis_adapter.len.call_count == 1
+    assert redis_adapter.len.call_args_list[0].args == (fake_empty_processed_filepath, )
+    assert result['subsystem_assignments'] == expected_result
+
+def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_given_metadata_file_and_csv_set_to_True_with_dict_def_subsystem_assignments_def_of_call_to_process_filepath_given_configFile_and_kwarg_csv_set_to_True_set_to_single_item_list_str_MISSION_for_each_item_when_given_ss_breakdown_evaluates_to_False(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    arg_configFile = MagicMock()
+    arg_ss_breakdown = False if pytest.gen.randint(0, 1) else 0
+
+    forced_return_extract_meta_data = {}
+    forced_return_process_filepath = MagicMock()
+    fake_processed_filepath = []
+    num_fake_processed_filepaths = pytest.gen.randint(1,10) # arbitrary, from 1 to 10 (0 has own test)
+    for i in range(num_fake_processed_filepaths):
+        fake_processed_filepath.append(i)
+    forced_return_extract_meta_data['subsystem_assignments'] = fake_processed_filepath
+    forced_return_len = num_fake_processed_filepaths
+
+    expected_result = []
+    for i in range(num_fake_processed_filepaths):
+        expected_result.append(['MISSION'])
+
+    mocker.patch(redis_adapter.__name__ + '.extract_meta_data', return_value=forced_return_extract_meta_data)
+    mocker.patch(redis_adapter.__name__ + '.len', return_value=forced_return_len)
+
+    # Act
+    result = cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown)
+
+    # Assert
+    assert redis_adapter.extract_meta_data.call_count == 1
+    assert redis_adapter.extract_meta_data.call_args_list[0].args == (arg_configFile, )
+    assert redis_adapter.len.call_count == 1
+    assert redis_adapter.len.call_args_list[0].args == (fake_processed_filepath, )
+    assert result['subsystem_assignments'] == expected_result
+
+# redis_adapter get_vehicle_metadata tests
+def test_redis_adapter_DataSource_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assignments():
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    fake_all_headers = MagicMock()
+    fake_test_assignments = MagicMock()
+    fake_binning_configs = {}
+    fake_binning_configs['test_assignments'] = fake_test_assignments
+
+    expected_result = (fake_all_headers, fake_test_assignments)
+
+    cut.all_headers = fake_all_headers
+    cut.binning_configs = fake_binning_configs
+
+    # Act
+    result = cut.get_vehicle_metadata()
+
+    # Assert
+    assert result == expected_result
+
+# redis_adapter process_data_file tests
+def test_redis_adapter_DataSource_process_data_file_does_nothing():
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    arg_data_file = MagicMock()
+
+    expected_result = None
+
+    # Act
+    result = cut.process_data_file(arg_data_file)
+
+    # Assert
+    assert result == expected_result

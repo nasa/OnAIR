@@ -18,12 +18,14 @@ import time
 import redis
 import json
 
-from ...data_handling.data_source import DataSource
+from onair.data_handling.on_air_data_source import OnAirDataSource
+from onair.src.util.print_io import *
+from onair.data_handling.parser_util import *
 
-class AdapterDataSource(DataSource):
+class DataSource(OnAirDataSource):
 
-    def __init__(self, data=[]):
-        super().__init__(data)
+    def __init__(self, data_file, meta_file, ss_breakdown = False):
+        super().__init__(data_file, meta_file, ss_breakdown = False)
         self.address = 'localhost'
         self.port = 6379
         self.db = 0
@@ -48,6 +50,19 @@ class AdapterDataSource(DataSource):
 
             listen_thread = threading.Thread(target=self.message_listener)
             listen_thread.start()
+
+    def parse_meta_data_file(self, meta_data_file, ss_breakdown):
+        parsed_meta_data = extract_meta_data(meta_data_file)
+        if ss_breakdown == False:
+            num_elements = len(parsed_meta_data['subsystem_assignments'])
+            parsed_meta_data['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
+        return parsed_meta_data
+
+    def process_data_file(self, data_file):
+        print("Redis Adapter ignoring file")
+
+    def get_vehicle_metadata(self):
+        return self.all_headers, self.binning_configs['test_assignments']
 
     def get_next(self):
         """Provides the latest data from REDIS channel"""
