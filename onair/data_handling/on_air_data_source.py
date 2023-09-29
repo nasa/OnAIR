@@ -11,6 +11,23 @@ from abc import ABC, abstractmethod
 from .parser_util import * 
 
 class OnAirDataSource(ABC):
+    """
+    Abstract base class for on-air data sources.
+
+    Args:
+    --------
+        data_file (str): The path to the raw data file.
+        meta_file (str): The path to the metadata file.
+        ss_breakdown (bool): Whether to perform subsystem breakdown.
+
+    Attributes:
+    --------
+        raw_data_file (str): The path to the raw data file.
+        meta_data_file (str): The path to the metadata file.
+        all_headers (list): List of all data headers.
+        sim_data (dict): Dictionary to store simulated data.
+        binning_configs (dict): Dictionary containing binning configurations.
+    """
     def __init__(self, data_file, meta_file, ss_breakdown = False):
         """An initial parsing needs to happen in order to use the parser classes
             This means that, if you want to use this class to parse in real time,

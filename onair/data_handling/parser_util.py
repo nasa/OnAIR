@@ -14,6 +14,17 @@ import datetime
 
 ## Method to extract configuration data and return 3 dictionaries
 def extract_meta_data(meta_data_file):
+    """
+    Extracts metadata from a telemetry configuration file.
+
+    Args:
+    --------
+        meta_data_file (str): The path to the telemetry configuration file.
+
+    Returns:
+    --------
+        dict: A dictionary containing extracted metadata including subsystem assignments and test assignments.
+    """
     assert meta_data_file != ''
 
     configs = parseTlmConfJson(meta_data_file)
@@ -37,6 +48,18 @@ def extract_meta_data(meta_data_file):
     return configs
 
 def floatify_input(_input, remove_str=False):
+     """
+    Convert a list of inputs to float values.
+
+    Args:
+    --------
+        _input (list): A list of input values.
+        remove_str (bool): If True, remove non-convertible string values; otherwise, set them to 0.0.
+
+    Returns:
+    --------
+        list: A list of float values.
+    """
     floatified = []
     for i in _input:
         try:
@@ -55,6 +78,17 @@ def floatify_input(_input, remove_str=False):
     return floatified
 
 def convert_str_to_timestamp(time_str):
+    """
+    Convert a timestamp string to a Unix timestamp.
+
+    Args:
+    --------
+        time_str (str): The timestamp string in a valid format.
+
+    Returns:
+    --------
+        float: The Unix timestamp.
+    """
     try:
         t = to_datetime(time_str)
         return t.timestamp()

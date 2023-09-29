@@ -16,6 +16,19 @@ import importlib.util
 from ..util.data_conversion import *
 
 class DataDrivenLearning:
+    """
+    A class for data-driven learning with AI plugins.
+
+    Args:
+    --------
+        headers (list): List of headers for the data.
+        _ai_plugins (dict): Dictionary of AI plugin modules.
+
+    Attributes:
+    --------
+        headers (list): List of headers for the data.
+        ai_constructs (list): List of AI plugin instances.
+    """
     def __init__(self, headers, _ai_plugins={}):
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers

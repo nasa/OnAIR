@@ -12,6 +12,18 @@ import orjson
 
 # parse tlm config json file
 def parseTlmConfJson(file_path):
+    """
+    Parses a telemetry configuration JSON file and returns organized data.
+
+    Args:
+    --------
+        file_path (str): The path to the JSON file to be parsed.
+
+    Returns:
+    --------
+        dict: A dictionary containing organized telemetry configuration data.
+              It includes subsystem assignments, test assignments, description assignments, and data labels.
+    """
     data = parseJson(file_path)
     reorg_data = reorganizeTlmDict(data)
 
@@ -63,6 +75,17 @@ def parseTlmConfJson(file_path):
 
 # process tlm dict into dict of labels and their attributes
 def reorganizeTlmDict(data):
+    """
+    Reorganizes telemetry dictionary data by subsystem.
+
+    Args:
+    --------
+        data (dict): The telemetry data dictionary.
+
+    Returns:
+    --------
+        dict: A dictionary with telemetry data organized by subsystem.
+    """
     processed_data = {}
     
     for s in data['subsystems']:
@@ -73,6 +96,17 @@ def reorganizeTlmDict(data):
     return processed_data
 
 def str2lst(string):
+    """
+    Convert a string representation of a list to an actual list.
+
+    Args:
+    --------
+        string (str): The string representation of the list.
+
+    Returns:
+    --------
+        list: The parsed list.
+    """
     try:
         return ast.literal_eval(string)
     except:
@@ -80,6 +114,17 @@ def str2lst(string):
         # return string
 
 def parseJson(path):
+    """
+    Parse a JSON file and return its data.
+
+    Args:
+    --------
+        path (str): The path to the JSON file.
+
+    Returns:
+    --------
+        dict: The parsed JSON data as a dictionary.
+    """
     file = open(path, 'rb')
     file_str = file.read()
 
