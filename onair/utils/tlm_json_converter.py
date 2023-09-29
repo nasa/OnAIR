@@ -16,6 +16,13 @@ import argparse
 
 # convert tlm txt config file to json file
 def convertTlmToJson(tlm, json):
+    """
+    Convert telemetry (TLM) data from one format to JSON format.
+
+    Args:
+        tlm (str): Path to the telemetry data file.
+        json (str): Path to the JSON output file.
+    """
     tlm_path = getConfigPath(tlm)
     json_path = getConfigPath(json)
     data = parseTlmConfTxt(tlm_path)
@@ -24,6 +31,15 @@ def convertTlmToJson(tlm, json):
     
 # convert tlm data format to readable json
 def convertTlmDictToJsonDict(data):
+    """
+    Convert telemetry data dictionary to JSON format.
+
+    Args:
+        data (list): List containing telemetry data in different categories.
+
+    Returns:
+        dict: Telemetry data in JSON format.
+    """
     labels, subsys_assigns, mnemonics, descriptions = data
     num_elems = len(labels)
     assert num_elems == len(subsys_assigns) and num_elems == len(mnemonics) and num_elems == len(descriptions)
@@ -48,6 +64,17 @@ def convertTlmDictToJsonDict(data):
 
 # helper function to organize data parsed from tlm file into desired json format
 def getJsonData(label, mnemonics, description):
+    """
+    Organize telemetry data into the desired JSON format.
+
+    Args:
+        label (str): Telemetry data label.
+        mnemonics (list): List of mnemonics.
+        description (str): Description of the telemetry data.
+
+    Returns:
+        dict: Telemetry data in JSON format.
+    """
     if str.upper(label) == 'TIME':
         tests_dict = {str(mnemonics[0][0]) : '[]', str(mnemonics[0][1]) : '[]'}
         return {label : {'conversion' : '', 'tests' : tests_dict, 'description' : str(description)}}
@@ -61,6 +88,15 @@ def getJsonData(label, mnemonics, description):
 
 # parse tlm config files in original txt format
 def parseTlmConfTxt(file_path):   
+    """
+    Parse telemetry configuration data from a text file.
+
+    Args:
+        file_path (str): Path to the telemetry configuration text file.
+
+    Returns:
+        list: A list containing telemetry data in different categories.
+    """
     f = open(file_path, 'r')
     data_str = f.read()
     f.close()

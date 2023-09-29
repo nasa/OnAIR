@@ -18,6 +18,19 @@ from .telemetry_test_suite import TelemetryTestSuite
 from ..util.print_io import *
 
 class VehicleRepresentation:
+    """
+    Class representing a vehicle's telemetry data and status.
+
+    Args:
+        headers (list): List of telemetry data headers.
+        tests (list): List of telemetry tests.
+
+    Attributes:
+        status (Status): The status of the vehicle.
+        headers (list): List of telemetry data headers.
+        test_suite (TelemetryTestSuite): Telemetry test suite.
+        curr_data (list): Current telemetry data.
+    """
     def __init__(self, headers, tests):
         assert(len(headers) == len(tests))
         self.status = Status('MISSION')

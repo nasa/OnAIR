@@ -12,6 +12,19 @@ Status Class
 """
 
 class Status:
+    """
+    Class representing the status of a telemetry data field.
+
+    Args:
+        name (str): Name of the telemetry data field.
+        stat (str): Initial status ('---', 'RED', 'YELLOW', 'GREEN').
+        conf (float): Initial Bayesian confidence score (-1.0 to 1.0).
+
+    Attributes:
+        name (str): Name of the telemetry data field.
+        status (str): Current status ('---', 'RED', 'YELLOW', 'GREEN').
+        bayesian_conf (float): Current Bayesian confidence score (-1.0 to 1.0).
+    """
     def __init__(self, name='MISSION', stat='---', conf=-1.0):
         self.name =  name
         self.set_status(stat, conf)
@@ -27,7 +40,19 @@ class Status:
         return self.status
 
     def get_bayesian_status(self):
+        """
+        Get the current status and Bayesian confidence score.
+
+        Returns:
+            tuple: A tuple containing the current status and Bayesian confidence score.
+        """
         return (self.status, self.bayesian_conf)
 
     def get_name(self):
+        """
+        Get the name of the telemetry data field.
+
+        Returns:
+            str: Name of the telemetry data field.
+        """
         return self.name

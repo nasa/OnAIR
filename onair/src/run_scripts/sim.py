@@ -24,6 +24,13 @@ MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100
 
 class Simulator:
+    """
+    Simulator class for creating and running simulations.
+
+    Args:
+        dataParser: The data parser for simulation data.
+        plugin_list (list): List of plugins for the simulation agent.
+    """
     def __init__(self, dataParser, plugin_list):
         self.simData = dataParser
 
@@ -32,6 +39,17 @@ class Simulator:
         self.agent = Agent(vehicle, plugin_list)
 
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
+        """
+        Run the simulation.
+
+        Args:
+            IO_Flag (bool or str): Flag for controlling simulation output.
+            dev_flag (bool): Development flag.
+            viz_flag (bool): Visualization flag.
+
+        Returns:
+            dict: Final diagnosis information.
+        """
         if IO_Flag == True: print_sim_header()
         if IO_Flag == 'strict': print_msg('Please wait...\n')
         diagnosis_list = []
@@ -64,9 +82,24 @@ class Simulator:
 
 
     def set_benchmark_data(self, filepath, files, indices):
+        """
+        Set benchmark data for supervised learning.
+
+        Args:
+            filepath (str): Path to the benchmark data file.
+            files (list): List of file names.
+            indices (list): List of indices.
+        """
         self.agent.supervised_learning.set_benchmark_data(filepath, files, indices)
 
     def IO_check(self, time_step, IO_Flag):
+        """
+        Perform IO checks and printing for the simulation.
+
+        Args:
+            time_step (int): Current time step.
+            IO_Flag (bool or str): Flag for controlling simulation output.
+        """
         if IO_Flag == True:
             print_sim_step(time_step + 1)
             curr_data = self.agent.vehicle_rep.curr_data

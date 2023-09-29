@@ -17,6 +17,22 @@ from .status import Status
 from collections import Counter
 
 class TelemetryTestSuite:
+    """
+    Class for handling telemetry mnemonic testing.
+
+    Args:
+    --------
+        headers (list): List of telemetry data headers.
+        tests (list): List of telemetry tests.
+
+    Attributes:
+    --------
+        dataFields (list): List of telemetry data headers.
+        tests (list): List of telemetry tests.
+        latest_results (list): Latest test results.
+        epsilon (float): Small value used for calculations.
+        all_tests (dict): Dictionary mapping test names to test functions.
+    """
     def __init__(self, headers=[], tests=[]):
         self.dataFields = headers
         self.tests = tests
@@ -30,12 +46,30 @@ class TelemetryTestSuite:
     ################  Running Tests  ############### 
 
     def execute_suite(self, updated_frame, sync_data={}):
+        """
+        Execute a suite of tests on updated telemetry data.
+
+        Args:
+            updated_frame (list): Updated telemetry data frame.
+            sync_data (dict): Synchronization data (not used).
+        """
         results = []
         for i in range(len(updated_frame)):
             results.append(self.run_tests(i, updated_frame[i], sync_data))
         self.latest_results = results
 
     def run_tests(self, header_index, test_val, sync_data):
+        """
+        Run tests for a specific telemetry data header.
+
+        Args:
+            header_index (int): Index of the telemetry data header.
+            test_val (float): Telemetry data value.
+            sync_data (dict): Synchronization data (not used).
+
+        Returns:
+            Status: Status object indicating the result of the tests.
+        """
         status = []
         tests = self.tests[header_index]
 
@@ -52,6 +86,15 @@ class TelemetryTestSuite:
 
 
     def get_latest_result(self, fieldName):
+        """
+        Get the latest result for a specific telemetry data field.
+
+        Args:
+            fieldName (str): Name of the telemetry data field.
+
+        Returns:
+            Status: Latest status result for the field.
+        """
         if self.latest_results == None:
             return None
         hdr_index = self.dataFields.index(fieldName)
@@ -61,6 +104,17 @@ class TelemetryTestSuite:
     ################   Test Suites  ################ 
 
     def state(self, val, test_params, epsilon):
+        """
+        Run the STATE test on telemetry data.
+
+        Args:
+            val (float): Telemetry data value.
+            test_params (list): Test parameters.
+            epsilon (float): Small value used for calculations.
+
+        Returns:
+            tuple: A tuple containing the status and mass assignments.
+        """
         mass_assignments = []
         val = float(val)
         green = test_params[0]
@@ -85,7 +139,18 @@ class TelemetryTestSuite:
         return stat, mass_assignments
 
     def feasibility(self, val, test_params, epsilon):
-        '''
+
+        """
+        Run the FEASIBILITY test on telemetry data.
+
+        Args:
+            val (float): Telemetry data value.
+            test_params (list): Test parameters.
+            epsilon (float): Small value used for calculations.
+
+        Returns:
+            tuple: A tuple containing the status and mass assignments.
+
         Test_Params : threshold ranges an attribute should fall in
         # if len(test_params == 4) then the thresholds are as follows:
         # before [0] is red
@@ -98,7 +163,7 @@ class TelemetryTestSuite:
         # before [0] is red
         # between [0] - [1] is green
         # after [1] is red
-        '''
+        """
         assert( (len(test_params) == 2) or (len(test_params) == 4))
 
         stat = '---'
@@ -190,6 +255,17 @@ class TelemetryTestSuite:
         return stat, mass_assignments
 
     def noop(self, val, test_params, epsilon):
+        """
+        Run the NOOP test on telemetry data.
+
+        Args:
+            val (float): Telemetry data value.
+            test_params (list): Test parameters (not used).
+            epsilon (float): Small value used for calculations (not used).
+
+        Returns:
+            tuple: A tuple containing the status and mass assignments.
+        """
         stat = 'GREEN'
         mass_assignments = [({stat}, 1.0)]
         return stat, mass_assignments
@@ -198,6 +274,16 @@ class TelemetryTestSuite:
     ################################################
     ############## Combining statuses ############## 
     def calc_single_status(self, status_list, mode='strict'):
+        """
+        Calculate a single status from a list of statuses.
+
+        Args:
+            status_list (list): List of statuses.
+            mode (str): Calculation mode ('strict', 'distr', 'max').
+
+        Returns:
+            tuple: A tuple containing the calculated status and confidence.
+        """
         occurrences = Counter(status_list)
         max_occurrence = occurrences.most_common(1)[0][0]
 
@@ -218,10 +304,25 @@ class TelemetryTestSuite:
             return max_occurrence, 1.0 # return max 
 
     def get_suite_status(self):
+        """
+        Get the status of the test suite.
+
+        Returns:
+            tuple: A tuple containing the calculated status and confidence of the test suite.
+        """
         status_strings = [res.get_status() for res in self.latest_results]
         return self.calc_single_status(status_strings) 
 
     def get_status_specific_mnemonics(self, status='RED'):
+        """
+        Get mnemonics associated with a specific status.
+
+        Args:
+            status (str): Status for which mnemonics are to be retrieved.
+
+        Returns:
+            list: List of mnemonics related to the specified status.
+        """
         names = [res.get_name() for res in self.latest_results if res.get_status() == status]
         return names
 

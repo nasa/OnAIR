@@ -15,6 +15,15 @@ Utility file for parsing file data
 import json
 
 def parse_associations_from_json(filepath):
+    """
+    Parse associations from a JSON file.
+
+    Args:
+        filepath (str): The path to the JSON file containing association data.
+
+    Returns:
+        list: A list of weighted associations.
+    """
     with open(filepath) as f:
       data = json.load(f)
 

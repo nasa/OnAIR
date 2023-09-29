@@ -16,6 +16,12 @@ import os
 import json 
 
 def render_reasoning(diagnosis_list):
+    """
+    Render and save diagnosis reasoning to a text and CSV file.
+
+    Args:
+        diagnosis_list (list): List of diagnosis objects.
+    """
     with open(os.path.join(os.environ.get('ONAIR_DIAGNOSIS_SAVE_PATH'), 'diagnosis.txt'), mode='a') as out:
         out.write('==========================================================\n')
         out.write('                        DIAGNOSIS                         \n')
@@ -31,6 +37,15 @@ def render_reasoning(diagnosis_list):
             out.write(diagnosis.results_csv())
 
 def render_viz(status_data, sensor_data, sim_name, diagnosis=None):
+    """
+    Render and save visualization data to JSON files.
+
+    Args:
+        status_data (dict): Status data for visualization.
+        sensor_data (list): Sensor data for visualization.
+        sim_name (str): Name of the simulation.
+        diagnosis (object): Diagnosis object (optional).
+    """
     # Status Staburst
     status_report = {} 
     status_report['filename'] = sim_name
@@ -53,6 +68,12 @@ def render_viz(status_data, sensor_data, sim_name, diagnosis=None):
             json.dump(results, outfile)
 
 def print_dots(ts):
+    """
+    Print a sequence of dots for visual progress indication.
+
+    Args:
+        ts (int): Time step.
+    """
     incrFlag = ts % 20
     if incrFlag < 10:
         dots = ts % 10

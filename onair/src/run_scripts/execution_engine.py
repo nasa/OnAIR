@@ -22,6 +22,14 @@ from time import gmtime, strftime
 from ..run_scripts.sim import Simulator
 
 class ExecutionEngine:
+    """
+    ExecutionEngine class for setting up and running simulations.
+
+    Args:
+        config_file (str): Path to the configuration file.
+        run_name (str): Name of the simulation run.
+        save_flag (bool): Flag to save simulation results.
+    """
     def __init__(self, config_file='', run_name='', save_flag=False):
         
         # Init Housekeeping 
@@ -61,6 +69,12 @@ class ExecutionEngine:
             self.setup_sim()
 
     def parse_configs(self, config_filepath):
+        """
+        Parse the configuration file.
+
+        Args:
+            config_filepath (str): Path to the configuration file.
+        """
         config = configparser.ConfigParser()
 
         if len(config.read(config_filepath)) == 0:
@@ -107,12 +121,22 @@ class ExecutionEngine:
             pass
 
     def parse_data(self, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
+        """
+        Parse data using the specified parser.
+
+        Args:
+            parser_file_name (str): Path to the parser module.
+            data_file_name (str): Path to the telemetry data file.
+            metadata_file_name (str): Path to the metadata file.
+            subsystems_breakdown (bool): Flag for subsystems breakdown.
+        """
         data_source_spec = importlib.util.spec_from_file_location('data_source', parser_file_name)
         data_source_module = importlib.util.module_from_spec(data_source_spec)
         data_source_spec.loader.exec_module(data_source_module)
         self.simDataParser = data_source_module.DataSource(data_file_name, metadata_file_name, subsystems_breakdown)
 
     def setup_sim(self):
+        """Set up the simulator"""
         self.sim = Simulator(self.simDataParser, self.plugin_list)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
@@ -123,11 +147,13 @@ class ExecutionEngine:
             pass
 
     def run_sim(self):
+        """Run the simulator"""
         self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag)
         if self.save_flag:
             self.save_results(self.save_name)
 
     def init_save_paths(self):
+        """Initialize save path"""
         save_path = os.environ['RESULTS_PATH']
         temp_save_path = os.path.join(save_path, 'tmp')
         temp_models_path = os.path.join(temp_save_path, 'models')
@@ -144,6 +170,7 @@ class ExecutionEngine:
         os.environ['ONAIR_DIAGNOSIS_SAVE_PATH'] = temp_diagnosis_path
 
     def delete_save_paths(self):
+        """Delete the Save path"""
         save_path = os.environ['RESULTS_PATH']
         sub_dirs = os.listdir(save_path)
         if 'tmp' in sub_dirs: 
