@@ -11,8 +11,8 @@
 import pytest
 from mock import MagicMock
 
-import onair.src.data_driven_components.ai_plugin_abstract.core as core
-from onair.src.data_driven_components.ai_plugin_abstract.core import AIPlugIn
+import onair.src.ai_components.ai_plugin_abstract.core as core
+from onair.src.ai_components.ai_plugin_abstract.core import AIPlugIn
 
 class FakeAIPlugIn(AIPlugIn):
     def __init__(self, _name, _headers):
