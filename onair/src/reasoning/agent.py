@@ -11,13 +11,13 @@
 Agent Class
 Deals with supervised learning for diagnosing statuses
 """
-from ..data_driven_components.data_driven_learning import DataDrivenLearning
+from ..ai_components.learners_interface import LearnersInterface
 from ..reasoning.diagnosis import Diagnosis
 
 class Agent:
     def __init__(self, vehicle, plugin_list):
         self.vehicle_rep = vehicle
-        self.learning_systems = DataDrivenLearning(self.vehicle_rep.get_headers(),plugin_list)
+        self.learning_systems = LearnersInterface(self.vehicle_rep.get_headers(),plugin_list)
         self.mission_status = self.vehicle_rep.get_status()
         self.bayesian_status = self.vehicle_rep.get_bayesian_status()
 
