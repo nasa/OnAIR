@@ -25,15 +25,18 @@ class LearnersInterface:
             spec.loader.exec_module(module)
             self.ai_constructs.append(module.Plugin(module_name,headers))
     
+    def apriori_training(self, batch_data):
+        for plugin in self.ai_constructs:
+            plugin.apriori_training(batch_data)
+
     def update(self, curr_data, status):
         input_data = curr_data
         output_data = status_to_oneHot(status)
         for plugin in self.ai_constructs:
             plugin.update(input_data)
 
-    def apriori_training(self, batch_data):
-        for plugin in self.ai_constructs:
-            plugin.apriori_training(batch_data)
+    def check_for_salient_event(self):
+        pass
 
     def render_reasoning(self):
         diagnoses = {}
