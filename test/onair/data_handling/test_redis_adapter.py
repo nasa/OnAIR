@@ -114,13 +114,12 @@ def test_redis_adapter_DataSource_fails_to_connect_to_server(mocker):
     assert cut.server == fake_server
 
 # subscribe_message tests
-def test_redis_adapter_DataSource_subscribe_sends_given_subscriptions_as_set_and_starts_listening_when_server_available(mocker):
+def test_redis_adapter_DataSource_subscribe_subscribes_to_each_given_subscription_and_starts_listening_when_server_available(mocker):
     # Arrange
     arg_subscriptions = [MagicMock()] * pytest.gen.randint(0, 10) # 0 to 10 arbitrary
 
     fake_server = MagicMock()
     fake_pubsub = MagicMock()
-    fake_subscription = MagicMock()
     fake_thread = MagicMock()
 
     cut = DataSource.__new__(DataSource)
@@ -128,7 +127,8 @@ def test_redis_adapter_DataSource_subscribe_sends_given_subscriptions_as_set_and
 
     mocker.patch.object(fake_server, 'ping', return_value=True)
     mocker.patch.object(fake_server, 'pubsub', return_value=fake_pubsub)
-    mocker.patch.object(fake_pubsub, 'subscribe', return_value=fake_subscription)
+    mocker.patch.object(fake_pubsub, 'subscribe')
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch('threading.Thread', return_value=fake_thread)
     mocker.patch.object(fake_thread, 'start')
 
@@ -138,16 +138,18 @@ def test_redis_adapter_DataSource_subscribe_sends_given_subscriptions_as_set_and
     # Assert
     assert fake_server.ping.call_count == 1
     assert fake_server.pubsub.call_count == 1
-    assert fake_pubsub.subscribe.call_count == 1
-    assert fake_pubsub.subscribe.call_args_list[0].args == (*arg_subscriptions,)
+    assert fake_pubsub.subscribe.call_count == len(arg_subscriptions)
+    for i in range(len(arg_subscriptions)):
+        assert fake_pubsub.subscribe.call_args_list[i].args == (arg_subscriptions[i],)
+        assert redis_adapter.print_msg.call_args_list[i].args == (f"Subscribing to channel {arg_subscriptions[i]}",)
     assert threading.Thread.call_count == 1
     assert threading.Thread.call_args_list[0].kwargs == ({'target': cut.message_listener})
     assert fake_thread.start.call_count == 1
     assert cut.pubsub == fake_pubsub
 
-def test_redis_adapter_DataSource_subscribe_does_nothing_when_server_does_not_respond_to_ping(mocker):
+def test_redis_adapter_DataSource_subscribe_states_no_subscriptions_given_when_empty(mocker):
     # Arrange
-    arg_channel = str(MagicMock())
+    arg_subscriptions = []
     fake_server = MagicMock()
     initial_pubsub = MagicMock()
     fake_subscription = MagicMock()
@@ -157,6 +159,37 @@ def test_redis_adapter_DataSource_subscribe_does_nothing_when_server_does_not_re
     cut.pubsub = initial_pubsub
 
     mocker.patch.object(fake_server, 'ping', return_value=False)
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+    mocker.patch.object(fake_server, 'pubsub')
+    mocker.patch('threading.Thread')
+    mocker.patch.object(fake_thread, 'start')
+
+    # Act
+    cut.subscribe(arg_subscriptions)
+
+    # Assert
+    assert fake_server.ping.call_count == 0
+    assert fake_server.pubsub.call_count == 0
+    assert threading.Thread.call_count == 0
+    assert fake_thread.start.call_count == 0
+    assert cut.pubsub == initial_pubsub
+    assert redis_adapter.print_msg.call_args_list[0].args == ("No subscriptions given!",)
+
+# Note the self.server.ping during runtime will error, not actually return False, but that means code will never run
+# this unit test is for completeness of coverage
+def test_redis_adapter_DataSource_subscribe_states_no_subscriptions_given_when_server_does_not_respond_to_ping(mocker):
+    # Arrange
+    arg_channel = [MagicMock()]
+    fake_server = MagicMock()
+    initial_pubsub = MagicMock()
+    fake_subscription = MagicMock()
+    fake_thread = MagicMock()
+    cut = DataSource.__new__(DataSource)
+    cut.server = fake_server
+    cut.pubsub = initial_pubsub
+
+    mocker.patch.object(fake_server, 'ping', return_value=False)
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch.object(fake_server, 'pubsub')
     mocker.patch('threading.Thread')
     mocker.patch.object(fake_thread, 'start')
@@ -170,6 +203,7 @@ def test_redis_adapter_DataSource_subscribe_does_nothing_when_server_does_not_re
     assert threading.Thread.call_count == 0
     assert fake_thread.start.call_count == 0
     assert cut.pubsub == initial_pubsub
+    assert redis_adapter.print_msg.call_args_list[0].args == ("No subscriptions given!",)
 
 # get_next tests
 

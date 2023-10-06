@@ -19,7 +19,7 @@ import redis
 import json
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
-from .tlm_json_parser import parseJson
+from onair.data_handling.tlm_json_parser import parseJson
 from onair.src.util.print_io import *
 from onair.data_handling.parser_util import *
 
@@ -50,12 +50,17 @@ class DataSource(OnAirDataSource):
 
     def subscribe(self, subscriptions):
         """Subscribe to REDIS message channel(s) and launch listener thread."""
-        if self.server.ping():
+        if len(subscriptions) != 0 and self.server.ping():
             self.pubsub = self.server.pubsub()
-            self.pubsub.subscribe(*subscriptions)
+
+            for s in subscriptions:
+                self.pubsub.subscribe(s)
+                print_msg(f"Subscribing to channel {s}")
 
             listen_thread = threading.Thread(target=self.message_listener)
             listen_thread.start()
+        else:
+            print_msg(f"No subscriptions given!")
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         configs = extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
