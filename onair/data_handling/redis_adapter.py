@@ -19,13 +19,14 @@ import redis
 import json
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
+from .tlm_json_parser import parseJson
 from onair.src.util.print_io import *
 from onair.data_handling.parser_util import *
 
 class DataSource(OnAirDataSource):
 
     def __init__(self, data_file, meta_file, ss_breakdown = False):
-        super().__init__(data_file, meta_file, ss_breakdown = False)
+        super().__init__(data_file, meta_file, ss_breakdown)
         self.address = 'localhost'
         self.port = 6379
         self.db = 0
@@ -35,24 +36,36 @@ class DataSource(OnAirDataSource):
         self.currentData = []
         self.currentData.append({'headers':None, 'data':None})
         self.currentData.append({'headers':None, 'data':None})
-        self.double_buffer_read_index = 0  
+        self.double_buffer_read_index = 0
+        self.connect()
+        self.subscribe(self.subscriptions)
 
     def connect(self):
         """Establish connection to REDIS server."""
+        print_msg('Redis adapter connecting to server...')
         self.server = redis.Redis(self.address, self.port, self.db)
 
+        if self.server.ping():
+            print_msg('... connected!')
 
-    def subscribe_message(self, channel):
-        """Subscribe to REDIS message channel and launch listener thread."""
+    def subscribe(self, subscriptions):
+        """Subscribe to REDIS message channel(s) and launch listener thread."""
         if self.server.ping():
             self.pubsub = self.server.pubsub()
-            self.pubsub.subscribe(channel)
+            self.pubsub.subscribe(*subscriptions)
 
             listen_thread = threading.Thread(target=self.message_listener)
             listen_thread.start()
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
-        return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
+        configs = extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
+        meta = parseJson(meta_data_file)
+        if 'redis_subscriptions' in meta.keys():
+            self.subscriptions = meta['redis_subscriptions']
+        else:
+            self.subscriptions = []
+
+        return configs
 
     def process_data_file(self, data_file):
         print("Redis Adapter ignoring file")
