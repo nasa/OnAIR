@@ -178,6 +178,17 @@ def test_LearnersInterface_apriori_training_calls_apriori_training_on_each_ai_co
         assert cut.ai_constructs[i].apriori_training.call_args_list[0].args == (arg_batch_data, )
     assert result == None
 
+# check_for_salient_event
+def test_salient_event_does_nothing():
+    # Arrange
+    cut = LearnersInterface.__new__(LearnersInterface)
+
+    # Act
+    result = cut.check_for_salient_event()
+
+    # Assert
+    assert result == None
+
 # render_reasoning tests
 def test_LearnersInterface_render_reasoning_returns_empty_dict_when_instance_ai_constructs_is_empty(mocker):
     # Arrange
