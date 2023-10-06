@@ -19,26 +19,26 @@ class PlannersInterface:
     def __init__(self, headers, _ai_plugins={}):
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers
-        self.planning_constructs = []
-        for module_name in list(_planning_plugins.keys()):
-            spec = importlib.util.spec_from_file_location(module_name, _planning_plugins[module_name])
+        self.ai_constructs = []
+        for module_name in list(_ai_plugins.keys()):
+            spec = importlib.util.spec_from_file_location(module_name, _ai_plugins[module_name])
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-            self.planning_constructs.append(module.Plugin(module_name,headers))
+            self.ai_constructs.append(module.Plugin(module_name,headers))
     
     def update(self, curr_data, status):
         input_data = curr_data
         output_data = status_to_oneHot(status)
-        for plugin in self.planning_constructs:
+        for plugin in self.ai_constructs:
             plugin.update(input_data)
 
     def apriori_training(self, batch_data):
-        for plugin in self.planning_constructs:
+        for plugin in self.ai_constructs:
             plugin.apriori_training(batch_data)
 
     def render_reasoning(self):
         diagnoses = {}
-        for plugin in self.planning_constructs:
+        for plugin in self.ai_constructs:
             diagnoses[plugin.component_name] = plugin.render_reasoning()
         return diagnoses
 
