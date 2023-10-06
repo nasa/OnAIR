@@ -11,7 +11,6 @@
 Planners interface class for managing all planning-based AI components
 """
 import importlib.util
-import importlib.util
 
 from ..util.data_conversion import *
 
@@ -41,6 +40,3 @@ class PlannersInterface:
         for plugin in self.ai_constructs:
             diagnoses[plugin.component_name] = plugin.render_reasoning()
         return diagnoses
-
-
-
