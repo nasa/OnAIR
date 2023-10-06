@@ -24,12 +24,8 @@ class PlannersInterface:
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             self.ai_constructs.append(module.Plugin(module_name,headers))
-    
-    def apriori_training(self, batch_data):
-        for plugin in self.ai_constructs:
-            plugin.apriori_training(batch_data)
 
-    def update(self, curr_raw_tlm):
+    def update(self, curr_raw_tlm, status):
         # Raw TLM should be transformed into high-leve state representation here 
         # Can store something as stale unless a planning thread is launched 
         pass
