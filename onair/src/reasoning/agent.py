@@ -27,10 +27,15 @@ class Agent:
 
     # Markov Assumption holds 
     def reason(self, frame):
+        # Update with new telemetry 
         self.vehicle_rep.update(frame)
         self.mission_status = self.vehicle_rep.get_status() 
         self.learning_systems.update(frame, self.mission_status)
         self.planning_systems.update(frame, self.mission_status)
+
+        # Check for a salient event, needing acionable outcome
+        self.learning_systems.check_for_salient_event()
+        self.planning_systems.check_for_salient_event()
 
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """
