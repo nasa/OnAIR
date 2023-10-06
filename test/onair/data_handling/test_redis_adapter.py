@@ -141,7 +141,7 @@ def test_redis_adapter_DataSource_subscribe_subscribes_to_each_given_subscriptio
     assert fake_pubsub.subscribe.call_count == len(arg_subscriptions)
     for i in range(len(arg_subscriptions)):
         assert fake_pubsub.subscribe.call_args_list[i].args == (arg_subscriptions[i],)
-        assert redis_adapter.print_msg.call_args_list[i].args == (f"Subscribing to channel {arg_subscriptions[i]}",)
+        assert redis_adapter.print_msg.call_args_list[i].args == (f"Subscribing to channel: {arg_subscriptions[i]}",)
     assert threading.Thread.call_count == 1
     assert threading.Thread.call_args_list[0].kwargs == ({'target': cut.message_listener})
     assert fake_thread.start.call_count == 1

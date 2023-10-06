@@ -55,7 +55,7 @@ class DataSource(OnAirDataSource):
 
             for s in subscriptions:
                 self.pubsub.subscribe(s)
-                print_msg(f"Subscribing to channel {s}")
+                print_msg(f"Subscribing to channel: {s}")
 
             listen_thread = threading.Thread(target=self.message_listener)
             listen_thread.start()
