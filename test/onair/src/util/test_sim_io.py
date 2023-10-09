@@ -219,7 +219,7 @@ def test_sim_io_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnos
   assert sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
   assert open.call_args_list[1].args == (fake_full_path, 'w')
   assert sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
-  arg_diagnosis.get_diagnosis_viz_json.called_once()
+  arg_diagnosis.get_diagnosis_viz_json.assert_called_once()
   assert sim_io.os.environ.get.call_args_list[2].args == (SAVE_PATH,)
   assert sim_io.os.path.join.call_args_list[2].args == (fake_system_filename, 'results.json')
   assert open.call_args_list[2].args == (fake_full_path, 'w')
