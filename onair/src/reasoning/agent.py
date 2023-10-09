@@ -13,6 +13,7 @@ Deals with supervised learning for diagnosing statuses
 """
 from ..ai_components.learners_interface import LearnersInterface
 from ..ai_components.planners_interface import PlannersInterface
+from ..reasoning.complex_reasoning_interface import ComplexReasoningInterface
 from ..reasoning.diagnosis import Diagnosis
 
 class Agent:
@@ -24,6 +25,7 @@ class Agent:
         # AI Interfaces
         self.learning_systems = LearnersInterface(self.vehicle_rep.get_headers(),plugin_list)
         self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),plugin_list)
+        self.complex_reasoning_systems = ComplexReasoningInterface(self.vehicle_rep.get_headers(),plugin_list)
 
     # Markov Assumption holds 
     def reason(self, frame):
@@ -36,6 +38,9 @@ class Agent:
         # Check for a salient event, needing acionable outcome
         self.learning_systems.check_for_salient_event()
         self.planning_systems.check_for_salient_event()
+
+        # NOT YET COMPLETE
+        self.complex_reasoning_systems.update(frame, self.learning_systems.check_for_salient_event())
 
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """

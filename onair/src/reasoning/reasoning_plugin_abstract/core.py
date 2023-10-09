@@ -25,7 +25,7 @@ class ReasoningPlugIn(ABC):
         self.headers = _headers
         
     @abstractmethod
-    def update(self, frame=[], high_level_info=[]):
+    def update(self, low_level_data=[], high_level_data={}):
         """
         Given streamed data point and other sources of high-level info,
         system should update internally
