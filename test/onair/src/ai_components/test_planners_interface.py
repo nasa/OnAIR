@@ -96,4 +96,35 @@ def test_PlannersInterfacee__init__sets_instance_ai_constructs_to_a_list_of_the_
 
     assert cut.ai_constructs == expected_ai_constructs
 
+def test_update_does_nothing():
+    # Arrange
+    arg_curr_raw_tlm = MagicMock()
+    arg_status = MagicMock()
 
+    cut = PlannersInterface.__new__(PlannersInterface)
+
+    # Act
+    result = cut.update(arg_curr_raw_tlm, arg_status)
+
+    # Assert
+    assert result == None
+
+def test_check_for_salient_event_does_nothing():
+    # Arrange
+    cut = PlannersInterface.__new__(PlannersInterface)
+
+    # Act
+    result = cut.check_for_salient_event()
+
+    # Assert
+    assert result == None
+
+def test_render_reasoning_does_nothing():
+    # Arrange
+    cut = PlannersInterface.__new__(PlannersInterface)
+    
+    # Act
+    result = cut.render_reasoning()
+
+    # Assert
+    assert result == None

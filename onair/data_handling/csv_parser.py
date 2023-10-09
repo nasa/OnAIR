@@ -39,18 +39,9 @@ class DataSource(OnAirDataSource):
         return all_data
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
-        parsed_meta_data = extract_meta_data(meta_data_file)
-        if ss_breakdown == False:
-            num_elements = len(parsed_meta_data['subsystem_assignments'])
-            parsed_meta_data['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
-        return parsed_meta_data
+        return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
 
 ##### GETTERS ##################################
-    def get_sim_data(self):
-        return self.all_headers, self.sim_data, self.binning_configs
-
-    def get_just_data(self):
-        return self.sim_data
 
     def get_vehicle_metadata(self):
         return self.all_headers, self.binning_configs['test_assignments']
