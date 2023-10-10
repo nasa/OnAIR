@@ -17,63 +17,13 @@ from onair.src.run_scripts.sim import Simulator
 from math import ceil, floor
 
 # __init__ tests
-def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
+def test_Simulator__init__creates_Vehicle_and_Agent(mocker):
     # Arrange
-    arg_simType = MagicMock()
     arg_dataParser = MagicMock()
-    arg_SBN_Flag = True if (pytest.gen.randint(0,1) == 0) else MagicMock()
-
-    class FakeDataAdapterSource:
-        def __init__(self, sim_data):
-            FakeDataAdapterSource.simData = self
-            FakeDataAdapterSource.sim_data = sim_data
-        
-        def connect(self):
-            if hasattr(FakeDataAdapterSource, 'connect_call_count'):
-                FakeDataAdapterSource.connect_call_count += 1
-            else:
-                FakeDataAdapterSource.connect_call_count = 1
-
-    fake_vehicle_metadata = [MagicMock(), MagicMock()]
-    fake_vehicle = MagicMock()
-    fake_sim_data = MagicMock()
-    fake_sbn_adapter = MagicMock()
-    fake_simData = MagicMock()
-    fake_agent = MagicMock()
-
-    cut = Simulator.__new__(Simulator)
-
-    mocker.patch.object(arg_dataParser, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
-    mocker.patch(sim.__name__ + '.vehicle', return_value=fake_vehicle)
-    mocker.patch(sim.__name__ + '.importlib.import_module', return_value=fake_sbn_adapter)
-    mocker.patch(sim.__name__ + '.getattr', return_value=FakeDataAdapterSource)
-    mocker.patch.object(arg_dataParser, 'get_just_data', return_value=fake_sim_data)
-    mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
-
-    # Act
-    cut.__init__(arg_simType, arg_dataParser, arg_SBN_Flag)
-
-    # Assert
-    assert cut.simulator == arg_simType
-    assert sim.vehicle.call_count == 1
-    assert sim.vehicle.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
-    assert FakeDataAdapterSource.simData == cut.simData
-    assert FakeDataAdapterSource.sim_data == fake_sim_data
-    assert FakeDataAdapterSource.connect_call_count == 1
-    assert sim.Agent.call_count == 1
-    assert sim.Agent.call_args_list[0].args == (fake_vehicle, )
-    assert cut.agent == fake_agent
-
-def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_False(mocker):
-    # Arrange
-    arg_simType = MagicMock()
-    arg_dataParser = MagicMock()
-    arg_SBN_Flag = False if (pytest.gen.randint(0,1) == 0) else None
     arg_plugin_list = MagicMock()
 
     fake_vehicle_metadata = [MagicMock(), MagicMock()]
     fake_vehicle = MagicMock()
-    fake_sim_data = MagicMock()
     fake_simData = MagicMock()
     fake_agent = MagicMock()
 
@@ -81,69 +31,17 @@ def test_Simulator__init__creates_Vehicle_and_DataSource_from_parsed_data_and_Ag
 
     mocker.patch.object(arg_dataParser, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
     mocker.patch(sim.__name__ + '.VehicleRepresentation', return_value=fake_vehicle)
-    mocker.patch.object(arg_dataParser, 'get_just_data', return_value=fake_sim_data)
-    mocker.patch(sim.__name__ + '.DataSource', return_value=fake_simData)
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
-    cut.__init__(arg_simType, arg_dataParser, arg_plugin_list, arg_SBN_Flag)
+    cut.__init__(arg_dataParser, arg_plugin_list)
 
     # Assert
-    assert cut.simulator == arg_simType
     assert sim.VehicleRepresentation.call_count == 1
     assert sim.VehicleRepresentation.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
-    assert sim.DataSource.call_count == 1
-    assert sim.DataSource.call_args_list[0].args == (fake_sim_data, )
+    assert cut.simData == arg_dataParser
     assert sim.Agent.call_count == 1
     assert sim.Agent.call_args_list[0].args == (fake_vehicle, arg_plugin_list)
-    assert cut.agent == fake_agent
-
-def test_Simulator__init__creates_Vehicle_and_AdapterDataSource_from_parsed_data_and_Agent_with_vehicle_when_SBN_Flag_resolves_to_True(mocker):
-    # Arrange
-    arg_simType = MagicMock()
-    arg_dataParser = MagicMock()
-    arg_SBN_Flag = True if (pytest.gen.randint(0,1) == 0) else MagicMock()
-
-    class FakeDataAdapterSource:
-        def __init__(self, sim_data):
-            FakeDataAdapterSource.simData = self
-            FakeDataAdapterSource.sim_data = sim_data
-        
-        def connect(self):
-            if hasattr(FakeDataAdapterSource, 'connect_call_count'):
-                FakeDataAdapterSource.connect_call_count += 1
-            else:
-                FakeDataAdapterSource.connect_call_count = 1
-
-    fake_vehicle_metadata = [MagicMock(), MagicMock()]
-    fake_vehicle = MagicMock()
-    fake_sim_data = MagicMock()
-    fake_sbn_adapter = MagicMock()
-    fake_simData = MagicMock()
-    fake_agent = MagicMock()
-    fake_plugin_list = MagicMock()
-
-    cut = Simulator.__new__(Simulator)
-
-    mocker.patch.object(arg_dataParser, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
-    mocker.patch(sim.__name__ + '.VehicleRepresentation', return_value=fake_vehicle)
-    mocker.patch(sim.__name__ + '.importlib.import_module', return_value=fake_sbn_adapter)
-    mocker.patch(sim.__name__ + '.getattr', return_value=FakeDataAdapterSource)
-    mocker.patch.object(arg_dataParser, 'get_just_data', return_value=fake_sim_data)
-    mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
-
-    # Act
-    cut.__init__(arg_simType, arg_dataParser, fake_plugin_list, arg_SBN_Flag)
-
-    # Assert
-    assert cut.simulator == arg_simType
-    assert sim.VehicleRepresentation.call_count == 1
-    assert sim.VehicleRepresentation.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
-    assert FakeDataAdapterSource.simData == cut.simData
-    assert FakeDataAdapterSource.sim_data == fake_sim_data
-    assert FakeDataAdapterSource.connect_call_count == 1
-    assert sim.Agent.call_count == 1
-    assert sim.Agent.call_args_list[0].args == (fake_vehicle, fake_plugin_list)
     assert cut.agent == fake_agent
 
 # run_sim tests
