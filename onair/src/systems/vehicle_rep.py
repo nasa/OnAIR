@@ -18,7 +18,7 @@ from .telemetry_test_suite import TelemetryTestSuite
 from ..util.print_io import *
 
 class VehicleRepresentation:
-    def __init__(self, headers=[], tests=[]): # metaData is a timesynchronizer obj
+    def __init__(self, headers, tests):
         assert(len(headers) == len(tests))
         self.status = Status('MISSION')
         self.headers = headers

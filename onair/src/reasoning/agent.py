@@ -15,9 +15,9 @@ from ..data_driven_components.data_driven_learning import DataDrivenLearning
 from ..reasoning.diagnosis import Diagnosis
 
 class Agent:
-    def __init__(self, vehicle):
+    def __init__(self, vehicle, plugin_list):
         self.vehicle_rep = vehicle
-        self.learning_systems = DataDrivenLearning(self.vehicle_rep.get_headers())
+        self.learning_systems = DataDrivenLearning(self.vehicle_rep.get_headers(),plugin_list)
         self.mission_status = self.vehicle_rep.get_status()
         self.bayesian_status = self.vehicle_rep.get_bayesian_status()
 
@@ -29,7 +29,7 @@ class Agent:
 
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """
-        learning_system_results = self.learning_systems.render_reasoning() 
+        learning_system_results = self.learning_systems.render_reasoning()
         diagnosis = Diagnosis(time_step, 
                               learning_system_results,
                               self.bayesian_status,

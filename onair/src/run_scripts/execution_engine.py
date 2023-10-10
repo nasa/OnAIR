@@ -17,9 +17,8 @@ import importlib
 import ast
 import shutil
 from distutils.dir_util import copy_tree
-from time import gmtime, strftime   
+from time import gmtime, strftime
 
-from ...data_handling.time_synchronizer import TimeSynchronizer
 from ..run_scripts.sim import Simulator
 
 class ExecutionEngine:
@@ -31,24 +30,26 @@ class ExecutionEngine:
         # Init Flags 
         self.IO_Flag = False
         self.Dev_Flag = False
-        self.SBN_Flag = False
         self.Viz_Flag = False
         
         # Init Paths 
         self.dataFilePath = ''
+        self.telemetryFile = ''
+        self.fullTelemetryFileName = ''
         self.metadataFilePath = ''
+        self.metaFile = ''
+        self.fullMetaDataFileName = ''
         self.benchmarkFilePath = ''
-        self.metaFiles = ''
-        self.telemetryFiles = ''
         self.benchmarkFiles = ''
         self.benchmarkIndices = ''
 
         # Init parsing/sim info
         self.parser_file_name = ''
-        self.parser_name = ''
-        self.sim_name = ''
-        self.processedSimData = None
+        self.simDataParser = None
         self.sim = None
+
+        # Init plugins
+        self.plugin_list = ['']
 
         self.save_flag = save_flag
         self.save_name = run_name
@@ -56,46 +57,63 @@ class ExecutionEngine:
         if config_file != '':
             self.init_save_paths()
             self.parse_configs(config_file)
-            self.parse_data(self.parser_name, self.parser_file_name, self.dataFilePath, self.metadataFilePath)
+            self.parse_data(self.parser_file_name, self.fullTelemetryFileName, self.fullMetaDataFileName)
             self.setup_sim()
 
     def parse_configs(self, config_filepath):
-        # print("Using config file: {}".format(config_filepath))
-
         config = configparser.ConfigParser()
-        config.read(config_filepath)
-        ## Sort Data: Telementry Data & Configuration
-        self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
-        self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
-        self.metaFiles = config['DEFAULT']['MetaFiles'] # Config for vehicle telemetry
-        self.telemetryFiles = config['DEFAULT']['TelemetryFiles'] # Vehicle telemetry data
+
+        if len(config.read(config_filepath)) == 0:
+            raise FileNotFoundError(f"Config file at '{config_filepath}' could not be read.")
+        
+        try:
+            ## Parse Required Data: Telementry Data & Configuration
+            self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
+            self.telemetryFile = config['DEFAULT']['TelemetryFile'] # Vehicle telemetry data
+            self.fullTelemetryFileName = os.path.join(self.dataFilePath, self.telemetryFile)
+            self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
+            self.metaFile = config['DEFAULT']['MetaFile'] # Config for vehicle telemetry
+            self.fullMetaDataFileName = os.path.join(self.metadataFilePath, self.metaFile)
+
+            ## Parse Required Data: Names
+            self.parser_file_name = config['DEFAULT']['ParserFileName']
+
+            ## Parse Required Data: Plugin name to path dict
+            config_plugin_list = config['DEFAULT']['PluginList']
+            ast_plugin_list = self.ast_parse_eval(config_plugin_list)
+            if isinstance(ast_plugin_list.body, ast.Dict) and len(ast_plugin_list.body.keys) > 0:
+                temp_plugin_list = ast.literal_eval(config_plugin_list)
+            else:
+                raise ValueError(f"{config_plugin_list} is an invalid PluginList. It must be a dict of at least 1 key/value pair.")
+            for plugin_name in temp_plugin_list.values():
+                if not(os.path.exists(plugin_name)):
+                    raise FileNotFoundError(f"In config file '{config_filepath}', path '{plugin_name}' does not exist or is formatted incorrectly.")
+            self.plugin_list = temp_plugin_list
+        except KeyError as e:
+            new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
+            raise KeyError(new_message) from e
+
+        ## Parse Optional Data: Flags
+        self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
+        self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
+        self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
+        
+        ## Parse Optional Data: Benchmarks
         try:
             self.benchmarkFilePath = config['DEFAULT']['BenchmarkFilePath']
             self.benchmarkFiles = config['DEFAULT']['BenchmarkFiles'] # Vehicle telemetry data
             self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
         except:
             pass
-        ## Sort Data: Names
-        self.parser_file_name = config['DEFAULT']['ParserFileName']
-        self.parser_name = config['DEFAULT']['ParserName']
-        self.sim_name = config['DEFAULT']['SimName']
 
-        ## Sort Data: Flags
-        self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
-        self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
-        self.SBN_Flag = config['RUN_FLAGS'].getboolean('SBN_Flag')
-        self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
-
-    def parse_data(self, parser_name, parser_file_name, dataFilePath, metadataFilePath, subsystems_breakdown=False):
-        parser = importlib.import_module('onair.data_handling.parsers.' + parser_file_name)
-        parser_class = getattr(parser, parser_name) # This could be simplified if the parsers all extend a parser class... but this works for now
-        tm_data_path = os.environ['RUN_PATH'] + dataFilePath
-        tm_metadata_path = os.environ['RUN_PATH'] +  metadataFilePath
-        parsed_data = parser_class(tm_data_path, tm_metadata_path, self.telemetryFiles, self.metaFiles, subsystems_breakdown)
-        self.processedSimData = TimeSynchronizer(*parsed_data.get_sim_data())
+    def parse_data(self, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
+        data_source_spec = importlib.util.spec_from_file_location('data_source', parser_file_name)
+        data_source_module = importlib.util.module_from_spec(data_source_spec)
+        data_source_spec.loader.exec_module(data_source_module)
+        self.simDataParser = data_source_module.DataSource(data_file_name, metadata_file_name, subsystems_breakdown)
 
     def setup_sim(self):
-        self.sim = Simulator(self.sim_name, self.processedSimData, self.SBN_Flag)
+        self.sim = Simulator(self.simDataParser, self.plugin_list)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath
@@ -140,11 +158,8 @@ class ExecutionEngine:
         os.mkdir(save_path)
         copy_tree(os.environ['ONAIR_TMP_SAVE_PATH'], save_path)
 
-    """ Getters and setters """
     def set_run_param(self, name, val):
         setattr(self, name, val)
 
-
-
-
-
+    def ast_parse_eval(self, config_list):
+        return ast.parse(config_list, mode='eval')

@@ -1,17 +1,4 @@
 *.pyc
-**/.DS_Store
-*.DS_Store
 .DS_Store
-DS_Store
-src/data_handling/parsers/dellingr_parser.py
-src/data/raw_telemetry_data/sensitive/
-src/data/telemetry_configs/sensitive/
-src/data/benchmarks/sensitive/
 __pycache__/
-src/DS/
-src/data_driven_components/logs/
-results/tmp/
-results/saved/sensitive/
-src/test/data/Model/
-**/runs
 .coverage
