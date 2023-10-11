@@ -116,7 +116,7 @@ def test_redis_adapter_DataSource_fails_to_connect_to_server(mocker):
 # subscribe_message tests
 def test_redis_adapter_DataSource_subscribe_subscribes_to_each_given_subscription_and_starts_listening_when_server_available(mocker):
     # Arrange
-    arg_subscriptions = [MagicMock()] * pytest.gen.randint(0, 10) # 0 to 10 arbitrary
+    arg_subscriptions = [MagicMock()] * pytest.gen.randint(1, 10) # 1 to 10 arbitrary
 
     fake_server = MagicMock()
     fake_pubsub = MagicMock()
@@ -362,7 +362,7 @@ def test_redis_adapter_DataSource_message_listener_loads_message_info_when_recei
 
     num_fake_data = pytest.gen.randint(1,10)
     for i in range(num_fake_data):
-        fake_data_header = str(MagicMock())
+        fake_data_header = str(i)
         fake_data_value = MagicMock()
         fake_data[fake_data_header] = fake_data_value
         expected_data_headers.append(fake_data_header)

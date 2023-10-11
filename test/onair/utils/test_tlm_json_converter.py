@@ -552,7 +552,7 @@ def test_tlm_json_converter_mergeDicts_when_args_contain_shared_keys(mocker):
     for i in range(len(base_dicts)):
         dict_len = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
         for j in range(dict_len):
-            key, value = str(MagicMock()), str(MagicMock())
+            key, value = (str(i) + str(j)), pytest.gen.randint(0,1000) # arbitrary, 0 to 1000
             base_dicts[i][key] = value
             merged_dict[key] = value
 

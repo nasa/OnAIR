@@ -11,9 +11,9 @@ test-onair:
   image: aetd-dockerlab.gsfc.nasa.gov/spar-lab/onair/onair-meta
   stage: test
   script:
-    - python3.9 -m pip install -r requirements_pip.txt
+    - python3.11 -m pip install -r requirements_pip.txt
     - pwd
-    - python3.9 driver.py -t
+    - python3.11 driver.py -t
     - coverage report    
     - coverage xml
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
