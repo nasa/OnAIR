@@ -35,18 +35,7 @@ def test_PlannersInterface__init__sets_instance_headers_to_given_headers_and_doe
     # Assert
     assert cut.headers == arg_headers
 
-def test_PlannersInterface__init__throws_AttributeError_when_given_module_file_has_no_attribute_Plugin(mocker):
-    # Arrange
-    fake_module_name = MagicMock()
-    arg_headers = []
-
-    arg__ai_plugins = {MagicMock()}
-
-    # Act
-
-    # Assert
-
-def test_PlannersInterfacee__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
+def test_PlannersInterface__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
     # Arrange
     arg_headers = []
     arg__ai_plugins = {}
@@ -58,11 +47,10 @@ def test_PlannersInterfacee__init__sets_instance_ai_constructs_to_a_list_of_the_
         arg_headers.append(MagicMock())
     num_fake_ai_plugins = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_ai_plugins):
-        arg__ai_plugins[str(MagicMock())] = str(MagicMock())
+        arg__ai_plugins[str(i)] = str(MagicMock())
         fake_spec_list.append(MagicMock())
         fake_module_list.append(MagicMock())
         
-
     expected_ai_constructs = []
     for i in range(num_fake_ai_plugins):
         expected_ai_constructs.append(MagicMock())
@@ -128,5 +116,3 @@ def test_render_reasoning_does_nothing():
 
     # Assert
     assert result == None
-
-
