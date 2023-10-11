@@ -60,7 +60,7 @@ def test_DataDrivenLearning__init__sets_instance_ai_constructs_to_a_list_of_the_
         arg_headers.append(MagicMock())
     num_fake_ai_plugins = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_ai_plugins):
-        arg__ai_plugins[str(MagicMock())] = str(MagicMock())
+        arg__ai_plugins[str(i)] = str(MagicMock())
         fake_spec_list.append(MagicMock())
         fake_module_list.append(MagicMock())
         
