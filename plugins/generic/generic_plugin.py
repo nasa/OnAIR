@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import numpy as np
-from onair.src.data_driven_components.ai_plugin_abstract.core import AIPlugIn
+from onair.src.ai_components.ai_plugin_abstract.core import AIPlugIn
 
 class Plugin(AIPlugIn):
     def apriori_training(self,batch_data=[]):

@@ -11,21 +11,31 @@
 Agent Class
 Deals with supervised learning for diagnosing statuses
 """
-from ..data_driven_components.data_driven_learning import DataDrivenLearning
+from ..ai_components.learners_interface import LearnersInterface
+from ..ai_components.planners_interface import PlannersInterface
 from ..reasoning.diagnosis import Diagnosis
 
 class Agent:
     def __init__(self, vehicle, plugin_list):
         self.vehicle_rep = vehicle
-        self.learning_systems = DataDrivenLearning(self.vehicle_rep.get_headers(),plugin_list)
         self.mission_status = self.vehicle_rep.get_status()
         self.bayesian_status = self.vehicle_rep.get_bayesian_status()
 
+        # AI Interfaces
+        self.learning_systems = LearnersInterface(self.vehicle_rep.get_headers(),plugin_list)
+        self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),plugin_list)
+
     # Markov Assumption holds 
     def reason(self, frame):
+        # Update with new telemetry 
         self.vehicle_rep.update(frame)
         self.mission_status = self.vehicle_rep.get_status() 
         self.learning_systems.update(frame, self.mission_status)
+        self.planning_systems.update(frame, self.mission_status)
+
+        # Check for a salient event, needing acionable outcome
+        self.learning_systems.check_for_salient_event()
+        self.planning_systems.check_for_salient_event()
 
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """
