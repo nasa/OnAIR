@@ -9,6 +9,7 @@
 
 import numpy as np
 from onair.src.ai_components.ai_plugin_abstract.core import AIPlugIn
+# from onair.src.reasoning.reasoning_plugin_abstract.core import ReasoningPlugIn
 
 class Plugin(AIPlugIn):
     def apriori_training(self,batch_data=[]):
@@ -17,7 +18,7 @@ class Plugin(AIPlugIn):
         """
         pass
             
-    def update(self,frame=[]):
+    def update(self,frame=[], high_level={}):
         """
         Given streamed data point, system should update internally
         """

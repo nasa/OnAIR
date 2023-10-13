@@ -11,10 +11,10 @@
 import pytest
 from mock import MagicMock
 
-import onair.src.reasoning.reasoning_plugin_abstract.core as core
-from onair.src.reasoning.reasoning_plugin_abstract.core import ReasoningPlugIn
+import onair.src.reasoning.complex_reasoning_plugin_abstract.core as core
+from onair.src.reasoning.complex_reasoning_plugin_abstract.core import ComplexReasoningPlugIn
 
-class FakeReasoningPlugIn(ReasoningPlugIn):
+class FakeComplexReasoningPlugIn(ComplexReasoningPlugIn):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
 
@@ -24,11 +24,11 @@ class FakeReasoningPlugIn(ReasoningPlugIn):
     def render_reasoning(self):
         return dict()
 
-class IncompleteFakeReasoningPlugIn(ReasoningPlugIn):
+class IncompleteFakeComplexReasoningPlugIn(ComplexReasoningPlugIn):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
 
-class BadFakeReasoningPlugIn(ReasoningPlugIn):
+class BadFakeComplexReasoningPlugIn(ComplexReasoningPlugIn):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
 
@@ -39,32 +39,32 @@ class BadFakeReasoningPlugIn(ReasoningPlugIn):
         return super().render_reasoning()
         
 # abstract methods tests
-def test_ReasoningPlugIn_raises_error_because_of_unimplemented_abstract_methods():
+def test_ComplexReasoningPlugIn_raises_error_because_of_unimplemented_abstract_methods():
     # Arrange - None
     # Act
     with pytest.raises(TypeError) as e_info:
-        cut = ReasoningPlugIn.__new__(ReasoningPlugIn)
+        cut = ComplexReasoningPlugIn.__new__(ComplexReasoningPlugIn)
     
     # Assert
-    assert "Can't instantiate abstract class ReasoningPlugIn with" in e_info.__str__()
+    assert "Can't instantiate abstract class ComplexReasoningPlugIn with" in e_info.__str__()
     assert "update" in e_info.__str__()
     assert "render_reasoning" in e_info.__str__()
 
 # Incomplete plugin call tests
-def test_ReasoningPlugIn_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
+def test_ComplexReasoningPlugIn_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
     # Arrange - None
     # Act
     with pytest.raises(TypeError) as e_info:
-        cut = IncompleteFakeReasoningPlugIn.__new__(IncompleteFakeReasoningPlugIn)
+        cut = IncompleteFakeComplexReasoningPlugIn.__new__(IncompleteFakeComplexReasoningPlugIn)
     
     # Assert
-    assert "Can't instantiate abstract class IncompleteFakeReasoningPlugIn with" in e_info.__str__()
+    assert "Can't instantiate abstract class IncompleteFakeComplexReasoningPlugIn with" in e_info.__str__()
     assert "update" in e_info.__str__()
     assert "render_reasoning" in e_info.__str__()
 
-def test_ReasoningPlugIn_raises_error_when_an_inherited_class_calls_abstract_methods_in_parent():
+def test_ComplexReasoningPlugIn_raises_error_when_an_inherited_class_calls_abstract_methods_in_parent():
     # Act
-    cut = BadFakeReasoningPlugIn.__new__(BadFakeReasoningPlugIn)
+    cut = BadFakeComplexReasoningPlugIn.__new__(BadFakeComplexReasoningPlugIn)
 
     # populate list with the functions that should raise exceptions when called.
     not_implemented_functions = [cut.update, cut.render_reasoning]
@@ -74,11 +74,11 @@ def test_ReasoningPlugIn_raises_error_when_an_inherited_class_calls_abstract_met
         assert "NotImplementedError" in e_info.__str__()
 
 # Complete plugin call tests
-def test_ReasoningPlugIn_does_not_raise_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_implemented_by_that_class():
+def test_ComplexReasoningPlugIn_does_not_raise_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_implemented_by_that_class():
     # Arrange
     exception_raised = False
     try:
-        fake_ic = FakeReasoningPlugIn.__new__(FakeReasoningPlugIn)
+        fake_ic = FakeComplexReasoningPlugIn.__new__(FakeComplexReasoningPlugIn)
     except:
         exception_raised = True
     
@@ -88,12 +88,12 @@ def test_ReasoningPlugIn_does_not_raise_error_when_an_inherited_class_is_instant
 # Complete plugin call tests
 
 # __init__ tests
-def test_ReasoningPlugIn__init__raises_assertion_error_when_given__headers_len_is_not_greater_than_0():
+def test_ComplexReasoningPlugIn__init__raises_assertion_error_when_given__headers_len_is_not_greater_than_0():
     # Arrange
     arg__name = MagicMock()
     arg__headers = []
 
-    cut = FakeReasoningPlugIn.__new__(FakeReasoningPlugIn)
+    cut = FakeComplexReasoningPlugIn.__new__(FakeComplexReasoningPlugIn)
 
     # Act
     with pytest.raises(AssertionError) as e_info:
@@ -102,12 +102,12 @@ def test_ReasoningPlugIn__init__raises_assertion_error_when_given__headers_len_i
     # Assert
     assert e_info.match('')
 
-def test_ReasoningPlugIn__init__sets_instance_values_to_given_args_when_given__headers_len_is_greater_than_0(mocker):
+def test_ComplexReasoningPlugIn__init__sets_instance_values_to_given_args_when_given__headers_len_is_greater_than_0(mocker):
     # Arrange
     arg__name = MagicMock()
     arg__headers = MagicMock()
 
-    cut = FakeReasoningPlugIn.__new__(FakeReasoningPlugIn)
+    cut = FakeComplexReasoningPlugIn.__new__(FakeComplexReasoningPlugIn)
 
     mocker.patch(core.__name__ + '.len', return_value=pytest.gen.randint(1, 200)) # arbitrary, from 1 to 200 (but > 0)
 

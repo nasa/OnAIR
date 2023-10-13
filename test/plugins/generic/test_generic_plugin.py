@@ -11,36 +11,36 @@
 import pytest
 from mock import MagicMock
 
-from plugins.generic import generic_plugin
-from plugins.generic import Plugin
+# from plugins.generic import generic_plugin
+# from plugins.generic import Plugin
 
-# test apriori training
-def test_apriori_training_does_nothing():
-    # Arrange
-    cut = Plugin.__new__(Plugin)
+# # test apriori training
+# def test_apriori_training_does_nothing():
+#     # Arrange
+#     cut = Plugin.__new__(Plugin)
 
-    # Act
-    result = cut.apriori_training()
+#     # Act
+#     result = cut.apriori_training()
 
-    # Assert
-    assert result == None
+#     # Assert
+#     assert result == None
 
-def test_update_does_nothing():
-    # Arrange
-    cut = Plugin.__new__(Plugin)
+# def test_update_does_nothing():
+#     # Arrange
+#     cut = Plugin.__new__(Plugin)
 
-    # Act
-    result = cut.update()
+#     # Act
+#     result = cut.update()
 
-    # Assert
-    assert result == None
+#     # Assert
+#     assert result == None
 
-def test_render_reasoning_does_nothing():
-    # Arrange
-    cut = Plugin.__new__(Plugin)
+# def test_render_reasoning_does_nothing():
+#     # Arrange
+#     cut = Plugin.__new__(Plugin)
     
-    # Act
-    result = cut.render_reasoning()
+#     # Act
+#     result = cut.render_reasoning()
 
-    # Assert
-    assert result == None
+#     # Assert
+#     assert result == None

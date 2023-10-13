@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
    standards and structures of compliance for user-created 
    and/or imported plug-ins/libraries
 """
-class ReasoningPlugIn(ABC):
+class ComplexReasoningPlugIn(ABC):
     def __init__(self, _name, _headers):
         """
         Superclass for custom/complex reasoning plugins that users can write. 

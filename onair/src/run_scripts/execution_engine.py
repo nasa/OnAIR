@@ -49,7 +49,8 @@ class ExecutionEngine:
         self.sim = None
 
         # Init plugins
-        self.plugin_list = ['']
+        self.ai_plugin_list = ['']
+        self.complex_plugin_list = ['']
 
         self.save_flag = save_flag
         self.save_name = run_name
@@ -77,18 +78,9 @@ class ExecutionEngine:
 
             ## Parse Required Data: Names
             self.parser_file_name = config['DEFAULT']['ParserFileName']
+            self.ai_plugin_list = self.parse_plugins_list(config['DEFAULT']['AIPluginList'])
+            self.complex_plugin_list = self.parse_plugins_list(config['DEFAULT']['ComplexPluginList'])
 
-            ## Parse Required Data: Plugin name to path dict
-            config_plugin_list = config['DEFAULT']['PluginList']
-            ast_plugin_list = self.ast_parse_eval(config_plugin_list)
-            if isinstance(ast_plugin_list.body, ast.Dict) and len(ast_plugin_list.body.keys) > 0:
-                temp_plugin_list = ast.literal_eval(config_plugin_list)
-            else:
-                raise ValueError(f"{config_plugin_list} is an invalid PluginList. It must be a dict of at least 1 key/value pair.")
-            for plugin_name in temp_plugin_list.values():
-                if not(os.path.exists(plugin_name)):
-                    raise FileNotFoundError(f"In config file '{config_filepath}', path '{plugin_name}' does not exist or is formatted incorrectly.")
-            self.plugin_list = temp_plugin_list
         except KeyError as e:
             new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
             raise KeyError(new_message) from e
@@ -106,6 +98,22 @@ class ExecutionEngine:
         except:
             pass
 
+    def parse_plugins_list(self, config_plugin_list): 
+        try:
+            ## Parse Required Data: Plugin name to path dict
+            ast_plugin_list = self.ast_parse_eval(config_plugin_list)
+            if isinstance(ast_plugin_list.body, ast.Dict) and len(ast_plugin_list.body.keys) > 0:
+                temp_plugin_list = ast.literal_eval(config_plugin_list)
+            else:
+                raise ValueError(f"{config_plugin_list} is an invalid PluginList. It must be a dict of at least 1 key/value pair.")
+            for plugin_name in temp_plugin_list.values():
+                if not(os.path.exists(plugin_name)):
+                    raise FileNotFoundError(f"In config file '{config_filepath}', path '{plugin_name}' does not exist or is formatted incorrectly.")
+            return temp_plugin_list
+        except KeyError as e:
+            new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
+            raise KeyError(new_message) from e
+
     def parse_data(self, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
         data_source_spec = importlib.util.spec_from_file_location('data_source', parser_file_name)
         data_source_module = importlib.util.module_from_spec(data_source_spec)
@@ -113,7 +121,7 @@ class ExecutionEngine:
         self.simDataParser = data_source_module.DataSource(data_file_name, metadata_file_name, subsystems_breakdown)
 
     def setup_sim(self):
-        self.sim = Simulator(self.simDataParser, self.plugin_list)
+        self.sim = Simulator(self.simDataParser, self.ai_plugin_list, self.complex_plugin_list)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath
