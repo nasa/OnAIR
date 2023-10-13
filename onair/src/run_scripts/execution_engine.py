@@ -49,7 +49,9 @@ class ExecutionEngine:
         self.sim = None
 
         # Init plugins
-        self.ai_plugin_list = ['']
+        self.knowledge_rep_plugin_list = ['']
+        self.learners_plugin_list = ['']
+        self.planners_plugin_list = ['']
         self.complex_plugin_list = ['']
 
         self.save_flag = save_flag
@@ -78,7 +80,10 @@ class ExecutionEngine:
 
             ## Parse Required Data: Names
             self.parser_file_name = config['DEFAULT']['ParserFileName']
-            self.ai_plugin_list = self.parse_plugins_list(config['DEFAULT']['AIPluginList'])
+
+            self.knowledge_rep_plugin_list = self.parse_plugins_list(config['DEFAULT']['KnowledgeRepPluginList'])
+            self.learners_plugin_list = self.parse_plugins_list(config['DEFAULT']['LearnersPluginList'])
+            self.planners_plugin_list = self.parse_plugins_list(config['DEFAULT']['PlannersPluginList'])
             self.complex_plugin_list = self.parse_plugins_list(config['DEFAULT']['ComplexPluginList'])
 
         except KeyError as e:
@@ -121,7 +126,11 @@ class ExecutionEngine:
         self.simDataParser = data_source_module.DataSource(data_file_name, metadata_file_name, subsystems_breakdown)
 
     def setup_sim(self):
-        self.sim = Simulator(self.simDataParser, self.ai_plugin_list, self.complex_plugin_list)
+        self.sim = Simulator(self.simDataParser, 
+                             self.knowledge_rep_plugin_list, 
+                             self.learners_plugin_list,
+                             self.planners_plugin_list,
+                             self.complex_plugin_list)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath

@@ -9,7 +9,6 @@
 
 import numpy as np
 from onair.src.ai_components.ai_plugin_abstract.core import AIPlugIn
-# from onair.src.reasoning.reasoning_plugin_abstract.core import ReasoningPlugIn
 
 class Plugin(AIPlugIn):
     def apriori_training(self,batch_data=[]):

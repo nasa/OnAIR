@@ -36,7 +36,7 @@ class AIPlugIn(ABC):
         raise NotImplementedError
         
     @abstractmethod
-    def update(self, frame=[]):
+    def update(self, low_level_data=[], high_level_data={}):
         """
         Given streamed data point, system should update internally
         """

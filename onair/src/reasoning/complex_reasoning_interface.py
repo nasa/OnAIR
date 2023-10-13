@@ -19,15 +19,16 @@ class ComplexReasoningInterface:
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers
         self.reasoning_constructs = []
+        
         for module_name in list(_reasoning_plugins.keys()):
             spec = importlib.util.spec_from_file_location(module_name, _reasoning_plugins[module_name])
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             self.reasoning_constructs.append(module.Plugin(module_name,headers))
 
-    def update(self, low_level_data, high_level_data):
+    def update(self, high_level_data):
         for plugin in self.reasoning_constructs:
-            plugin.update(low_level_data,high_level_data)
+            plugin.update(high_level_data)
 
     def check_for_salient_event(self):
         pass
