@@ -28,7 +28,7 @@ class ComplexReasoningInterface:
 
     def update(self, high_level_data):
         for plugin in self.reasoning_constructs:
-            plugin.update(high_level_data)
+            plugin.update(high_level_data=high_level_data)
 
     def check_for_salient_event(self):
         pass

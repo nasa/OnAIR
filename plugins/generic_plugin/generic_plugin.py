@@ -17,7 +17,7 @@ class Plugin(AIPlugIn):
         """
         pass
             
-    def update(self,frame=[], high_level={}):
+    def update(self,low_level_data=[], high_level_data={}):
         """
         Given streamed data point, system should update internally
         """
