@@ -25,7 +25,7 @@ class PlannersInterface:
             spec.loader.exec_module(module)
             self.ai_constructs.append(module.Plugin(module_name,headers))
 
-    def update(self, curr_raw_tlm, status):
+    def update(self, high_level_data):
         # Raw TLM should be transformed into high-leve state representation here 
         # Can store something as stale unless a planning thread is launched 
         pass

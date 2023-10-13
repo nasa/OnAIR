@@ -17,30 +17,28 @@ from ..reasoning.complex_reasoning_interface import ComplexReasoningInterface
 from ..reasoning.diagnosis import Diagnosis
 
 class Agent:
-    def __init__(self, vehicle, ai_plugin_list, complex_plugin_list):
+    def __init__(self, vehicle, learners_plugin_list, planners_plugin_list, complex_plugin_list):
+
         self.vehicle_rep = vehicle
         self.mission_status = self.vehicle_rep.get_status()
         self.bayesian_status = self.vehicle_rep.get_bayesian_status()
 
         # AI Interfaces
-        self.learning_systems = LearnersInterface(self.vehicle_rep.get_headers(),ai_plugin_list)
-        self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),ai_plugin_list)
+        self.learning_systems = LearnersInterface(self.vehicle_rep.get_headers(),learners_plugin_list)
+        self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),planners_plugin_list)
         self.complex_reasoning_systems = ComplexReasoningInterface(self.vehicle_rep.get_headers(),complex_plugin_list)
 
-    # Markov Assumption holds 
     def reason(self, frame):
-        # Update with new telemetry 
-        self.vehicle_rep.update(frame)
-        self.mission_status = self.vehicle_rep.get_status() 
-        self.learning_systems.update(frame, self.mission_status)
-        self.planning_systems.update(frame, self.mission_status)
+        self.vehicle_rep.update(frame) 
+        self.learning_systems.update(frame, self.vehicle_rep.get_state_information(['status']))
+        self.planning_systems.update(self.vehicle_rep.get_state_information('PDDL_state')) 
+        
+        
+        aggregate_high_level_info = {'vehicle_rep' : self.vehicle_rep.get_state_information(),
+                                     'learning_systems' : self.learning_systems.render_reasoning(),
+                                     'planning_systems' : self.planning_systems.render_reasoning()}
 
-        # Check for a salient event, needing acionable outcome
-        self.learning_systems.check_for_salient_event()
-        self.planning_systems.check_for_salient_event()
-
-        # NOT YET COMPLETE
-        self.complex_reasoning_systems.update(frame, self.learning_systems.check_for_salient_event())
+        self.complex_reasoning_systems.update(aggregate_high_level_info)
 
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """

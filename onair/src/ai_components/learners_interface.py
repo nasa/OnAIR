@@ -29,11 +29,9 @@ class LearnersInterface:
         for plugin in self.ai_constructs:
             plugin.apriori_training(batch_data)
 
-    def update(self, curr_data, status):
-        input_data = curr_data
-        output_data = status_to_oneHot(status)
+    def update(self, low_level_data, high_level_data):
         for plugin in self.ai_constructs:
-            plugin.update(input_data)
+            plugin.update(low_level_data)
 
     def check_for_salient_event(self):
         pass

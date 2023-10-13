@@ -17,13 +17,28 @@ from .telemetry_test_suite import TelemetryTestSuite
 
 from ..util.print_io import *
 
+import importlib.util
+
+# from ..util.data_conversion import *
+
 class VehicleRepresentation:
-    def __init__(self, headers, tests):
+    def __init__(self, headers, tests, _knowledge_rep_plugins={}):
         assert(len(headers) == len(tests))
-        self.status = Status('MISSION')
         self.headers = headers
+        self.knowledge_synthesis_constructs = []
+
+        for module_name in list(_knowledge_rep_plugins.keys()):
+            spec = importlib.util.spec_from_file_location(module_name, _knowledge_rep_plugins[module_name])
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            self.knowledge_synthesis_constructs.append(module.Plugin(module_name,headers))
+
+
+        self.status = Status('MISSION')
         self.test_suite = TelemetryTestSuite(headers, tests)
-        self.curr_data = ['-']* len(self.headers)
+
+        
+        self.curr_data = ['-']* len(self.headers) #stale data
 
     ##### UPDATERS #################################
     def update(self, frame):
@@ -54,5 +69,8 @@ class VehicleRepresentation:
 
     def get_batch_status_reports(self, batch_data):
         return
+
+    def get_state_information(self, scope=['status']):
+        return {}
 
 
