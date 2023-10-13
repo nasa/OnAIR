@@ -10,21 +10,15 @@
 """
 Reasoning interface class for managing all complex custom reasoning components
 """
-import importlib.util
 
 from ..util.data_conversion import *
+from ..util.plugin_import import import_plugins
 
 class ComplexReasoningInterface:
     def __init__(self, headers, _reasoning_plugins={}):
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers
-        self.reasoning_constructs = []
-        
-        for module_name in list(_reasoning_plugins.keys()):
-            spec = importlib.util.spec_from_file_location(module_name, _reasoning_plugins[module_name])
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            self.reasoning_constructs.append(module.Plugin(module_name,headers))
+        self.reasoning_constructs = import_plugins(self.headers,_reasoning_plugins)
 
     def update(self, high_level_data):
         for plugin in self.reasoning_constructs:

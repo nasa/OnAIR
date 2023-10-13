@@ -10,20 +10,15 @@
 """
 Data driven learning class for managing all data driven AI components
 """
-import importlib.util
-
+from ..util.plugin_import import import_plugins
 from ..util.data_conversion import *
 
 class LearnersInterface:
-    def __init__(self, headers, _ai_plugins={}):
+    def __init__(self, headers, _learner_plugins={}):
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers
-        self.ai_constructs = []
-        for module_name in list(_ai_plugins.keys()):
-            spec = importlib.util.spec_from_file_location(module_name, _ai_plugins[module_name])
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            self.ai_constructs.append(module.Plugin(module_name,headers))
+        self.ai_constructs = import_plugins(self.headers, _learner_plugins)
+        
     
     def apriori_training(self, batch_data):
         for plugin in self.ai_constructs:
