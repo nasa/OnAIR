@@ -10,20 +10,14 @@
 """
 Planners interface class for managing all planning-based AI components
 """
-import importlib.util
-
+from ..util.plugin_import import import_plugins
 from ..util.data_conversion import *
 
 class PlannersInterface:
-    def __init__(self, headers, _ai_plugins={}):
+    def __init__(self, headers, _planner_plugins={}):
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers
-        self.ai_constructs = []
-        for module_name in list(_ai_plugins.keys()):
-            spec = importlib.util.spec_from_file_location(module_name, _ai_plugins[module_name])
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            self.ai_constructs.append(module.Plugin(module_name,headers))
+        self.ai_constructs = import_plugins(self.headers,_planner_plugins)
 
     def update(self, high_level_data):
         # Raw TLM should be transformed into high-leve state representation here 

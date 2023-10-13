@@ -16,22 +16,14 @@ from .status import Status
 from .telemetry_test_suite import TelemetryTestSuite
 
 from ..util.print_io import *
-
-import importlib.util
-
+from ..util.plugin_import import import_plugins
 # from ..util.data_conversion import *
 
 class VehicleRepresentation:
     def __init__(self, headers, tests, _knowledge_rep_plugins={}):
         assert(len(headers) == len(tests))
         self.headers = headers
-        self.knowledge_synthesis_constructs = []
-
-        for module_name in list(_knowledge_rep_plugins.keys()):
-            spec = importlib.util.spec_from_file_location(module_name, _knowledge_rep_plugins[module_name])
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            self.knowledge_synthesis_constructs.append(module.Plugin(module_name,headers))
+        self.knowledge_synthesis_constructs = import_plugins(self.headers,_knowledge_rep_plugins)
 
 
         self.status = Status('MISSION')
