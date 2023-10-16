@@ -34,6 +34,10 @@ class VehicleRepresentation:
 
     ##### UPDATERS #################################
     def update(self, frame):
+        # Update constructs
+        for construct in self.knowledge_synthesis_constructs:
+            construct.update(frame)
+
         for i in range(len(frame)):
             if frame[i] != '-':
                 self.curr_data[i] = frame[i]
@@ -63,6 +67,9 @@ class VehicleRepresentation:
         return
 
     def get_state_information(self, scope=['status']):
-        return {}
+        state_info = {}
+        for construct in self.knowledge_synthesis_constructs:
+            state_info[construct.component_name] = construct.render_reasoning()
+        return state_info
 
 
