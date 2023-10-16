@@ -107,11 +107,11 @@ class ExecutionEngine:
     def parse_plugins_list(self, config_plugin_list): 
         try:
             ## Parse Required Data: Plugin name to path dict
-            # ast_plugin_list = self.ast_parse_eval(config_plugin_list)
-            # if isinstance(ast_plugin_list.body, ast.Dict) and len(ast_plugin_list.body.keys) > 0:
-            #     temp_plugin_list = ast.literal_eval(config_plugin_list)
-            # else:
-            #     raise ValueError(f"{config_plugin_list} is an invalid PluginList. It must be a dict of at least 1 key/value pair.")
+            ast_plugin_list = self.ast_parse_eval(config_plugin_list)
+            if isinstance(ast_plugin_list.body, ast.Dict):
+                temp_plugin_list = ast.literal_eval(config_plugin_list)
+            else:
+                raise ValueError(f"{config_plugin_list} is an invalid PluginList. It must be a dict.")
             temp_plugin_list = ast.literal_eval(config_plugin_list)
             for plugin_name in temp_plugin_list.values():
                 if not(os.path.exists(plugin_name)):
