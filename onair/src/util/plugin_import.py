@@ -13,6 +13,7 @@ Function to import user-specified plugins (from config files) into interfaces
 """
 
 import importlib.util
+import sys
 
 def import_plugins(headers, module_dict):
     plugin_list = []
@@ -20,5 +21,7 @@ def import_plugins(headers, module_dict):
                 spec = importlib.util.spec_from_file_location(module_name, module_dict[module_name])
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
-                plugin_list.append(module.Plugin(module_name,headers))
+                sys.modules[module_name] = module         
+                plugin = __import__(f'{module_name}.{module_name}_plugin', fromlist=[f'{module_name}_plugin'])            
+                plugin_list.append(plugin.Plugin(module_name,headers))
     return(plugin_list)
