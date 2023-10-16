@@ -28,6 +28,10 @@ class Agent:
         self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),planners_plugin_list)
         self.complex_reasoning_systems = ComplexReasoningInterface(self.vehicle_rep.get_headers(),complex_plugin_list)
 
+      
+    def render_reasoning(self):
+        return self.complex_reasoning_systems.render_reasoning()
+
     def reason(self, frame):
         self.vehicle_rep.update(frame) 
         self.learning_systems.update(frame, self.vehicle_rep.get_state_information(['status']))
@@ -39,6 +43,10 @@ class Agent:
                                      'planning_systems' : self.planning_systems.render_reasoning()}
 
         self.complex_reasoning_systems.update(aggregate_high_level_info)
+        
+        return self.render_reasoning()
+        # Does this need further separation?
+  
 
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """
