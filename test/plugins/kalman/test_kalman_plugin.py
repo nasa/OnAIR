@@ -12,8 +12,8 @@ import pytest
 from mock import MagicMock
 import onair
 
-from plugins.kalman_plugin import kalman_plugin
-from plugins.kalman_plugin import Plugin as Kalman
+from plugins.kalman import kalman_plugin
+from plugins.kalman.kalman_plugin import Plugin as Kalman
 
 # test init
 def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args_except_window_size(mocker):
