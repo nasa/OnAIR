@@ -50,10 +50,10 @@ class ExecutionEngine:
         self.sim = None
 
         # Init plugins
-        self.knowledge_rep_plugin_list = ['']
-        self.learners_plugin_list = ['']
-        self.planners_plugin_list = ['']
-        self.complex_plugin_list = ['']
+        self.knowledge_rep_plugin_dict = ['']
+        self.learners_plugin_dict = ['']
+        self.planners_plugin_dict = ['']
+        self.complex_plugin_dict = ['']
 
         self.save_flag = save_flag
         self.save_name = run_name
@@ -82,19 +82,21 @@ class ExecutionEngine:
             ## Parse Required Data: Names
             self.parser_file_name = config['DEFAULT']['ParserFileName']
 
-            self.knowledge_rep_plugin_list = self.parse_plugins_list(config['DEFAULT']['KnowledgeRepPluginList'])
-            self.learners_plugin_list = self.parse_plugins_list(config['DEFAULT']['LearnersPluginList'])
-            self.planners_plugin_list = self.parse_plugins_list(config['DEFAULT']['PlannersPluginList'])
-            self.complex_plugin_list = self.parse_plugins_list(config['DEFAULT']['ComplexPluginList'])
+            ## Parse Required Data: Plugins
+            self.knowledge_rep_plugin_dict = self.parse_plugins_dict(config['DEFAULT']['KnowledgeRepPluginDict'])
+            self.learners_plugin_dict = self.parse_plugins_dict(config['DEFAULT']['LearnersPluginDict'])
+            self.planners_plugin_dict = self.parse_plugins_dict(config['DEFAULT']['PlannersPluginDict'])
+            self.complex_plugin_dict = self.parse_plugins_dict(config['DEFAULT']['ComplexPluginDict'])
+
+            ## Parse Optional Data: Flags
+            ## 'RUN_FLAGS' must exist, but individual flags return False if missing
+            self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
+            self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
+            self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
 
         except KeyError as e:
             new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
             raise KeyError(new_message) from e
-
-        ## Parse Optional Data: Flags
-        self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
-        self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
-        self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
         
         ## Parse Optional Data: Benchmarks
         try:
@@ -104,22 +106,18 @@ class ExecutionEngine:
         except:
             pass
 
-    def parse_plugins_list(self, config_plugin_list): 
-        try:
-            ## Parse Required Data: Plugin name to path dict
-            ast_plugin_list = self.ast_parse_eval(config_plugin_list)
-            if isinstance(ast_plugin_list.body, ast.Dict):
-                temp_plugin_list = ast.literal_eval(config_plugin_list)
-            else:
-                raise ValueError(f"{config_plugin_list} is an invalid PluginList. It must be a dict.")
-            temp_plugin_list = ast.literal_eval(config_plugin_list)
-            for plugin_name in temp_plugin_list.values():
-                if not(os.path.exists(plugin_name)):
-                    raise FileNotFoundError(f"In config file '{self.config_filepath}', path '{plugin_name}' does not exist or is formatted incorrectly.")
-            return temp_plugin_list
-        except KeyError as e:
-            new_message = f"Config file: '{self.config_filepath}', missing key: {e.args[0]}"
-            raise KeyError(new_message) from e
+    def parse_plugins_dict(self, config_plugin_dict): 
+        ## Parse Required Data: Plugin name to path dict
+        ast_plugin_dict = self.ast_parse_eval(config_plugin_dict)
+        if isinstance(ast_plugin_dict.body, ast.Dict):
+            temp_plugin_dict = ast.literal_eval(config_plugin_dict)
+        else:
+            raise ValueError(f"Plugin dict {config_plugin_dict} from {self.config_filepath} is invalid. It must be a dict.")
+
+        for plugin_file in temp_plugin_dict.values():
+            if not(os.path.exists(plugin_file)):
+                raise FileNotFoundError(f"In config file '{self.config_filepath}' Plugin path '{plugin_file}' does not exist.")
+        return temp_plugin_dict
 
     def parse_data(self, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
         data_source_spec = importlib.util.spec_from_file_location('data_source', parser_file_name)
@@ -129,10 +127,10 @@ class ExecutionEngine:
 
     def setup_sim(self):
         self.sim = Simulator(self.simDataParser, 
-                             self.knowledge_rep_plugin_list, 
-                             self.learners_plugin_list,
-                             self.planners_plugin_list,
-                             self.complex_plugin_list)
+                             self.knowledge_rep_plugin_dict, 
+                             self.learners_plugin_dict,
+                             self.planners_plugin_dict,
+                             self.complex_plugin_dict)
         try:
             fls = ast.literal_eval(self.benchmarkFiles)
             fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath

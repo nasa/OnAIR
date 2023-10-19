@@ -17,16 +17,16 @@ from ..reasoning.complex_reasoning_interface import ComplexReasoningInterface
 from ..reasoning.diagnosis import Diagnosis
 
 class Agent:
-    def __init__(self, vehicle, learners_plugin_list, planners_plugin_list, complex_plugin_list):
+    def __init__(self, vehicle, learners_plugin_dict, planners_plugin_dict, complex_plugin_dict):
 
         self.vehicle_rep = vehicle
         self.mission_status = self.vehicle_rep.get_status()
         self.bayesian_status = self.vehicle_rep.get_bayesian_status()
 
         # AI Interfaces
-        self.learning_systems = LearnersInterface(self.vehicle_rep.get_headers(),learners_plugin_list)
-        self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),planners_plugin_list)
-        self.complex_reasoning_systems = ComplexReasoningInterface(self.vehicle_rep.get_headers(),complex_plugin_list)
+        self.learning_systems = LearnersInterface(self.vehicle_rep.get_headers(),learners_plugin_dict)
+        self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),planners_plugin_dict)
+        self.complex_reasoning_systems = ComplexReasoningInterface(self.vehicle_rep.get_headers(),complex_plugin_dict)
 
       
     def render_reasoning(self):
