@@ -20,12 +20,15 @@ from math import ceil, floor
 def test_Simulator__init__creates_Vehicle_and_Agent(mocker):
     # Arrange
     arg_dataParser = MagicMock()
-    arg_ai_plugin_list = MagicMock()
+    arg_knowledge_rep_plugin_list = MagicMock()
+    arg_learners_plugin_list = MagicMock()
+    arg_planners_plugin_list = MagicMock()
     arg_complex_plugin_list = MagicMock()
 
-    fake_vehicle_metadata = [MagicMock(), MagicMock()]
+    fake_headers = MagicMock()
+    fake_tests = MagicMock()
+    fake_vehicle_metadata = [fake_headers, fake_tests]
     fake_vehicle = MagicMock()
-    fake_simData = MagicMock()
     fake_agent = MagicMock()
 
     cut = Simulator.__new__(Simulator)
@@ -35,14 +38,18 @@ def test_Simulator__init__creates_Vehicle_and_Agent(mocker):
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
-    cut.__init__(arg_dataParser, arg_ai_plugin_list, arg_complex_plugin_list)
+    cut.__init__(arg_dataParser, 
+                 arg_knowledge_rep_plugin_list, 
+                 arg_learners_plugin_list, 
+                 arg_planners_plugin_list, 
+                 arg_complex_plugin_list)
 
     # Assert
-    assert sim.VehicleRepresentation.call_count == 1
-    assert sim.VehicleRepresentation.call_args_list[0].args == (fake_vehicle_metadata[0], fake_vehicle_metadata[1], )
     assert cut.simData == arg_dataParser
+    assert sim.VehicleRepresentation.call_count == 1
+    assert sim.VehicleRepresentation.call_args_list[0].args == (fake_headers, fake_tests, arg_knowledge_rep_plugin_list)
     assert sim.Agent.call_count == 1
-    assert sim.Agent.call_args_list[0].args == (fake_vehicle, arg_ai_plugin_list, arg_complex_plugin_list)
+    assert sim.Agent.call_args_list[0].args == (fake_vehicle, arg_learners_plugin_list, arg_planners_plugin_list, arg_complex_plugin_list)
     assert cut.agent == fake_agent
 
 # run_sim tests
