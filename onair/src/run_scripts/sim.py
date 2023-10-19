@@ -24,11 +24,11 @@ MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100
 
 class Simulator:
-    def __init__(self, dataParser, knowledge_rep_plugin_list, learners_plugin_list, planners_plugin_list, complex_plugin_list):
+    def __init__(self, dataParser, knowledge_rep_plugin_dict, learners_plugin_dict, planners_plugin_dict, complex_plugin_dict):
         self.simData = dataParser
         headers, tests = dataParser.get_vehicle_metadata()
-        vehicle = VehicleRepresentation(headers, tests, knowledge_rep_plugin_list)
-        self.agent = Agent(vehicle, learners_plugin_list, planners_plugin_list, complex_plugin_list)
+        vehicle = VehicleRepresentation(headers, tests, knowledge_rep_plugin_dict)
+        self.agent = Agent(vehicle, learners_plugin_dict, planners_plugin_dict, complex_plugin_dict)
 
     def run_sim(self, IO_Flag=False, dev_flag=False, viz_flag = True):
         if IO_Flag == True: print_sim_header()
