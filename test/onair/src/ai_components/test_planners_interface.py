@@ -14,9 +14,6 @@ from mock import MagicMock
 import onair.src.ai_components.planners_interface as planners_interface
 from onair.src.ai_components.planners_interface import PlannersInterface
 
-import importlib
-from typing import Dict
-
 # __init__ tests
 def test_PlannersInterface__init__raises_AssertionError_when_given_headers_len_is_0():
     # Arrange
@@ -55,6 +52,7 @@ def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_se
     assert planners_interface.import_plugins.call_args_list[0].args == (arg_headers, arg__planner_plugins)
     assert cut.ai_constructs == forced_return_ai_constructs
 
+# update tests
 def test_update_does_nothing():
     # Arrange
     arg_high_level_data = MagicMock()
@@ -67,6 +65,7 @@ def test_update_does_nothing():
     # Assert
     assert result == None
 
+# check_for_salient_event tests
 def test_check_for_salient_event_does_nothing():
     # Arrange
     cut = PlannersInterface.__new__(PlannersInterface)
@@ -77,6 +76,7 @@ def test_check_for_salient_event_does_nothing():
     # Assert
     assert result == None
 
+# render reasoning tests
 def test_render_reasoning_does_nothing():
     # Arrange
     cut = PlannersInterface.__new__(PlannersInterface)
