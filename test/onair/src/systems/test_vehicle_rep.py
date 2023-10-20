@@ -330,7 +330,36 @@ def test_VehicleRepresentation_update_does_not_raise_IndexError_when_frame_locat
 
     # Assert
     assert e_info.match(fake_non_IndexError_message)
+    
+def test_VehicleRepresentation_update_calls_update_with_given_frame_on_each_knowledge_synthesis_constructs_item(mocker):
+    # Arrange
+    arg_frame = MagicMock()
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
 
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
+    cut.knowledge_synthesis_constructs = []
+
+    num_fake_knowledge_synthesis_constructs = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
+    for i in range(num_fake_knowledge_synthesis_constructs):
+        cut.knowledge_synthesis_constructs.append(MagicMock())
+    
+    # Set status, needed by update
+    fake_suite_status = []
+    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+        fake_suite_status.append(MagicMock())
+    mocker.patch.object(cut.status, 'set_status')
+    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
+
+    # Act
+    cut.update(arg_frame) # vehicle_rep update doesn't return anything
+
+    # Assert
+    for i in range(num_fake_knowledge_synthesis_constructs):
+        assert cut.knowledge_synthesis_constructs[i].update.call_count == 1
+        assert cut.knowledge_synthesis_constructs[i].update.call_args_list[0].args == (arg_frame, )
+        
 # get_headers
 def test_VehicleRepresentation_get_headers_returns_headers():
     # Arrange
@@ -442,3 +471,26 @@ def test_VehicleRepresentation_get_batch_status_reports_returngets_None():
 
     # Assert
     assert result == expected_result
+    
+# get_state_information tests
+def test_VehicleRepresentation_get_state_information_calls_render_reasoning_on_knowledge_synthesis_constructs(mocker):
+    # Arrange
+    arg_frame = MagicMock()
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
+    fake_render_reasoning_result = MagicMock()
+    
+    fake_knowledge_synthesis_construct = MagicMock()
+    fake_knowledge_synthesis_construct.component_name = 'foo'
+
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
+    cut.knowledge_synthesis_constructs = [fake_knowledge_synthesis_construct]
+    mocker.patch.object(fake_knowledge_synthesis_construct, 'render_reasoning', return_value=fake_render_reasoning_result)
+
+    # Act
+    result = cut.get_state_information()
+
+    # Assert
+    assert list(result.keys())[0] == 'foo'
+    assert list(result.values())[0] == fake_render_reasoning_result
