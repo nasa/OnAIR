@@ -72,8 +72,11 @@ def test_VehicleRepresentation__init__sets_status_to_Status_with_str_MISSION_and
 def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_frame_is_vacant_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
 
@@ -84,7 +87,7 @@ def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_fram
     mocker.patch.object(cut.test_suite, 'execute_suite')
     mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
     mocker.patch.object(cut.status, 'set_status')
-    
+
     # Act
     cut.update(arg_frame)
 
@@ -99,12 +102,15 @@ def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_fram
 def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_frame_is_all_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
 
     num_fake_empty_steps = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_empty_steps):
         arg_frame.append('-')
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     cut.curr_data = []
@@ -133,12 +139,15 @@ def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_fram
 def test_VehicleRepresentation_update_does_puts_all_frame_data_into_curr_data_when_none_are_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
 
     num_fake_full_steps = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_full_steps):
         arg_frame.append(MagicMock())
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     cut.curr_data = [MagicMock()] * num_fake_full_steps
@@ -167,6 +176,8 @@ def test_VehicleRepresentation_update_does_puts_all_frame_data_into_curr_data_wh
 def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
 
     num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
     for i in range(num_fake_total_steps):
@@ -176,6 +187,7 @@ def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_lis
         arg_frame[i] = '-'
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     unchanged_data = MagicMock()
@@ -209,6 +221,8 @@ def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_lis
 def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_including_locations_in_curr_data_that_do_not_exist_in_frame_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
     # Arrange
     arg_frame = []
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
 
     num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
     for i in range(num_fake_total_steps):
@@ -218,6 +232,7 @@ def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_lis
         arg_frame[i] = '-'
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     unchanged_data = MagicMock()
@@ -252,12 +267,15 @@ def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_lis
 def test_VehicleRepresentation_update_raises_IndexError_when_frame_location_size_with_relevant_data_extends_beyond_curr_data_size(mocker):
     # Arrange
     arg_frame = []
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
 
     num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
     for i in range(num_fake_total_steps):
         arg_frame.append(MagicMock())
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     unchanged_data = MagicMock()
@@ -281,12 +299,15 @@ def test_VehicleRepresentation_update_raises_IndexError_when_frame_location_size
 def test_VehicleRepresentation_update_does_not_raise_IndexError_when_frame_location_size_with_only_empty_steps_extends_beyond_curr_data_size(mocker):
     # Arrange
     arg_frame = []
+    arg_headers = MagicMock()
+    arg_tests = MagicMock()
 
     num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
     for i in range(num_fake_total_steps):
         arg_frame.append(MagicMock())
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.test_suite = MagicMock()
     cut.status = MagicMock()
     unchanged_data = MagicMock()
