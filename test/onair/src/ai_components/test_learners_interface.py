@@ -123,7 +123,7 @@ def test_LearnersInterface_update_calls_update_with_given_low_level_data_on_each
         assert cut.ai_constructs[i].update.call_args_list[0].args == (arg_low_level_data, )
 
 # check_for_salient_event
-def test_salient_event_does_nothing():
+def test_LearnersInterface_salient_event_does_nothing():
     # Arrange
     cut = LearnersInterface.__new__(LearnersInterface)
 
