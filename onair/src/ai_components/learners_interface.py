@@ -19,7 +19,6 @@ class LearnersInterface:
         self.headers = headers
         self.ai_constructs = import_plugins(self.headers, _learner_plugins)
         
-    
     def apriori_training(self, batch_data):
         for plugin in self.ai_constructs:
             plugin.apriori_training(batch_data)

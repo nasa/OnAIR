@@ -14,135 +14,44 @@ from mock import MagicMock
 import onair.src.ai_components.learners_interface as learners_interface
 from onair.src.ai_components.learners_interface import LearnersInterface
 
-import importlib
-from typing import Dict
-
 # __init__ tests
-def test_LearnersInterface__init__sets_instance_headers_to_given_headers_and_does_nothing_else_when_given__ai_plugins_is_empty(mocker):
+def test_LearnersInterface__init__raises_AssertionError_when_given_headers_len_is_0():
     # Arrange
-    arg_headers = []
-    arg__ai_plugins = {}
+    arg_headers = MagicMock()
 
-    num_fake_headers = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 headers (0 has own test)
-    for i in range(num_fake_headers):
-        arg_headers.append(MagicMock())
+    arg_headers.__len__.return_value = 0
 
     cut = LearnersInterface.__new__(LearnersInterface)
 
     # Act
-    cut.__init__(arg_headers, arg__ai_plugins)
+    with pytest.raises(AssertionError) as e_info:
+        cut.__init__(arg_headers)
+
+    # Assert
+    assert e_info.match('Headers are required')
+
+def test_LearnersInterface__init__sets_self_headers_to_given_headers_and_sets_self_ai_constructs_to_return_value_of_import_plugins(mocker):
+    # Arrange
+    arg_headers = MagicMock()
+    arg__learner_plugins = MagicMock()
+
+    arg_headers.__len__.return_value = 1
+
+    forced_return_ai_constructs = MagicMock()
+
+    mocker.patch(learners_interface.__name__ + '.import_plugins', return_value=forced_return_ai_constructs)
+    
+
+    cut = LearnersInterface.__new__(LearnersInterface)
+
+    # Act
+    cut.__init__(arg_headers, arg__learner_plugins)
 
     # Assert
     assert cut.headers == arg_headers
-
-def test_LearnersInterface__init__throws_AttributeError_when_given_module_file_has_no_attribute_Plugin(mocker):
-    # Arrange
-    fake_module_name = MagicMock()
-    arg_headers = []
-
-    arg__ai_plugins = {MagicMock()}
-
-    
-
-    # Act
-
-    # Assert
-
-def test_LearnersInterface__init__sets_instance_ai_constructs_to_a_list_of_the_calls_AIPlugIn_with_plugin_and_given_headers_for_each_item_in_given__ai_plugins_when_given__ai_plugins_is_occupied(mocker):
-    # Arrange
-    arg_headers = []
-    arg__ai_plugins = {}
-    fake_spec_list = []
-    fake_module_list = []
-
-    num_fake_headers = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 headers (0 has own test)
-    for i in range(num_fake_headers):
-        arg_headers.append(MagicMock())
-    num_fake_ai_plugins = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_ai_plugins):
-        arg__ai_plugins[str(i)] = str(MagicMock())
-        fake_spec_list.append(MagicMock())
-        fake_module_list.append(MagicMock())
-        
-
-    expected_ai_constructs = []
-    for i in range(num_fake_ai_plugins):
-        expected_ai_constructs.append(MagicMock())
-
-    # mocker.patch('importlib.import_module', return_value=fake_imported_module)
-    mocker.patch('importlib.util.spec_from_file_location',side_effect=fake_spec_list)
-    mocker.patch('importlib.util.module_from_spec',side_effect=fake_module_list)
-    for spec in fake_spec_list:
-        mocker.patch.object(spec,'loader.exec_module')
-    for i, module in enumerate(fake_module_list):
-        mocker.patch.object(module,'Plugin',return_value=expected_ai_constructs[i])
-
-    cut = LearnersInterface.__new__(LearnersInterface)
-
-    # Act
-    cut.__init__(arg_headers, arg__ai_plugins)
-
-    # Assert
-    assert importlib.util.spec_from_file_location.call_count == len(arg__ai_plugins)
-    assert importlib.util.module_from_spec.call_count == len(fake_spec_list)
-
-    for i in range(num_fake_ai_plugins):
-        fake_name = list(arg__ai_plugins.keys())[i]
-        fake_path = arg__ai_plugins[fake_name]
-        assert importlib.util.spec_from_file_location.call_args_list[i].args == (fake_name,fake_path)
-        assert importlib.util.module_from_spec.call_args_list[i].args == (fake_spec_list[i],)
-        assert fake_spec_list[i].loader.exec_module.call_count == 1
-        assert fake_spec_list[i].loader.exec_module.call_args_list[0].args == (fake_module_list[i],)
-        assert fake_module_list[i].Plugin.call_count == 1
-        assert fake_module_list[i].Plugin.call_args_list[0].args == (fake_name,arg_headers)
-
-    assert cut.ai_constructs == expected_ai_constructs
-
-# update tests
-def test_LearnersInterface_update_only_calls_flotify_input_with_given_curr_data_and_status_to_oneHot_with_given_status_when_instance_ai_constructs_is_empty(mocker):
-    # Arrange
-    arg_curr_data = MagicMock()
-    arg_status = MagicMock()
-
-    mocker.patch(learners_interface.__name__ + '.status_to_oneHot')
-
-    cut = LearnersInterface.__new__(LearnersInterface)
-    cut.ai_constructs = []
-
-    # Act
-    result = cut.update(arg_curr_data, arg_status)
-
-    # Assert
-    assert learners_interface.status_to_oneHot.call_count == 1
-    assert learners_interface.status_to_oneHot.call_args_list[0].args == (arg_status,)
-    assert result == None
-
-def test_LearnersInterface_update_calls_flotify_input_with_given_curr_data_and_status_to_oneHot_with_given_status_and_calls_update_on_each_ai_construct_with_input_data_when_instance_ai_constructs_is_occupied(mocker):
-    # Arrange
-    arg_curr_data = MagicMock()
-    arg_status = MagicMock()
-
-    mocker.patch(learners_interface.__name__ + '.status_to_oneHot')
-
-    cut = LearnersInterface.__new__(LearnersInterface)
-    cut.ai_constructs = []
-
-    num_fake_ai_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_ai_constructs):
-        fake_ai_construct = MagicMock()
-        cut.ai_constructs.append(fake_ai_construct)
-        mocker.patch.object(fake_ai_construct, 'update')
-
-    # Act
-    result = cut.update(arg_curr_data, arg_status)
-
-    # Assert
-    assert learners_interface.status_to_oneHot.call_count == 1
-    assert learners_interface.status_to_oneHot.call_args_list[0].args == (arg_status,)
-    for i in range(num_fake_ai_constructs):
-        assert cut.ai_constructs[i].update.call_count == 1
-        assert cut.ai_constructs[i].update.call_args_list[0].args == (arg_curr_data,)
-    assert result == None
+    assert learners_interface.import_plugins.call_count == 1
+    assert learners_interface.import_plugins.call_args_list[0].args == (arg_headers, arg__learner_plugins)
+    assert cut.ai_constructs == forced_return_ai_constructs
 
 # apriori_training tests
 def test_LearnersInterface_apriori_training_does_nothing_when_instance_ai_constructs_is_empty():
@@ -177,6 +86,41 @@ def test_LearnersInterface_apriori_training_calls_apriori_training_on_each_ai_co
         assert cut.ai_constructs[i].apriori_training.call_count == 1
         assert cut.ai_constructs[i].apriori_training.call_args_list[0].args == (arg_batch_data, )
     assert result == None
+
+# update tests
+def test_LearnersInterface_update_does_nothing_when_instance_ai_constructs_is_empty():
+    # Arrange
+    arg_low_level_data = MagicMock()
+    arg_high_level_data = MagicMock()
+
+    cut = LearnersInterface.__new__(LearnersInterface)
+    cut.ai_constructs = []
+
+    # Act
+    result = cut.update(arg_low_level_data, arg_high_level_data)
+
+    # Assert
+    assert result == None
+
+def test_LearnersInterface_update_calls_update_with_given_low_level_data_on_each_ai_constructs_item(mocker):
+    # Arrange
+    arg_low_level_data = MagicMock()
+    arg_high_level_data = MagicMock()
+
+    cut = LearnersInterface.__new__(LearnersInterface)
+    cut.ai_constructs = []
+
+    num_fake_ai_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    for i in range(num_fake_ai_constructs):
+        cut.ai_constructs.append(MagicMock())
+
+    # Act
+    result = cut.update(arg_low_level_data, arg_high_level_data)
+
+    # Assert
+    for i in range(num_fake_ai_constructs):
+        assert cut.ai_constructs[i].update.call_count == 1
+        assert cut.ai_constructs[i].update.call_args_list[0].args == (arg_low_level_data, )
 
 # check_for_salient_event
 def test_salient_event_does_nothing():
