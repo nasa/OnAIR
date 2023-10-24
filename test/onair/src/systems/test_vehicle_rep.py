@@ -69,298 +69,143 @@ def test_VehicleRepresentation__init__sets_status_to_Status_with_str_MISSION_and
     assert cut.curr_data == ['-'] * fake_len
 
 # update tests
-def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_frame_is_vacant_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
+def test_VehicleRepresentation_update_calls_update_constructs_then_update_curr_data_then_executes_test_suite_and_finally_sets_status(mocker):
     # Arrange
-    arg_frame = []
-    arg_headers = MagicMock()
-    arg_tests = MagicMock()
-
-    cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
-    cut.test_suite = MagicMock()
-    cut.status = MagicMock()
+    mock_manager = mocker.MagicMock()
+    arg_frame = MagicMock()
 
     fake_suite_status = []
-    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
+    num_fake_status = pytest.gen.randint(0, 10) # from 0 to 10 arbitrary
+    for i in range(num_fake_status):
         fake_suite_status.append(MagicMock())
-
-    mocker.patch.object(cut.test_suite, 'execute_suite')
-    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
-    mocker.patch.object(cut.status, 'set_status')
-
-    # Act
-    cut.update(arg_frame)
-
-    # Assert
-    assert cut.test_suite.execute_suite.call_count == 1
-    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
-    assert cut.test_suite.get_suite_status.call_count == 1
-    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
-    assert cut.status.set_status.call_count == 1
-    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
-    
-def test_VehicleRepresentation_update_does_not_set_any_curr_data_when_given_frame_is_all_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
-    # Arrange
-    arg_frame = []
-    arg_headers = MagicMock()
-    arg_tests = MagicMock()
-
-    num_fake_empty_steps = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_empty_steps):
-        arg_frame.append('-')
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.test_suite = MagicMock()
+    cut.curr_data = MagicMock()
     cut.status = MagicMock()
-    cut.curr_data = []
 
-    fake_suite_status = []
-    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
-        fake_suite_status.append(MagicMock())
-
-    mocker.patch.object(cut.test_suite, 'execute_suite')
-    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
-    mocker.patch.object(cut.status, 'set_status')
+    mock_manager.attach_mock(mocker.patch.object(cut, 'update_constructs'), 'update_constructs')
+    mock_manager.attach_mock(mocker.patch.object(cut, 'update_curr_data'), 'update_curr_data')
+    mock_manager.attach_mock(mocker.patch.object(cut.test_suite, 'execute_suite'), 'test_suite.execute_suite')
+    mock_manager.attach_mock(mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status), 'test_suite.get_suite_status')
+    mock_manager.attach_mock(mocker.patch.object(cut.status, 'set_status'), 'status.set_status')
     
     # Act
     cut.update(arg_frame)
 
     # Assert
-    assert len(arg_frame) == num_fake_empty_steps
-    assert cut.curr_data == []
-    assert cut.test_suite.execute_suite.call_count == 1
-    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
-    assert cut.test_suite.get_suite_status.call_count == 1
-    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
-    assert cut.status.set_status.call_count == 1
-    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
-    
-def test_VehicleRepresentation_update_does_puts_all_frame_data_into_curr_data_when_none_are_empty_step_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
-    # Arrange
-    arg_frame = []
-    arg_headers = MagicMock()
-    arg_tests = MagicMock()
+    mock_manager.assert_has_calls([
+        mocker.call.update_curr_data(arg_frame),
+        mocker.call.test_suite.execute_suite(cut.curr_data),
+        mocker.call.test_suite.get_suite_status(),
+        mocker.call.status.set_status(*fake_suite_status),
+        mocker.call.update_constructs(cut.curr_data),
+    ], any_order=False)
 
-    num_fake_full_steps = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_full_steps):
-        arg_frame.append(MagicMock())
-
-    cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
-    cut.test_suite = MagicMock()
-    cut.status = MagicMock()
-    cut.curr_data = [MagicMock()] * num_fake_full_steps
-
-    fake_suite_status = []
-    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
-        fake_suite_status.append(MagicMock())
-
-    mocker.patch.object(cut.test_suite, 'execute_suite')
-    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
-    mocker.patch.object(cut.status, 'set_status')
-    
-    # Act
-    cut.update(arg_frame)
-
-    # Assert
-    assert len(arg_frame) == num_fake_full_steps
-    assert cut.curr_data == arg_frame
-    assert cut.test_suite.execute_suite.call_count == 1
-    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
-    assert cut.test_suite.get_suite_status.call_count == 1
-    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
-    assert cut.status.set_status.call_count == 1
-    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
-    
-def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
-    # Arrange
-    arg_frame = []
-    arg_headers = MagicMock()
-    arg_tests = MagicMock()
-
-    num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
-    for i in range(num_fake_total_steps):
-        arg_frame.append(MagicMock())
-    location_fake_empty_steps = pytest.gen.sample(list(range(num_fake_total_steps)), pytest.gen.randint(1, num_fake_total_steps - 1)) # sample from a list of all numbers up to total then take from 1 to up to 1 less than total
-    for i in location_fake_empty_steps:
-        arg_frame[i] = '-'
-
-    cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
-    cut.test_suite = MagicMock()
-    cut.status = MagicMock()
-    unchanged_data = MagicMock()
-    cut.curr_data = [unchanged_data] * num_fake_total_steps
-
-    fake_suite_status = []
-    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
-        fake_suite_status.append(MagicMock())
-
-    mocker.patch.object(cut.test_suite, 'execute_suite')
-    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
-    mocker.patch.object(cut.status, 'set_status')
-    
-    # Act
-    cut.update(arg_frame)
-
-    # Assert
-    assert len(arg_frame) == num_fake_total_steps
-    for i in range(len(cut.curr_data)):
-        if location_fake_empty_steps.count(i):
-            assert cut.curr_data[i] == unchanged_data
-        else:
-            assert cut.curr_data[i] == arg_frame[i]
-    assert cut.test_suite.execute_suite.call_count == 1
-    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
-    assert cut.test_suite.get_suite_status.call_count == 1
-    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
-    assert cut.status.set_status.call_count == 1
-    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
-    
-def test_VehicleRepresentation_update_puts_frame_data_into_curr_data_at_same_list_location_unless_data_is_empty_step_then_leaves_curr_data_that_location_alone_including_locations_in_curr_data_that_do_not_exist_in_frame_and_executes_suite_with_given_frame_and_sets_status_with_suite_status(mocker):
-    # Arrange
-    arg_frame = []
-    arg_headers = MagicMock()
-    arg_tests = MagicMock()
-
-    num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
-    for i in range(num_fake_total_steps):
-        arg_frame.append(MagicMock())
-    location_fake_empty_steps = pytest.gen.sample(list(range(num_fake_total_steps)), pytest.gen.randint(1, num_fake_total_steps - 1)) # sample from a list of all numbers up to total then take from 1 to up to 1 less than total
-    for i in location_fake_empty_steps:
-        arg_frame[i] = '-'
-
-    cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
-    cut.test_suite = MagicMock()
-    cut.status = MagicMock()
-    unchanged_data = MagicMock()
-    cut.curr_data = [unchanged_data] * (num_fake_total_steps + pytest.gen.randint(1, 10)) # arbitrary, from 1 to 10 extra items over frame
-
-    fake_suite_status = []
-    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
-        fake_suite_status.append(MagicMock())
-
-    mocker.patch.object(cut.test_suite, 'execute_suite')
-    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
-    mocker.patch.object(cut.status, 'set_status')
-    
-    # Act
-    cut.update(arg_frame)
-
-    # Assert
-    assert len(arg_frame) == num_fake_total_steps
-    assert len(cut.curr_data) > len(arg_frame)
-    for i in range(len(cut.curr_data)):
-        if i >= len(arg_frame) or location_fake_empty_steps.count(i):
-            assert cut.curr_data[i] == unchanged_data
-        else:
-            assert cut.curr_data[i] == arg_frame[i]
-    assert cut.test_suite.execute_suite.call_count == 1
-    assert cut.test_suite.execute_suite.call_args_list[0].args == (arg_frame, )
-    assert cut.test_suite.get_suite_status.call_count == 1
-    assert cut.test_suite.get_suite_status.call_args_list[0].args == ()
-    assert cut.status.set_status.call_count == 1
-    assert cut.status.set_status.call_args_list[0].args == tuple(fake_suite_status)
-    
-def test_VehicleRepresentation_update_raises_IndexError_when_frame_location_size_with_relevant_data_extends_beyond_curr_data_size(mocker):
-    # Arrange
-    arg_frame = []
-    arg_headers = MagicMock()
-    arg_tests = MagicMock()
-
-    num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
-    for i in range(num_fake_total_steps):
-        arg_frame.append(MagicMock())
-
-    cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
-    cut.test_suite = MagicMock()
-    cut.status = MagicMock()
-    unchanged_data = MagicMock()
-    cut.curr_data = [unchanged_data] * (num_fake_total_steps - 1) # - 1 ensures less than with min of 1
-
-    fake_suite_status = []
-    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
-        fake_suite_status.append(MagicMock())
-
-    mocker.patch.object(cut.test_suite, 'execute_suite')
-    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
-    mocker.patch.object(cut.status, 'set_status')
-    
-    # Act
-    with pytest.raises(IndexError) as e_info:
-        cut.update(arg_frame)
-
-    # Assert
-    assert e_info.match('list assignment index out of range')
-    
-def test_VehicleRepresentation_update_does_not_raise_IndexError_when_frame_location_size_with_only_empty_steps_extends_beyond_curr_data_size(mocker):
-    # Arrange
-    arg_frame = []
-    arg_headers = MagicMock()
-    arg_tests = MagicMock()
-
-    num_fake_total_steps = pytest.gen.randint(2, 10) # arbitrary, from 2 to 10 (must have 2 to have at least one of each type)
-    for i in range(num_fake_total_steps):
-        arg_frame.append(MagicMock())
-
-    cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
-    cut.test_suite = MagicMock()
-    cut.status = MagicMock()
-    unchanged_data = MagicMock()
-    fake_curr_data_size = pytest.gen.randint(1, num_fake_total_steps - 1) # from 1 to 1 less than total
-    cut.curr_data = [unchanged_data] * fake_curr_data_size
-
-    for i in range(fake_curr_data_size, len(arg_frame)):
-        arg_frame[i] = '-'
-
-    fake_suite_status = []
-    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
-        fake_suite_status.append(MagicMock())
-    fake_non_IndexError_message = str(MagicMock())
-
-    mocker.patch.object(cut.test_suite, 'execute_suite', side_effect=Exception(fake_non_IndexError_message)) # testing short circuit that is provable to not be the IndexError
-
-    # Act
-    with pytest.raises(Exception) as e_info:
-        cut.update(arg_frame)
-
-    # Assert
-    assert e_info.match(fake_non_IndexError_message)
-    
-def test_VehicleRepresentation_update_calls_update_with_given_frame_on_each_knowledge_synthesis_constructs_item(mocker):
+# update_constructs tests
+def test_VehicleRepresentation_update_constructs_does_nothing_when_knowledge_synthesis_constructs_are_empty(mocker):
     # Arrange
     arg_frame = MagicMock()
-    arg_headers = MagicMock()
-    arg_tests = MagicMock()
 
-    cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
-    cut.knowledge_synthesis_constructs = []
-
-    num_fake_knowledge_synthesis_constructs = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
-    for i in range(num_fake_knowledge_synthesis_constructs):
-        cut.knowledge_synthesis_constructs.append(MagicMock())
+    fake_constructs = []
     
-    # Set status, needed by update
-    fake_suite_status = []
-    for i in range(pytest.gen.randint(1, 10)): # arbitrary, from 1 to 10 status items
-        fake_suite_status.append(MagicMock())
-    mocker.patch.object(cut.status, 'set_status')
-    mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status)
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.knowledge_synthesis_constructs = fake_constructs
 
     # Act
-    cut.update(arg_frame) # vehicle_rep update doesn't return anything
+    result = cut.update_constructs(arg_frame)
 
     # Assert
-    for i in range(num_fake_knowledge_synthesis_constructs):
-        assert cut.knowledge_synthesis_constructs[i].update.call_count == 1
-        assert cut.knowledge_synthesis_constructs[i].update.call_args_list[0].args == (arg_frame, )
-        
-# get_headers
+    assert result == None
+
+def test_VehicleRepresentation_update_constructs_calls_update_on_each_knowledge_synthesis_construct(mocker):
+    # Arrange
+    arg_frame = MagicMock()
+
+    num_fake_constructs = pytest.gen.randint(1, 10) # from 1 to 10 arbitrary, 0 has own test
+    fake_constructs = []
+
+    for i in range(num_fake_constructs):
+        fake_construct = MagicMock()
+        fake_constructs.append(fake_construct)
+        mocker.patch.object(fake_construct, 'update')
+    
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.knowledge_synthesis_constructs = fake_constructs
+
+    # Act
+    result = cut.update_constructs(arg_frame)
+
+    # Assert
+    for i in range(num_fake_constructs):
+        fake_constructs[i].update.call_count == 1
+        fake_constructs[i].update.call_args_list[0].args == (arg_frame, )
+
+# update_curr_data tests
+def test_VehicleRepresentation_update_does_nothing_when_given_frame_is_empty(mocker):
+    # Arrange
+    arg_frame = MagicMock()
+    arg_frame.__len__.return_value = 0
+
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
+
+    # Act
+    result = cut.update_curr_data(arg_frame)
+
+    # Assert
+    assert result == None
+
+def test_VehicleRepresentation_update_copies_all_frame_data_into_curr_data_when_all_frame_data_occupied(mocker):
+    # Arrange
+    arg_frame = []
+    num_items_in_arg_frame = pytest.gen.randint(1, 10) # from 1 to 10 arbitrary, 0 has own test
+
+    fake_curr_data = []
+
+    for i in range(num_items_in_arg_frame):
+        arg_frame.append(MagicMock())
+        fake_curr_data.append(MagicMock())
+    assert fake_curr_data != arg_frame # sanity check
+
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.curr_data = fake_curr_data
+
+    # Act
+    cut.update_curr_data(arg_frame)
+
+    # Assert
+    assert cut.curr_data == arg_frame
+
+def test_VehicleRepresentation_update_copies_only_occupied_frame_data_into_curr_data_when_some_frame_data_vacant(mocker):
+    # Arrange
+    arg_frame = []
+
+    num_items_in_arg_frame = pytest.gen.randint(1, 10) # from 1 to 10 arbitrary, 0 has own test
+    fake_curr_data = []
+
+    for i in range(num_items_in_arg_frame):
+        arg_frame.append(MagicMock())
+        fake_curr_data.append(MagicMock())
+    assert fake_curr_data != arg_frame # sanity check
+
+    expected_curr_data = arg_frame.copy()
+    num_vacant_frame_data = pytest.gen.randint(1, num_items_in_arg_frame) # from 1 to frame size
+    vacant_data_points = list(range(num_vacant_frame_data))
+
+    for i in vacant_data_points:
+        arg_frame[i] = '-'
+        expected_curr_data[i] = fake_curr_data[i]
+
+    cut = VehicleRepresentation.__new__(VehicleRepresentation)
+    cut.curr_data = fake_curr_data
+
+    # Act
+    cut.update_curr_data(arg_frame)
+
+    # Assert
+    assert cut.curr_data == expected_curr_data
+
+# get_headers tests
 def test_VehicleRepresentation_get_headers_returns_headers():
     # Arrange
     expected_result = MagicMock()

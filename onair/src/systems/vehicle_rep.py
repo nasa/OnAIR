@@ -25,24 +25,27 @@ class VehicleRepresentation:
         self.headers = headers
         self.knowledge_synthesis_constructs = import_plugins(self.headers,_knowledge_rep_plugins)
 
-
         self.status = Status('MISSION')
         self.test_suite = TelemetryTestSuite(headers, tests)
-
-        
+   
         self.curr_data = ['-']* len(self.headers) #stale data
 
     ##### UPDATERS #################################
     def update(self, frame):
         # Update constructs
+        self.update_curr_data(frame)
+        self.test_suite.execute_suite(self.curr_data)
+        self.status.set_status(*self.test_suite.get_suite_status())
+        self.update_constructs(self.curr_data)
+
+    def update_constructs(self, frame):
         for construct in self.knowledge_synthesis_constructs:
             construct.update(frame)
 
+    def update_curr_data(self, frame):
         for i in range(len(frame)):
             if frame[i] != '-':
                 self.curr_data[i] = frame[i]
-        self.test_suite.execute_suite(frame)
-        self.status.set_status(*self.test_suite.get_suite_status())
 
     ##### GETTERS AND SETTERS #####
     def get_headers(self):
