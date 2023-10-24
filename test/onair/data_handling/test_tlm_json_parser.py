@@ -350,10 +350,7 @@ def test_tlm_json_parser_reorganizeTlmDict_raises_error_when_arg_data_does_not_c
 
 def test_tlm_json_parser_reorganizeTlmDict_returns_empty_dict_when_arg_data_subsystems_exists_and_is_empty():
     # Arrange
-    arg_data_len = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
-    arg_data = {}
-    [arg_data.update({MagicMock() : MagicMock()}) for i in range(arg_data_len)]
-    arg_data.update({'subsystems' : {}})
+    arg_data = {'subsystems' : {}}
 
     # Assert
     result = tlm_json_parser.reorganizeTlmDict(arg_data)
@@ -361,25 +358,40 @@ def test_tlm_json_parser_reorganizeTlmDict_returns_empty_dict_when_arg_data_subs
     # Act
     assert result == {}
 
-def test_tlm_json_parser_reorganizeTlmDict_returns_expected_dict_when_arg_data_subsystems_exists_and_is_not_empty(mocker):
+def test_tlm_json_parser_reorganizeTlmDict_returns_empty_dict_when_arg_data_subsystems_exists_and_all_keys_map_to_empty():
     # Arrange
-    num_subsystems = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
-    fake_subsystems = [MagicMock() for i in range(num_subsystems)]
+    arg_data = {'subsystems' : {}}
 
-    arg_data_len = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
-    arg_data = {}
-    [arg_data.update({MagicMock() : MagicMock()}) for i in range(arg_data_len)]
-    arg_data.update({'subsystems' : {}})
+    num_fake_subsystems = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
+    fake_subsystems = [MagicMock() for i in range(num_fake_subsystems)]
+
+    for fs in fake_subsystems:
+        arg_data['subsystems'][fs] = {}
+
+    # Assert
+    result = tlm_json_parser.reorganizeTlmDict(arg_data)
+
+    # Act
+    assert result == {}
+
+def test_tlm_json_parser_reorganizeTlmDict_returns_expected_dict_when_arg_data_subsystems_exists_and_is_not_empty():
+    # Arrange
+    arg_data = {'subsystems' : {}}
+
+    num_fake_subsystems = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10, 0 has own test
+    fake_subsystems = [MagicMock() for i in range(num_fake_subsystems)]
+
     expected_result = {}
-    for ss in fake_subsystems:
-        arg_data['subsystems'].update({ss : {}})
-        num_fake_apps = pytest.gen.randint(0, 10) # arbitrary, from 0 to 10
-        for i in range(num_fake_apps):
-            fake_label = MagicMock()
-            fake_data = {MagicMock() : MagicMock()}
-            arg_data['subsystems'][ss].update({fake_label : fake_data})
-            expected_result.update({fake_label : fake_data})
-            expected_result[fake_label]['subsystem'] = ss
+
+    for fs in fake_subsystems:
+        arg_data['subsystems'][fs] = {}
+        num_fake_labels = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10, 0 has own test
+        for i in range(num_fake_labels):
+            fake_label = i
+            fake_label_value = MagicMock()
+            arg_data['subsystems'][fs][fake_label] = fake_label_value
+            expected_result[fake_label] = fake_label_value
+            expected_result[fake_label]['subsystem'] = fs
 
     # Assert
     result = tlm_json_parser.reorganizeTlmDict(arg_data)
