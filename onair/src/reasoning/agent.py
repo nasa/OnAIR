@@ -28,15 +28,13 @@ class Agent:
         self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),planners_plugin_dict)
         self.complex_reasoning_systems = ComplexReasoningInterface(self.vehicle_rep.get_headers(),complex_plugin_dict)
 
-      
     def render_reasoning(self):
         return self.complex_reasoning_systems.render_reasoning()
 
     def reason(self, frame):
         self.vehicle_rep.update(frame) 
-        self.learning_systems.update(frame, self.vehicle_rep.get_state_information(['status']))
-        self.planning_systems.update(self.vehicle_rep.get_state_information('PDDL_state')) 
-        
+        self.learning_systems.update(self.vehicle_rep.curr_data, self.vehicle_rep.get_state_information())
+        self.planning_systems.update(self.vehicle_rep.get_state_information()) 
         
         aggregate_high_level_info = {'vehicle_rep' : self.vehicle_rep.get_state_information(),
                                      'learning_systems' : self.learning_systems.render_reasoning(),
@@ -45,9 +43,7 @@ class Agent:
         self.complex_reasoning_systems.update(aggregate_high_level_info)
         
         return self.render_reasoning()
-        # Does this need further separation?
   
-
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """
         learning_system_results = self.learning_systems.render_reasoning()
@@ -56,4 +52,3 @@ class Agent:
                               self.bayesian_status,
                               self.vehicle_rep.get_current_faulting_mnemonics())
         return diagnosis.perform_diagnosis()
-
