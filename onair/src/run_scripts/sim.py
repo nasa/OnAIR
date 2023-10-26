@@ -46,7 +46,6 @@ class Simulator:
             if self.agent.mission_status == 'RED':
                 if last_fault == time_step - 1: #if they are consecutive
                     if (time_step - last_diagnosis) % DIAGNOSIS_INTERVAL == 0:
-                        print(time_step)
                         diagnosis_list.append(self.agent.diagnose(time_step))
                         last_diagnosis = time_step
                 else:
