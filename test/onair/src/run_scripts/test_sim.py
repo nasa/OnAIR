@@ -16,6 +16,10 @@ from onair.src.run_scripts.sim import Simulator
 
 from math import ceil, floor
 
+# constants tests
+def test_Simulator_DIAGNOSIS_INTERVAL_is_expected_value():
+    assert sim.DIAGNOSIS_INTERVAL == 100
+
 # __init__ tests
 def test_Simulator__init__creates_Vehicle_and_Agent(mocker):
     # Arrange
@@ -123,19 +127,21 @@ def test_Simulator_run_sim_prints_wait_message_when_given_IO_Flag_is_the_str_str
     assert sim.print_msg.call_args_list[0].args == ('Please wait...\n', )
     assert result == fake_diagnosis # check we ran through the method correctly
 
-def test_Simulator_run_sim_runs_until_time_step_2050_when_simData_always_has_more(mocker):
+def test_Simulator_run_sim_runs_until_has_more_is_false(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)
     cut.simData = MagicMock()
     cut.agent = MagicMock()
 
+    num_fake_steps = pytest.gen.randint(1, 100) # from 1 to 100 arbitrary for fast test
     fake_diagnosis = MagicMock()
     fake_next = MagicMock()
     fake_IO_Flag = MagicMock()
+    side_effects_for_has_more = [True] * (num_fake_steps) + [False]
 
     mocker.patch(sim.__name__ + '.print_sim_header')
     mocker.patch(sim.__name__ + '.print_msg')
-    mocker.patch.object(cut.simData, 'has_more', return_value=True)
+    mocker.patch.object(cut.simData, 'has_more', side_effect=side_effects_for_has_more)
     mocker.patch.object(cut.simData, 'get_next', return_value=fake_next)
     mocker.patch.object(cut.agent, 'reason')
     mocker.patch.object(cut, 'IO_check')
@@ -148,17 +154,17 @@ def test_Simulator_run_sim_runs_until_time_step_2050_when_simData_always_has_mor
     # Assert
     assert sim.print_sim_header.call_count == 0
     assert sim.print_msg.call_count == 0
-    assert cut.simData.get_next.call_count == 2050
-    for i in range(2050):
+    assert cut.simData.get_next.call_count == num_fake_steps
+    for i in range(num_fake_steps):
         assert cut.simData.get_next.call_args_list[i].args == ()
-    assert cut.agent.reason.call_count == 2050
-    for i in range(2050):
+    assert cut.agent.reason.call_count == num_fake_steps
+    for i in range(num_fake_steps):
         assert cut.agent.reason.call_args_list[i].args == (fake_next, )
-    assert cut.IO_check.call_count == 2050
-    for i in range(2050):
+    assert cut.IO_check.call_count == num_fake_steps
+    for i in range(num_fake_steps):
         assert cut.IO_check.call_args_list[i].args == (i, fake_IO_Flag, )
     assert cut.agent.diagnose.call_count == 1
-    assert cut.agent.diagnose.call_args_list[0].args == (2050, )
+    assert cut.agent.diagnose.call_args_list[0].args == (num_fake_steps, )
     assert result == fake_diagnosis
 
 def test_Simulator_run_sim_diagnose_always_performed_when_fault_is_on_first_time_step(mocker):
@@ -197,14 +203,15 @@ def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_conse
     cut.simData = MagicMock()
     cut.agent = MagicMock()
 
-    fake_diagnoses = [MagicMock()] * floor(2050/100)
-    fake_diagnoses.append(MagicMock())
+    num_fake_steps = pytest.gen.randint(sim.DIAGNOSIS_INTERVAL, sim.DIAGNOSIS_INTERVAL * 10) # from interval to (10 * interval) arbitrary
+    fake_diagnoses = [MagicMock()] * (floor(num_fake_steps/sim.DIAGNOSIS_INTERVAL) + 1) # + 1 is for last diagnosis
     fake_next = MagicMock()
     fake_IO_Flag = MagicMock()
+    side_effects_for_has_more = [True] * (num_fake_steps) + [False]
 
     mocker.patch(sim.__name__ + '.print_sim_header')
     mocker.patch(sim.__name__ + '.print_msg')
-    mocker.patch.object(cut.simData, 'has_more',  return_value=True) # True runs all time_steps
+    mocker.patch.object(cut.simData, 'has_more',  side_effect=side_effects_for_has_more)
     mocker.patch.object(cut.simData, 'get_next', return_value=fake_next)
     mocker.patch.object(cut.agent, 'reason')
     mocker.patch.object(cut, 'IO_check')
@@ -215,18 +222,18 @@ def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_conse
     result = cut.run_sim(fake_IO_Flag)
 
     # Assert
-    assert cut.simData.get_next.call_count == 2050
-    for i in range(2050):
+    assert cut.simData.get_next.call_count == num_fake_steps 
+    for i in range(num_fake_steps):
         assert cut.simData.get_next.call_args_list[i].args == ()
-    assert cut.agent.reason.call_count == 2050
-    for i in range(2050):
+    assert cut.agent.reason.call_count == num_fake_steps
+    for i in range(num_fake_steps):
         assert cut.agent.reason.call_args_list[i].args == (fake_next, )
-    assert cut.IO_check.call_count == 2050
-    for i in range(2050):
+    assert cut.IO_check.call_count == num_fake_steps
+    for i in range(num_fake_steps):
         assert cut.IO_check.call_args_list[i].args == (i, fake_IO_Flag, )
-    assert cut.agent.diagnose.call_count == ceil(2050/100)
+    assert cut.agent.diagnose.call_count == ceil(num_fake_steps/sim.DIAGNOSIS_INTERVAL)
     for i in range(cut.agent.diagnose.call_count):
-        assert cut.agent.diagnose.call_args_list[i].args == (i * 100, )
+        assert cut.agent.diagnose.call_args_list[i].args == (i * sim.DIAGNOSIS_INTERVAL, )
     assert result == fake_diagnoses[-1] # check we actually got the last diagnosis
 
 # set_benchmark_data tests

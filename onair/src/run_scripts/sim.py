@@ -20,7 +20,6 @@ from ..util.file_io import *
 from ..util.print_io import *
 from ..util.sim_io import *
 
-MAX_STEPS = 2050
 DIAGNOSIS_INTERVAL = 100
 
 class Simulator:
@@ -38,7 +37,7 @@ class Simulator:
         last_diagnosis = time_step
         last_fault = time_step
 
-        while self.simData.has_more() and time_step < MAX_STEPS:
+        while self.simData.has_more():
             next = self.simData.get_next()
             self.agent.reason(next)
             self.IO_check(time_step, IO_Flag)
@@ -47,6 +46,7 @@ class Simulator:
             if self.agent.mission_status == 'RED':
                 if last_fault == time_step - 1: #if they are consecutive
                     if (time_step - last_diagnosis) % DIAGNOSIS_INTERVAL == 0:
+                        print(time_step)
                         diagnosis_list.append(self.agent.diagnose(time_step))
                         last_diagnosis = time_step
                 else:
