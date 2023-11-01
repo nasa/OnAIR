@@ -329,7 +329,6 @@ def test_VehicleRepresentation_get_state_information_calls_render_reasoning_on_k
     fake_knowledge_synthesis_construct.component_name = 'foo'
 
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
-    cut.__init__(arg_headers, arg_tests) # Init to fill attributes
     cut.knowledge_synthesis_constructs = [fake_knowledge_synthesis_construct]
     mocker.patch.object(fake_knowledge_synthesis_construct, 'render_reasoning', return_value=fake_render_reasoning_result)
 
