@@ -19,7 +19,7 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements_pip.txt ]; then pip install -r requirements_pip.txt; fi
     - name: Test with pytest
-      run: python -m coverage run --branch --source=onair -m pytest ./test/
+      run: python -m coverage run --branch --source=onair,plugins -m pytest ./test/
     - name: Coverage report
       run: coverage report --skip-empty
     - name: Upload coverage reports to Codecov
