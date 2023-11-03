@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="80mm"
+   height="30mm"
+   viewBox="0 0 80 30"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="OnAIR_logo.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="55.3709"
+     inkscape:cy="288.05569"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1136"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-267)">
+    <g
+       aria-label="OnAIR"
+       transform="matrix(0.26458333,0,0,0.26458333,-0.37797619,267.07798)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:-10px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="flowRoot815">
+      <path
+         d="m 54.139734,23.639975 c -18.816,0 -31.392,10.752 -35.808,32.544 -4.32,21.696 3.936,32.256 22.848,32.256 h 8.832 c 18.912,0 31.392,-10.56 35.712,-32.256 4.416,-21.792 -3.936,-32.544 -22.752,-32.544 z m 6.528,11.328 c 12.48,0 16.608,6.336 13.632,21.12 -2.976,14.88 -9.504,21.024 -21.984,21.024 h -8.832 c -12.576,0 -16.8,-6.144 -13.824,-20.928 2.976,-14.88 9.696,-21.216 22.176,-21.216 z"
+         style="letter-spacing:-10px;fill:#0072b2;fill-opacity:1"
+         id="path892"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 99.339733,37.751975 c -5.088,0 -7.488,1.92 -8.736,7.872 l -8.544,42.816 h 10.176 l 7.871997,-39.456 c 0.192,-0.96 0.672,-1.44 1.536,-1.44 h 16.608 c 10.656,0 14.4,4.416 12.768,12.384 l -5.664,28.512 h 10.272 l 5.664,-28.512 c 2.88,-14.016 -3.84,-22.176 -21.024,-22.176 z"
+         style="letter-spacing:-10px;fill:#0072b2;fill-opacity:1"
+         id="path894"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 177.94762,36.311975 c 0.96,-1.536 2.112,-2.208 3.648,-2.208 1.536,0 2.496,0.672 2.784,2.208 l 9.216,52.128 h 12.576 l -10.368,-57.6 c -1.056,-6.048 -5.088,-8.352 -11.808,-8.352 -6.816,0 -11.616,2.304 -15.264,8.352 l -34.272,57.6 h 12.48 z"
+         style="letter-spacing:-10px;fill:#d55e00;fill-opacity:1"
+         id="path896"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 218.73148,23.639975 -12.96,64.8 h 11.328 l 12.96,-64.8 z"
+         style="letter-spacing:-10px;fill:#d55e00;fill-opacity:1"
+         id="path898"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 235.51531,23.639975 -2.304,11.328 h 35.52 c 6.24,0 8.256,3.936 7.392,8.544 -0.96,4.608 -4.416,9.024 -10.848,9.024 h -25.248 c -7.104,0 -10.752,2.976 -12.288,10.272 l -5.088,25.632 h 11.328 l 4.704,-23.424 c 0.192,-1.152 0.864,-1.632 1.92,-1.632 h 16.896 l 9.792,25.056 h 12.576 l -9.888,-25.92 c 10.464,-2.784 16.032,-11.424 17.664,-19.488 2.016,-10.368 -2.4,-19.392 -16.992,-19.392 z"
+         style="letter-spacing:-10px;fill:#0072b2;fill-opacity:1"
+         id="path900"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>
