@@ -46,7 +46,7 @@ def test_ExecutionEngine__init__sets_expected_values_but_does_no_calls_when_conf
     assert cut.benchmarkFiles == ''
     assert cut.benchmarkIndices == ''
     assert cut.parser_file_name == ''
-    assert cut.simDataParser == None
+    assert cut.simDataSource == None
     assert cut.sim == None
     assert cut.save_flag == arg_save_flag
     assert cut.save_name == arg_run_name
@@ -110,7 +110,7 @@ def test_ExecutionEngine_parse_configs_raises_FileNotFoundError_when_config_cann
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
-   
+
     # Act
     with pytest.raises(FileNotFoundError) as e_info:
         cut.parse_configs(arg_bad_config_filepath)
@@ -253,7 +253,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
 
     fake_keys.__len__.return_value = 1
     fake_keys.__iter__.return_value = iter([str(fake_plugin)])
-    
+
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
@@ -331,7 +331,7 @@ def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_er
 
     fake_keys.__len__.return_value = 1
     fake_keys.__iter__.return_value = iter([str(fake_plugin)])
-    
+
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
@@ -400,7 +400,7 @@ def test_ExecutionEngine_parse_plugins_list_raises_FileNotFoundError_when_single
     mocker.patch(execution_engine.__name__ + '.ast.literal_eval', return_value=fake_temp_plugin_dict)
     mocker.patch.object(fake_temp_plugin_dict, 'values', return_value=fake_values)
     mocker.patch(execution_engine.__name__ + '.os.path.exists', return_value=False)
-    
+
     # Act
     with pytest.raises(FileNotFoundError) as e_info:
         cut.parse_plugins_dict(arg_config_plugin_dict)
@@ -444,7 +444,7 @@ def test_ExecutionEngine_parse_plugins_list_raises_FileNotFoundError_when_any_co
     mocker.patch(execution_engine.__name__ + '.ast.literal_eval', return_value=fake_temp_plugin_dict)
     mocker.patch.object(fake_temp_plugin_dict, 'values', return_value=fake_values)
     mocker.patch(execution_engine.__name__ + '.os.path.exists', side_effect=exists_side_effects)
-    
+
     # Act
     with pytest.raises(FileNotFoundError) as e_info:
         cut.parse_plugins_dict(arg_config_plugin_dict)
@@ -478,7 +478,7 @@ def test_ExecutionEngine_returns_empty_dict_when_config_dict_is_empty(mocker):
     mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_dict)
     mocker.patch(execution_engine.__name__ + '.isinstance', return_value=True)
     mocker.patch(execution_engine.__name__ + '.ast.literal_eval', return_value=fake_temp_plugin_dict)
-    
+
     # Act
     result = cut.parse_plugins_dict(arg_config_plugin_dict)
 
@@ -514,7 +514,7 @@ def test_ExecutionEngine_returns_expected_dict_when_all_mapped_files_exist(mocke
     mocker.patch(execution_engine.__name__ + '.ast.literal_eval', return_value=fake_temp_plugin_dict)
     mocker.patch.object(fake_temp_plugin_dict, 'values', return_value=fake_values)
     mocker.patch(execution_engine.__name__ + '.os.path.exists', side_effect=exists_side_effects)
-    
+
     # Act
     result = cut.parse_plugins_dict(arg_config_plugin_dict)
 
@@ -533,7 +533,7 @@ def test_ExecutionEngine_returns_expected_dict_when_all_mapped_files_exist(mocke
         assert execution_engine.os.path.exists.call_args_list[i].args == (fake_path, )
 
 # parse_data tests
-def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mocker):
+def test_ExecutionEngine_parse_data_sets_the_simDataSource_to_the_data_parser(mocker):
     # Arrange
     arg_parser_file_name = MagicMock()
     arg_dataFile = str(MagicMock())
@@ -562,7 +562,7 @@ def test_ExecutionEngine_parse_data_sets_the_simDataParser_to_the_data_parser(mo
     assert fake_spec.loader.exec_module.call_count == 1
     assert fake_module.DataSource.call_count == 1
     assert fake_module.DataSource.call_args_list[0].args == (arg_dataFile, arg_metadataFile, arg_subsystems_breakdown, )
-    assert cut.simDataParser == fake_parser_class_instance
+    assert cut.simDataSource == fake_parser_class_instance
 
 def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_default_is_False(mocker):
     # Arrange
@@ -602,7 +602,7 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
 def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_and_sets_benchmark_data_when_no_exceptions_are_encountered(mocker):
     # Arrange
     cut = ExecutionEngine()
-    cut.simDataParser = MagicMock()
+    cut.simDataSource = MagicMock()
     cut.knowledge_rep_plugin_dict = MagicMock()
     cut.learners_plugin_dict = MagicMock()
     cut.planners_plugin_dict = MagicMock()
@@ -630,9 +630,9 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_and_sets_bench
 
     # Assert
     assert execution_engine.Simulator.call_count == 1
-    assert execution_engine.Simulator.call_args_list[0].args == (cut.simDataParser, 
-                                                                 cut.knowledge_rep_plugin_dict, 
-                                                                 cut.learners_plugin_dict, 
+    assert execution_engine.Simulator.call_args_list[0].args == (cut.simDataSource,
+                                                                 cut.knowledge_rep_plugin_dict,
+                                                                 cut.learners_plugin_dict,
                                                                  cut.planners_plugin_dict,
                                                                  cut.complex_plugin_dict)
     assert cut.sim == fake_sim
@@ -649,7 +649,7 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_and_sets_bench
 def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_set_bencmark_data_because_exception_is_encountered(mocker):
     # Arrange
     cut = ExecutionEngine.__new__(ExecutionEngine)
-    cut.simDataParser = MagicMock()
+    cut.simDataSource = MagicMock()
     cut.knowledge_rep_plugin_dict = MagicMock()
     cut.learners_plugin_dict = MagicMock()
     cut.planners_plugin_dict = MagicMock()
@@ -672,9 +672,9 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_s
 
     # Assert
     assert execution_engine.Simulator.call_count == 1
-    assert execution_engine.Simulator.call_args_list[0].args == (cut.simDataParser, 
-                                                                 cut.knowledge_rep_plugin_dict, 
-                                                                 cut.learners_plugin_dict, 
+    assert execution_engine.Simulator.call_args_list[0].args == (cut.simDataSource,
+                                                                 cut.knowledge_rep_plugin_dict,
+                                                                 cut.learners_plugin_dict,
                                                                  cut.planners_plugin_dict,
                                                                  cut.complex_plugin_dict)
     assert cut.sim == fake_sim
@@ -738,11 +738,11 @@ def test_ExecutionEngine_init_save_paths_makes_tmp_and_models_and_diagnosis_dire
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
-    mocker.patch(execution_engine.__name__ + '.os.path.join', 
+    mocker.patch(execution_engine.__name__ + '.os.path.join',
     side_effect=[fake_tmp_save_path, fake_tmp_models_path, fake_tmp_diagnosis_path])
     mocker.patch.object(cut, 'delete_save_paths')
     mocker.patch(execution_engine.__name__ + '.os.mkdir')
-    
+
     # Act
     cut.init_save_paths()
 
@@ -794,7 +794,7 @@ def test_ExecutionEngine_delete_save_paths_removes_tmp_tree_when_it_exists(mocke
     fake_dirs.append('tmp')
     for i in range(pytest.gen.randint(0, 5)): # 0 to 5
         fake_dirs.append(str(MagicMock()))
-        
+
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
@@ -824,7 +824,7 @@ def test_ExecutionEngine_delete_save_paths_prints_error_message_when_rmtree_rais
     fake_dirs.append('tmp')
     for i in range(pytest.gen.randint(0, 5)): # 0 to 5
         fake_dirs.append(str(MagicMock()))
-        
+
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
@@ -854,7 +854,7 @@ def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_prop
     fake_onair_tmp_save_path = str(MagicMock())
     fake_environ = {'ONAIR_SAVE_PATH':fake_onair_save_path, 'ONAIR_TMP_SAVE_PATH':fake_onair_tmp_save_path}
     fake_save_path = fake_onair_save_path + '/saved/' + arg_save_name + '_' + fake_complete_time
-    
+
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch(execution_engine.__name__ + '.gmtime', return_value=fake_gmtime)
@@ -875,7 +875,7 @@ def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_prop
     assert execution_engine.os.mkdir.call_args_list[0].args == (fake_save_path, )
     assert execution_engine.copy_tree.call_count == 1
     assert execution_engine.copy_tree.call_args_list[0].args == (fake_onair_tmp_save_path, fake_save_path, )
-    
+
 # set_run_param tests
 def test_ExecutionEngine_set_run_param_passes_given_arguments_to_setattr(mocker):
     # Arrange

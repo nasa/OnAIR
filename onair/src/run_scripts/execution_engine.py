@@ -23,17 +23,17 @@ from ..run_scripts.sim import Simulator
 
 class ExecutionEngine:
     def __init__(self, config_file='', run_name='', save_flag=False):
-        
-        # Init Housekeeping 
+
+        # Init Housekeeping
         self.run_name = run_name
         self.config_filepath = config_file
 
-        # Init Flags 
+        # Init Flags
         self.IO_Flag = False
         self.Dev_Flag = False
         self.Viz_Flag = False
-        
-        # Init Paths 
+
+        # Init Paths
         self.dataFilePath = ''
         self.telemetryFile = ''
         self.fullTelemetryFileName = ''
@@ -46,7 +46,7 @@ class ExecutionEngine:
 
         # Init parsing/sim info
         self.parser_file_name = ''
-        self.simDataParser = None
+        self.simDataSource = None
         self.sim = None
 
         # Init plugins
@@ -69,7 +69,7 @@ class ExecutionEngine:
 
         if len(config.read(config_filepath)) == 0:
             raise FileNotFoundError(f"Config file at '{config_filepath}' could not be read.")
-        
+
         try:
             ## Parse Required Data: Telementry Data & Configuration
             self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
@@ -97,7 +97,7 @@ class ExecutionEngine:
         except KeyError as e:
             new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
             raise KeyError(new_message) from e
-        
+
         ## Parse Optional Data: Benchmarks
         try:
             self.benchmarkFilePath = config['DEFAULT']['BenchmarkFilePath']
@@ -106,7 +106,7 @@ class ExecutionEngine:
         except:
             pass
 
-    def parse_plugins_dict(self, config_plugin_dict): 
+    def parse_plugins_dict(self, config_plugin_dict):
         ## Parse Required Data: Plugin name to path dict
         ast_plugin_dict = self.ast_parse_eval(config_plugin_dict)
         if isinstance(ast_plugin_dict.body, ast.Dict):
@@ -123,11 +123,11 @@ class ExecutionEngine:
         data_source_spec = importlib.util.spec_from_file_location('data_source', parser_file_name)
         data_source_module = importlib.util.module_from_spec(data_source_spec)
         data_source_spec.loader.exec_module(data_source_module)
-        self.simDataParser = data_source_module.DataSource(data_file_name, metadata_file_name, subsystems_breakdown)
+        self.simDataSource = data_source_module.DataSource(data_file_name, metadata_file_name, subsystems_breakdown)
 
     def setup_sim(self):
-        self.sim = Simulator(self.simDataParser, 
-                             self.knowledge_rep_plugin_dict, 
+        self.sim = Simulator(self.simDataSource,
+                             self.knowledge_rep_plugin_dict,
                              self.learners_plugin_dict,
                              self.planners_plugin_dict,
                              self.complex_plugin_dict)
@@ -154,7 +154,7 @@ class ExecutionEngine:
         os.mkdir(temp_save_path)
         os.mkdir(temp_models_path)
         os.mkdir(temp_diagnosis_path)
-    
+
         os.environ['ONAIR_SAVE_PATH'] = save_path
         os.environ['ONAIR_TMP_SAVE_PATH'] = temp_save_path
         os.environ['ONAIR_MODELS_SAVE_PATH'] = temp_models_path
@@ -163,7 +163,7 @@ class ExecutionEngine:
     def delete_save_paths(self):
         save_path = os.environ['RESULTS_PATH']
         sub_dirs = os.listdir(save_path)
-        if 'tmp' in sub_dirs: 
+        if 'tmp' in sub_dirs:
             try:
                 shutil.rmtree(save_path + '/tmp')
             except OSError as e:

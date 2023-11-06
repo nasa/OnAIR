@@ -7,7 +7,7 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
-""" Test Simulator Functionality """ 
+""" Test Simulator Functionality """
 import pytest
 from mock import MagicMock
 
@@ -23,7 +23,7 @@ def test_Simulator_DIAGNOSIS_INTERVAL_is_expected_value():
 # __init__ tests
 def test_Simulator__init__creates_Vehicle_and_Agent(mocker):
     # Arrange
-    arg_dataParser = MagicMock()
+    arg_dataSource = MagicMock()
     arg_knowledge_rep_plugin_list = MagicMock()
     arg_learners_plugin_list = MagicMock()
     arg_planners_plugin_list = MagicMock()
@@ -37,19 +37,19 @@ def test_Simulator__init__creates_Vehicle_and_Agent(mocker):
 
     cut = Simulator.__new__(Simulator)
 
-    mocker.patch.object(arg_dataParser, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
+    mocker.patch.object(arg_dataSource, 'get_vehicle_metadata', return_value=fake_vehicle_metadata)
     mocker.patch(sim.__name__ + '.VehicleRepresentation', return_value=fake_vehicle)
     mocker.patch(sim.__name__ + '.Agent', return_value=fake_agent)
 
     # Act
-    cut.__init__(arg_dataParser, 
-                 arg_knowledge_rep_plugin_list, 
-                 arg_learners_plugin_list, 
-                 arg_planners_plugin_list, 
+    cut.__init__(arg_dataSource,
+                 arg_knowledge_rep_plugin_list,
+                 arg_learners_plugin_list,
+                 arg_planners_plugin_list,
                  arg_complex_plugin_list)
 
     # Assert
-    assert cut.simData == arg_dataParser
+    assert cut.simData == arg_dataSource
     assert sim.VehicleRepresentation.call_count == 1
     assert sim.VehicleRepresentation.call_args_list[0].args == (fake_headers, fake_tests, arg_knowledge_rep_plugin_list)
     assert sim.Agent.call_count == 1
@@ -222,7 +222,7 @@ def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_conse
     result = cut.run_sim(fake_IO_Flag)
 
     # Assert
-    assert cut.simData.get_next.call_count == num_fake_steps 
+    assert cut.simData.get_next.call_count == num_fake_steps
     for i in range(num_fake_steps):
         assert cut.simData.get_next.call_args_list[i].args == ()
     assert cut.agent.reason.call_count == num_fake_steps

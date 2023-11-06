@@ -23,9 +23,9 @@ from ..util.sim_io import *
 DIAGNOSIS_INTERVAL = 100
 
 class Simulator:
-    def __init__(self, dataParser, knowledge_rep_plugin_dict, learners_plugin_dict, planners_plugin_dict, complex_plugin_dict):
-        self.simData = dataParser
-        headers, tests = dataParser.get_vehicle_metadata()
+    def __init__(self, dataSource, knowledge_rep_plugin_dict, learners_plugin_dict, planners_plugin_dict, complex_plugin_dict):
+        self.simData = dataSource
+        headers, tests = dataSource.get_vehicle_metadata()
         vehicle = VehicleRepresentation(headers, tests, knowledge_rep_plugin_dict)
         self.agent = Agent(vehicle, learners_plugin_dict, planners_plugin_dict, complex_plugin_dict)
 
@@ -41,8 +41,8 @@ class Simulator:
             next = self.simData.get_next()
             self.agent.reason(next)
             self.IO_check(time_step, IO_Flag)
-            
-            ### Stop when a fault is reached  
+
+            ### Stop when a fault is reached
             if self.agent.mission_status == 'RED':
                 if last_fault == time_step - 1: #if they are consecutive
                     if (time_step - last_diagnosis) % DIAGNOSIS_INTERVAL == 0:
@@ -53,7 +53,7 @@ class Simulator:
                     last_diagnosis = time_step
                 last_fault = time_step
             time_step += 1
-            
+
         # Final diagnosis processing
         if len(diagnosis_list) == 0:
             diagnosis_list.append(self.agent.diagnose(time_step))
