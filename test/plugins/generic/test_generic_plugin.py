@@ -13,17 +13,6 @@ from mock import MagicMock
 
 from plugins.generic.generic_plugin import Plugin
 
-# test apriori training
-def test_apriori_training_does_nothing():
-    # Arrange
-    cut = Plugin.__new__(Plugin)
-
-    # Act
-    result = cut.apriori_training()
-
-    # Assert
-    assert result == None
-
 def test_update_does_nothing():
     # Arrange
     cut = Plugin.__new__(Plugin)
@@ -37,7 +26,7 @@ def test_update_does_nothing():
 def test_render_reasoning_does_nothing():
     # Arrange
     cut = Plugin.__new__(Plugin)
-    
+
     # Act
     result = cut.render_reasoning()
 

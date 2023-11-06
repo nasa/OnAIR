@@ -52,7 +52,7 @@ def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_a
     assert cut.kf.process_noise == forced_diag_return_value
     assert cut.kf.observation_model == forced_array_return_value
     assert cut.kf.observation_noise == 1.0
-  
+
 def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args(mocker):
     # Arrange
     arg_name = MagicMock()
@@ -90,17 +90,6 @@ def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_a
     assert cut.kf.process_noise == forced_diag_return_value
     assert cut.kf.observation_model == forced_array_return_value
     assert cut.kf.observation_noise == 1.0
-    
-# test apiori training
-def test_Kalman_apiori_training_returns_none():
-    # Arrange
-    cut = Kalman.__new__(Kalman)
-
-    # Act
-    result = cut.apriori_training()  
-
-    # Assert
-    assert result == None
 
 # test update
 def test_Kalman_update_does_not_mutate_frames_attribute_when_arg_frame_is_empty():
@@ -141,7 +130,7 @@ def test_Kalman_update_mutates_frames_attribute_as_expected_when_both_frames_and
     len_fake_frames = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
     fake_frames = [[MagicMock()]] * len_fake_frames
     fake_window_size = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
-    
+
     len_arg_frame = pytest.gen.randint(6, 10) # arbitrary int greater than max len of fake_frames, from 6 to 10
     arg_frame = [MagicMock()] * len_arg_frame
 
@@ -171,7 +160,7 @@ def test_Kalman_update_mutates_frames_attribute_as_expected_when_both_frames_and
     len_fake_frames = pytest.gen.randint(6, 10) # arbitrary int greater than max len of arg_frame, from 6 to 10
     fake_frames = [[MagicMock()]] * len_fake_frames
     fake_window_size = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
-    
+
     len_arg_frame = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
     arg_frame = [MagicMock()] * len_arg_frame
 
@@ -261,13 +250,13 @@ def test_Kalman_render_reasoning_returns_value_returned_by_frame_diagnosis_funct
     fake_frames = MagicMock()
     fake_headers = MagicMock()
     forced_frame_diagnose_return = MagicMock()
-    
+
     cut = Kalman.__new__(Kalman)
     cut.frames = fake_frames
     cut.headers = fake_headers
 
     mocker.patch.object(cut, 'frame_diagnosis', return_value=forced_frame_diagnose_return)
-    
+
     # Act
     result = cut.render_reasoning()
 
@@ -358,7 +347,7 @@ def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_fun
     assert fake_kf.smooth.call_args_list[0].args == (arg_data, )
     assert fake_kf.predict.call_count == 1
     assert fake_kf.predict.call_args_list[0].args == (arg_data, arg_forward_steps)
-   
+
 def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_data_is_empty_and_initial_val_is_not_None(mocker):
     # Arrange
     arg_data = []
@@ -413,7 +402,7 @@ def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_fun
     assert fake_kf.smooth.call_args_list[0].args == (arg_data, )
     assert fake_kf.predict.call_count == 1
     assert fake_kf.predict.call_args_list[0].args == (arg_data, arg_forward_steps)
-   
+
 def test_Kalman_predict_when_not_given_initial_val_arg_sets_initial_val_arg_equal_to_None(mocker):
     # Arrange
     len_arg_data = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
@@ -441,7 +430,7 @@ def test_Kalman_predict_when_not_given_initial_val_arg_sets_initial_val_arg_equa
     assert fake_kf.smooth.call_args_list[0].args == (arg_data, )
     assert fake_kf.predict.call_count == 1
     assert fake_kf.predict.call_args_list[0].args == (arg_data, arg_forward_steps)
-   
+
 def test_Kalman_predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_initial_val_is_not_None(mocker):
     # Arrange
     len_arg_data = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
@@ -565,7 +554,7 @@ def test_Kalman_predictions_for_given_data_returns_expected_result_when_data_arg
     assert cut.predict.call_count == len_data - 1
     for i in range(len_data - 1):
         cut.predict.call_args_list[i].args == (arg_data[0:i+1], 1, arg_data[0])
-    
+
 # test generate_residuals_for_given_data
 def test_Kalman_generate_residuals_for_given_data_raises_error_when_data_arg_is_empty(mocker):
     # Arrange
@@ -659,7 +648,7 @@ def test_Kalman_current_attribute_chunk_get_error_returns_true_when_abs_of_mean_
     assert kalman_plugin.abs.call_count == 2
     assert kalman_plugin.abs.call_args_list[0].args == (forced_mean_return_value, )
     assert kalman_plugin.abs.call_args_list[1].args == (forced_abs_return_value, )
-    
+
 def test_Kalman_current_attribute_chunk_get_error_returns_false_when_abs_of_mean_residuals_less_than_one_point_five(mocker):
     # Arrange
     arg_data = MagicMock()

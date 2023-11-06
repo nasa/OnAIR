@@ -40,7 +40,7 @@ def test_LearnersInterface__init__sets_self_headers_to_given_headers_and_sets_se
     forced_return_ai_constructs = MagicMock()
 
     mocker.patch(learners_interface.__name__ + '.import_plugins', return_value=forced_return_ai_constructs)
-    
+
 
     cut = LearnersInterface.__new__(LearnersInterface)
 
@@ -52,40 +52,6 @@ def test_LearnersInterface__init__sets_self_headers_to_given_headers_and_sets_se
     assert learners_interface.import_plugins.call_count == 1
     assert learners_interface.import_plugins.call_args_list[0].args == (arg_headers, arg__learner_plugins)
     assert cut.ai_constructs == forced_return_ai_constructs
-
-# apriori_training tests
-def test_LearnersInterface_apriori_training_does_nothing_when_instance_ai_constructs_is_empty():
-    # Arrange
-    arg_batch_data = MagicMock()
-
-    cut = LearnersInterface.__new__(LearnersInterface)
-    cut.ai_constructs = []
-
-    # Act
-    result = cut.apriori_training(arg_batch_data)
-
-    # Assert
-    assert result == None
-
-def test_LearnersInterface_apriori_training_calls_apriori_training_on_each_ai_constructs_item(mocker):
-    # Arrange
-    arg_batch_data = MagicMock()
-
-    cut = LearnersInterface.__new__(LearnersInterface)
-    cut.ai_constructs = []
-
-    num_fake_ai_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_ai_constructs):
-        cut.ai_constructs.append(MagicMock())
-
-    # Act
-    result = cut.apriori_training(arg_batch_data)
-
-    # Assert
-    for i in range(num_fake_ai_constructs):
-        assert cut.ai_constructs[i].apriori_training.call_count == 1
-        assert cut.ai_constructs[i].apriori_training.call_args_list[0].args == (arg_batch_data, )
-    assert result == None
 
 # update tests
 def test_LearnersInterface_update_does_nothing_when_instance_ai_constructs_is_empty():

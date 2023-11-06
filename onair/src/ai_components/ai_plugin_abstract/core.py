@@ -9,8 +9,8 @@
 
 from abc import ABC, abstractmethod
 """This object serves as a proxy for all plug-ins.
-   Therefore, the AIPlugIn object is meant to induce 
-   standards and structures of compliance for user-created 
+   Therefore, the AIPlugIn object is meant to induce
+   standards and structures of compliance for user-created
    and/or imported plug-ins/libraries
 """
 class AIPlugIn(ABC):
@@ -22,19 +22,6 @@ class AIPlugIn(ABC):
         self.component_name = _name
         self.headers = _headers
 
-    @abstractmethod
-    def apriori_training(self, batch_data=[]):
-        """
-        Given data, system should learn any priors necessary for realtime diagnosis.
-        """
-        # I dont know yet whether we should allow empty frames from updates 
-        # The batch data format could change 
-        # depending on how the tutorial fleshes out (too early to tell) 
-        # There will be no return from this function (user can pull training)
-        # data from the construct itself) 
-        # I dont know yet whether we should allow empty batch data
-        raise NotImplementedError
-        
     @abstractmethod
     def update(self, low_level_data=[], high_level_data={}):
         """
