@@ -30,9 +30,6 @@ class Plugin(AIPlugIn):
         observation_noise = 1.0)                 # R
 
     #### START: Classes mandated by plugin architecture
-    def apriori_training(self):
-        pass
-
     def update(self, frame):
         """
         :param frame: (list of floats) input sequence of len (input_dim)
@@ -42,11 +39,11 @@ class Plugin(AIPlugIn):
             if len(self.frames) < len(frame): # If the frames variable is empty, append each data point in frame to it, each point wrapped as a list
                 # This is done so the data can have each attribute grouped in one list before being passed to kalman
                 # Ex: [[1:00, 1:01, 1:02, 1:03, 1:04, 1:05], [1, 2, 3, 4, 5]]
-                self.frames.append([frame[data_point_index]]) 
+                self.frames.append([frame[data_point_index]])
             else:
                 self.frames[data_point_index].append(frame[data_point_index])
                 if len(self.frames[data_point_index]) > self.window_size: # If after adding a point to the frame, that attribute is larger than the window_size, take out the first element
-                    self.frames[data_point_index].pop(0) 
+                    self.frames[data_point_index].pop(0)
 
     def render_reasoning(self):
         """
@@ -84,20 +81,20 @@ class Plugin(AIPlugIn):
         returned_data = []
         initial_val = data[0]
         for item in range(len(data)-1):
-            predicted = self.predict(data[0:item+1], 1, initial_val)        
+            predicted = self.predict(data[0:item+1], 1, initial_val)
             actual_next_state = data[item+1]
             pred_mean = predicted.observations.mean
             returned_data.append(pred_mean)
         if(len(returned_data) == 0): # If there's not enough data just set it to 0
             returned_data.append(0)
         return returned_data
-    
-    # Get data, make predictions, and then find the errors for these predictions 
+
+    # Get data, make predictions, and then find the errors for these predictions
     def generate_residuals_for_given_data(self, data):
         residuals = []
         initial_val = data[0]
         for item in range(len(data)-1):
-            predicted = self.predict(data[0:item+1], 1, initial_val)        
+            predicted = self.predict(data[0:item+1], 1, initial_val)
             actual_next_state = data[item+1]
             pred_mean = predicted.observations.mean
             residual_error = float(self.residual(pred_mean, actual_next_state))
@@ -107,14 +104,14 @@ class Plugin(AIPlugIn):
         return residuals
 
     #Info: takes a chunk of data of n size. Walks through it and gets residual errors.
-    #Takes the mean of the errors and determines if they're too large overall in order to determine whether or not there's a chunk in said error. 
+    #Takes the mean of the errors and determines if they're too large overall in order to determine whether or not there's a chunk in said error.
     def current_attribute_chunk_get_error(self, data):
         residuals = self.generate_residuals_for_given_data(data)
         mean_residuals = abs(self.mean(residuals))
         if (abs(mean_residuals) < 1.5):
                 return False
         return True
-    
+
     def frame_diagnosis(self, frame, headers):
         kal_broken_attributes = []
         for attribute_index in range(len(frame)):

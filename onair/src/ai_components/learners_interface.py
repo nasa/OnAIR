@@ -18,10 +18,6 @@ class LearnersInterface:
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers
         self.ai_constructs = import_plugins(self.headers, _learner_plugins)
-        
-    def apriori_training(self, batch_data):
-        for plugin in self.ai_constructs:
-            plugin.apriori_training(batch_data)
 
     def update(self, low_level_data, high_level_data):
         for plugin in self.ai_constructs:

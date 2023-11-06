@@ -18,9 +18,6 @@ class FakeAIPlugIn(AIPlugIn):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
 
-    def apriori_training(self):
-        return None
-
     def update(self):
         return None
 
@@ -35,25 +32,21 @@ class BadFakeAIPlugIn(AIPlugIn):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
 
-    def apriori_training(self):
-        return super().apriori_training()
-
     def update(self):
         return super().update()
 
     def render_reasoning(self):
         return super().render_reasoning()
-        
+
 # abstract methods tests
 def test_AIPlugIn_raises_error_because_of_unimplemented_abstract_methods():
     # Arrange - None
     # Act
     with pytest.raises(TypeError) as e_info:
         cut = AIPlugIn.__new__(AIPlugIn)
-    
+
     # Assert
     assert "Can't instantiate abstract class AIPlugIn with" in e_info.__str__()
-    assert "apriori_training" in e_info.__str__()
     assert "update" in e_info.__str__()
     assert "render_reasoning" in e_info.__str__()
 
@@ -63,10 +56,9 @@ def test_AIPlugIn_raises_error_when_an_inherited_class_is_instantiated_because_a
     # Act
     with pytest.raises(TypeError) as e_info:
         cut = IncompleteFakeAIPlugIn.__new__(IncompleteFakeAIPlugIn)
-    
+
     # Assert
     assert "Can't instantiate abstract class IncompleteFakeAIPlugIn with" in e_info.__str__()
-    assert "apriori_training" in e_info.__str__()
     assert "update" in e_info.__str__()
     assert "render_reasoning" in e_info.__str__()
 
@@ -75,7 +67,7 @@ def test_AIPlugIn_raises_error_when_an_inherited_class_calls_abstract_methods_in
     cut = BadFakeAIPlugIn.__new__(BadFakeAIPlugIn)
 
     # populate list with the functions that should raise exceptions when called.
-    not_implemented_functions = [cut.update, cut.apriori_training, cut.render_reasoning]
+    not_implemented_functions = [cut.update, cut.render_reasoning]
     for fnc in not_implemented_functions:
         with pytest.raises(NotImplementedError) as e_info:
             fnc()
@@ -89,7 +81,7 @@ def test_AIPlugIn_does_not_raise_error_when_an_inherited_class_is_instantiated_b
         fake_ic = FakeAIPlugIn.__new__(FakeAIPlugIn)
     except:
         exception_raised = True
-    
+
     # Assert
     assert exception_raised == False
 
