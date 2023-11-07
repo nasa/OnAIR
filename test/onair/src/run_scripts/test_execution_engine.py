@@ -533,7 +533,7 @@ def test_ExecutionEngine_returns_expected_dict_when_all_mapped_files_exist(mocke
         assert execution_engine.os.path.exists.call_args_list[i].args == (fake_path, )
 
 # parse_data tests
-def test_ExecutionEngine_parse_data_sets_the_simDataSource_to_the_data_parser(mocker):
+def test_ExecutionEngine_parse_data_sets_the_simDataSource_to_a_new_data_source_module_DataSource(mocker):
     # Arrange
     arg_parser_file_name = MagicMock()
     arg_dataFile = str(MagicMock())
