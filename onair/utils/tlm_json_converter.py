@@ -7,7 +7,7 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
-import orjson
+import json
 import os
 import ast
 import argparse
@@ -116,7 +116,7 @@ def mergeDicts(dict1, dict2):
 def writeToJson(path, data):
     file = open(path, 'wb')
 
-    file.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
+    file.write(json.dumps(data, indent=2))
     file.close()
 
 def str2lst(string):

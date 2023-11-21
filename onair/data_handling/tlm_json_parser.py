@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import ast
-import orjson
+import json
 
 # parse tlm config json file
 def parseTlmConfJson(file_path):
@@ -83,6 +83,6 @@ def parseJson(path):
     file = open(path, 'rb')
     file_str = file.read()
 
-    data = orjson.loads(file_str)
+    data = json.loads(file_str)
     file.close()
     return data
