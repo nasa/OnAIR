@@ -16,11 +16,11 @@ import argparse
 
 # convert tlm txt config file to json file
 def convertTlmToJson(tlm, json):
-    tlm_path = getConfigPath(tlm)
-    json_path = getConfigPath(json)
-    data = parseTlmConfTxt(tlm_path)
+    #tlm_path = getConfigPath(tlm)
+    #json_path = getConfigPath(json)
+    data = parseTlmConfTxt(tlm)
     json_data = convertTlmDictToJsonDict(data)
-    writeToJson(json_path, json_data)
+    writeToJson(json, json_data)
     
 # convert tlm data format to readable json
 def convertTlmDictToJsonDict(data):
@@ -60,7 +60,7 @@ def getJsonData(label, mnemonics, description):
     return json_data
 
 # parse tlm config files in original txt format
-def parseTlmConfTxt(file_path):   
+def parseTlmConfTxt(file_path):
     f = open(file_path, 'r')
     data_str = f.read()
     f.close()
@@ -114,7 +114,7 @@ def mergeDicts(dict1, dict2):
             dict1[key] = dict2[key]
 
 def writeToJson(path, data):
-    file = open(path, 'wb')
+    file = open(path, 'w')
 
     file.write(json.dumps(data, indent=2))
     file.close()
