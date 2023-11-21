@@ -633,7 +633,7 @@ def test_tlm_json_converter_writeJson_opens_given_path_and_writes_data_using_jso
     
     # Assert
     assert tlm_json_converter.open.call_count == 1
-    assert tlm_json_converter.open.call_args_list[0].args == (arg_path, 'wb')
+    assert tlm_json_converter.open.call_args_list[0].args == (arg_path, 'w')
     assert tlm_json_converter.json.dumps.call_count == 1
     assert tlm_json_converter.json.dumps.call_args_list[0].args == (arg_data, )
     assert tlm_json_converter.json.dumps.call_args_list[0].kwargs == {'indent' : 2}

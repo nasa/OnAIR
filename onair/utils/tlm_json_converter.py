@@ -16,11 +16,11 @@ import argparse
 
 # convert tlm txt config file to json file
 def convertTlmToJson(tlm, json):
-    #tlm_path = getConfigPath(tlm)
-    #json_path = getConfigPath(json)
-    data = parseTlmConfTxt(tlm)
+    tlm_path = getConfigPath(tlm)
+    json_path = getConfigPath(json)
+    data = parseTlmConfTxt(tlm_path)
     json_data = convertTlmDictToJsonDict(data)
-    writeToJson(json, json_data)
+    writeToJson(json_path, json_data)
     
 # convert tlm data format to readable json
 def convertTlmDictToJsonDict(data):
