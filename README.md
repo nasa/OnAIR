@@ -33,6 +33,23 @@ From the parent directory of your local repository:
 python driver.py -t
 ```
 
+#### A few optional settings for the driver.py file
+Options that may be added to the driver.py test run. Use these at your own discretion.
+
+`--conftest-seed=###` - set the random values seed for this run  
+`--randomly-seed=###` - set the random order seed for this run  
+`--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.  
+
+NOTE: Running tests will output results using provided seeds, but each seed is random when not set directly.  
+Example start of test output:
+```
+Using --conftest-seed=1691289424
+===== test session starts =======
+platform linux -- Python 3.11.2, pytest-7.2.0, pluggy-1.3.0
+Using --randomly-seed=1956010105
+```
+Copy and paste previously output seeds (or type them out) as the arguments to repeat results.
+
 ### Running pytest directly from command line
 
 For the equivalent of the driver.py run:
@@ -49,11 +66,16 @@ python -m coverage run --branch --source=onair,plugins -m pytest ./test/
 `-m pytest` - tells coverage what test runner (framework) to wrap  
 `./test` - run all tests found in this directory and subdirectories  
 
-#### A few optional settings
+#### A few optional settings for the command line
 Options that may be added to the command line test run. Use these at your own discretion.
 
 `--disable-warnings` - removes the warning reports, but displays count (i.e., 124 passed, 1 warning in 0.65s)  
 `-p no:randomly` - ONLY required to stop random order testing IFF pytest-randomly installed
+`--conftest-seed=###` - set the random values seed for this run  
+`--randomly-seed=###` - set the random order seed for this run  
+`--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.  
+
+NOTE: see note about seeds in driver.py section above
 
 ### To view testing line coverage after run:
 NOTE: you may or may not need the `python -m` to run coverage report or html

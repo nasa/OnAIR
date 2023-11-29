@@ -9,14 +9,19 @@
 
 import pytest
 import random
-import datetime
+from time import time
 from mock import MagicMock
 import sys
 
-def pytest_configure():
-  seed = datetime.datetime.now().timestamp()
+def pytest_addoption(parser):
+  parser.addoption("--conftest-seed", action="store", type=int, default=None)
+
+def pytest_configure(config):
+  seed = config.getoption("--conftest-seed")
+  if config.getoption("--conftest-seed") == None:
+    seed = int(time())
   pytest.gen = random.Random(seed)
-  print(f"conftest random seed = {seed}")
+  print(f"Using --conftest-seed={seed}")
 
   # Mock simdkalman for kalman_plugin testing
   simdkalman = MagicMock()
