@@ -11,22 +11,14 @@
 Driver
 Source of the main function for the OnAIR repo
 """
-import pytest
-import coverage
 # coverage started early to see all lines in all files (def and imports were being missed with programmatic runs)
-cov = coverage.Coverage(source=['onair','plugins'], branch=True)
-cov.start()
+
+
 
 import os
 import sys
 import argparse
 from datetime import datetime
-# from test_all import *
-from onair.src.util.cleanup import *
-
-from onair.src.run_scripts.execution_engine import ExecutionEngine
-
-cov.stop()
 
 def main():
     """
@@ -43,29 +35,56 @@ def main():
     arg_parser.add_argument('--save', '-s', action='store_true', help='Should log files be saved?')
     arg_parser.add_argument('--save_name', '--name', '-n', help='Name of saved log files')
     arg_parser.add_argument('--mute', '-m', action='store_true', help='Mute all non-error output')
+
+    """
+    Testing specific arguments
+    """
     arg_parser.add_argument('--test', '-t', action='store_true', help='Run tests')
+    arg_parser.add_argument('--verbose', '-v', action='count', default=0, help="Increase verbosity in tests")
+    arg_parser.add_argument('--conftest-seed', action='store', type=int, default=None, help="Set the random seed for test values")
+    arg_parser.add_argument('--randomly-seed', action='store', type=int, default=None, help="Set the random seed for test run order")
     args = arg_parser.parse_args()
+
+    """
+    In test mode, covergage must start before imports from onair, otherwise lines are missed.
+    """
+    if args.test:
+        import coverage
+        cov = coverage.Coverage(source=['onair','plugins'], branch=True)
+        cov.start()
+
+    """
+    Imports from onair that load with or without test mode enabled.
+    """
+    from onair.src.util.cleanup import setup_folders
+    from onair.src.run_scripts.execution_engine import ExecutionEngine
 
     if args.mute:
         blockPrint()
 
     init_global_paths(args.test)
 
+    """ Runs all unit tests """
     if args.test:
-        run_unit_tests(cov)
+        import pytest
+        test_directory_name = "test"
+        pytest_args = [test_directory_name]
+        pytest_args.extend(['-v'] * args.verbose)
+        if args.conftest_seed:
+            pytest_args.extend([f"--conftest-seed={args.conftest_seed}"])
+        if args.randomly_seed:
+            pytest_args.extend([f"--randomly-seed={args.randomly_seed}"])
+        pytest.main(pytest_args)
+        cov.stop()
+        cov.save()
+        cov.html_report()
     else:
         setup_folders(os.environ['RESULTS_PATH'])
         save_name = args.save_name if args.save_name else datetime.now().strftime("%m%d%Y_%H%M%S")
         OnAIR = ExecutionEngine(args.configfile, save_name, args.save)
         OnAIR.run_sim()
 
-""" Runs all unit tests """
-def run_unit_tests(Coverage: cov):
-    cov.start()
-    retval=pytest.main(['test'])
-    cov.stop()
-    cov.save()
-    cov.html_report()
+
 
 """ Initializes global paths, used throughout execution """
 def init_global_paths(test=False):
