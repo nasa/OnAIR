@@ -434,7 +434,7 @@ def test_tlm_json_parser_str2lst_prints_message_when_ast_literal_eval_receives_g
     assert result == None
 
 # parseJson tests
-def test_tlm_json_parser_parseJson_opens_given_path_and_returns_data_returned_by_orjson(mocker):
+def test_tlm_json_parser_parseJson_opens_given_path_and_returns_data_returned_by_json(mocker):
     # Arrange
     arg_path = MagicMock()
 
@@ -444,7 +444,7 @@ def test_tlm_json_parser_parseJson_opens_given_path_and_returns_data_returned_by
 
     mocker.patch(tlm_json_parser.__name__ + '.open', return_value=fake_file)
     mocker.patch.object(fake_file, 'read', return_value=fake_file_str)
-    mocker.patch(tlm_json_parser.__name__ + '.orjson.loads', return_value=fake_file_data)
+    mocker.patch(tlm_json_parser.__name__ + '.json.loads', return_value=fake_file_data)
     mocker.patch.object(fake_file, 'close')
 
     # Act
@@ -454,7 +454,7 @@ def test_tlm_json_parser_parseJson_opens_given_path_and_returns_data_returned_by
     assert tlm_json_parser.open.call_count == 1
     assert tlm_json_parser.open.call_args_list[0].args == (arg_path, 'rb')
     assert fake_file.read.call_count == 1
-    assert tlm_json_parser.orjson.loads.call_count == 1
-    assert tlm_json_parser.orjson.loads.call_args_list[0].args == (fake_file_str, )
+    assert tlm_json_parser.json.loads.call_count == 1
+    assert tlm_json_parser.json.loads.call_args_list[0].args == (fake_file_str, )
     assert fake_file.close.call_count == 1
     assert result == fake_file_data

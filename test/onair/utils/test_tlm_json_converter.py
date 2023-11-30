@@ -615,7 +615,7 @@ def test_tlm_json_converter_mergeDicts_returns_negative_one_if_arg_dict2_is_not_
     assert result == -1
 
 # writeToJson tests
-def test_tlm_json_converter_writeJson_opens_given_path_and_writes_data_using_orjson(mocker):
+def test_tlm_json_converter_writeJson_opens_given_path_and_writes_data_using_json(mocker):
     # Arrange
     arg_path = MagicMock()
     arg_data = MagicMock()
@@ -625,7 +625,7 @@ def test_tlm_json_converter_writeJson_opens_given_path_and_writes_data_using_orj
 
     mocker.patch(tlm_json_converter.__name__ + '.open', return_value=fake_file)
     mocker.patch.object(fake_file, 'write')
-    mocker.patch(tlm_json_converter.__name__ + '.orjson.dumps', return_value=fake_json_data)
+    mocker.patch(tlm_json_converter.__name__ + '.json.dumps', return_value=fake_json_data)
     mocker.patch.object(fake_file, 'close')
 
     # Act
@@ -633,10 +633,10 @@ def test_tlm_json_converter_writeJson_opens_given_path_and_writes_data_using_orj
     
     # Assert
     assert tlm_json_converter.open.call_count == 1
-    assert tlm_json_converter.open.call_args_list[0].args == (arg_path, 'wb')
-    assert tlm_json_converter.orjson.dumps.call_count == 1
-    assert tlm_json_converter.orjson.dumps.call_args_list[0].args == (arg_data, )
-    assert tlm_json_converter.orjson.dumps.call_args_list[0].kwargs == {'option' : tlm_json_converter.orjson.OPT_INDENT_2}
+    assert tlm_json_converter.open.call_args_list[0].args == (arg_path, 'w')
+    assert tlm_json_converter.json.dumps.call_count == 1
+    assert tlm_json_converter.json.dumps.call_args_list[0].args == (arg_data, )
+    assert tlm_json_converter.json.dumps.call_args_list[0].kwargs == {'indent' : 2}
     assert fake_file.write.call_count == 1
     assert fake_file.write.call_args_list[0].args == (fake_json_data, )
     assert fake_file.close.call_count == 1

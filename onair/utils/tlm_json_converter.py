@@ -7,7 +7,7 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
-import orjson
+import json
 import os
 import ast
 import argparse
@@ -60,7 +60,7 @@ def getJsonData(label, mnemonics, description):
     return json_data
 
 # parse tlm config files in original txt format
-def parseTlmConfTxt(file_path):   
+def parseTlmConfTxt(file_path):
     f = open(file_path, 'r')
     data_str = f.read()
     f.close()
@@ -114,9 +114,9 @@ def mergeDicts(dict1, dict2):
             dict1[key] = dict2[key]
 
 def writeToJson(path, data):
-    file = open(path, 'wb')
+    file = open(path, 'w')
 
-    file.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
+    file.write(json.dumps(data, indent=2))
     file.close()
 
 def str2lst(string):
