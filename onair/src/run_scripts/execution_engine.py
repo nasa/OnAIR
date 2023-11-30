@@ -40,9 +40,6 @@ class ExecutionEngine:
         self.metadataFilePath = ''
         self.metaFile = ''
         self.fullMetaDataFileName = ''
-        self.benchmarkFilePath = ''
-        self.benchmarkFiles = ''
-        self.benchmarkIndices = ''
 
         # Init parsing/sim info
         self.parser_file_name = ''
@@ -98,14 +95,6 @@ class ExecutionEngine:
             new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
             raise KeyError(new_message) from e
 
-        ## Parse Optional Data: Benchmarks
-        try:
-            self.benchmarkFilePath = config['DEFAULT']['BenchmarkFilePath']
-            self.benchmarkFiles = config['DEFAULT']['BenchmarkFiles'] # Vehicle telemetry data
-            self.benchmarkIndices = config['DEFAULT']['BenchmarkIndices']
-        except:
-            pass
-
     def parse_plugins_dict(self, config_plugin_dict):
         ## Parse Required Data: Plugin name to path dict
         ast_plugin_dict = self.ast_parse_eval(config_plugin_dict)
@@ -131,13 +120,6 @@ class ExecutionEngine:
                              self.learners_plugin_dict,
                              self.planners_plugin_dict,
                              self.complex_plugin_dict)
-        try:
-            fls = ast.literal_eval(self.benchmarkFiles)
-            fp = os.path.dirname(os.path.realpath(__file__)) + '/../..' + self.benchmarkFilePath
-            bi = ast.literal_eval(self.benchmarkIndices)
-            self.sim.set_benchmark_data(fp, fls, bi)
-        except:
-            pass
 
     def run_sim(self):
         self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag)

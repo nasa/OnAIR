@@ -236,23 +236,6 @@ def test_Simulator_run_sim_diagnose_is_not_performed_again_when_faults_are_conse
         assert cut.agent.diagnose.call_args_list[i].args == (i * sim.DIAGNOSIS_INTERVAL, )
     assert result == fake_diagnoses[-1] # check we actually got the last diagnosis
 
-# set_benchmark_data tests
-def test_Simulator_set_benchmark_data_sends_agent_supervised_learning_set_benchmark_data_given_filepath_files_and_indices(mocker):
-    # Arrange
-    arg_filepath = MagicMock()
-    arg_files = MagicMock()
-    arg_indices = MagicMock()
-
-    cut = Simulator.__new__(Simulator)
-    cut.agent = MagicMock()
-
-    # Act
-    cut.set_benchmark_data(arg_filepath, arg_files, arg_indices)
-
-    # Assert
-    assert cut.agent.supervised_learning.set_benchmark_data.call_count == 1
-    assert cut.agent.supervised_learning.set_benchmark_data.call_args_list[0].args == (arg_filepath, arg_files, arg_indices, )
-
 # IO_check tests
 def test_Simulator_IO_check_prints_sim_step_and_mission_status_when_given_IO_Flag_is_True(mocker):
     # Arrange
