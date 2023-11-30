@@ -60,10 +60,6 @@ class Simulator:
         final_diagnosis = diagnosis_list[-1]
         return final_diagnosis
 
-
-    def set_benchmark_data(self, filepath, files, indices):
-        self.agent.supervised_learning.set_benchmark_data(filepath, files, indices)
-
     def IO_check(self, time_step, IO_Flag):
         if IO_Flag == True:
             print_sim_step(time_step + 1)

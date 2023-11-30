@@ -42,9 +42,6 @@ def test_ExecutionEngine__init__sets_expected_values_but_does_no_calls_when_conf
     assert cut.metadataFilePath == ''
     assert cut.metaFile == ''
     assert cut.fullMetaDataFileName == ''
-    assert cut.benchmarkFilePath == ''
-    assert cut.benchmarkFiles == ''
-    assert cut.benchmarkIndices == ''
     assert cut.parser_file_name == ''
     assert cut.simDataSource == None
     assert cut.sim == None
@@ -151,16 +148,13 @@ def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_whe
                     'TelemetryFile':MagicMock(),
                     'TelemetryMetadataFilePath':MagicMock(),
                     'MetaFile':MagicMock(),
-                    'BenchmarkFilePath':MagicMock(),
-                    'BenchmarkFiles':MagicMock(),
-                    'BenchmarkIndices':MagicMock(),
                     'ParserFileName':MagicMock(),
                     'KnowledgeRepPluginDict':"{fake_name:fake_path}",
                     'LearnersPluginDict':"{fake_name:fake_path}",
                     'PlannersPluginDict':"{fake_name:fake_path}",
                     'ComplexPluginDict':"{fake_name:fake_path}"
                     }
-    required_keys = [item for item in list(fake_default.keys()) if 'Benchmark' not in item]
+    required_keys = [item for item in list(fake_default.keys())]
     missing_key = pytest.gen.choice(required_keys)
     del fake_default[missing_key]
     fake_run_flags = MagicMock()
@@ -216,9 +210,6 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
                     'TelemetryFile':MagicMock(),
                     'TelemetryMetadataFilePath':MagicMock(),
                     'MetaFile':MagicMock(),
-                    'BenchmarkFilePath':MagicMock(),
-                    'BenchmarkFiles':MagicMock(),
-                    'BenchmarkIndices':MagicMock(),
                     'ParserFileName':MagicMock(),
                     'KnowledgeRepPluginDict':"{fake_name:fake_path}",
                     'LearnersPluginDict':"{fake_name:fake_path}",
@@ -275,9 +266,6 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     assert cut.telemetryFile == fake_default['TelemetryFile']
     assert cut.metadataFilePath == fake_default['TelemetryMetadataFilePath']
     assert cut.metaFile == fake_default['MetaFile']
-    assert cut.benchmarkFilePath == fake_default['BenchmarkFilePath']
-    assert cut.benchmarkFiles == fake_default['BenchmarkFiles']
-    assert cut.benchmarkIndices == fake_default['BenchmarkIndices']
     assert cut.parser_file_name == fake_default['ParserFileName']
     assert cut.parse_plugins_dict.call_count == 4
     assert cut.knowledge_rep_plugin_dict == fake_knowledge_rep_plugin_list
@@ -291,66 +279,6 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     assert cut.Dev_Flag == fake_Dev_flags
     assert fake_run_flags.getboolean.call_args_list[2].args == ('Viz_Flag', )
     assert cut.Viz_Flag == fake_Viz_flags
-
-def test_ExecutionEngine_parse_configs_bypasses_benchmarks_when_access_raises_error(mocker):
-    # Arrange
-    arg_config_filepath = MagicMock()
-
-    # NOTE: not including the benchmark strings causes the exception
-    fake_default = {'TelemetryDataFilePath':MagicMock(),
-                    'TelemetryFile':MagicMock(),
-                    'TelemetryMetadataFilePath':MagicMock(),
-                    'MetaFile':MagicMock(),
-                    'ParserFileName':MagicMock(),
-                    'KnowledgeRepPluginDict':"{fake_name:fake_path}",
-                    'LearnersPluginDict':"{fake_name:fake_path}",
-                    'PlannersPluginDict':"{fake_name:fake_path}",
-                    'ComplexPluginDict':"{fake_name:fake_path}"
-                    }
-    fake_run_flags = MagicMock()
-    fake_dict_for_Config = {'DEFAULT':fake_default, 'RUN_FLAGS':fake_run_flags}
-    fake_config = MagicMock()
-    fake_config.__getitem__.side_effect = fake_dict_for_Config.__getitem__
-    fake_config_read_result = MagicMock()
-    fake_config_read_result.__len__.return_value = 1
-    fake_knowledge_rep_plugin_list = MagicMock()
-    fake_learners_plugin_list = MagicMock()
-    fake_planners_plugin_list = MagicMock()
-    fake_complex_plugin_list = MagicMock()
-    fake_plugins = [fake_knowledge_rep_plugin_list,
-                    fake_learners_plugin_list,
-                    fake_planners_plugin_list,
-                    fake_complex_plugin_list]
-    fake_IO_flags = MagicMock()
-    fake_Dev_flags = MagicMock()
-    fake_Viz_flags = MagicMock()
-    fake_plugin_dict = MagicMock()
-    fake_keys = MagicMock()
-    fake_plugin = MagicMock()
-    fake_path = MagicMock()
-
-    fake_keys.__len__.return_value = 1
-    fake_keys.__iter__.return_value = iter([str(fake_plugin)])
-
-    cut = ExecutionEngine.__new__(ExecutionEngine)
-
-    mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
-    mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
-    mocker.patch.object(cut, 'parse_plugins_dict', side_effect=fake_plugins)
-    mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_Viz_flags])
-    mocker.patch('ast.literal_eval',return_value=fake_plugin_dict)
-    mocker.patch.object(fake_plugin_dict, 'keys', return_value=fake_keys)
-    mocker.patch.object(fake_plugin_dict, '__getitem__', return_value=fake_path)
-    mocker.patch('os.path.exists', return_value=True)
-
-
-    # Act
-    cut.parse_configs(arg_config_filepath)
-
-    # Assert
-    assert hasattr(cut, 'benchmarkFilePath') == False
-    assert hasattr(cut, 'benchmarkFiles') == False
-    assert hasattr(cut, 'benchmarkIndices') == False
 
 # parse_plugins_dict
 
@@ -599,54 +527,7 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
     assert fake_module.DataSource.call_args_list[0].args == (arg_dataFile, arg_metadataFile, False, )
 
 # setup_sim tests
-def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_and_sets_benchmark_data_when_no_exceptions_are_encountered(mocker):
-    # Arrange
-    cut = ExecutionEngine()
-    cut.simDataSource = MagicMock()
-    cut.knowledge_rep_plugin_dict = MagicMock()
-    cut.learners_plugin_dict = MagicMock()
-    cut.planners_plugin_dict = MagicMock()
-    cut.complex_plugin_dict = MagicMock()
-    cut.benchmarkFiles = MagicMock()
-    cut.benchmarkFilePath = str(MagicMock())
-    cut.benchmarkIndices = MagicMock()
-    cut.plugin_list = MagicMock()
-
-    fake_sim = MagicMock()
-    fake_fls = MagicMock()
-    fake_fp = str(MagicMock())
-    fake_bi = MagicMock()
-    fake__file__ = str(MagicMock())
-
-    mocker.patch(execution_engine.__name__ + '.Simulator', return_value=fake_sim)
-    mocker.patch(execution_engine.__name__ + '.ast.literal_eval', side_effect=[fake_fls, fake_bi])
-    mocker.patch(execution_engine.__name__ + '.__file__', fake__file__)
-    mocker.patch(execution_engine.__name__ + '.os.path.realpath', return_value=fake_fp)
-    mocker.patch(execution_engine.__name__ + '.os.path.dirname', return_value=fake_fp)
-    mocker.patch.object(fake_sim, 'set_benchmark_data')
-
-    # Act
-    cut.setup_sim()
-
-    # Assert
-    assert execution_engine.Simulator.call_count == 1
-    assert execution_engine.Simulator.call_args_list[0].args == (cut.simDataSource,
-                                                                 cut.knowledge_rep_plugin_dict,
-                                                                 cut.learners_plugin_dict,
-                                                                 cut.planners_plugin_dict,
-                                                                 cut.complex_plugin_dict)
-    assert cut.sim == fake_sim
-    assert execution_engine.ast.literal_eval.call_count == 2
-    assert execution_engine.ast.literal_eval.call_args_list[0].args == (cut.benchmarkFiles, )
-    assert execution_engine.os.path.realpath.call_count == 1
-    assert execution_engine.os.path.realpath.call_args_list[0].args == (fake__file__, )
-    assert execution_engine.os.path.dirname.call_count == 1
-    assert execution_engine.os.path.dirname.call_args_list[0].args == (fake_fp, )
-    assert execution_engine.ast.literal_eval.call_args_list[1].args == (cut.benchmarkIndices, )
-    assert fake_sim.set_benchmark_data.call_count == 1
-    assert fake_sim.set_benchmark_data.call_args_list[0].args == (fake_fp + '/../..' + cut.benchmarkFilePath, fake_fls, fake_bi, )
-
-def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_set_bencmark_data_because_exception_is_encountered(mocker):
+def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator(mocker):
     # Arrange
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.simDataSource = MagicMock()
@@ -654,18 +535,10 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_s
     cut.learners_plugin_dict = MagicMock()
     cut.planners_plugin_dict = MagicMock()
     cut.complex_plugin_dict = MagicMock()
-    cut.benchmarkFiles = MagicMock()
-    cut.benchmarkFilePath = MagicMock()
-    cut.benchmarkIndices = MagicMock()
-    cut.plugin_list = MagicMock()
 
     fake_sim = MagicMock()
 
     mocker.patch(execution_engine.__name__ + '.Simulator', return_value=fake_sim)
-    mocker.patch(execution_engine.__name__ + '.ast.literal_eval', side_effect=Exception)
-    mocker.patch(execution_engine.__name__ + '.os.path.realpath')
-    mocker.patch(execution_engine.__name__ + '.os.path.dirname')
-    mocker.patch.object(fake_sim, 'set_benchmark_data')
 
     # Act
     cut.setup_sim()
@@ -678,10 +551,6 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator_but_does_not_s
                                                                  cut.planners_plugin_dict,
                                                                  cut.complex_plugin_dict)
     assert cut.sim == fake_sim
-    assert execution_engine.ast.literal_eval.call_count == 1
-    assert execution_engine.ast.literal_eval.call_args_list[0].args == (cut.benchmarkFiles, )
-    assert execution_engine.os.path.realpath.call_count == 0
-    assert fake_sim.set_benchmark_data.call_count == 0
 
 # run_sim tests
 def test_ExecutionEngine_run_sim_runs_but_does_not_save_results_when_save_flag_is_False(mocker):
