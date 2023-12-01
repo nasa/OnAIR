@@ -722,14 +722,14 @@ def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_prop
     fake_onair_save_path = str(MagicMock())
     fake_onair_tmp_save_path = str(MagicMock())
     fake_environ = {'ONAIR_SAVE_PATH':fake_onair_save_path, 'ONAIR_TMP_SAVE_PATH':fake_onair_tmp_save_path}
-    fake_save_path = fake_onair_save_path + '/saved/' + arg_save_name + '_' + fake_complete_time
+    fake_save_path = fake_onair_save_path + 'saved/' + arg_save_name + '_' + fake_complete_time
 
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
     mocker.patch(execution_engine.__name__ + '.gmtime', return_value=fake_gmtime)
     mocker.patch(execution_engine.__name__ + '.strftime', return_value=fake_complete_time)
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
-    mocker.patch(execution_engine.__name__ + '.os.mkdir')
+    mocker.patch(execution_engine.__name__ + '.os.makedirs')
     mocker.patch(execution_engine.__name__ + '.copy_tree')
 
     # Act
@@ -740,8 +740,9 @@ def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_prop
     assert execution_engine.gmtime.call_args_list[0].args == ()
     assert execution_engine.strftime.call_count == 1
     assert execution_engine.strftime.call_args_list[0].args == ("%H-%M-%S", fake_gmtime,)
-    assert execution_engine.os.mkdir.call_count == 1
-    assert execution_engine.os.mkdir.call_args_list[0].args == (fake_save_path, )
+    assert execution_engine.os.makedirs.call_count == 1
+    assert execution_engine.os.makedirs.call_args_list[0].args == (fake_save_path, )
+    assert execution_engine.os.makedirs.call_args_list[0].kwargs == {"exist_ok":True}
     assert execution_engine.copy_tree.call_count == 1
     assert execution_engine.copy_tree.call_args_list[0].args == (fake_onair_tmp_save_path, fake_save_path, )
 
