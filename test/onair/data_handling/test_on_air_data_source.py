@@ -9,7 +9,7 @@
 
 """ Test OnAir Parser Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.data_handling.on_air_data_source as on_air_data_source
 from onair.data_handling.on_air_data_source import OnAirDataSource
@@ -88,7 +88,7 @@ def test_OnAirDataSource_raises_error_because_of_unimplemented_abstract_methods(
     # Act
     with pytest.raises(TypeError) as e_info:
         cut = OnAirDataSource.__new__(OnAirDataSource)
-    
+
     # Assert
     assert "Can't instantiate abstract class OnAirDataSource with" in e_info.__str__()
     assert "process_data_file" in e_info.__str__()
@@ -102,7 +102,7 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_is_instantiated_be
     # Act
     with pytest.raises(TypeError) as e_info:
         cut = IncompleteOnAirDataSource.__new__(IncompleteOnAirDataSource)
-    
+
     # Assert
     assert "Can't instantiate abstract class IncompleteOnAirDataSource with" in e_info.__str__()
     assert "process_data_file" in e_info.__str__()

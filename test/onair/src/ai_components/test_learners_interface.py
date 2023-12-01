@@ -9,7 +9,7 @@
 
 """ Test LearnersInterface Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.ai_components.learners_interface as learners_interface
 from onair.src.ai_components.learners_interface import LearnersInterface

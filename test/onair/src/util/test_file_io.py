@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.util.file_io as file_io
 

@@ -9,7 +9,7 @@
 
 """ Test Generic Plugin Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from plugins.generic.generic_plugin import Plugin
 

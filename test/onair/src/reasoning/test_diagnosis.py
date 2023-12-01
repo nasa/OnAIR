@@ -9,7 +9,7 @@
 
 """ Test Diagnosis Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.reasoning.diagnosis as diagnosis
 from onair.src.reasoning.diagnosis import Diagnosis
@@ -204,7 +204,7 @@ def test_Diagnosis_walkdown_returns_NO_DIAGNOSIS_when_mnemonic_name_is_not_blank
     fake_kalman_results = [MagicMock()] * pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
     len_fake_list = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
     fake_kalman_results[0] = [MagicMock()] * len_fake_list
-    
+
     rand_name_index = pytest.gen.randint(0, len_fake_list - 1) # random index in fake_kalman_results[0]
     fake_kalman_results[0][rand_name_index] = arg_mnemonic_name
 

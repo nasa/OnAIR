@@ -7,7 +7,7 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.data_handling.redis_adapter as redis_adapter
 from onair.data_handling.redis_adapter import DataSource
@@ -57,7 +57,7 @@ def test_redis_adapter_DataSource__init__sets_redis_values_then_connects_and_sub
     assert cut.connect.call_args_list[0].args == ()
     assert cut.subscribe.call_count == 1
     assert cut.subscribe.call_args_list[0].args == (expected_subscriptions, )
-    
+
 # connect tests
 def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_attributes(mocker):
     # Arrange
@@ -65,12 +65,12 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_at
     expected_port = MagicMock()
     expected_db = MagicMock()
     fake_server = MagicMock()
-    
+
     cut = DataSource.__new__(DataSource)
     cut.address = expected_address
     cut.port = expected_port
     cut.db = expected_db
-    
+
     mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch('redis.Redis', return_value=fake_server)
 
@@ -92,7 +92,7 @@ def test_redis_adapter_DataSource_fails_to_connect_to_server(mocker):
     expected_port = MagicMock()
     expected_db = MagicMock()
     fake_server = MagicMock()
-    
+
     cut = DataSource.__new__(DataSource)
     cut.address = expected_address
     cut.port = expected_port
@@ -277,7 +277,7 @@ def test_redis_adapter_DataSource_get_next_when_called_multiple_times_when_new_d
     for i in range(num_calls):
         results[i] = expected_data[i]
     assert cut.double_buffer_read_index == (num_calls + pre_call_index) % 2
-    
+
 def test_redis_adapter_DataSource_get_next_waits_until_data_is_available(mocker):
     # Arrange
     # Renew DataSource to ensure test independence

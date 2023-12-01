@@ -9,7 +9,7 @@
 
 """ Test TLM Json Parser Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.data_handling.tlm_json_parser as tlm_json_parser
 
@@ -235,7 +235,7 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     ordering_list = []
     for label in fake_label:
         ordering_list.append(desired_order[label])
-    
+
     ordered_subsys = [y for x, y in sorted(zip(ordering_list, fake_subsystem))]
     ordered_mnemonics = [y for x, y in sorted(zip(ordering_list, fake_mnemonics))]
     ordered_limits = [y for x, y in sorted(zip(ordering_list, fake_limits))]
@@ -298,13 +298,13 @@ def test_tlm_json_parser_parseTlmConfJson_returns_expected_configs_dict_when_reo
     ordering_list = []
     for label in fake_label:
         ordering_list.append(desired_order[label])
-    
+
     ordered_subsys = [y for x, y in sorted(zip(ordering_list, fake_subsystem))]
     ordered_mnemonics = [y for x, y in sorted(zip(ordering_list, fake_mnemonics))]
     ordered_limits = [y for x, y in sorted(zip(ordering_list, fake_limits))]
     ordered_descs = [y for x, y in sorted(zip(ordering_list, fake_description))]
     ordered_labels = [y for x, y in sorted(zip(ordering_list, fake_label))]
-    
+
     fake_organized_data = {}
     for i in range(num_elems):
         fake_organized_data[fake_label[i]] = {'subsystem' : fake_subsystem[i],
@@ -405,7 +405,7 @@ def test_tlm_json_parser_str2lst_returns_call_to_ast_literal_eval_which_receive_
     arg_string = str(MagicMock())
 
     expected_result = MagicMock()
-    
+
     mocker.patch(tlm_json_parser.__name__ + '.ast.literal_eval', return_value=expected_result)
 
     # Act
@@ -419,10 +419,10 @@ def test_tlm_json_parser_str2lst_returns_call_to_ast_literal_eval_which_receive_
 def test_tlm_json_parser_str2lst_prints_message_when_ast_literal_eval_receives_given_string_but_raises_exception(mocker):
     # Arrange
     arg_string = str(MagicMock())
-    
+
     mocker.patch(tlm_json_parser.__name__ + '.ast.literal_eval', side_effect=Exception)
     mocker.patch(tlm_json_parser.__name__ + '.print')
-    
+
     # Act
     result = tlm_json_parser.str2lst(arg_string)
 
@@ -449,7 +449,7 @@ def test_tlm_json_parser_parseJson_opens_given_path_and_returns_data_returned_by
 
     # Act
     result = tlm_json_parser.parseJson(arg_path)
-    
+
     # Assert
     assert tlm_json_parser.open.call_count == 1
     assert tlm_json_parser.open.call_args_list[0].args == (arg_path, 'rb')

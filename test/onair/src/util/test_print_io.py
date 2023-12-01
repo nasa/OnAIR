@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.util.print_io as print_io
 
@@ -21,7 +21,7 @@ def test_print_io_bcolors_OKBLUE_is_expected_value():
 
 def test_print_io_bcolors_OKGREEN_is_expected_value():
   assert print_io.bcolors.OKGREEN == '\033[92m'
-  
+
 def test_print_io_bcolors_WARNING_is_expected_value():
   assert print_io.bcolors.WARNING == '\033[93m'
 
@@ -33,7 +33,7 @@ def test_print_io_bcolors_ENDC_is_expected_value():
 
 def test_print_io_bcolors_BOLD_is_expected_value():
   assert print_io.bcolors.BOLD == '\033[1m'
-  
+
 def test_print_io_bcolors_UNDERLINE_is_expected_value():
   assert print_io.bcolors.UNDERLINE == '\033[4m'
 
@@ -47,7 +47,7 @@ def test_print_io_scolors_OKBLUE_is_set_to_bcolors_OKBLUE():
 
 def test_print_io_scolors_OKGREEN_is_set_to_bcolors_OKGREEN():
   assert print_io.scolors['OKGREEN'] == print_io.bcolors.OKGREEN
-  
+
 def test_print_io_scolors_WARNING_is_set_to_bcolors_WARNING():
   assert print_io.scolors['WARNING'] == print_io.bcolors.WARNING
 
@@ -59,7 +59,7 @@ def test_print_io_scolors_ENDC_is_set_to_bcolors_ENDC():
 
 def test_print_io_scolors_BOLD_is_set_to_bcolors_BOLD():
   assert print_io.scolors['BOLD'] == print_io.bcolors.BOLD
-  
+
 def test_print_io_scolors_UNDERLINE_is_set_to_bcolors_UNDERLINE():
   assert print_io.scolors['UNDERLINE'] == print_io.bcolors.UNDERLINE
 
@@ -111,7 +111,7 @@ def test_print_io_print_sim_step_inserts_given_step_num_into_text(mocker):
 
   # Act
   print_io.print_sim_step(arg_step_num)
-  
+
   # Assert
   assert print_io.print.call_args_list[0].args == (expected_print, )
 
@@ -129,7 +129,7 @@ def test_print_io_print_separator_uses_bcolors_HEADER_as_default_color_value(moc
 
   # Act
   print_io.print_separator()
-  
+
   # Assert
   assert print_io.print.call_args_list[0].args == (expected_print, )
 
@@ -146,7 +146,7 @@ def test_print_io_print_separator_prints_whatever_is_passed_in_as_color_at_start
 
   # Act
   print_io.print_separator(arg_color)
-  
+
   # Assert
   assert print_io.print.call_count == 1
   assert print_io.print.call_args_list[0].args == (expected_print, )
@@ -194,7 +194,7 @@ def test_print_io_update_header_prints_message_starting_with_whatever_is_given_a
 def test_print_io_print_msg_prints_message_starting_only_with_scolor_HEADER_when_no_clrs_arg_given(mocker):
     # Arrange
   arg_msg = MagicMock()
-  
+
   expected_scolor = print_io.scolors['HEADER']
   expected_print = []
   expected_print.append(expected_scolor)
@@ -261,7 +261,7 @@ def test_print_io_print_msg_prints_all_scolors_given_in_clrs(mocker):
 def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_data_not_given(mocker):
   # Arrange
   arg_agent = MagicMock()
-  
+
   fake_mission_status = MagicMock()
   fake_status = MagicMock()
 
@@ -273,7 +273,7 @@ def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_d
 
   # Act
   print_io.print_system_status(arg_agent)
-  
+
   # Assert
   assert print_io.format_status.call_count == 1
   assert print_io.format_status.call_args_list[0].args == (fake_mission_status,)
@@ -284,7 +284,7 @@ def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_d
   # Arrange
   arg_agent = MagicMock()
   arg_data = None
-  
+
   fake_mission_status = MagicMock()
   fake_status = MagicMock()
 
@@ -296,7 +296,7 @@ def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_d
 
   # Act
   print_io.print_system_status(arg_agent, arg_data)
-  
+
   # Assert
   assert print_io.format_status.call_count == 1
   assert print_io.format_status.call_args_list[0].args == (fake_mission_status,)
@@ -307,7 +307,7 @@ def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_d
   # Arrange
   arg_agent = MagicMock()
   arg_data = MagicMock()
-  
+
   fake_mission_status = MagicMock()
   fake_status = MagicMock()
 
@@ -321,7 +321,7 @@ def test_print_io_print_mission_status_only_prints_agent_formatted_status_when_d
 
   # Act
   print_io.print_system_status(arg_agent, arg_data)
-  
+
   # Assert
   assert print_io.format_status.call_count == 1
   assert print_io.format_status.call_args_list[0].args == (fake_mission_status,)
@@ -420,7 +420,7 @@ def test_print_io_subsystem_status_str_returns_expected_string_when_stat_exists_
   assert print_io.str.call_args_list[1].args == (fake_stat, )
   assert print_io.str.call_args_list[2].args == (fake_uncertainty, )
   assert result == expected_s
-  
+
 
 # subsystem_str tests
 def test_print_io_subsystem_str_returns_string_without_any_data_when_headers_tests_and_test_data_empty(mocker):
@@ -489,13 +489,13 @@ def test_print_io_format_status_returns_all_headers_in_formatted_string_when_occ
   # Arrange
   num_headers = pytest.gen.randint(1, 10) # arbitrary from 1 to 10
   arg_headers = []
-  
+
   expected_result = ''
 
   for i in range(num_headers):
     arg_headers.append(str(MagicMock()))
     expected_result = expected_result + '\n  -- ' + arg_headers[i]
-  
+
   # Act
   result = print_io.headers_string(arg_headers)
 
