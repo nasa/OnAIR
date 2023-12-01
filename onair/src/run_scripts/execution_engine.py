@@ -153,8 +153,8 @@ class ExecutionEngine:
 
     def save_results(self, save_name):
         complete_time = strftime("%H-%M-%S", gmtime())
-        save_path = os.environ['ONAIR_SAVE_PATH'] + '/saved/' + save_name + '_' + complete_time
-        os.mkdir(save_path)
+        save_path = os.environ['ONAIR_SAVE_PATH'] + 'saved/' + save_name + '_' + complete_time
+        os.makedirs(save_path, exist_ok=True)
         copy_tree(os.environ['ONAIR_TMP_SAVE_PATH'], save_path)
 
     def set_run_param(self, name, val):
