@@ -7,7 +7,7 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.util.sim_io as sim_io
 
@@ -44,7 +44,7 @@ def test_sim_io_render_reasoning_writes_txt_and_csv_files_even_when_list_is_empt
   assert open.call_args_list[1].args == (fake_full_path,)
   assert open.call_args_list[1].kwargs == {'mode':'a'}
   assert fake_file_iterator.write.call_args_list[3].args == ('time_step, cohens_kappa, faults, subgraph\n',)
-  
+
 def test_sim_io_render_reasoning_writes_txt_and_csv_files_with_entry_for_each_given_diagnosis_in_list(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_DIAGNOSIS_SAVE_PATH'
@@ -83,13 +83,13 @@ def test_sim_io_render_reasoning_writes_txt_and_csv_files_with_entry_for_each_gi
   assert fake_file_iterator.write.call_args_list[0].args == ('==========================================================\n',)
   assert fake_file_iterator.write.call_args_list[1].args == ('                        DIAGNOSIS                         \n',)
   assert fake_file_iterator.write.call_args_list[2].args == ('==========================================================\n',)
-  
+
   for i in range(5):
     assert fake_file_iterator.write.call_args_list[i*4 + 3].args == ('\n----------------------------------------------------------\n',)
     assert fake_file_iterator.write.call_args_list[i*4 + 4].args == ('***                DIAGNOSIS AT FRAME ' + fake_timestep + '               ***\n',)
     assert fake_file_iterator.write.call_args_list[i*4 + 5].args == (fake_str,)
     assert fake_file_iterator.write.call_args_list[i*4 + 6].args == ('----------------------------------------------------------\n',)
-  
+
   assert sim_io.os.environ.get.call_args_list[1].args == (SAVE_PATH,)
   assert sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'diagnosis.csv')
   assert open.call_args_list[1].args == (fake_full_path,)
@@ -98,7 +98,7 @@ def test_sim_io_render_reasoning_writes_txt_and_csv_files_with_entry_for_each_gi
 
   for j in range(5):
     assert fake_file_iterator.write.call_args_list[j + i*4 + 8].args == (fake_results_csv,)
-    
+
 def test_sim_io_render_viz_does_only_stattest_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_givenus_and_sensor_reports_when_diagnosis_is_not_given(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'
@@ -137,7 +137,7 @@ def test_sim_io_render_viz_does_only_stattest_render_viz_does_status_sensor_and_
   assert sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
   assert open.call_args_list[1].args == (fake_full_path, 'w')
   assert sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
-  
+
 def test_sim_io_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is_given_as_None(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'
@@ -177,7 +177,7 @@ def test_sim_io_render_viz_does_only_status_and_sensor_reports_when_diagnosis_is
   assert sim_io.os.path.join.call_args_list[1].args == (fake_system_filename, 'faults.json')
   assert open.call_args_list[1].args == (fake_full_path, 'w')
   assert sim_io.json.dump.call_args_list[1].args == (expected_sensor_status_report, fake_iterator)
-  
+
 def test_sim_io_render_viz_does_status_sensor_and_diagnosis_reports_when_diagnosis_is_given(mocker):
   # Arrange
   SAVE_PATH = 'ONAIR_VIZ_SAVE_PATH'

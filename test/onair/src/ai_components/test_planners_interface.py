@@ -9,7 +9,7 @@
 
 """ Test PlannersInterface Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.ai_components.planners_interface as planners_interface
 from onair.src.ai_components.planners_interface import PlannersInterface
@@ -40,7 +40,7 @@ def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_se
     forced_return_ai_constructs = MagicMock()
 
     mocker.patch(planners_interface.__name__ + '.import_plugins', return_value=forced_return_ai_constructs)
-    
+
     cut = PlannersInterface.__new__(PlannersInterface)
 
     # Act
@@ -80,7 +80,7 @@ def test_check_for_salient_event_does_nothing():
 def test_render_reasoning_does_nothing():
     # Arrange
     cut = PlannersInterface.__new__(PlannersInterface)
-    
+
     # Act
     result = cut.render_reasoning()
 

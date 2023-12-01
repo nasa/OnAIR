@@ -9,7 +9,7 @@
 
 """ Test VehicleRepresentation Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.systems.vehicle_rep as vehicle_rep
 from onair.src.systems.vehicle_rep import VehicleRepresentation
@@ -32,7 +32,7 @@ def test_VehicleRepresentation__init__asserts_when_len_given_headers_is_not_eq_t
     # Act
     with pytest.raises(AssertionError) as e_info:
         cut.__init__(arg_headers, arg_tests)
-    
+
     # Assert
     assert vehicle_rep.len.call_count == 2
     call_list = set({})
@@ -54,7 +54,7 @@ def test_VehicleRepresentation__init__sets_status_to_Status_with_str_MISSION_and
     mocker.patch(vehicle_rep.__name__ + '.len', return_value=fake_len)
     mocker.patch(vehicle_rep.__name__ + '.Status', return_value=fake_status)
     mocker.patch(vehicle_rep.__name__ + '.TelemetryTestSuite', return_value=fake_test_suite)
-    
+
     # Act
     cut.__init__(arg_headers, arg_tests)
 
@@ -89,7 +89,7 @@ def test_VehicleRepresentation_update_calls_update_constructs_then_update_curr_d
     mock_manager.attach_mock(mocker.patch.object(cut.test_suite, 'execute_suite'), 'test_suite.execute_suite')
     mock_manager.attach_mock(mocker.patch.object(cut.test_suite, 'get_suite_status', return_value=fake_suite_status), 'test_suite.get_suite_status')
     mock_manager.attach_mock(mocker.patch.object(cut.status, 'set_status'), 'status.set_status')
-    
+
     # Act
     cut.update(arg_frame)
 
@@ -108,7 +108,7 @@ def test_VehicleRepresentation_update_constructs_does_nothing_when_knowledge_syn
     arg_frame = MagicMock()
 
     fake_constructs = []
-    
+
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.knowledge_synthesis_constructs = fake_constructs
 
@@ -129,7 +129,7 @@ def test_VehicleRepresentation_update_constructs_calls_update_on_each_knowledge_
         fake_construct = MagicMock()
         fake_constructs.append(fake_construct)
         mocker.patch.object(fake_construct, 'update')
-    
+
     cut = VehicleRepresentation.__new__(VehicleRepresentation)
     cut.knowledge_synthesis_constructs = fake_constructs
 
@@ -316,7 +316,7 @@ def test_VehicleRepresentation_get_batch_status_reports_returngets_None():
 
     # Assert
     assert result == expected_result
-    
+
 # get_state_information tests
 def test_VehicleRepresentation_get_state_information_calls_render_reasoning_on_knowledge_synthesis_constructs(mocker):
     # Arrange
@@ -324,7 +324,7 @@ def test_VehicleRepresentation_get_state_information_calls_render_reasoning_on_k
     arg_headers = MagicMock()
     arg_tests = MagicMock()
     fake_render_reasoning_result = MagicMock()
-    
+
     fake_knowledge_synthesis_construct = MagicMock()
     fake_knowledge_synthesis_construct.component_name = 'foo'
 

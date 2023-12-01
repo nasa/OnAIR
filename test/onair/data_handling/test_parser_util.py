@@ -9,7 +9,7 @@
 
 """ Test Parser Util Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.data_handling.parser_util as parser_util
 
@@ -173,7 +173,7 @@ def test_parser_util_extract_meta_data_returns_expected_dicts_dict_when_len_conf
     forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
                                 'test_assignments' : fake_tests,
                                 'description_assignments' : fake_descs}
-    
+
     mocker.patch(parser_util.__name__ + '.parseTlmConfJson', return_value=forced_return_parse_tlm)
     mocker.patch(parser_util.__name__ + '.str2lst')
 
@@ -204,7 +204,7 @@ def test_parser_util_extract_meta_data_returns_expected_dicts_dict_when_len_conf
     noop_test_assign = 'NOOP'
     fake_tests = [[[fake_test_assign]]] * (len_configs - num_noops) + [[[noop_test_assign]]] * num_noops
     fake_descs = [MagicMock()] * len_configs
-    
+
     forced_return_parse_tlm = {'subsystem_assignments' : fake_subsystem_assignments,
                                 'test_assignments' : fake_tests,
                                 'description_assignments' : fake_descs}
@@ -355,7 +355,7 @@ def test_parser_util_flotify_input_raises_exception_when_float_returns_non_Value
 def test_parser_util_flotify_input_returns_list_of_size_one_that_contains_the_call_to_float_when_no_Exception_is_thrown_and_given__input_is_str(mocker):
     # Arrange
     arg__input = []
-    arg_remove_str = False 
+    arg_remove_str = False
 
     fake_item = str(MagicMock())
     arg__input.append(fake_item) # list of single str, one iteration
@@ -384,7 +384,7 @@ def test_parser_util_flotify_input_returns_list_of_size_one_that_contains_the_se
 
     mocker.patch(parser_util.__name__ + '.float', side_effect=[ValueError])
     mocker.patch(parser_util.__name__ + '.convert_str_to_timestamp', return_value=expected_result)
-    
+
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
 
@@ -405,7 +405,7 @@ def test_parser_util_flotify_input_returns_list_of_size_one_that_contains_0_dot_
 
     mocker.patch(parser_util.__name__ + '.float', side_effect=[ValueError])
     mocker.patch(parser_util.__name__ + '.convert_str_to_timestamp', side_effect=[Exception])
-    
+
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
 
@@ -425,7 +425,7 @@ def test_parser_util_flotify_input_default_arg_remove_str_is_False(mocker):
 
     mocker.patch(parser_util.__name__ + '.float', side_effect=[ValueError])
     mocker.patch(parser_util.__name__ + '.convert_str_to_timestamp', side_effect=[Exception])
-    
+
     # Act
     result = parser_util.floatify_input(arg__input)
 
@@ -442,7 +442,7 @@ def test_parser_util_flotify_input_returns_empty_list_when_two_Exceptions_are_th
 
     mocker.patch(parser_util.__name__ + '.float', side_effect=[ValueError])
     mocker.patch(parser_util.__name__ + '.convert_str_to_timestamp', side_effect=[Exception])
-    
+
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
 
@@ -463,7 +463,7 @@ def test_parser_util_flotify_input_returns_call_to_float_that_was_given___input_
     expected_result = MagicMock()
 
     mocker.patch(parser_util.__name__ + '.float', return_value=expected_result)
-    
+
     # Act
     result = parser_util.floatify_input(arg__input)
 
@@ -510,13 +510,13 @@ def test_parser_util_flotify_input_returns_expected_values_for_given__input_that
 
     mocker.patch(parser_util.__name__ + '.float', side_effect=side_effects_for_float)
     mocker.patch(parser_util.__name__ + '.convert_str_to_timestamp', side_effect=side_effects_for_convert_str)
-    
+
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
 
     # Assert
     assert result == expected_result
-    
+
 def test_parser_util_flotify_input_returns_expected_values_for_given__input_that_is_multi_typed_when_remove_str_is_False(mocker):
     # Arrange
     arg__input = []
@@ -558,7 +558,7 @@ def test_parser_util_flotify_input_returns_expected_values_for_given__input_that
 
     mocker.patch(parser_util.__name__ + '.float', side_effect=side_effects_for_float)
     mocker.patch(parser_util.__name__ + '.convert_str_to_timestamp', side_effect=side_effects_for_convert_str)
-    
+
     # Act
     result = parser_util.floatify_input(arg__input, arg_remove_str)
 
@@ -585,7 +585,7 @@ def test_parser_util_convert_str_to_timestamp_returns_datetime_strptime_timestam
     # Assert
     assert fake_dt_module.datetime.strptime.call_count == 1
     assert fake_dt_module.datetime.strptime.call_args_list[0].args == (arg_time_str, '%Y-%j-%H:%M:%S.%f')
-    assert fake_datetime.timestamp.call_count == 1 
+    assert fake_datetime.timestamp.call_count == 1
     assert result == fake_timestamp
 
 def test_parser_util_convert_str_to_timestamp_returns_datetime_timestamp_when_strptime_raises_error(mocker):

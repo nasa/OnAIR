@@ -6,10 +6,10 @@
 #
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
-  
+
 """ Test Status Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.systems.telemetry_test_suite as telemetry_test_suite
 from onair.src.systems.telemetry_test_suite import TelemetryTestSuite
@@ -31,7 +31,7 @@ def test_TelemetryTestSuite__init__sets_the_expected_values_with_given_headers_a
     assert cut.latest_results == None
     assert cut.epsilon == 1/100000 # production codes notes this value as needing intelligent definition
     assert cut.all_tests == {'STATE' : cut.state,
-                      'FEASIBILITY' : cut.feasibility, 
+                      'FEASIBILITY' : cut.feasibility,
                              'NOOP' : cut.noop}
 
 def test_TelemetryTestSuite__init__default_arg_tests_is_empty_list(mocker):
@@ -158,14 +158,14 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     cut.tests = {arg_header_index:fake_tests}
     cut.dataFields = {arg_header_index:expected_datafield}
     cut.epsilon = MagicMock()
-    
+
     # IMPORTANT: note, using state function as an easy mock -- not really calling it here!!
     mocker.patch.object(cut, 'state', return_value=(fake_stat, fake_mass_assigments))
     mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
     mocker.patch(telemetry_test_suite.__name__ + '.Status', return_value = expected_result)
 
     cut.all_tests = {fake_tests[0][0]:cut.state} # IMPORTANT: purposely set AFTER patch of cut's sync function
-    
+
     # Act
     result = cut.run_tests(arg_header_index, arg_test_val, arg_sync_data)
 
@@ -191,7 +191,7 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     fake_stat = MagicMock()
     fake_mass_assigments = MagicMock()
     fake_bayesian = [MagicMock(),MagicMock()]
-    
+
     expected_datafield = MagicMock()
     expected_result = telemetry_test_suite.Status.__new__(telemetry_test_suite.Status)
     expected_stats = []
@@ -202,13 +202,13 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     cut.tests = {arg_header_index:fake_tests}
     cut.dataFields = {arg_header_index:expected_datafield}
     cut.epsilon = MagicMock()
-    
+
     mocker.patch.object(cut, 'state', return_value=(fake_stat, fake_mass_assigments))
     mocker.patch.object(cut, 'calc_single_status', return_value=fake_bayesian)
     mocker.patch(telemetry_test_suite.__name__ + '.Status', return_value = expected_result)
 
     cut.all_tests = {'STATE':cut.state} # IMPORTANT: purposely set AFTER patch of cut's state function
-    
+
     # setup random input and results
     for i in range(num_fake_tests):
         fake_vars.append(MagicMock())
@@ -228,7 +228,7 @@ def test_TelemetryTestSuite_run_tests_return_Status_object_based_upon_given_head
     assert telemetry_test_suite.Status.call_count == 1
     assert telemetry_test_suite.Status.call_args_list[0].args == (expected_datafield, fake_bayesian[0], fake_bayesian[1])
     assert result == expected_result
-  
+
 # get_latest_result tests
 def test_TelemetryTestSuite_get_latest_results_returns_None_when_latest_results_is_None():
     # Arrange
@@ -272,8 +272,8 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_GREEN_and_list_containing
     factor = 1
     if pytest.gen.randint(0,1) == 1:
         factor *= -1
-     # arbitrary, from 0 to 200 with 50/50 change of negative 
-    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative 
+     # arbitrary, from 0 to 200 with 50/50 change of negative
+    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative
     fake_green_tol = pytest.gen.randint(1, 50) # arbitrary, from 1 to 50 allowance in both directions from fake_mid_point
 
     arg_test_params.append(range((fake_mid_point - fake_green_tol), (fake_mid_point + fake_green_tol)))
@@ -302,8 +302,8 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_YELLOW_and_list_containin
     factor = 1
     if pytest.gen.randint(0,1) == 1:
         factor *= -1
-     # arbitrary, from 0 to 200 with 50/50 change of negative 
-    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative 
+     # arbitrary, from 0 to 200 with 50/50 change of negative
+    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative
     fake_green_tol = pytest.gen.randint(1, 50) # arbitrary, from 1 to 50 allowance in both directions from fake_mid_point
     fake_yellow_tol = pytest.gen.randint(1, 20) + fake_green_tol # arbitrary, from 1 to 20 allowance in both directions from fake_mid_point + fake_green_tol
 
@@ -311,15 +311,15 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_YELLOW_and_list_containin
     arg_test_params.append(range((fake_mid_point - fake_yellow_tol), (fake_mid_point + fake_yellow_tol)))
     arg_test_params.append(MagicMock())
 
-    if pytest.gen.randint(0,1) == 1: 
+    if pytest.gen.randint(0,1) == 1:
         arg_val = pytest.gen.randint(fake_green_tol, fake_yellow_tol - 1) + fake_mid_point # random val within upper yellow range
     else:
-        arg_val = pytest.gen.randint(0 - fake_yellow_tol, 0 - fake_green_tol - 1) + fake_mid_point # sometimes flip to lower yellow range   
+        arg_val = pytest.gen.randint(0 - fake_yellow_tol, 0 - fake_green_tol - 1) + fake_mid_point # sometimes flip to lower yellow range
     if arg_val > 0:
         arg_val += pytest.gen.random() # make float by adding some random decimal
     else:
         arg_val -= pytest.gen.random() # make float by adding some random decimal
-    
+
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
     # Act
@@ -327,7 +327,7 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_YELLOW_and_list_containin
 
     # Assert
     assert result == ('YELLOW', [({'YELLOW'}, 1.0)])
-    
+
 def test_TelemetryTestSuite_state_returns_tuple_of_str_RED_and_list_containing_tuple_of_set_of_str_RED_and_1_pt_0_when_int_val_is_in_range_test_params_2_and_not_in_0_or_1():
     # Arrange
     arg_test_params = []
@@ -336,8 +336,8 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_RED_and_list_containing_t
     factor = 1
     if pytest.gen.randint(0,1) == 1:
         factor *= -1
-     # arbitrary, from 0 to 200 with 50/50 change of negative 
-    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative 
+     # arbitrary, from 0 to 200 with 50/50 change of negative
+    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative
     fake_green_tol = pytest.gen.randint(1, 50) # arbitrary, from 1 to 50 allowance in both directions from fake_mid_point
     fake_yellow_tol = pytest.gen.randint(1, 20) + fake_green_tol # arbitrary, from 1 to 20 allowance in both directions from fake_mid_point + fake_green_tol
     fake_red_tol = pytest.gen.randint(1, 10) + fake_yellow_tol # arbitrary, from 1 to 10 allowance in both directions from fake_mid_point + fake_yellow_tol
@@ -346,15 +346,15 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_RED_and_list_containing_t
     arg_test_params.append(range((fake_mid_point - fake_yellow_tol), (fake_mid_point + fake_yellow_tol)))
     arg_test_params.append(range((fake_mid_point - fake_red_tol), (fake_mid_point + fake_red_tol)))
 
-    if pytest.gen.randint(0,1) == 1: 
+    if pytest.gen.randint(0,1) == 1:
         arg_val = pytest.gen.randint(fake_yellow_tol, fake_red_tol - 1) + fake_mid_point # random val within upper red range
     else:
-        arg_val = pytest.gen.randint(0 - fake_red_tol, 0 - fake_yellow_tol - 1) + fake_mid_point # sometimes flip to lower red range   
+        arg_val = pytest.gen.randint(0 - fake_red_tol, 0 - fake_yellow_tol - 1) + fake_mid_point # sometimes flip to lower red range
     if arg_val > 0:
         arg_val += pytest.gen.random() # make float by adding some random decimal
     else:
         arg_val -= pytest.gen.random() # make float by adding some random decimal
-    
+
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
     # Act
@@ -362,7 +362,7 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_RED_and_list_containing_t
 
     # Assert
     assert result == ('RED', [({'RED'}, 1.0)])
-     
+
 def test_TelemetryTestSuite_state_returns_tuple_of_str_3_dashes_and_list_containing_tuple_of_set_of_str_RED_YELLOW_and_GREEN_and_1_pt_0_when_int_val_is_in_not_in_any_range():
     # Arrange
     arg_test_params = []
@@ -371,8 +371,8 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_3_dashes_and_list_contain
     factor = 1
     if pytest.gen.randint(0,1) == 1:
         factor *= -1
-     # arbitrary, from 0 to 200 with 50/50 change of negative 
-    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative 
+     # arbitrary, from 0 to 200 with 50/50 change of negative
+    fake_mid_point = pytest.gen.randint(0, 200) * factor # arbitrary, from 0 to 200 with 50/50 change of negative
     fake_green_tol = pytest.gen.randint(1, 50) # arbitrary, from 1 to 50 allowance in both directions from fake_mid_point
     fake_yellow_tol = pytest.gen.randint(1, 20) + fake_green_tol # arbitrary, from 1 to 20 allowance in both directions from fake_mid_point + fake_green_tol
     fake_red_tol = pytest.gen.randint(1, 10) + fake_yellow_tol # arbitrary, from 1 to 10 allowance in both directions from fake_mid_point + fake_yellow_tol
@@ -381,15 +381,15 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_3_dashes_and_list_contain
     arg_test_params.append(range((fake_mid_point - fake_yellow_tol), (fake_mid_point + fake_yellow_tol)))
     arg_test_params.append(range((fake_mid_point - fake_red_tol), (fake_mid_point + fake_red_tol)))
 
-    if pytest.gen.randint(0,1) == 1: 
+    if pytest.gen.randint(0,1) == 1:
         arg_val = fake_red_tol + fake_mid_point + 1 # random val outside upper red
     else:
-        arg_val = 0 - fake_red_tol + fake_mid_point - 1 # random val outside lower red  
+        arg_val = 0 - fake_red_tol + fake_mid_point - 1 # random val outside lower red
     if arg_val > 0:
         arg_val += pytest.gen.random() # make float by adding some random decimal
     else:
         arg_val -= pytest.gen.random() # make float by adding some random decimal
-    
+
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
     # Act
@@ -397,7 +397,7 @@ def test_TelemetryTestSuite_state_returns_tuple_of_str_3_dashes_and_list_contain
 
     # Assert
     assert result == ('---', [({'RED', 'YELLOW', 'GREEN'}, 1.0)])
-    
+
 # feasibility tests
 def test_TelemetryTestSuite_feasibility_asserts_len_given_test_params_is_not_2_or_4(mocker):
     # Arrange
@@ -425,9 +425,9 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, fake_highest_bound]    
-    arg_val = fake_lowest_bound    
+
+    arg_test_params = [fake_lowest_bound, fake_highest_bound]
+    arg_val = fake_lowest_bound
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -443,13 +443,13 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, 
-                       fake_lowest_bound + 1, 
-                       fake_highest_bound - 1, 
-                       fake_highest_bound]    
-    
-    arg_val = fake_lowest_bound    
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_lowest_bound + 1,
+                       fake_highest_bound - 1,
+                       fake_highest_bound]
+
+    arg_val = fake_lowest_bound
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -468,9 +468,9 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
     fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
 
     arg_test_params = [fake_lowest_bound,
-                       fake_highest_bound]    
-    
-    arg_val = fake_lowest_bound - fake_delta - 1 # -1 for less than low minus delta  
+                       fake_highest_bound]
+
+    arg_val = fake_lowest_bound - fake_delta - 1 # -1 for less than low minus delta
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -489,9 +489,9 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
     fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
 
     arg_test_params = [fake_lowest_bound,
-                       fake_highest_bound]    
-    
-    arg_val = fake_lowest_bound - fake_delta - 1 # -1 for less than low minus delta  
+                       fake_highest_bound]
+
+    arg_val = fake_lowest_bound - fake_delta - 1 # -1 for less than low minus delta
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -510,8 +510,8 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
     fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
 
     arg_test_params = [fake_lowest_bound,
-                       fake_highest_bound]    
-    arg_val = fake_lowest_bound - 1   
+                       fake_highest_bound]
+    arg_val = fake_lowest_bound - 1
 
     expected_mass = abs(fake_lowest_bound - arg_val)/fake_delta
     expected_red_yellow_mass = 1.0 - expected_mass
@@ -535,8 +535,8 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
     arg_test_params = [fake_lowest_bound,
                        fake_lowest_bound + 2,
                        fake_highest_bound - 2,
-                       fake_highest_bound]    
-    arg_val = fake_lowest_bound - 1   
+                       fake_highest_bound]
+    arg_val = fake_lowest_bound - 1
 
     expected_mass = abs(fake_lowest_bound - arg_val)/fake_delta
     expected_red_yellow_mass = 1.0 - expected_mass
@@ -555,9 +555,9 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, fake_highest_bound]    
-    arg_val = fake_highest_bound    
+
+    arg_test_params = [fake_lowest_bound, fake_highest_bound]
+    arg_val = fake_highest_bound
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -573,13 +573,13 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, 
-                       fake_lowest_bound + 1, 
-                       fake_highest_bound - 1, 
-                       fake_highest_bound]    
-    
-    arg_val = fake_highest_bound    
+
+    arg_test_params = [fake_lowest_bound,
+                       fake_lowest_bound + 1,
+                       fake_highest_bound - 1,
+                       fake_highest_bound]
+
+    arg_val = fake_highest_bound
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -598,9 +598,9 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
     fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
 
     arg_test_params = [fake_lowest_bound,
-                       fake_highest_bound]    
-    
-    arg_val = fake_highest_bound + fake_delta + 1 # +1 for more than high plus delta  
+                       fake_highest_bound]
+
+    arg_val = fake_highest_bound + fake_delta + 1 # +1 for more than high plus delta
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -619,9 +619,9 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
     fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
 
     arg_test_params = [fake_lowest_bound,
-                       fake_highest_bound]    
-    
-    arg_val = fake_highest_bound + fake_delta + 1 # +1 for more than high plus delta  
+                       fake_highest_bound]
+
+    arg_val = fake_highest_bound + fake_delta + 1 # +1 for more than high plus delta
 
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
@@ -640,8 +640,8 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
     fake_delta = arg_epsilon * abs(fake_highest_bound - fake_lowest_bound)
 
     arg_test_params = [fake_lowest_bound,
-                       fake_highest_bound]    
-    arg_val = fake_highest_bound + 1   
+                       fake_highest_bound]
+    arg_val = fake_highest_bound + 1
 
     expected_mass = abs(fake_highest_bound - arg_val)/fake_delta
     expected_red_yellow_mass = 1.0 - expected_mass
@@ -665,8 +665,8 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
     arg_test_params = [fake_lowest_bound,
                        fake_lowest_bound + 2,
                        fake_highest_bound - 2,
-                       fake_highest_bound]    
-    arg_val = fake_highest_bound + 1   
+                       fake_highest_bound]
+    arg_val = fake_highest_bound + 1
 
     expected_mass = abs(fake_highest_bound - arg_val)/fake_delta
     expected_red_yellow_mass = 1.0 - expected_mass
@@ -685,14 +685,14 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, fake_highest_bound]    
-    arg_val = int(fake_highest_bound - (abs(fake_highest_bound - fake_lowest_bound) / 2))  
+
+    arg_test_params = [fake_lowest_bound, fake_highest_bound]
+    arg_val = int(fake_highest_bound - (abs(fake_highest_bound - fake_lowest_bound) / 2))
 
     fake_delta = arg_epsilon * (abs(fake_highest_bound-fake_lowest_bound))
     expected_mass = abs(fake_lowest_bound - arg_val)/fake_delta
     print(fake_lowest_bound, arg_val, fake_highest_bound)
-    
+
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
     # Act
@@ -707,17 +707,17 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 3 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, 
+
+    arg_test_params = [fake_lowest_bound,
                        fake_lowest_bound + 1,
                        fake_highest_bound - 1,
-                       fake_highest_bound]    
+                       fake_highest_bound]
 
     fake_delta = arg_epsilon * (abs(fake_highest_bound-fake_lowest_bound))
-     
-    arg_val = int(fake_highest_bound - (abs(fake_highest_bound - fake_lowest_bound) / 2))  
+
+    arg_val = int(fake_highest_bound - (abs(fake_highest_bound - fake_lowest_bound) / 2))
     print(fake_lowest_bound, arg_val, fake_lowest_bound + 2, fake_highest_bound -2, fake_highest_bound)
-    
+
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
     # Act
@@ -732,17 +732,17 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(10, 100) # arbitrary, from 10 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, 
+
+    arg_test_params = [fake_lowest_bound,
                        fake_lowest_bound + 2,
                        fake_highest_bound - 2,
-                       fake_highest_bound]    
+                       fake_highest_bound]
 
     fake_delta = arg_epsilon * (abs(fake_highest_bound-fake_lowest_bound))
-     
+
     arg_val = fake_lowest_bound + 1
     print(fake_lowest_bound, arg_val, fake_lowest_bound + 2, fake_highest_bound -2, fake_highest_bound)
-    
+
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
 
     # Act
@@ -757,11 +757,11 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(20, 100) # arbitrary, from 10 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, 
+
+    arg_test_params = [fake_lowest_bound,
                        fake_lowest_bound + 4,
                        fake_highest_bound - 4,
-                       fake_highest_bound]    
+                       fake_highest_bound]
 
     arg_val = fake_highest_bound - 1
     print(fake_lowest_bound, fake_lowest_bound + 4, fake_highest_bound -4, arg_val, fake_highest_bound)
@@ -779,11 +779,11 @@ def test_TelemetryTestSuite_feasibility_return_expected_stat_and_mass_assignment
 
     fake_lowest_bound = pytest.gen.randint(-100, 100) # arbitrary, from -100 to 100
     fake_highest_bound = fake_lowest_bound + pytest.gen.randint(20, 100) # arbitrary, from 10 to 100 higher than lowest bound
-    
-    arg_test_params = [fake_lowest_bound, 
+
+    arg_test_params = [fake_lowest_bound,
                        fake_lowest_bound + 4,
                        fake_highest_bound - 4,
-                       fake_highest_bound]    
+                       fake_highest_bound]
 
     arg_val = fake_highest_bound - 4
     print(fake_lowest_bound, fake_lowest_bound + 4, fake_highest_bound -4, arg_val, fake_highest_bound)
@@ -823,7 +823,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
-    
+
     # Act
     result = cut.calc_single_status(arg_status_list, arg_mode)
 
@@ -844,7 +844,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
-    
+
     # Act
     result = cut.calc_single_status(arg_status_list, arg_mode)
 
@@ -860,7 +860,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     num_fake_statuses = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 not allowed, div by 0 error)
     fake_max_occurrence = MagicMock()
-    
+
     for i in range(num_fake_statuses):
         arg_status_list.append(MagicMock())
     fake_occurrences = telemetry_test_suite.Counter.__new__(telemetry_test_suite.Counter)
@@ -871,7 +871,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
-    
+
     # Act
     result = cut.calc_single_status(arg_status_list, arg_mode)
 
@@ -887,7 +887,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     num_fake_statuses = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 not allowed, div by 0 error)
     fake_max_occurrence = MagicMock()
-    
+
     for i in range(num_fake_statuses):
         arg_status_list.append(MagicMock())
     fake_occurrences = telemetry_test_suite.Counter.__new__(telemetry_test_suite.Counter)
@@ -898,7 +898,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_value_from_call_
 
     mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
-    
+
     # Act
     result = cut.calc_single_status(arg_status_list, arg_mode)
 
@@ -915,7 +915,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_str_RED_and_1_pt
     num_fake_statuses = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 not allowed, div by 0 error)
     num_red_statuses = pytest.gen.randint(1, num_fake_statuses) # arbitrary, from 1 to total statuses
     fake_max_occurrence = MagicMock()
-    
+
     for i in range(num_fake_statuses):
         arg_status_list.append(MagicMock())
 
@@ -927,7 +927,7 @@ def test_TelemetryTestSuite_calc_single_status_returns_tuple_of_str_RED_and_1_pt
 
     mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
-    
+
     # Act
     result = cut.calc_single_status(arg_status_list, arg_mode)
 
@@ -943,7 +943,7 @@ def test_TelemetryTestSuite_calc_single_status_default_given_mode_is_str_strict(
     num_fake_statuses = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 not allowed, div by 0 error)
     num_red_statuses = pytest.gen.randint(1, num_fake_statuses) # arbitrary, from 1 to total statuses
     fake_max_occurrence = MagicMock()
-    
+
     for i in range(num_fake_statuses):
         arg_status_list.append(MagicMock())
 
@@ -955,7 +955,7 @@ def test_TelemetryTestSuite_calc_single_status_default_given_mode_is_str_strict(
 
     mocker.patch(telemetry_test_suite.__name__ + '.Counter', return_value=fake_occurrences)
     mocker.patch.object(fake_occurrences, 'most_common', return_value=[[fake_max_occurrence]])
-    
+
     # Act
     result = cut.calc_single_status(arg_status_list)
 
@@ -1005,7 +1005,7 @@ def test_TelemetryTestSuite_get_suite_status_returns_value_from_call_to_calc_sin
         fake_status = MagicMock()
 
         mocker.patch.object(fake_res, 'get_status', return_value=fake_status)
-        
+
         fake_latest_results.append(fake_res)
         fake_statuses.append(fake_status)
 
@@ -1113,7 +1113,7 @@ def test_TelemetryTestSuite_get_status_specific_mnemonics_returns_only_names_in_
         else:
             mocker.patch.object(fake_res, 'get_status', return_value=MagicMock())
         fake_latest_results[i] = fake_res
-            
+
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
     cut.latest_results = fake_latest_results
 
@@ -1140,7 +1140,7 @@ def test_TelemetryTestSuite_get_status_specific_mnemonics_returns_all_names_in_l
         mocker.patch.object(fake_res, 'get_name', return_value=fake_name)
         fake_latest_results.append(fake_res)
         expected_names.append(fake_name)
-            
+
     cut = TelemetryTestSuite.__new__(TelemetryTestSuite)
     cut.latest_results = fake_latest_results
 

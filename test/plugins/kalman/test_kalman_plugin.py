@@ -9,7 +9,7 @@
 
 """ Test Kalman Plugin Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 import onair
 
 from plugins.kalman import kalman_plugin

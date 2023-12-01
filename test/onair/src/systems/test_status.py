@@ -9,7 +9,7 @@
 
 """ Test Status Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from onair.src.systems.status import Status
 
@@ -106,9 +106,9 @@ def test_Status_set_status_when_only_stat_arg_is_provided_sets_variables_to_expe
 def test_Status_set_status_raises_error_because_bayesian_conf_greater_than_1():
     # Arrange
     cut = Status.__new__(Status)
-    
+
     arg_status = '---'
-    arg_bayesian_conf = pytest.gen.uniform(1.01, 10.0) # arbitrary float greater than 1.0 (top of accepted range) 
+    arg_bayesian_conf = pytest.gen.uniform(1.01, 10.0) # arbitrary float greater than 1.0 (top of accepted range)
 
     # Act
     with pytest.raises(AssertionError) as e_info:
@@ -120,7 +120,7 @@ def test_Status_set_status_raises_error_because_bayesian_conf_greater_than_1():
 def test_Status_set_status_raises_error_because_bayesian_conf_less_than_neg_1():
     # Arrange
     cut = Status.__new__(Status)
-    
+
     arg_status = '---'
     arg_bayesian_conf = pytest.gen.uniform(-10.0, -1.01) # arbitrary float less than -1.0 (bottom of accepted range)
 

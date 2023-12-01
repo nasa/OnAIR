@@ -9,12 +9,12 @@
 
 """ Test Data Conversion Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.util.data_conversion as data_conversion
 
 from numpy import ndarray
-    
+
 # status_to_oneHot tests
 def test_data_conversion_status_to_oneHot_returns_given_status_when_status_isinstance_of_np_ndarray(mocker):
     # Arrange

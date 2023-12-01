@@ -7,7 +7,7 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.util.cleanup as cleanup
 
@@ -21,7 +21,7 @@ def test_cleanup_setup_folders_creates_dir_when_given_results_path_does_not_exis
 
   # Act
   cleanup.setup_folders(arg_results_path)
-  
+
   # Assert
   assert cleanup.os.path.isdir.call_count == 1
   assert cleanup.os.mkdir.call_count == 1
@@ -36,7 +36,7 @@ def test_cleanup_setup_folders_does_not_create_dir_when_it_already_exists(mocker
 
   # Act
   cleanup.setup_folders(arg_results_path)
-  
+
   # Assert
   assert cleanup.os.path.isdir.call_count == 1
   assert cleanup.os.mkdir.call_count == 0

@@ -9,7 +9,7 @@
 
 """ Test PlannersInterface Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.reasoning.complex_reasoning_interface as complex_reasoning_interface
 from onair.src.reasoning.complex_reasoning_interface import ComplexReasoningInterface
@@ -40,7 +40,7 @@ def test_ComplexReasoningInterface__init__sets_self_headers_to_given_headers_and
     forced_return_reasoning_constructs = MagicMock()
 
     mocker.patch(complex_reasoning_interface.__name__ + '.import_plugins', return_value=forced_return_reasoning_constructs)
-    
+
 
     cut = ComplexReasoningInterface.__new__(ComplexReasoningInterface)
 

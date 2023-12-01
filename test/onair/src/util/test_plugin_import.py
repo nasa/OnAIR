@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.util.plugin_import as plugin_import
 
@@ -41,7 +41,7 @@ def test_plugin_import_returns_single_item_list_when_given_module_dict_contains_
     mocker.patch.dict(plugin_import.sys.modules)
     import_mock = mocker.patch('builtins.__import__', return_value=fake_plugin)
     mocker.patch.object(fake_plugin, 'Plugin', return_value=fake_Plugin_instance)
-    
+
     # Act
     result = plugin_import.import_plugins(arg_headers, arg_module_dict)
 

@@ -9,7 +9,7 @@
 
 """ Test CSV Parser Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.data_handling.csv_parser as csv_parser
 from onair.data_handling.csv_parser import DataSource

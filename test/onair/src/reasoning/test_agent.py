@@ -9,7 +9,7 @@
 
 """ Test Agent Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.reasoning.agent as agent
 from onair.src.reasoning.agent import Agent
@@ -95,7 +95,7 @@ def test_Agent_reason_updates_vehicle_rep_with_given_frame_and_updates_learning_
     fake_complex_reasoning_systems = MagicMock()
     fake_learning_systems_reasoning = MagicMock()
     fake_planning_systems_reasoning = MagicMock()
-    expected_aggregate_high_level_info = {'vehicle_rep': fake_state, 
+    expected_aggregate_high_level_info = {'vehicle_rep': fake_state,
                                           'learning_systems':fake_learning_systems_reasoning,
                                           'planning_systems':fake_planning_systems_reasoning}
     expected_result = MagicMock()
@@ -138,7 +138,7 @@ def test_Agent_reason_updates_vehicle_rep_with_given_frame_and_updates_learning_
     assert cut.planning_systems.render_reasoning.call_count == 1
     assert cut.planning_systems.render_reasoning.call_args_list[0].args == ()
 
-     
+
 # diagnose tests
 def test_Agent_diagnose_returns_empty_Dict():
     # Arrange

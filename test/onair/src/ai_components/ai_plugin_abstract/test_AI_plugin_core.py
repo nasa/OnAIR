@@ -9,7 +9,7 @@
 
 """ Test Generic Component Core (abstract class) Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.ai_components.ai_plugin_abstract.ai_plugin as ai_plugin
 from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin

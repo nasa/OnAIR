@@ -10,7 +10,7 @@
 import pytest
 import random
 from time import time
-from mock import MagicMock
+from unittest.mock import MagicMock
 import sys
 
 def pytest_addoption(parser):

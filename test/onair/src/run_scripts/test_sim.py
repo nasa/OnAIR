@@ -9,7 +9,7 @@
 
 """ Test Simulator Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.run_scripts.sim as sim
 from onair.src.run_scripts.sim import Simulator

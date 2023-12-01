@@ -9,7 +9,7 @@
 
 """ Test Execution Engine Functionality """
 import pytest
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 import onair.src.run_scripts.execution_engine as execution_engine
 from onair.src.run_scripts.execution_engine import ExecutionEngine
