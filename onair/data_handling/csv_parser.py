@@ -87,5 +87,6 @@ def convert_str_to_timestamp(time_str):
     except:
         min_sec = time_str.split(':')
         current = datetime.datetime.now()
-        t = datetime.datetime(current.year, current.month, current.day, current.hour, int(min_sec[0]), int(min_sec[1]), 0)
+        # Use 1 am on Jan 1st, 2000 as the date if only minutes and seconds are specified
+        t = datetime.datetime(2000, 1, 1, 1, int(min_sec[0]), int(min_sec[1]), 0)
         return t.timestamp()
