@@ -38,7 +38,8 @@ Options that may be added to the driver.py test run. Use these at your own discr
 
 `--conftest-seed=###` - set the random values seed for this run  
 `--randomly-seed=###` - set the random order seed for this run  
-`--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.  
+`--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.
+`-k KEYWORD` - only run tests that match the KEYWORD (see `pytest --help`)  
 
 NOTE: Running tests will output results using provided seeds, but each seed is random when not set directly.  
 Example start of test output:
@@ -74,6 +75,7 @@ Options that may be added to the command line test run. Use these at your own di
 `--conftest-seed=###` - set the random values seed for this run  
 `--randomly-seed=###` - set the random order seed for this run  
 `--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.  
+`-k KEYWORD` - only run tests that match the KEYWORD (see `pytest --help`)  
 
 NOTE: see note about seeds in driver.py section above
 
