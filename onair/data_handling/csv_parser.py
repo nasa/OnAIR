@@ -12,7 +12,7 @@ CSV Parser
 """
 
 import os
-import pandas as pd
+import csv
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
 from onair.src.util.print_io import *
@@ -27,14 +27,21 @@ class DataSource(OnAirDataSource):
 ##### INITIAL PROCESSING ####
     def parse_csv_data(self, data_file):
         #Read in the data set
-        dataset = pd.read_csv(data_file, delimiter=',', header=0, dtype=str)
-        dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
+        csv_file = open(data_file, 'r')
+        dataset = csv.reader(csv_file, delimiter=',')
+        #dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
 
         #Initialize the entire data dictionary
         all_data = []
-        for index, row in dataset.iterrows():
-            rowVals = floatify_input(list(row))
-            all_data.append(floatify_input(list(row)))
+        index = 0
+        for row in dataset:
+            if index == 0:
+                # Skip first row (headers)
+                pass
+            else:
+                rowVals = floatify_input(list(row))
+                all_data.append(rowVals)
+            index = index + 1
 
         return all_data
 
@@ -54,3 +61,31 @@ class DataSource(OnAirDataSource):
     # Return whether or not the index has finished traveling through the data
     def has_more(self):
         return self.frame_index < len(self.sim_data)
+
+def floatify_input(_input, remove_str=False):
+    floatified = []
+    for i in _input:
+        try:
+            x = float(i)
+            floatified.append(x)
+        except ValueError:
+            try:
+                x = convert_str_to_timestamp(i)
+                floatified.append(x)
+            except:
+                if remove_str == False:
+                    floatified.append(0.0)
+                else:
+                    continue
+                continue
+    return floatified
+
+def convert_str_to_timestamp(time_str):
+    try:
+        t = datetime.datetime.strptime(time_str, '%Y-%j-%H:%M:%S.%f')
+        return t.timestamp()
+    except:
+        min_sec = time_str.split(':')
+        current = datetime.datetime.now()
+        t = datetime.datetime(current.year, current.month, current.day, current.hour, int(min_sec[0]), int(min_sec[1]), 0)
+        return t.timestamp()

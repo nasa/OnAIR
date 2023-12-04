@@ -9,7 +9,6 @@
 
 import os
 from .tlm_json_parser import parseTlmConfJson, str2lst
-from pandas import to_datetime
 import datetime
 
 def extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown):
@@ -42,29 +41,3 @@ def extract_meta_data(meta_data_file):
                 test_assign[j] = test + limits
 
     return configs
-
-def floatify_input(_input, remove_str=False):
-    floatified = []
-    for i in _input:
-        try:
-            x = float(i)
-            floatified.append(x)
-        except ValueError:
-            try:
-                x = convert_str_to_timestamp(i)
-                floatified.append(x)
-            except:
-                if remove_str == False:
-                    floatified.append(0.0)
-                else:
-                    continue
-                continue
-    return floatified
-
-def convert_str_to_timestamp(time_str):
-    try:
-        t = to_datetime(time_str)
-        return t.timestamp()
-    except:
-        t = datetime.datetime.strptime(time_str[:24], '%Y-%j-%H:%M:%S.%f')
-        return t.timestamp()
