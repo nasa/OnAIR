@@ -41,3 +41,31 @@ def extract_meta_data(meta_data_file):
                 test_assign[j] = test + limits
 
     return configs
+
+def floatify_input(_input, remove_str=False):
+    floatified = []
+    for i in _input:
+        try:
+            x = float(i)
+            floatified.append(x)
+        except ValueError:
+            try:
+                x = convert_str_to_timestamp(i)
+                floatified.append(x)
+            except:
+                if remove_str == False:
+                    floatified.append(0.0)
+                else:
+                    continue
+                continue
+    return floatified
+
+def convert_str_to_timestamp(time_str):
+    try:
+        t = datetime.datetime.strptime(time_str, '%Y-%j-%H:%M:%S.%f')
+        return t.timestamp()
+    except:
+        min_sec = time_str.split(':')
+        # Use 1 am on Jan 1st, 2000 as the date if only minutes and seconds are specified
+        t = datetime.datetime(2000, 1, 1, 1, int(min_sec[0]), int(min_sec[1]), 0)
+        return t.timestamp()

@@ -27,9 +27,8 @@ class DataSource(OnAirDataSource):
 ##### INITIAL PROCESSING ####
     def parse_csv_data(self, data_file):
         #Read in the data set
-        csv_file = open(data_file, 'r')
+        csv_file = open(data_file, 'r', newline='')
         dataset = csv.reader(csv_file, delimiter=',')
-        #dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
 
         #Initialize the entire data dictionary
         all_data = []
@@ -61,32 +60,3 @@ class DataSource(OnAirDataSource):
     # Return whether or not the index has finished traveling through the data
     def has_more(self):
         return self.frame_index < len(self.sim_data)
-
-def floatify_input(_input, remove_str=False):
-    floatified = []
-    for i in _input:
-        try:
-            x = float(i)
-            floatified.append(x)
-        except ValueError:
-            try:
-                x = convert_str_to_timestamp(i)
-                floatified.append(x)
-            except:
-                if remove_str == False:
-                    floatified.append(0.0)
-                else:
-                    continue
-                continue
-    return floatified
-
-def convert_str_to_timestamp(time_str):
-    try:
-        t = datetime.datetime.strptime(time_str, '%Y-%j-%H:%M:%S.%f')
-        return t.timestamp()
-    except:
-        min_sec = time_str.split(':')
-        current = datetime.datetime.now()
-        # Use 1 am on Jan 1st, 2000 as the date if only minutes and seconds are specified
-        t = datetime.datetime(2000, 1, 1, 1, int(min_sec[0]), int(min_sec[1]), 0)
-        return t.timestamp()
