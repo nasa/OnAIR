@@ -105,28 +105,6 @@ def test_Simulator_run_sim_prints_header_when_given_IO_Flag_is_equal_to_True(moc
     assert sim.print_msg.call_count == 0
     assert result == fake_diagnosis # check we ran through the method correctly
 
-def test_Simulator_run_sim_prints_wait_message_when_given_IO_Flag_is_the_str_strict(mocker):
-    # Arrange
-    cut = Simulator.__new__(Simulator)
-    cut.simData = MagicMock()
-    cut.agent = MagicMock()
-
-    fake_diagnosis = MagicMock()
-
-    mocker.patch(sim.__name__ + '.print_sim_header')
-    mocker.patch(sim.__name__ + '.print_msg')
-    mocker.patch.object(cut.simData, 'has_more', return_value=False)
-    mocker.patch.object(cut.agent, 'diagnose', return_value=fake_diagnosis)
-
-    # Act
-    result = cut.run_sim('strict')
-
-    # Assert
-    assert sim.print_sim_header.call_count == 0
-    assert sim.print_msg.call_count == 1
-    assert sim.print_msg.call_args_list[0].args == ('Please wait...\n', )
-    assert result == fake_diagnosis # check we ran through the method correctly
-
 def test_Simulator_run_sim_runs_until_has_more_is_false(mocker):
     # Arrange
     cut = Simulator.__new__(Simulator)

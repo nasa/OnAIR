@@ -30,8 +30,6 @@ class ExecutionEngine:
 
         # Init Flags
         self.IO_Flag = False
-        self.Dev_Flag = False
-        self.Viz_Flag = False
 
         # Init Paths
         self.dataFilePath = ''
@@ -88,8 +86,6 @@ class ExecutionEngine:
             ## Parse Optional Data: Flags
             ## 'RUN_FLAGS' must exist, but individual flags return False if missing
             self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
-            self.Dev_Flag = config['RUN_FLAGS'].getboolean('Dev_Flag')
-            self.Viz_Flag = config['RUN_FLAGS'].getboolean('Viz_Flag')
 
         except KeyError as e:
             new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
@@ -122,7 +118,7 @@ class ExecutionEngine:
                              self.complex_plugin_dict)
 
     def run_sim(self):
-        self.sim.run_sim(self.IO_Flag, self.Dev_Flag, self.Viz_Flag)
+        self.sim.run_sim(self.IO_Flag)
         if self.save_flag:
             self.save_results(self.save_name)
 

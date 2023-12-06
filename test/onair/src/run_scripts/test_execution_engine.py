@@ -34,8 +34,6 @@ def test_ExecutionEngine__init__sets_expected_values_but_does_no_calls_when_conf
     # Assert
     assert cut.run_name == arg_run_name
     assert cut.IO_Flag == False
-    assert cut.Dev_Flag == False
-    assert cut.Viz_Flag == False
     assert cut.dataFilePath == ''
     assert cut.telemetryFile == ''
     assert cut.fullTelemetryFileName == ''
@@ -250,7 +248,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     mocker.patch(execution_engine.__name__ + '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read', return_value=fake_config_read_result)
     mocker.patch.object(cut, 'parse_plugins_dict', side_effect=fake_plugins)
-    mocker.patch.object(fake_run_flags, 'getboolean', side_effect=[fake_IO_flags, fake_Dev_flags, fake_Viz_flags])
+    mocker.patch.object(fake_run_flags, 'getboolean', return_value=fake_IO_flags)
     mocker.patch(execution_engine.__name__ + '.isinstance', return_value=True)
     mocker.patch(execution_engine.__name__ + '.os.path.exists', return_value=True)
     mocker.patch.object(fake_plugin_dict, 'keys', return_value=fake_keys)
@@ -272,13 +270,9 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     assert cut.learners_plugin_dict == fake_learners_plugin_list
     assert cut.planners_plugin_dict == fake_planners_plugin_list
     assert cut.complex_plugin_dict == fake_complex_plugin_list
-    assert fake_run_flags.getboolean.call_count == 3
+    assert fake_run_flags.getboolean.call_count == 1
     assert fake_run_flags.getboolean.call_args_list[0].args == ('IO_Flag', )
     assert cut.IO_Flag == fake_IO_flags
-    assert fake_run_flags.getboolean.call_args_list[1].args == ('Dev_Flag', )
-    assert cut.Dev_Flag == fake_Dev_flags
-    assert fake_run_flags.getboolean.call_args_list[2].args == ('Viz_Flag', )
-    assert cut.Viz_Flag == fake_Viz_flags
 
 # parse_plugins_dict
 
@@ -558,8 +552,6 @@ def test_ExecutionEngine_run_sim_runs_but_does_not_save_results_when_save_flag_i
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.sim = MagicMock()
     cut.IO_Flag = MagicMock()
-    cut.Dev_Flag = MagicMock()
-    cut.Viz_Flag = MagicMock()
     cut.save_flag = False
 
     mocker.patch.object(cut.sim, 'run_sim')
@@ -570,7 +562,7 @@ def test_ExecutionEngine_run_sim_runs_but_does_not_save_results_when_save_flag_i
 
     # Assert
     assert cut.sim.run_sim.call_count == 1
-    assert cut.sim.run_sim.call_args_list[0].args == (cut.IO_Flag, cut.Dev_Flag, cut.Viz_Flag, )
+    assert cut.sim.run_sim.call_args_list[0].args == (cut.IO_Flag, )
     assert cut.save_results.call_count == 0
 
 def test_ExecutionEngine_run_sim_runs_and_saves_results_when_save_flag_is_True(mocker):
@@ -578,8 +570,6 @@ def test_ExecutionEngine_run_sim_runs_and_saves_results_when_save_flag_is_True(m
     cut = ExecutionEngine.__new__(ExecutionEngine)
     cut.sim = MagicMock()
     cut.IO_Flag = MagicMock()
-    cut.Dev_Flag = MagicMock()
-    cut.Viz_Flag = MagicMock()
     cut.save_flag = True
     cut.save_name = MagicMock()
 
@@ -591,7 +581,7 @@ def test_ExecutionEngine_run_sim_runs_and_saves_results_when_save_flag_is_True(m
 
     # Assert
     assert cut.sim.run_sim.call_count == 1
-    assert cut.sim.run_sim.call_args_list[0].args == (cut.IO_Flag, cut.Dev_Flag, cut.Viz_Flag, )
+    assert cut.sim.run_sim.call_args_list[0].args == (cut.IO_Flag, )
     assert cut.save_results.call_count == 1
     assert cut.save_results.call_args_list[0].args == (cut.save_name, )
 
