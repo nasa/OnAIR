@@ -565,7 +565,8 @@ def test_parser_util_flotify_input_returns_expected_values_for_given__input_that
     # Assert
     assert result == expected_result
 
-def test_parser_util_convert_str_to_timestamp_returns_to_datetime_timestamp_on_success(mocker):
+# convert_str_to_timestamp
+def test_parser_util_convert_str_to_timestamp_returns_datetime_strptime_timestamp_on_success(mocker):
     # Arrange
     arg_time_str = str(MagicMock())
 
@@ -574,48 +575,55 @@ def test_parser_util_convert_str_to_timestamp_returns_to_datetime_timestamp_on_s
     fake_dt_module = MagicMock()
     fake_dt_dt = MagicMock()
 
-    mocker.patch(parser_util.__name__ + '.to_datetime', return_value=fake_datetime)
-    mocker.patch(parser_util.__name__ + '.datetime', fake_dt_module)
-    mocker.patch.object(fake_dt_module, 'datetime', fake_dt_dt)
-    mocker.patch.object(fake_dt_dt, 'strptime')
-    mocker.patch.object(fake_datetime, 'timestamp', return_value=fake_timestamp)
-    # Act
-    result = parser_util.convert_str_to_timestamp(arg_time_str)
-
-    # Assert
-    assert parser_util.to_datetime.call_count == 1
-    assert parser_util.to_datetime.call_args_list[0].args == (arg_time_str, )
-    assert fake_dt_module.datetime.strptime.call_count == 0
-    assert fake_datetime.timestamp.call_count == 1 
-    assert result == fake_timestamp
-
-def test_parser_util_convert_str_to_timestamp_returns_datetime_strptime_timestamp_when_to_datetime_raises_error(mocker):
-    # Arrange
-    arg_time_str = str(MagicMock())
-
-    fake_datetime = MagicMock()
-    fake_timestamp = MagicMock()
-    fake_dt_module = MagicMock()
-    fake_dt_dt = MagicMock()
-
-    mocker.patch(parser_util.__name__ + '.to_datetime', side_effect=[Exception])
     mocker.patch(parser_util.__name__ + '.datetime', fake_dt_module)
     mocker.patch.object(fake_dt_module, 'datetime', fake_dt_dt)
     mocker.patch.object(fake_dt_dt, 'strptime', return_value=fake_datetime)
     mocker.patch.object(fake_datetime, 'timestamp', return_value=fake_timestamp)
+    # Act
+    result = parser_util.convert_str_to_timestamp(arg_time_str)
+
+    # Assert
+    assert fake_dt_module.datetime.strptime.call_count == 1
+    assert fake_dt_module.datetime.strptime.call_args_list[0].args == (arg_time_str, '%Y-%j-%H:%M:%S.%f')
+    assert fake_datetime.timestamp.call_count == 1 
+    assert result == fake_timestamp
+
+def test_parser_util_convert_str_to_timestamp_returns_datetime_timestamp_when_strptime_raises_error(mocker):
+    # Arrange
+    arg_time_str = '59:20'
+
+    fake_timestamp = MagicMock()
+    fake_dt_module = MagicMock()
+
+    class Fake_Datetime():
+        timestamp_call_count = 0
+        def __init__(self, year, month, day, hour, minute, second, subsecond):
+            assert year == 2000
+            assert month == 1
+            assert day == 1
+            assert hour == 1
+            assert minute == 59
+            assert second == 20
+            assert subsecond == 0
+
+        def strptime(arg1, arg2):
+            raise Exception
+
+        def timestamp(self):
+            Fake_Datetime.timestamp_call_count = self.timestamp_call_count + 1
+            return fake_timestamp
+
+    mocker.patch(parser_util.__name__ + '.datetime', fake_dt_module)
+    mocker.patch.object(fake_dt_module, 'datetime', Fake_Datetime)
 
     # Act
     result = parser_util.convert_str_to_timestamp(arg_time_str)
 
     # Assert
-    assert parser_util.to_datetime.call_count == 1
-    assert parser_util.to_datetime.call_args_list[0].args == (arg_time_str, )
-    assert fake_dt_module.datetime.strptime.call_count == 1
-    assert fake_dt_module.datetime.strptime.call_args_list[0].args == (arg_time_str[:24], '%Y-%j-%H:%M:%S.%f')
-    assert fake_datetime.timestamp.call_count == 1
+    assert Fake_Datetime.timestamp_call_count == 1
     assert result == fake_timestamp
 
-def test_parser_util_convert_str_to_timestamp_raises_error_when_both_to_datetime_and_strptime_raise_errors(mocker):
+def test_parser_util_convert_str_to_timestamp_raises_error_when_both_strptime_and_datetime_raise_errors(mocker):
     # Arrange
     arg_time_str = str(MagicMock())
 
@@ -624,20 +632,22 @@ def test_parser_util_convert_str_to_timestamp_raises_error_when_both_to_datetime
     fake_dt_module = MagicMock()
     fake_dt_dt = MagicMock()
 
-    mocker.patch(parser_util.__name__ + '.to_datetime', side_effect=[Exception])
+    class Fake_Datetime():
+        def __init__(self, year, month, day, hour, minute, second, subsecond):
+            raise Exception
+
+        def strptime(arg1, arg2):
+            raise Exception
+
+        def timestamp():
+            assert False
+
     mocker.patch(parser_util.__name__ + '.datetime', fake_dt_module)
-    mocker.patch.object(fake_dt_module, 'datetime', fake_dt_dt)
-    mocker.patch.object(fake_dt_dt, 'strptime', side_effect=[Exception])
-    mocker.patch.object(fake_datetime, 'timestamp')
+    mocker.patch.object(fake_dt_module, 'datetime', Fake_Datetime)
 
     # Act
     with pytest.raises(Exception) as e_info:
         parser_util.convert_str_to_timestamp(arg_time_str)
 
     # Assert
-    assert parser_util.to_datetime.call_count == 1
-    assert parser_util.to_datetime.call_args_list[0].args == (arg_time_str, )
-    assert fake_dt_module.datetime.strptime.call_count == 1
-    assert fake_dt_module.datetime.strptime.call_args_list[0].args == (arg_time_str[:24], '%Y-%j-%H:%M:%S.%f')
-    assert fake_datetime.timestamp.call_count == 0
     assert e_info.match('')
