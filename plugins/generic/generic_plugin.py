@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import numpy as np
-from onair.src.ai_components.ai_plugin_abstract.core import AIPlugIn
+from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugIn
 
 class Plugin(AIPlugIn):
     def update(self,low_level_data=[], high_level_data={}):

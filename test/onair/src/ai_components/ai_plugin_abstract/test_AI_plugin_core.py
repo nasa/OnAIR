@@ -11,8 +11,8 @@
 import pytest
 from mock import MagicMock
 
-import onair.src.ai_components.ai_plugin_abstract.core as core
-from onair.src.ai_components.ai_plugin_abstract.core import AIPlugIn
+import onair.src.ai_components.ai_plugin_abstract.ai_plugin as ai_plugin
+from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugIn
 
 class FakeAIPlugIn(AIPlugIn):
     def __init__(self, _name, _headers):
@@ -109,13 +109,13 @@ def test_AIPlugIn__init__sets_instance_values_to_given_args_when_given__headers_
 
     cut = FakeAIPlugIn.__new__(FakeAIPlugIn)
 
-    mocker.patch(core.__name__ + '.len', return_value=pytest.gen.randint(1, 200)) # arbitrary, from 1 to 200 (but > 0)
+    mocker.patch(ai_plugin.__name__ + '.len', return_value=pytest.gen.randint(1, 200)) # arbitrary, from 1 to 200 (but > 0)
 
     # Act
     cut.__init__(arg__name, arg__headers)
 
     # Assert
-    assert core.len.call_count == 1
-    assert core.len.call_args_list[0].args == (arg__headers,)
+    assert ai_plugin.len.call_count == 1
+    assert ai_plugin.len.call_args_list[0].args == (arg__headers,)
     assert cut.component_name == arg__name
     assert cut.headers == arg__headers
