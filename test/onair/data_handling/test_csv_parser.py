@@ -40,7 +40,9 @@ def test_CSV_parse_csv_data_returns_empty_list_when_parsed_dataset_is_empty(mock
     # Arrange
     arg_dataFile = MagicMock()
 
+    fake_file_iterator = MagicMock()
     fake_csv_file = MagicMock()
+    fake_csv_file.configure_mock(**{'__enter__.return_value': fake_file_iterator})
     fake_dataset = []
     forced_return_contains = MagicMock()
     fake_second_data_set = MagicMock()
@@ -61,7 +63,7 @@ def test_CSV_parse_csv_data_returns_empty_list_when_parsed_dataset_is_empty(mock
     assert csv_parser.open.call_args_list[0].args == (arg_dataFile, 'r')
     assert csv_parser.open.call_args_list[0].kwargs == ({'newline':''})
     assert csv_parser.csv.reader.call_count == 1
-    assert csv_parser.csv.reader.call_args_list[0].args == (fake_csv_file, )
+    assert csv_parser.csv.reader.call_args_list[0].args == (fake_file_iterator, )
     assert csv_parser.csv.reader.call_args_list[0].kwargs == ({'delimiter':','})
     assert csv_parser.floatify_input.call_count == 0
 
@@ -71,7 +73,9 @@ def test_CSV_parse_csv_data_returns_empty_list_when_parsed_dataset_is_just_heade
     # Arrange
     arg_dataFile = MagicMock()
 
+    fake_file_iterator = MagicMock()
     fake_csv_file = MagicMock()
+    fake_csv_file.configure_mock(**{'__enter__.return_value': fake_file_iterator})
     fake_dataset = [['fake column header', 'another fake column header']]
     forced_return_contains = MagicMock()
     fake_second_data_set = MagicMock()
@@ -91,7 +95,7 @@ def test_CSV_parse_csv_data_returns_empty_list_when_parsed_dataset_is_just_heade
     assert csv_parser.open.call_count == 1
     assert csv_parser.open.call_args_list[0].args == (arg_dataFile, 'r')
     assert csv_parser.csv.reader.call_count == 1
-    assert csv_parser.csv.reader.call_args_list[0].args == (fake_csv_file, )
+    assert csv_parser.csv.reader.call_args_list[0].args == (fake_file_iterator, )
     assert csv_parser.csv.reader.call_args_list[0].kwargs == ({'delimiter':','})
     assert csv_parser.floatify_input.call_count == 0
 
@@ -102,7 +106,9 @@ def test_CSV_parse_csv_data_returns_list_of_row_values_when_parsed_dataset(mocke
     # Arrange
     arg_dataFile = MagicMock()
 
+    fake_file_iterator = MagicMock()
     fake_csv_file = MagicMock()
+    fake_csv_file.configure_mock(**{'__enter__.return_value': fake_file_iterator})
     fake_dataset = [['fake column header', 'another fake column header']]
     expected_result_list = []
     num_fake_rows = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10
@@ -124,7 +130,7 @@ def test_CSV_parse_csv_data_returns_list_of_row_values_when_parsed_dataset(mocke
     assert csv_parser.open.call_count == 1
     assert csv_parser.open.call_args_list[0].args == (arg_dataFile, 'r')
     assert csv_parser.csv.reader.call_count == 1
-    assert csv_parser.csv.reader.call_args_list[0].args == (fake_csv_file, )
+    assert csv_parser.csv.reader.call_args_list[0].args == (fake_file_iterator, )
     assert csv_parser.csv.reader.call_args_list[0].kwargs == ({'delimiter':','})
     assert csv_parser.floatify_input.call_count == num_fake_rows
 

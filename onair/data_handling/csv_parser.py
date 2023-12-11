@@ -27,20 +27,22 @@ class DataSource(OnAirDataSource):
 ##### INITIAL PROCESSING ####
     def parse_csv_data(self, data_file):
         #Read in the data set
-        csv_file = open(data_file, 'r', newline='')
-        dataset = csv.reader(csv_file, delimiter=',')
 
-        #Initialize the entire data dictionary
         all_data = []
-        index = 0
-        for row in dataset:
-            if index == 0:
-                # Skip first row (headers)
-                pass
-            else:
-                rowVals = floatify_input(list(row))
-                all_data.append(rowVals)
-            index = index + 1
+
+        with open(data_file, 'r', newline='') as csv_file:
+            dataset = csv.reader(csv_file, delimiter=',')
+
+            #Initialize the entire data dictionary
+            index = 0
+            for row in dataset:
+                if index == 0:
+                    # Skip first row (headers)
+                    pass
+                else:
+                    rowVals = floatify_input(list(row))
+                    all_data.append(rowVals)
+                index = index + 1
 
         return all_data
 
