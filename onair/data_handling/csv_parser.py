@@ -12,7 +12,7 @@ CSV Parser
 """
 
 import os
-import pandas as pd
+import csv
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
 from onair.src.util.print_io import *
@@ -27,14 +27,22 @@ class DataSource(OnAirDataSource):
 ##### INITIAL PROCESSING ####
     def parse_csv_data(self, data_file):
         #Read in the data set
-        dataset = pd.read_csv(data_file, delimiter=',', header=0, dtype=str)
-        dataset = dataset.loc[:, ~dataset.columns.str.contains('^Unnamed')]
 
-        #Initialize the entire data dictionary
         all_data = []
-        for index, row in dataset.iterrows():
-            rowVals = floatify_input(list(row))
-            all_data.append(floatify_input(list(row)))
+
+        with open(data_file, 'r', newline='') as csv_file:
+            dataset = csv.reader(csv_file, delimiter=',')
+
+            #Initialize the entire data dictionary
+            index = 0
+            for row in dataset:
+                if index == 0:
+                    # Skip first row (headers)
+                    pass
+                else:
+                    rowVals = floatify_input(list(row))
+                    all_data.append(rowVals)
+                index = index + 1
 
         return all_data
 

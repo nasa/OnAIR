@@ -9,7 +9,6 @@
 
 import os
 from .tlm_json_parser import parseTlmConfJson, str2lst
-from pandas import to_datetime
 import datetime
 
 def extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown):
@@ -63,8 +62,10 @@ def floatify_input(_input, remove_str=False):
 
 def convert_str_to_timestamp(time_str):
     try:
-        t = to_datetime(time_str)
+        t = datetime.datetime.strptime(time_str, '%Y-%j-%H:%M:%S.%f')
         return t.timestamp()
     except:
-        t = datetime.datetime.strptime(time_str[:24], '%Y-%j-%H:%M:%S.%f')
+        min_sec = time_str.split(':')
+        # Use 1 am on Jan 1st, 2000 as the date if only minutes and seconds are specified
+        t = datetime.datetime(2000, 1, 1, 1, int(min_sec[0]), int(min_sec[1]), 0)
         return t.timestamp()
