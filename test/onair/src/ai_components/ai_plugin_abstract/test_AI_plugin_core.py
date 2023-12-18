@@ -12,9 +12,9 @@ import pytest
 from mock import MagicMock
 
 import onair.src.ai_components.ai_plugin_abstract.ai_plugin as ai_plugin
-from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugIn
+from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
-class FakeAIPlugIn(AIPlugIn):
+class FakeAIPlugin(AIPlugin):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
 
@@ -24,11 +24,11 @@ class FakeAIPlugIn(AIPlugIn):
     def render_reasoning(self):
         return dict()
 
-class IncompleteFakeAIPlugIn(AIPlugIn):
+class IncompleteFakeAIPlugin(AIPlugin):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
 
-class BadFakeAIPlugIn(AIPlugIn):
+class BadFakeAIPlugin(AIPlugin):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
 
@@ -39,32 +39,32 @@ class BadFakeAIPlugIn(AIPlugIn):
         return super().render_reasoning()
 
 # abstract methods tests
-def test_AIPlugIn_raises_error_because_of_unimplemented_abstract_methods():
+def test_AIPlugin_raises_error_because_of_unimplemented_abstract_methods():
     # Arrange - None
     # Act
     with pytest.raises(TypeError) as e_info:
-        cut = AIPlugIn.__new__(AIPlugIn)
+        cut = AIPlugin.__new__(AIPlugin)
 
     # Assert
-    assert "Can't instantiate abstract class AIPlugIn with" in e_info.__str__()
+    assert "Can't instantiate abstract class AIPlugin with" in e_info.__str__()
     assert "update" in e_info.__str__()
     assert "render_reasoning" in e_info.__str__()
 
 # Incomplete plugin call tests
-def test_AIPlugIn_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
+def test_AIPlugin_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
     # Arrange - None
     # Act
     with pytest.raises(TypeError) as e_info:
-        cut = IncompleteFakeAIPlugIn.__new__(IncompleteFakeAIPlugIn)
+        cut = IncompleteFakeAIPlugin.__new__(IncompleteFakeAIPlugin)
 
     # Assert
-    assert "Can't instantiate abstract class IncompleteFakeAIPlugIn with" in e_info.__str__()
+    assert "Can't instantiate abstract class IncompleteFakeAIPlugin with" in e_info.__str__()
     assert "update" in e_info.__str__()
     assert "render_reasoning" in e_info.__str__()
 
-def test_AIPlugIn_raises_error_when_an_inherited_class_calls_abstract_methods_in_parent():
+def test_AIPlugin_raises_error_when_an_inherited_class_calls_abstract_methods_in_parent():
     # Act
-    cut = BadFakeAIPlugIn.__new__(BadFakeAIPlugIn)
+    cut = BadFakeAIPlugin.__new__(BadFakeAIPlugin)
 
     # populate list with the functions that should raise exceptions when called.
     not_implemented_functions = [cut.update, cut.render_reasoning]
@@ -74,11 +74,11 @@ def test_AIPlugIn_raises_error_when_an_inherited_class_calls_abstract_methods_in
         assert "NotImplementedError" in e_info.__str__()
 
 # Complete plugin call tests
-def test_AIPlugIn_does_not_raise_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_implemented_by_that_class():
+def test_AIPlugin_does_not_raise_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_implemented_by_that_class():
     # Arrange
     exception_raised = False
     try:
-        fake_ic = FakeAIPlugIn.__new__(FakeAIPlugIn)
+        fake_ic = FakeAIPlugin.__new__(FakeAIPlugin)
     except:
         exception_raised = True
 
@@ -88,12 +88,12 @@ def test_AIPlugIn_does_not_raise_error_when_an_inherited_class_is_instantiated_b
 # Complete plugin call tests
 
 # __init__ tests
-def test_AIPlugIn__init__raises_assertion_error_when_given__headers_len_is_not_greater_than_0():
+def test_AIPlugin__init__raises_assertion_error_when_given__headers_len_is_not_greater_than_0():
     # Arrange
     arg__name = MagicMock()
     arg__headers = []
 
-    cut = FakeAIPlugIn.__new__(FakeAIPlugIn)
+    cut = FakeAIPlugin.__new__(FakeAIPlugin)
 
     # Act
     with pytest.raises(AssertionError) as e_info:
@@ -102,12 +102,12 @@ def test_AIPlugIn__init__raises_assertion_error_when_given__headers_len_is_not_g
     # Assert
     assert e_info.match('')
 
-def test_AIPlugIn__init__sets_instance_values_to_given_args_when_given__headers_len_is_greater_than_0(mocker):
+def test_AIPlugin__init__sets_instance_values_to_given_args_when_given__headers_len_is_greater_than_0(mocker):
     # Arrange
     arg__name = MagicMock()
     arg__headers = MagicMock()
 
-    cut = FakeAIPlugIn.__new__(FakeAIPlugIn)
+    cut = FakeAIPlugin.__new__(FakeAIPlugin)
 
     mocker.patch(ai_plugin.__name__ + '.len', return_value=pytest.gen.randint(1, 200)) # arbitrary, from 1 to 200 (but > 0)
 
