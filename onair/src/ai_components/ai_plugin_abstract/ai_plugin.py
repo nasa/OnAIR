@@ -8,12 +8,12 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 from abc import ABC, abstractmethod
-"""This object serves as a proxy for all plug-ins.
-   Therefore, the AIPlugIn object is meant to induce
+"""This object serves as a proxy for all plugins.
+   Therefore, the AIPlugin object is meant to induce
    standards and structures of compliance for user-created
-   and/or imported plug-ins/libraries
+   and/or imported plugins/libraries
 """
-class AIPlugIn(ABC):
+class AIPlugin(ABC):
     def __init__(self, _name, _headers):
         """
         Superclass for data driven components: VAE, PPO, etc. Allows for easier modularity.

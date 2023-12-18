@@ -9,9 +9,9 @@
 
 import simdkalman
 import numpy as np
-from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugIn
+from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
-class Plugin(AIPlugIn):
+class Plugin(AIPlugin):
     def __init__(self, name, headers, window_size=3):
         """
         :param headers: (int) length of time agent examines

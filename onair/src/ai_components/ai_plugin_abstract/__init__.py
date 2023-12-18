@@ -1,1 +1,1 @@
-from .ai_plugin import AIPlugIn
+from .ai_plugin import AIPlugin
