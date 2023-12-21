@@ -30,16 +30,16 @@ def test_PlannersInterface__init__raises_AssertionError_when_given_headers_len_i
     # Assert
     assert e_info.match('Headers are required')
 
-def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_self_ai_constructs_to_return_value_of_import_plugins(mocker):
+def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_self_planner_constructs_to_return_value_of_import_plugins(mocker):
     # Arrange
     arg_headers = MagicMock()
     arg__planner_plugins = MagicMock()
 
     arg_headers.__len__.return_value = 1
 
-    forced_return_ai_constructs = MagicMock()
+    forced_return_planner_constructs = MagicMock()
 
-    mocker.patch(planners_interface.__name__ + '.import_plugins', return_value=forced_return_ai_constructs)
+    mocker.patch(planners_interface.__name__ + '.import_plugins', return_value=forced_return_planner_constructs)
 
     cut = PlannersInterface.__new__(PlannersInterface)
 
@@ -50,7 +50,7 @@ def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_se
     assert cut.headers == arg_headers
     assert planners_interface.import_plugins.call_count == 1
     assert planners_interface.import_plugins.call_args_list[0].args == (arg_headers, arg__planner_plugins)
-    assert cut.ai_constructs == forced_return_ai_constructs
+    assert cut.planner_constructs == forced_return_planner_constructs
 
 # update tests
 def test_update_does_nothing():

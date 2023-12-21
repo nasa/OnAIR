@@ -17,11 +17,11 @@ class PlannersInterface:
     def __init__(self, headers, _planner_plugins={}):
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers
-        self.ai_constructs = import_plugins(self.headers,_planner_plugins)
+        self.planner_constructs = import_plugins(self.headers,_planner_plugins)
 
     def update(self, high_level_data):
-        # Raw TLM should be transformed into high-leve state representation here 
-        # Can store something as stale unless a planning thread is launched 
+        # Raw TLM should be transformed into high-leve state representation here
+        # Can store something as stale unless a planning thread is launched
         pass
 
     def check_for_salient_event(self):

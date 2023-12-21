@@ -17,10 +17,10 @@ class LearnersInterface:
     def __init__(self, headers, _learner_plugins={}):
         assert(len(headers)>0), 'Headers are required'
         self.headers = headers
-        self.ai_constructs = import_plugins(self.headers, _learner_plugins)
+        self.learner_constructs = import_plugins(self.headers, _learner_plugins)
 
     def update(self, low_level_data, high_level_data):
-        for plugin in self.ai_constructs:
+        for plugin in self.learner_constructs:
             plugin.update(low_level_data)
 
     def check_for_salient_event(self):
@@ -28,6 +28,6 @@ class LearnersInterface:
 
     def render_reasoning(self):
         diagnoses = {}
-        for plugin in self.ai_constructs:
+        for plugin in self.learner_constructs:
             diagnoses[plugin.component_name] = plugin.render_reasoning()
         return diagnoses
