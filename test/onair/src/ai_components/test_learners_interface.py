@@ -30,16 +30,16 @@ def test_LearnersInterface__init__raises_AssertionError_when_given_headers_len_i
     # Assert
     assert e_info.match('Headers are required')
 
-def test_LearnersInterface__init__sets_self_headers_to_given_headers_and_sets_self_ai_constructs_to_return_value_of_import_plugins(mocker):
+def test_LearnersInterface__init__sets_self_headers_to_given_headers_and_sets_self_learner_constructs_to_return_value_of_import_plugins(mocker):
     # Arrange
     arg_headers = MagicMock()
     arg__learner_plugins = MagicMock()
 
     arg_headers.__len__.return_value = 1
 
-    forced_return_ai_constructs = MagicMock()
+    forced_return_learner_constructs = MagicMock()
 
-    mocker.patch(learners_interface.__name__ + '.import_plugins', return_value=forced_return_ai_constructs)
+    mocker.patch(learners_interface.__name__ + '.import_plugins', return_value=forced_return_learner_constructs)
 
 
     cut = LearnersInterface.__new__(LearnersInterface)
@@ -51,16 +51,16 @@ def test_LearnersInterface__init__sets_self_headers_to_given_headers_and_sets_se
     assert cut.headers == arg_headers
     assert learners_interface.import_plugins.call_count == 1
     assert learners_interface.import_plugins.call_args_list[0].args == (arg_headers, arg__learner_plugins)
-    assert cut.ai_constructs == forced_return_ai_constructs
+    assert cut.learner_constructs == forced_return_learner_constructs
 
 # update tests
-def test_LearnersInterface_update_does_nothing_when_instance_ai_constructs_is_empty():
+def test_LearnersInterface_update_does_nothing_when_instance_learner_constructs_is_empty():
     # Arrange
     arg_low_level_data = MagicMock()
     arg_high_level_data = MagicMock()
 
     cut = LearnersInterface.__new__(LearnersInterface)
-    cut.ai_constructs = []
+    cut.learner_constructs = []
 
     # Act
     result = cut.update(arg_low_level_data, arg_high_level_data)
@@ -68,25 +68,25 @@ def test_LearnersInterface_update_does_nothing_when_instance_ai_constructs_is_em
     # Assert
     assert result == None
 
-def test_LearnersInterface_update_calls_update_with_given_low_level_data_on_each_ai_constructs_item(mocker):
+def test_LearnersInterface_update_calls_update_with_given_low_level_data_on_each_learner_constructs_item(mocker):
     # Arrange
     arg_low_level_data = MagicMock()
     arg_high_level_data = MagicMock()
 
     cut = LearnersInterface.__new__(LearnersInterface)
-    cut.ai_constructs = []
+    cut.learner_constructs = []
 
-    num_fake_ai_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_ai_constructs):
-        cut.ai_constructs.append(MagicMock())
+    num_fake_learner_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    for i in range(num_fake_learner_constructs):
+        cut.learner_constructs.append(MagicMock())
 
     # Act
     result = cut.update(arg_low_level_data, arg_high_level_data)
 
     # Assert
-    for i in range(num_fake_ai_constructs):
-        assert cut.ai_constructs[i].update.call_count == 1
-        assert cut.ai_constructs[i].update.call_args_list[0].args == (arg_low_level_data, )
+    for i in range(num_fake_learner_constructs):
+        assert cut.learner_constructs[i].update.call_count == 1
+        assert cut.learner_constructs[i].update.call_args_list[0].args == (arg_low_level_data, )
 
 # check_for_salient_event
 def test_LearnersInterface_salient_event_does_nothing():
@@ -100,10 +100,10 @@ def test_LearnersInterface_salient_event_does_nothing():
     assert result == None
 
 # render_reasoning tests
-def test_LearnersInterface_render_reasoning_returns_empty_dict_when_instance_ai_constructs_is_empty(mocker):
+def test_LearnersInterface_render_reasoning_returns_empty_dict_when_instance_learner_constructs_is_empty(mocker):
     # Arrange
     cut = LearnersInterface.__new__(LearnersInterface)
-    cut.ai_constructs = []
+    cut.learner_constructs = []
 
     # Act
     result = cut.render_reasoning()
@@ -111,18 +111,18 @@ def test_LearnersInterface_render_reasoning_returns_empty_dict_when_instance_ai_
     # Assert
     assert result == {}
 
-def test_LearnersInterface_render_reasoning_returns_dict_of_each_ai_construct_as_key_to_the_result_of_its_render_reasoning_when_instance_ai_constructs_is_occupied(mocker):
+def test_LearnersInterface_render_reasoning_returns_dict_of_each_ai_construct_as_key_to_the_result_of_its_render_reasoning_when_instance_learner_constructs_is_occupied(mocker):
     # Arrange
     cut = LearnersInterface.__new__(LearnersInterface)
-    cut.ai_constructs = []
+    cut.learner_constructs = []
 
     expected_result = {}
 
-    num_fake_ai_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_ai_constructs):
+    num_fake_learner_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    for i in range(num_fake_learner_constructs):
         fake_ai_construct = MagicMock()
         forced_return_ai_construct_render_reasoning = MagicMock()
-        cut.ai_constructs.append(fake_ai_construct)
+        cut.learner_constructs.append(fake_ai_construct)
         mocker.patch.object(fake_ai_construct, 'render_reasoning', return_value=forced_return_ai_construct_render_reasoning)
         fake_ai_construct.component_name = MagicMock()
         expected_result[fake_ai_construct.component_name] = forced_return_ai_construct_render_reasoning
@@ -131,7 +131,7 @@ def test_LearnersInterface_render_reasoning_returns_dict_of_each_ai_construct_as
     result = cut.render_reasoning()
 
     # Assert
-    for i in range(num_fake_ai_constructs):
-        assert cut.ai_constructs[i].render_reasoning.call_count == 1
-        assert cut.ai_constructs[i].render_reasoning.call_args_list[0].args == ()
+    for i in range(num_fake_learner_constructs):
+        assert cut.learner_constructs[i].render_reasoning.call_count == 1
+        assert cut.learner_constructs[i].render_reasoning.call_args_list[0].args == ()
     assert result == expected_result
