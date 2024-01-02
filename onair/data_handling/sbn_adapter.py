@@ -18,20 +18,22 @@ import time
 import datetime
 import os
 
-from ...data_handling.on_air_data_source import OnAirDataSource
+from onair.data_handling.on_air_data_source import OnAirDataSource
 from ctypes import *
-import sbn_client as sbn
+import sbn_python_client as sbn
 import message_headers as msg_hdr
 
-from ...data_handling.parser_util import *
+from onair.data_handling.parser_util import *
 
 # Note: The double buffer does not clear between switching. If fresh data doesn't come in, stale data is returned (delayed by 1 frame)
 
 # msgID_lookup_table format { msgID : [ "<APP NAME>" , msg_hdr.<data struct in message_headers.py> , "<data category>" ] }
-msgID_lookup_table = {0x0885 : ["SAMPLE", msg_hdr.sample_data_tlm_t],
-                      0x0887 : ["SAMPLE", msg_hdr.sample_data_power_t],
-                      0x0889 : ["SAMPLE", msg_hdr.sample_data_thermal_t],
-                      0x088A : ["SAMPLE", msg_hdr.sample_data_gps_t]}
+msgID_lookup_table = {0x0894 : ["SAMPLE", msg_hdr.CSV_APP_CSVData_t]}
+
+#,
+#                      0x0887 : ["SAMPLE", msg_hdr.sample_data_power_t],
+#                      0x0889 : ["SAMPLE", msg_hdr.sample_data_thermal_t],
+#                      0x088A : ["SAMPLE", msg_hdr.sample_data_gps_t]}
 
 def message_listener_thread():
     """Thread to listen for incoming messages from SBN"""
@@ -55,7 +57,7 @@ def message_listener_thread():
 
 def get_current_data(recv_msg, data_struct, app_name):
     # TODO: Lock needed here?
-    current_buffer = AdapterDataSource.currentData[(AdapterDataSource.double_buffer_read_index + 1) %2]
+    current_buffer = DataSource.currentData[(DataSource.double_buffer_read_index + 1) %2]
     secondary_header = recv_msg.TlmHeader.Secondary
 
     #gets seconds from header and adds to current buffer
@@ -73,11 +75,11 @@ def get_current_data(recv_msg, data_struct, app_name):
         data = str(getattr(recv_msg, field_name))
         current_buffer['data'][idx] = data
 
-    with AdapterDataSource.new_data_lock:
-        AdapterDataSource.new_data = True
+    with DataSource.new_data_lock:
+        DataSource.new_data = True
 
 
-class AdapterDataSource(OnAirDataSource):
+class DataSource(OnAirDataSource):
     # Data structure
     # TODO: Make init data structure better
     # TODO: This should be in an __init__ function
@@ -126,17 +128,15 @@ class AdapterDataSource(OnAirDataSource):
         else:
             sbn.subscribe(msgid)
 
-    # TODO: Same as csv_parser, may move to parser_utils
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
-        print("HOOOOLLLLLLAAAA!")
-        parsed_meta_data = extract_meta_data(meta_data_file)
-        if ss_breakdown == False:
-            num_elements = len(parsed_meta_data['subsystem_assignments'])
-            parsed_meta_data['subsystem_assignments'] = [['MISSION'] for elem in range(num_elements)]
-        return parsed_meta_data
+        # TODO: may want to parse sbn specific meta data here, like message ids
+        return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
 
     def process_data_file(self, data_file):
-        pass # Nothing to do since telemetry is live
+        print("SBN Adapter ignoring data file (telemetry should be live)")
+
+    def get_vehicle_metadata(self):
+        return self.all_headers, self.binning_configs['test_assignments']
 
     def get_next(self):
         """Provides the latest data from SBN in a dictionary of lists structure.
@@ -146,21 +146,23 @@ class AdapterDataSource(OnAirDataSource):
         data_available = False
 
         while not data_available:
-            with AdapterDataSource.new_data_lock:
-                data_available = AdapterDataSource.new_data
+            with DataSource.new_data_lock:
+                data_available = DataSource.new_data
 
             if not data_available:
                 time.sleep(0.01)
 
         read_index = 0
-        with AdapterDataSource.new_data_lock:
-            AdapterDataSource.new_data = False
-            AdapterDataSource.double_buffer_read_index = (AdapterDataSource.double_buffer_read_index + 1) % 2
-            read_index = AdapterDataSource.double_buffer_read_index
+        with DataSource.new_data_lock:
+            DataSource.new_data = False
+            DataSource.double_buffer_read_index = (DataSource.double_buffer_read_index + 1) % 2
+            read_index = DataSource.double_buffer_read_index
 
         print("Reading buffer: {}".format(read_index))
         return self.currentData[read_index]['data']
 
     def has_more(self):
-        """Returns true if the adapter has more data. Always true: connection should be live as long as cFS is running"""
+        """Returns true if the adapter has more data.
+           For now always true: connection should be live as long as cFS is running.
+           TODO: allow to detect if cFS/the connection has died"""
         return True
