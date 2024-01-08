@@ -28,91 +28,46 @@ from onair.data_handling.parser_util import *
 # Note: The double buffer does not clear between switching. If fresh data doesn't come in, stale data is returned (delayed by 1 frame)
 
 # msgID_lookup_table format { msgID : [ "<APP NAME>" , msg_hdr.<data struct in message_headers.py> , "<data category>" ] }
-msgID_lookup_table = {0x0894 : ["SAMPLE", msg_hdr.CSV_APP_CSVData_t]}
+msgID_lookup_table = {0x0894 : ["CSV", msg_hdr.CSV_APP_CSVData_t]}
 
 #,
 #                      0x0887 : ["SAMPLE", msg_hdr.sample_data_power_t],
 #                      0x0889 : ["SAMPLE", msg_hdr.sample_data_thermal_t],
 #                      0x088A : ["SAMPLE", msg_hdr.sample_data_gps_t]}
 
-def message_listener_thread():
-    """Thread to listen for incoming messages from SBN"""
-
-    while(True):
-        generic_recv_msg_p = POINTER(sbn.sbn_data_generic_t)()
-        sbn.recv_msg(generic_recv_msg_p)
-
-        msgID = generic_recv_msg_p.contents.TlmHeader.Primary.StreamId
-        app_name, data_struct = msgID_lookup_table[msgID]
-
-        recv_msg_p = POINTER(data_struct)()
-        recv_msg_p.contents = generic_recv_msg_p.contents
-        recv_msg = recv_msg_p.contents 
-       
-        # prints out the data from the message to the terminal
-        print(", ".join([field_name + ": " + str(getattr(recv_msg, field_name)) for field_name, field_type in recv_msg._fields_[1:]]))
-
-        # TODO: Lock needed here?
-        get_current_data(recv_msg, data_struct, app_name)
-
-def get_current_data(recv_msg, data_struct, app_name):
-    # TODO: Lock needed here?
-    current_buffer = DataSource.currentData[(DataSource.double_buffer_read_index + 1) %2]
-    secondary_header = recv_msg.TlmHeader.Secondary
-
-    #gets seconds from header and adds to current buffer
-    start_time = datetime.datetime(1969, 12, 31, 20) # January 1, 1980
-    seconds = secondary_header.Seconds
-    subseconds = secondary_header.Subseconds
-    curr_time = seconds + (2**(-32) * subseconds) # a subsecond is equal to 2^-32 second
-    time = start_time + datetime.timedelta(seconds=curr_time)
-    str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
-    current_buffer['data'][0] = str_time
-
-    for field_name, field_type in data_struct._fields_[1:]:
-        header_name = app_name + "." + data_struct.__name__ + "." + str(field_name)
-        idx = current_buffer['headers'].index(header_name)
-        data = str(getattr(recv_msg, field_name))
-        current_buffer['data'][idx] = data
-
-    with DataSource.new_data_lock:
-        DataSource.new_data = True
-
-
 class DataSource(OnAirDataSource):
-    # Data structure
-    # TODO: Make init data structure better
-    # TODO: This should be in an __init__ function
-    currentData = []
 
-    for x in range(0,2):
-        currentData.append({'headers' : [], 'data' : []})
-        #print("Index {}".format(x))
+    def __init__(self, data_file, meta_file, ss_breakdown = False):
+        super().__init__(data_file, meta_file, ss_breakdown);
 
-        # First element is always the time, set to a dummy value here
-        currentData[x]['headers'].append('TIME')
-        currentData[x]['data'].append('2000-001-12:00:00.000000000')
 
-        for msgID in msgID_lookup_table.keys():
-            app_name, data_struct = msgID_lookup_table[msgID]
-            struct_name = data_struct.__name__
-            for field_name, field_type in data_struct._fields_[1:]:
-                currentData[x]['headers'].append(app_name + "." + struct_name + "." + str(field_name))
-            currentData[x]['data'].extend([0]*len(data_struct._fields_[1:])) #initialize all the data arrays with zero
+        self.currentData = []
 
-    new_data_lock = threading.Lock()
-    new_data = False
-    double_buffer_read_index = 0
+        for x in range(0,2):
+            self.currentData.append({'headers':[], 'data':[]})
+
+            for msgID in msgID_lookup_table.keys():
+                app_name, data_struct = msgID_lookup_table[msgID]
+                struct_name = data_struct.__name__
+                for field_name, field_type in data_struct._fields_[1:]:
+                    self.currentData[x]['headers'].append(app_name + "." + struct_name + "." + str(field_name))
+                self.currentData[x]['data'].extend([0]*len(data_struct._fields_[1:])) #initialize all the data arrays with zero
+
+        self.new_data_lock = threading.Lock()
+        self.new_data = False
+        self.double_buffer_read_index = 0
+        self.connect()
 
     def connect(self):
         """Establish connection to SBN and launch listener thread."""
         time.sleep(2)
         os.chdir("cf")
         sbn.sbn_load_and_init()
+        os.chdir("../")
         print("SBN_Adapter Running")
 
         # Launch thread to listen for messages
-        self.listener_thread = threading.Thread(target=message_listener_thread)
+        self.listener_thread = threading.Thread(target=self.message_listener_thread)
         self.listener_thread.start()
 
         # subscribe to message IDs
@@ -120,6 +75,7 @@ class DataSource(OnAirDataSource):
             sbn.subscribe(msgID)
 
     def subscribe_message(self, msgid):
+        # TODO: Not used yet. Need to read subscribed msgids from the tlm meta data file
         """Specify cFS message id to listen for. Unstable"""
         
         if isinstance(msgid, list):
@@ -146,19 +102,18 @@ class DataSource(OnAirDataSource):
         data_available = False
 
         while not data_available:
-            with DataSource.new_data_lock:
-                data_available = DataSource.new_data
+            with self.new_data_lock:
+                data_available = self.new_data
 
             if not data_available:
                 time.sleep(0.01)
 
         read_index = 0
-        with DataSource.new_data_lock:
-            DataSource.new_data = False
-            DataSource.double_buffer_read_index = (DataSource.double_buffer_read_index + 1) % 2
-            read_index = DataSource.double_buffer_read_index
+        with self.new_data_lock:
+            self.new_data = False
+            self.double_buffer_read_index = (self.double_buffer_read_index + 1) % 2
+            read_index = self.double_buffer_read_index
 
-        print("Reading buffer: {}".format(read_index))
         return self.currentData[read_index]['data']
 
     def has_more(self):
@@ -166,3 +121,46 @@ class DataSource(OnAirDataSource):
            For now always true: connection should be live as long as cFS is running.
            TODO: allow to detect if cFS/the connection has died"""
         return True
+
+    def message_listener_thread(self):
+        """Thread to listen for incoming messages from SBN"""
+
+        while(True):
+            generic_recv_msg_p = POINTER(sbn.sbn_data_generic_t)()
+            sbn.recv_msg(generic_recv_msg_p)
+
+            msgID = generic_recv_msg_p.contents.TlmHeader.Primary.StreamId
+            app_name, data_struct = msgID_lookup_table[msgID]
+
+            recv_msg_p = POINTER(data_struct)()
+            recv_msg_p.contents = generic_recv_msg_p.contents
+            recv_msg = recv_msg_p.contents
+
+            # prints out the data from the message to the terminal
+            print(", ".join([field_name + ": " + str(getattr(recv_msg, field_name)) for field_name, field_type in recv_msg._fields_[1:]]))
+
+            # TODO: Lock needed here?
+            self.get_current_data(recv_msg, data_struct, app_name)
+
+    def get_current_data(self, recv_msg, data_struct, app_name):
+        # TODO: Lock needed here?
+        current_buffer = self.currentData[(self.double_buffer_read_index + 1) %2]
+        secondary_header = recv_msg.TlmHeader.Secondary
+
+        #gets seconds from header and adds to current buffer
+        start_time = datetime.datetime(1969, 12, 31, 20) # January 1, 1980
+        seconds = secondary_header.Seconds
+        subseconds = secondary_header.Subseconds
+        curr_time = seconds + (2**(-32) * subseconds) # a subsecond is equal to 2^-32 second
+        time = start_time + datetime.timedelta(seconds=curr_time)
+        str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
+        current_buffer['data'][0] = str_time
+
+        for field_name, field_type in data_struct._fields_[1:]:
+            header_name = app_name + "." + data_struct.__name__ + "." + str(field_name)
+            idx = current_buffer['headers'].index(header_name)
+            data = str(getattr(recv_msg, field_name))
+            current_buffer['data'][idx] = data
+
+        with self.new_data_lock:
+            self.new_data = True
