@@ -8,7 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import pytest
-from mock import MagicMock, PropertyMock
+from unittest.mock import MagicMock, PropertyMock
 
 import onair.src.run_scripts.sbn_adapter as sbn_adapter
 from onair.src.run_scripts.sbn_adapter import AdapterDataSource
