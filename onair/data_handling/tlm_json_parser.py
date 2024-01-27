@@ -11,7 +11,7 @@ import ast
 import json
 
 # parse tlm config json file
-def parseTlmConfJson(file_path):
+def parseTlmConfJson(file_path: str) -> dict:
     data = parseJson(file_path)
     reorg_data = reorganizeTlmDict(data)
 
@@ -62,7 +62,7 @@ def parseTlmConfJson(file_path):
     return configs
 
 # process tlm dict into dict of labels and their attributes
-def reorganizeTlmDict(data):
+def reorganizeTlmDict(data: dict) -> dict:
     processed_data = {}
     
     for s in data['subsystems']:
@@ -72,14 +72,14 @@ def reorganizeTlmDict(data):
     
     return processed_data
 
-def str2lst(string):
+def str2lst(string: str) -> list | None:
     try:
         return ast.literal_eval(string)
     except:
         print("Unable to process string representation of list")
         # return string
 
-def parseJson(path):
+def parseJson(path: str) -> dict:
     file = open(path, 'rb')
     file_str = file.read()
 

@@ -25,7 +25,7 @@ from onair.data_handling.parser_util import *
 
 class DataSource(OnAirDataSource):
 
-    def __init__(self, data_file, meta_file, ss_breakdown = False):
+    def __init__(self, data_file: str, meta_file: str, ss_breakdown: bool = False) -> None:
         super().__init__(data_file, meta_file, ss_breakdown)
         self.address = 'localhost'
         self.port = 6379
@@ -40,7 +40,7 @@ class DataSource(OnAirDataSource):
         self.connect()
         self.subscribe(self.subscriptions)
 
-    def connect(self):
+    def connect(self) -> None:
         """Establish connection to REDIS server."""
         print_msg('Redis adapter connecting to server...')
         self.server = redis.Redis(self.address, self.port, self.db)
@@ -48,7 +48,7 @@ class DataSource(OnAirDataSource):
         if self.server.ping():
             print_msg('... connected!')
 
-    def subscribe(self, subscriptions):
+    def subscribe(self, subscriptions: list) -> None:
         """Subscribe to REDIS message channel(s) and launch listener thread."""
         if len(subscriptions) != 0 and self.server.ping():
             self.pubsub = self.server.pubsub()
@@ -62,7 +62,7 @@ class DataSource(OnAirDataSource):
         else:
             print_msg(f"No subscriptions given!")
 
-    def parse_meta_data_file(self, meta_data_file, ss_breakdown):
+    def parse_meta_data_file(self, meta_data_file: str, ss_breakdown: bool) -> dict:
         configs = extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
         meta = parseJson(meta_data_file)
         if 'redis_subscriptions' in meta.keys():
@@ -72,13 +72,13 @@ class DataSource(OnAirDataSource):
 
         return configs
 
-    def process_data_file(self, data_file):
+    def process_data_file(self, data_file: str) -> None:
         print("Redis Adapter ignoring file")
 
-    def get_vehicle_metadata(self):
+    def get_vehicle_metadata(self) -> tuple:
         return self.all_headers, self.binning_configs['test_assignments']
 
-    def get_next(self):
+    def get_next(self) -> list:
         """Provides the latest data from REDIS channel"""
         data_available = False
 
@@ -97,11 +97,11 @@ class DataSource(OnAirDataSource):
 
         return self.currentData[read_index]['data']
 
-    def has_more(self):
+    def has_more(self) -> bool:
         """Live connection should always return True"""
         return True
 
-    def message_listener(self):
+    def message_listener(self) -> None:
         """Loop for listening for messages on channel"""
         for message in self.pubsub.listen():
             if message['type'] == 'message':
@@ -114,6 +114,6 @@ class DataSource(OnAirDataSource):
                 with self.new_data_lock:
                     self.new_data = True
 
-    def has_data(self):
+    def has_data(self) -> bool:
         return self.new_data
     
