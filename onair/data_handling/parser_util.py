@@ -11,7 +11,7 @@ import os
 from .tlm_json_parser import parseTlmConfJson, str2lst
 import datetime
 
-def extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown):
+def extract_meta_data_handle_ss_breakdown(meta_data_file: str, ss_breakdown: bool) -> dict:
     parsed_meta_data = extract_meta_data(meta_data_file)
     if ss_breakdown == False:
         num_elements = len(parsed_meta_data['subsystem_assignments'])
@@ -19,7 +19,7 @@ def extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown):
     return parsed_meta_data
 
 ## Method to extract configuration data and return 3 dictionaries
-def extract_meta_data(meta_data_file):
+def extract_meta_data(meta_data_file: str) -> dict:
     assert meta_data_file != ''
 
     configs = parseTlmConfJson(meta_data_file)
@@ -42,7 +42,7 @@ def extract_meta_data(meta_data_file):
 
     return configs
 
-def floatify_input(_input, remove_str=False):
+def floatify_input(_input: list, remove_str: bool = False) -> list:
     floatified = []
     for i in _input:
         try:
@@ -60,7 +60,7 @@ def floatify_input(_input, remove_str=False):
                 continue
     return floatified
 
-def convert_str_to_timestamp(time_str):
+def convert_str_to_timestamp(time_str: str) -> float:
     try:
         t = datetime.datetime.strptime(time_str, '%Y-%j-%H:%M:%S.%f')
         return t.timestamp()

@@ -20,12 +20,12 @@ from onair.data_handling.parser_util import *
 
 class DataSource(OnAirDataSource):
 
-    def process_data_file(self, data_file):
+    def process_data_file(self, data_file: str) -> None:
         self.sim_data = self.parse_csv_data(data_file)
         self.frame_index = 0
 
 ##### INITIAL PROCESSING ####
-    def parse_csv_data(self, data_file):
+    def parse_csv_data(self, data_file: str) -> list:
         #Read in the data set
 
         all_data = []
@@ -46,19 +46,19 @@ class DataSource(OnAirDataSource):
 
         return all_data
 
-    def parse_meta_data_file(self, meta_data_file, ss_breakdown):
+    def parse_meta_data_file(self, meta_data_file: str, ss_breakdown: bool) -> dict:
         return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
 
 ##### GETTERS ##################################
 
-    def get_vehicle_metadata(self):
+    def get_vehicle_metadata(self) -> tuple:
         return self.all_headers, self.binning_configs['test_assignments']
 
     # Get the data at self.index and increment the index
-    def get_next(self):
+    def get_next(self) -> list:
         self.frame_index = self.frame_index + 1
         return self.sim_data[self.frame_index - 1]
 
     # Return whether or not the index has finished traveling through the data
-    def has_more(self):
+    def has_more(self) -> bool:
         return self.frame_index < len(self.sim_data)

@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from .parser_util import * 
 
 class OnAirDataSource(ABC):
-    def __init__(self, data_file, meta_file, ss_breakdown = False):
+    def __init__(self, data_file: str, meta_file: str, ss_breakdown: bool = False) -> None:
         """An initial parsing needs to happen in order to use the parser classes
             This means that, if you want to use this class to parse in real time,
             it needs to at least have seen one sample of the anticipated format """
@@ -32,28 +32,28 @@ class OnAirDataSource(ABC):
         self.process_data_file(self.raw_data_file)
 
     @abstractmethod
-    def parse_meta_data_file(self, meta_data_file, ss_breakdown):
+    def parse_meta_data_file(self, meta_data_file: str, ss_breakdown: bool) -> dict:
         """
         Create the configs that will be used to populate the binning_configs for the data files
         """
         raise NotImplementedError
 
     @abstractmethod
-    def process_data_file(self, data_file):
+    def process_data_file(self, data_file: str) -> None:
         """
         Read data frames from the specified file.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def get_next(self):
+    def get_next(self) -> list:
         """
         Return a frame of data
         """
         raise NotImplementedError
 
     @abstractmethod
-    def has_more(self):
+    def has_more(self) -> bool:
         """
         Used by file-based data to indicate if there are more frames (True) or if the end of the file has been reached (False)
         """
