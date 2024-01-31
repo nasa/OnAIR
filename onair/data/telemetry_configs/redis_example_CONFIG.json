@@ -1,0 +1,89 @@
+{
+  "subsystems": {
+    "NONE": {
+      "Time": {
+        "conversion": "",
+        "tests": {
+          "NOOP": "[]"
+        },
+        "description": "No description"
+      },
+      "THRUST": {
+        "conversion": "",
+        "tests": {
+          "FEASIBILITY": "[-999999999999999, 999999999999999]"
+        },
+        "description": "No description"
+      },
+      "ALTITUDE": {
+        "conversion": "",
+        "tests": {
+          "FEASIBILITY": "[-999999999999999, 999999999999999]"
+        },
+        "description": "No description"
+      },
+      "ACCELERATION": {
+        "conversion": "",
+        "tests": {
+          "FEASIBILITY": "[-20.1111, 20.1111]"
+        },
+        "description": "No description"
+      },
+      "SCIENCE_COLLECTION": {
+        "conversion": "",
+        "tests": {
+          "FEASIBILITY": "[-0.9999, 1.1111]"
+        },
+        "description": "No description"
+      },
+      "LABEL_ERROR_STATE": {
+        "conversion": "",
+        "tests": {
+          "NOOP": "[]"
+        },
+        "description": "No description"
+      }
+    },
+    "POWER": {
+      "VOLTAGE": {
+        "conversion": "",
+        "tests": {
+          "FEASIBILITY": "[12.9999, 18.1111]"
+        },
+        "description": "No description"
+      },
+      "CURRENT": {
+        "conversion": "",
+        "tests": {
+          "FEASIBILITY": "[2.9999, 5.1111]"
+        },
+        "description": "No description"
+      }
+    },
+    "THERMAL": {
+      "TEMPERATURE": {
+        "conversion": "",
+        "tests": {
+          "FEASIBILITY": "[9.9999, 90.1111]"
+        },
+        "description": "No description"
+      }
+    }
+  },
+  "redis_subscriptions": [
+    "vehicle_0_state",
+    "vehicle_1_state",
+    "vehicle_2_state"
+  ],
+  "order": [
+    "Time",
+    "VOLTAGE",
+    "CURRENT",
+    "THRUST",
+    "ALTITUDE",
+    "ACCELERATION",
+    "TEMPERATURE",
+    "SCIENCE_COLLECTION",
+    "LABEL_ERROR_STATE"
+  ]
+}
