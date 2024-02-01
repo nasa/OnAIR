@@ -32,22 +32,22 @@ class Agent:
         return self.complex_reasoning_systems.render_reasoning()
 
     def reason(self, frame):
-        self.vehicle_rep.update(frame) 
+        self.vehicle_rep.update(frame)
         self.learning_systems.update(self.vehicle_rep.curr_data, self.vehicle_rep.get_state_information())
-        self.planning_systems.update(self.vehicle_rep.get_state_information()) 
-        
+        self.planning_systems.update(self.vehicle_rep.get_state_information())
+
         aggregate_high_level_info = {'vehicle_rep' : self.vehicle_rep.get_state_information(),
                                      'learning_systems' : self.learning_systems.render_reasoning(),
                                      'planning_systems' : self.planning_systems.render_reasoning()}
 
         self.complex_reasoning_systems.update(aggregate_high_level_info)
-        
+
         return self.render_reasoning()
-  
+
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """
         learning_system_results = self.learning_systems.render_reasoning()
-        diagnosis = Diagnosis(time_step, 
+        diagnosis = Diagnosis(time_step,
                               learning_system_results,
                               self.bayesian_status,
                               self.vehicle_rep.get_current_faulting_mnemonics())
