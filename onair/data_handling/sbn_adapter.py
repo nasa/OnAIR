@@ -17,6 +17,7 @@ import threading
 import time
 import datetime
 import os
+import json
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
 from ctypes import *
@@ -27,31 +28,10 @@ from onair.data_handling.parser_util import *
 
 # Note: The double buffer does not clear between switching. If fresh data doesn't come in, stale data is returned (delayed by 1 frame)
 
-# msgID_lookup_table format { msgID : [ "<APP NAME>" , msg_hdr.<data struct in message_headers.py> , "<data category>" ] }
-msgID_lookup_table = {0x0894 : ["CSV", msg_hdr.CSV_APP_CSVData_t]}
-
-#,
-#                      0x0887 : ["SAMPLE", msg_hdr.sample_data_power_t],
-#                      0x0889 : ["SAMPLE", msg_hdr.sample_data_thermal_t],
-#                      0x088A : ["SAMPLE", msg_hdr.sample_data_gps_t]}
-
 class DataSource(OnAirDataSource):
 
     def __init__(self, data_file, meta_file, ss_breakdown = False):
         super().__init__(data_file, meta_file, ss_breakdown);
-
-
-        self.currentData = []
-
-        for x in range(0,2):
-            self.currentData.append({'headers':[], 'data':[]})
-
-            for msgID in msgID_lookup_table.keys():
-                app_name, data_struct = msgID_lookup_table[msgID]
-                struct_name = data_struct.__name__
-                for field_name, field_type in data_struct._fields_[1:]:
-                    self.currentData[x]['headers'].append(app_name + "." + struct_name + "." + str(field_name))
-                self.currentData[x]['data'].extend([0]*len(data_struct._fields_[1:])) #initialize all the data arrays with zero
 
         self.new_data_lock = threading.Lock()
         self.new_data = False
@@ -71,21 +51,40 @@ class DataSource(OnAirDataSource):
         self.listener_thread.start()
 
         # subscribe to message IDs
-        for msgID in msgID_lookup_table.keys():
+        for msgID in self.msgID_lookup_table.keys():
             sbn.subscribe(msgID)
 
-    def subscribe_message(self, msgid):
-        # TODO: Not used yet. Need to read subscribed msgids from the tlm meta data file
-        """Specify cFS message id to listen for. Unstable"""
-        
-        if isinstance(msgid, list):
-            for mID in msgid:
-                sbn.subscribe(mID)
-        else:
-            sbn.subscribe(msgid)
-
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
-        # TODO: may want to parse sbn specific meta data here, like message ids
+        self.msgID_lookup_table = {}
+        self.currentData = []
+
+        # pull out message ids
+        file = open(meta_data_file, 'rb')
+        file_str = file.read()
+
+        meta_config = json.loads(file_str)
+        file.close()
+
+        # Copy message ID table from .json, convert string hex to ints for ID
+        for key in meta_config['channels']:
+            self.msgID_lookup_table[int(key, 16)] = meta_config['channels'][key]
+
+        # Use eval() to convert class name from .json to match with message_headers.py
+        for key in self.msgID_lookup_table:
+            msg_struct_name = self.msgID_lookup_table[key][1]
+            self.msgID_lookup_table[key][1] = eval("msg_hdr." + msg_struct_name)
+
+        # populate headers and reserve space for data
+        for x in range(0,2):
+            self.currentData.append({'headers':[], 'data':[]})
+
+            for msgID in self.msgID_lookup_table.keys():
+                app_name, data_struct = self.msgID_lookup_table[msgID]
+                struct_name = data_struct.__name__
+                for field_name, field_type in data_struct._fields_[1:]:
+                    self.currentData[x]['headers'].append(app_name + "." + struct_name + "." + str(field_name))
+                self.currentData[x]['data'].extend([0]*len(data_struct._fields_[1:])) #initialize all the data arrays with zero
+
         return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
 
     def process_data_file(self, data_file):
@@ -130,7 +129,7 @@ class DataSource(OnAirDataSource):
             sbn.recv_msg(generic_recv_msg_p)
 
             msgID = generic_recv_msg_p.contents.TlmHeader.Primary.StreamId
-            app_name, data_struct = msgID_lookup_table[msgID]
+            app_name, data_struct = self.msgID_lookup_table[msgID]
 
             recv_msg_p = POINTER(data_struct)()
             recv_msg_p.contents = generic_recv_msg_p.contents
