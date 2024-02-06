@@ -115,5 +115,10 @@
     "SAMPLE.sample_data_gps_t.sample_data_lat",
     "SAMPLE.sample_data_gps_t.sample_data_lng",
     "SAMPLE.sample_data_gps_t.sample_data_alt"
-  ]
+  ],
+  "channels":
+    {"0x0887": ["SAMPLE", "sample_data_power_t"],
+     "0x0889": ["SAMPLE", "sample_data_thermal_t"],
+     "0x088A": ["SAMPLE", "sample_data_gps_t"]
+    }
 }
