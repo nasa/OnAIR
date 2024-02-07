@@ -54,6 +54,16 @@ class DataSource(OnAirDataSource):
         for msgID in self.msgID_lookup_table.keys():
             sbn.subscribe(msgID)
 
+    def gather_field_names(self, field_name, field_type):
+        field_names = []
+        if "message_headers" in str(field_type):
+            for sub_field_name, sub_field_type in field_type._fields_:
+                field_names.append(self.gather_field_names(field_name + "." + sub_field_name, sub_field_type))
+        else:
+            #field_names.append(field_name)
+            return field_name
+        return field_names
+
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         self.msgID_lookup_table = {}
         self.currentData = []
@@ -81,9 +91,13 @@ class DataSource(OnAirDataSource):
             for msgID in self.msgID_lookup_table.keys():
                 app_name, data_struct = self.msgID_lookup_table[msgID]
                 struct_name = data_struct.__name__
+                # Skip the header, walk through the stuct
                 for field_name, field_type in data_struct._fields_[1:]:
-                    self.currentData[x]['headers'].append(app_name + "." + struct_name + "." + str(field_name))
-                self.currentData[x]['data'].extend([0]*len(data_struct._fields_[1:])) #initialize all the data arrays with zero
+                    field_names = self.gather_field_names(app_name + "." + field_name, field_type)
+
+                    for field_name in field_names:
+                        self.currentData[x]['headers'].append(field_name)
+                        self.currentData[x]['data'].append([0]) #initialize all the data arrays with zero
 
         return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
 
@@ -155,11 +169,21 @@ class DataSource(OnAirDataSource):
         str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
         current_buffer['data'][0] = str_time
 
-        for field_name, field_type in data_struct._fields_[1:]:
-            header_name = app_name + "." + data_struct.__name__ + "." + str(field_name)
-            idx = current_buffer['headers'].index(header_name)
-            data = str(getattr(recv_msg, field_name))
-            current_buffer['data'][idx] = data
+        # Skip the header, walk through the stuct
+        for field_name, field_type in recv_msg._fields_[1:]:
+            field_names = self.gather_field_names(field_name, field_type)
+
+            for name in field_names:
+                idx = current_buffer['headers'].index(app_name + "." + name)
+                # Pull the data out of the message buy walking down the nested types
+                data = ""
+                current_object = recv_msg
+                for sub_type in name.split('.'):
+                    print ("sub_type: " + sub_type)
+                    current_object = getattr(current_object, sub_type)
+                    data = str(current_object)
+                    print("\tdata: " + data)
+                current_buffer['data'][idx] = data
 
         with self.new_data_lock:
             self.new_data = True
