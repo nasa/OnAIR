@@ -179,10 +179,8 @@ class DataSource(OnAirDataSource):
                 data = ""
                 current_object = recv_msg
                 for sub_type in name.split('.'):
-                    print ("sub_type: " + sub_type)
                     current_object = getattr(current_object, sub_type)
                     data = str(current_object)
-                    print("\tdata: " + data)
                 current_buffer['data'][idx] = data
 
         with self.new_data_lock:
