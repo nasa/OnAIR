@@ -7,26 +7,27 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
-import numpy as np
+from datetime import datetime
+
+#import numpy as np
 from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
 class Plugin(AIPlugin):
     def __init__(self, name, headers):
-        print("csv_output_plugin.py:init name: " + name + "\theaders: " + headers)
+        print("csv_output_plugin.py:init name: " + name + "\theaders: " + str(headers))
         super().__init__(name, headers)
 
-        self.name = name
-        self.headers = headers
+        self.headers_line = ""
+        for header in headers:
+            self.headers_line += header + ','
 
         # Init some basic parameters, like number of entries for a single file
         self.first_frame = True
-        self.lines_before_output = 0
+        self.lines_before_output = 10
         self.lines_current = 0
         self.current_buffer = [] # List of strings, each string is a line for the .csv
-        self.filename_preamble = "csv_output"
-
-        # Open temp file (or use buffer?)
-
+        self.filename_preamble = "csv_out_"
+        self.filename = ""
 
         # Plugin should write each frame of data out to a .csv file
         # low_level_data is optional. Should use the headers provided in __init__
@@ -39,8 +40,14 @@ class Plugin(AIPlugin):
         """
         Given streamed data point, system should update internally
         """
+        print("csv_output_plugin:update")
+        print("low_level_data: " + str(low_level_data))
 
         # TODO: Need to get headers for high level data
+        if (self.first_frame):
+            for plugin in high_level_data:
+                self.headers_line += str(plugin) + ","
+            self.headers_line = self.headers_line[:-1]
 
         new_line = ""
 
@@ -64,26 +71,35 @@ class Plugin(AIPlugin):
         """
 
         if (self.first_frame):
-            # Create file
-            print("Create file")
+            # Create file- TODO: make separate function
+            date_stamp = datetime.today().strftime('%j_%H_%M')
+            self.file_name = self.filename_preamble + date_stamp + ".csv"
 
-            # Output headers
-            print("Output headers")
+            self.current_buffer.insert(0, self.headers_line)
 
             self.first_frame = False
         pass
 
-        if (self.lines_before_output == 0)
+        if (self.lines_before_output == 0):
             # Write out to file
-            print(self.current_buffer)
+            with open(self.file_name, 'a') as file:
+                for line in self.current_buffer:
+                    file.write(line + '\n')
+                    print("Wrote out: " + line + '\n')
             self.current_buffer = []
         elif (self.lines_before_output != 0 and self.lines_before_output == self.lines_current):
             # Create new file
             print("Create new file")
+            date_stamp = datetime.today().strftime('%j_%H_%M')
+            self.file_name = self.filename_preamble + date_stamp + ".csv"
+            with open(self.file_name, 'w') as file:
+                for line in self.current_buffer:
+                    file.write(line + '\n')
+                    print("Wrote out: " + line + '\n')
 
-            print(self.current_buffer)
             self.current_buffer = []
-
+            self.lines_current = 0
         else:
-            print("Nothing to write this go...")
+            print("Nothing to write this go...") # TODO: should still write out, otherwise everything is batched until the end
+            self.lines_current += 1
             pass
