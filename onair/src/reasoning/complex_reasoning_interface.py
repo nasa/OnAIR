@@ -20,9 +20,9 @@ class ComplexReasoningInterface:
         self.headers = headers
         self.reasoning_constructs = import_plugins(self.headers,_reasoning_plugins)
 
-    def update(self, high_level_data):
+    def update(self, low_level_data, high_level_data):
         for plugin in self.reasoning_constructs:
-            plugin.update(high_level_data=high_level_data)
+            plugin.update(low_level_data, high_level_data=high_level_data)
 
     def check_for_salient_event(self):
         pass

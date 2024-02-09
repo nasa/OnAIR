@@ -40,7 +40,7 @@ class Agent:
                                      'learning_systems' : self.learning_systems.render_reasoning(),
                                      'planning_systems' : self.planning_systems.render_reasoning()}
 
-        self.complex_reasoning_systems.update(aggregate_high_level_info)
+        self.complex_reasoning_systems.update(self.vehicle_rep.curr_data, aggregate_high_level_info)
         
         return self.render_reasoning()
   
