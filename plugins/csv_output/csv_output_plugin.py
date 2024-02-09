@@ -17,15 +17,11 @@ class Plugin(AIPlugin):
         print("csv_output_plugin.py:init name: " + name + "\theaders: " + str(headers))
         super().__init__(name, headers)
 
-        self.headers_line = ""
-        for header in headers:
-            self.headers_line += header + ','
-
         # Init some basic parameters, like number of entries for a single file
         self.first_frame = True
         self.lines_per_file = 10
         self.lines_current = 0
-        self.current_buffer = [] # List of strings, each string is a line for the .csv
+        self.current_buffer = [] # List of telemetry points
         self.filename_preamble = "csv_out_"
         self.filename = ""
 
@@ -33,7 +29,7 @@ class Plugin(AIPlugin):
         # low_level_data is optional. Should use the headers provided in __init__
         # high level data is coming from different sources: list in headers
 
-        # simplest mode is just always writting out to a file
+        # simplest mode is just always writing out to a file
         # live move writes out headers? then n lines to a temp file (or internal buffer), then writes to a new file with date/time filename
 
     def update(self,low_level_data=[], high_level_data={}):
@@ -46,24 +42,20 @@ class Plugin(AIPlugin):
         # TODO: Need to get headers for high level data
         if (self.first_frame):
             for plugin in high_level_data:
-                self.headers_line += str(plugin) + ","
-            self.headers_line = self.headers_line[:-1]
+                self.headers.append(str(plugin))
 
-        new_line = ""
+        self.current_buffer = []
 
         # Add low level data
         for telem_point in low_level_data:
-            new_line += str(telem_point) + ","
+            self.current_buffer.append(str(telem_point))
 
         # Add high level data
         # a bit trickier since it a dictionary. One entry per plugin and I don't know what is inside
         for plugin_data in high_level_data:
-            # Assume each plugin is outputing a list
+            # Assume each plugin is outputting a list
             for telem_point in high_level_data:
-                new_line += str(telem_point) + ","
-
-        # remove trailing comma, save to buffer
-        self.current_buffer.append(new_line[:-1])
+                self.current_buffer.append(str(telem_point))
 
     def render_reasoning(self):
         """
@@ -75,24 +67,23 @@ class Plugin(AIPlugin):
             date_stamp = datetime.today().strftime('%j_%H_%M')
             self.file_name = self.filename_preamble + date_stamp + ".csv"
 
-            self.current_buffer.insert(0, self.headers_line)
-
+            # Write out to file
+            with open(self.file_name, 'a') as file:
+                delimiter = ','
+                file.write(delimiter.join(self.headers) + '\n')
             self.first_frame = False
         pass
 
         # Write out to file
         with open(self.file_name, 'a') as file:
-            for line in self.current_buffer:
-                file.write(line + '\n')
-                print("Wrote out: " + line + '\n')
+            delimiter = ','
+            file.write(delimiter.join(self.current_buffer) + '\n')
         self.current_buffer = []
         self.lines_current += 1
 
         if (self.lines_per_file != 0 and self.lines_per_file == self.lines_current):
             # Create new file
-            print("Create new file")
             date_stamp = datetime.today().strftime('%j_%H_%M')
             self.file_name = self.filename_preamble + date_stamp + ".csv"
 
-            self.current_buffer = []
             self.lines_current = 0
