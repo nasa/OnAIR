@@ -23,7 +23,7 @@ class Plugin(AIPlugin):
 
         # Init some basic parameters, like number of entries for a single file
         self.first_frame = True
-        self.lines_before_output = 10
+        self.lines_per_file = 10
         self.lines_current = 0
         self.current_buffer = [] # List of strings, each string is a line for the .csv
         self.filename_preamble = "csv_out_"
@@ -80,26 +80,19 @@ class Plugin(AIPlugin):
             self.first_frame = False
         pass
 
-        if (self.lines_before_output == 0):
-            # Write out to file
-            with open(self.file_name, 'a') as file:
-                for line in self.current_buffer:
-                    file.write(line + '\n')
-                    print("Wrote out: " + line + '\n')
-            self.current_buffer = []
-        elif (self.lines_before_output != 0 and self.lines_before_output == self.lines_current):
+        # Write out to file
+        with open(self.file_name, 'a') as file:
+            for line in self.current_buffer:
+                file.write(line + '\n')
+                print("Wrote out: " + line + '\n')
+        self.current_buffer = []
+        self.lines_current += 1
+
+        if (self.lines_per_file != 0 and self.lines_per_file == self.lines_current):
             # Create new file
             print("Create new file")
             date_stamp = datetime.today().strftime('%j_%H_%M')
             self.file_name = self.filename_preamble + date_stamp + ".csv"
-            with open(self.file_name, 'w') as file:
-                for line in self.current_buffer:
-                    file.write(line + '\n')
-                    print("Wrote out: " + line + '\n')
 
             self.current_buffer = []
             self.lines_current = 0
-        else:
-            print("Nothing to write this go...") # TODO: should still write out, otherwise everything is batched until the end
-            self.lines_current += 1
-            pass
