@@ -14,7 +14,6 @@ from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
 class Plugin(AIPlugin):
     def __init__(self, name, headers):
-        print("csv_output_plugin.py:init name: " + name + "\theaders: " + str(headers))
         super().__init__(name, headers)
 
         # Init some basic parameters, like number of entries for a single file
@@ -36,12 +35,10 @@ class Plugin(AIPlugin):
         """
         Given streamed data point, system should update internally
         """
-        print("csv_output_plugin:update")
-        print("low_level_data: " + str(low_level_data))
 
-        # TODO: Need to get headers for high level data
         if (self.first_frame):
-            for plugin in high_level_data:
+            # TODO: Should look at vehicle_rep, learning_systems, and planning_systems
+            for plugin in high_level_data['learning_systems']:
                 self.headers.append(str(plugin))
 
         self.current_buffer = []
@@ -51,10 +48,11 @@ class Plugin(AIPlugin):
             self.current_buffer.append(str(telem_point))
 
         # Add high level data
-        # a bit trickier since it a dictionary. One entry per plugin and I don't know what is inside
-        for plugin_data in high_level_data:
+        # TODO: Should look at vehicle_rep, learning_systems, and planning_systems
+        for plugin in high_level_data['learning_systems']:
+            plugin_output = high_level_data['learning_systems'].get(plugin, "empty")
             # Assume each plugin is outputting a list
-            for telem_point in high_level_data:
+            for telem_point in plugin_output:
                 self.current_buffer.append(str(telem_point))
 
     def render_reasoning(self):
