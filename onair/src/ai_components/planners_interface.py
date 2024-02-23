@@ -22,10 +22,14 @@ class PlannersInterface:
     def update(self, high_level_data):
         # Raw TLM should be transformed into high-leve state representation here
         # Can store something as stale unless a planning thread is launched
-        pass
+        for plugin in self.planner_constructs:
+            plugin.update(high_level_data=high_level_data)
 
     def check_for_salient_event(self):
         pass
 
     def render_reasoning(self):
-        pass
+        diagnoses = {}
+        for plugin in self.planner_constructs:
+            diagnoses[plugin.component_name] = plugin.render_reasoning()
+        return diagnoses

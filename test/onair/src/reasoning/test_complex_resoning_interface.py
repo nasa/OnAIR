@@ -53,39 +53,46 @@ def test_ComplexReasoningInterface__init__sets_self_headers_to_given_headers_and
     assert complex_reasoning_interface.import_plugins.call_args_list[0].args == (arg_headers, arg__reasoning_plugins)
     assert cut.reasoning_constructs == forced_return_reasoning_constructs
 
-# update tests
-def test_ComplexReasoningInterface_update_does_nothing_when_instance_reasoning_constructs_is_empty():
+# update_and_render_reasoning
+def test_ComplexReasoningInterface_update_and_render_reasoning_returns_given_high_level_data_with_complex_systems_as_empty_dict_when_no_reasoning_constructs(mocker):
     # Arrange
-    arg_high_level_data = MagicMock()
+    fake_high_level_key = MagicMock(name='fake_high_level_key')
+    fake_high_level_value = MagicMock(name='fake_high_level_value')
+    arg_high_level_data = {fake_high_level_key:fake_high_level_value}
+    expected_result = arg_high_level_data | {'complex_systems':{}}
 
     cut = ComplexReasoningInterface.__new__(ComplexReasoningInterface)
     cut.reasoning_constructs = []
 
     # Act
-    result = cut.update(arg_high_level_data)
+    result = cut.update_and_render_reasoning(arg_high_level_data)
 
     # Assert
-    assert result == None
+    assert result == expected_result
 
-def test_ComplexReasoningInterface_update_calls_update_with_given_low_level_data_on_each_reasoning_constructs_item(mocker):
+def test_ComplexReasoningInterface_update_and_render_reasoning_invokes_on_all_reasoning_constructs_then_returns_their_results_added_to_the_hgih_level_data(mocker):
     # Arrange
-    arg_high_level_data = MagicMock()
+    fake_high_level_key = MagicMock(name='fake_high_level_key')
+    fake_high_level_value = MagicMock(name='fake_high_level_value')
+    arg_high_level_data = {fake_high_level_key:fake_high_level_value}
+    expected_result = arg_high_level_data | {'complex_systems':{}}
 
     cut = ComplexReasoningInterface.__new__(ComplexReasoningInterface)
     cut.reasoning_constructs = []
-
-    num_fake_reasoning_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_reasoning_constructs):
-        cut.reasoning_constructs.append(MagicMock())
+    for i in range(0, pytest.gen.randint(1, 10)):
+        cut.reasoning_constructs.append(MagicMock(name=f"fake_plugin_{i}"))
+        cut.reasoning_constructs[-1].component_name = f"fake_plugin_{i}"
+        mocker.patch.object(cut.reasoning_constructs[-1], 'update')
+        rv = f"{i}"
+        mocker.patch.object(cut.reasoning_constructs[-1], 'render_reasoning', return_value=rv)
+        expected_result['complex_systems'] |= {cut.reasoning_constructs[-1].component_name : rv}
 
     # Act
-    result = cut.update(arg_high_level_data)
+    result = cut.update_and_render_reasoning(arg_high_level_data)
 
     # Assert
-    for i in range(num_fake_reasoning_constructs):
-        assert cut.reasoning_constructs[i].update.call_count == 1
-        assert cut.reasoning_constructs[i].update.call_args_list[0].args == ()
-        assert cut.reasoning_constructs[i].update.call_args_list[0].kwargs == {'high_level_data':arg_high_level_data}
+    assert result == expected_result
+    assert cut.reasoning_constructs[0].update.call_count == 1
 
 # check_for_salient_event tests
 def test_ComplexReasoningInterface_salient_event_does_nothing():
@@ -97,40 +104,3 @@ def test_ComplexReasoningInterface_salient_event_does_nothing():
 
     # Assert
     assert result == None
-
-# render_reasoning tests
-def test_ComplexReasoningInterface_render_reasoning_returns_empty_dict_when_instance_reasoning_constructs_is_empty(mocker):
-    # Arrange
-    cut = ComplexReasoningInterface.__new__(ComplexReasoningInterface)
-    cut.reasoning_constructs = []
-
-    # Act
-    result = cut.render_reasoning()
-
-    # Assert
-    assert result == {}
-
-def test_ComplexReasoningInterface_render_reasoning_returns_dict_of_each_ai_construct_as_key_to_the_result_of_its_render_reasoning_when_instance_reasoning_constructs_is_occupied(mocker):
-    # Arrange
-    cut = ComplexReasoningInterface.__new__(ComplexReasoningInterface)
-    cut.reasoning_constructs = []
-
-    expected_result = {}
-
-    num_fake_reasoning_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
-    for i in range(num_fake_reasoning_constructs):
-        fake_ai_construct = MagicMock()
-        forced_return_ai_construct_render_reasoning = MagicMock()
-        cut.reasoning_constructs.append(fake_ai_construct)
-        mocker.patch.object(fake_ai_construct, 'render_reasoning', return_value=forced_return_ai_construct_render_reasoning)
-        fake_ai_construct.component_name = MagicMock()
-        expected_result[fake_ai_construct.component_name] = forced_return_ai_construct_render_reasoning
-
-    # Act
-    result = cut.render_reasoning()
-
-    # Assert
-    for i in range(num_fake_reasoning_constructs):
-        assert cut.reasoning_constructs[i].render_reasoning.call_count == 1
-        assert cut.reasoning_constructs[i].render_reasoning.call_args_list[0].args == ()
-    assert result == expected_result

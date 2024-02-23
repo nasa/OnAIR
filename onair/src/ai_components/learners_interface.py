@@ -21,7 +21,7 @@ class LearnersInterface:
 
     def update(self, low_level_data, high_level_data):
         for plugin in self.learner_constructs:
-            plugin.update(low_level_data)
+            plugin.update(low_level_data, high_level_data)
 
     def check_for_salient_event(self):
         pass
