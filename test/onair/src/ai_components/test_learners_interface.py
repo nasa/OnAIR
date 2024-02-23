@@ -68,7 +68,7 @@ def test_LearnersInterface_update_does_nothing_when_instance_learner_constructs_
     # Assert
     assert result == None
 
-def test_LearnersInterface_update_calls_update_with_given_low_level_data_on_each_learner_constructs_item(mocker):
+def test_LearnersInterface_update_calls_update_with_given_low_level_and_high_level_data_on_each_learner_constructs_item(mocker):
     # Arrange
     arg_low_level_data = MagicMock()
     arg_high_level_data = MagicMock()
@@ -86,7 +86,7 @@ def test_LearnersInterface_update_calls_update_with_given_low_level_data_on_each
     # Assert
     for i in range(num_fake_learner_constructs):
         assert cut.learner_constructs[i].update.call_count == 1
-        assert cut.learner_constructs[i].update.call_args_list[0].args == (arg_low_level_data, )
+        assert cut.learner_constructs[i].update.call_args_list[0].args == (arg_low_level_data, arg_high_level_data)
 
 # check_for_salient_event
 def test_LearnersInterface_salient_event_does_nothing():

@@ -28,21 +28,16 @@ class Agent:
         self.planning_systems = PlannersInterface(self.vehicle_rep.get_headers(),planners_plugin_dict)
         self.complex_reasoning_systems = ComplexReasoningInterface(self.vehicle_rep.get_headers(),complex_plugin_dict)
 
-    def render_reasoning(self):
-        return self.complex_reasoning_systems.render_reasoning()
-
     def reason(self, frame):
+        aggregate_high_level_info = {}
         self.vehicle_rep.update(frame)
-        self.learning_systems.update(self.vehicle_rep.curr_data, self.vehicle_rep.get_state_information())
-        self.planning_systems.update(self.vehicle_rep.get_state_information())
+        aggregate_high_level_info['vehicle_rep'] = self.vehicle_rep.get_state_information()
+        self.learning_systems.update(self.vehicle_rep.curr_data, aggregate_high_level_info)
+        aggregate_high_level_info['learning_systems'] = self.learning_systems.render_reasoning()
+        self.planning_systems.update(aggregate_high_level_info)
+        aggregate_high_level_info['planning_systems'] = self.planning_systems.render_reasoning()
 
-        aggregate_high_level_info = {'vehicle_rep' : self.vehicle_rep.get_state_information(),
-                                     'learning_systems' : self.learning_systems.render_reasoning(),
-                                     'planning_systems' : self.planning_systems.render_reasoning()}
-
-        self.complex_reasoning_systems.update(aggregate_high_level_info)
-
-        return self.render_reasoning()
+        return self.complex_reasoning_systems.update_and_render_reasoning(aggregate_high_level_info)
 
     def diagnose(self, time_step):
         """ Grab the mnemonics from the """
