@@ -23,8 +23,10 @@ jobs:
         conda info
         conda list
     - name: Test with pytest
+      shell: bash -l {0}
       run: python -m coverage run --branch --source=onair,plugins -m pytest ./test/
     - name: Coverage report
+      shell: bash -l {0}
       run: coverage report --skip-empty
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
