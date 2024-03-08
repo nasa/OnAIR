@@ -3,7 +3,7 @@ channels:
   - default
   - conda-forge
 dependencies:
-  - python==3.11.*
+  - python==3.11.2
   - numpy==1.23.4
   - coverage==6.5.0
   - pytest==7.2.0
