@@ -1,89 +1,41 @@
 {
   "subsystems": {
-    "NONE": {
-      "Time": {
-        "conversion": "",
-        "tests": {
-          "NOOP": "[]"
-        },
-        "description": "No description"
+    "STATES": {
+      "time": {
+        "description": "Time of latest receipt of values"
       },
-      "THRUST": {
-        "conversion": "",
-        "tests": {
-          "FEASIBILITY": "[-999999999999999, 999999999999999]"
-        },
-        "description": "No description"
+      "state_0.x": {
+        "description": "Vehicle 0's current state of x"
       },
-      "ALTITUDE": {
-        "conversion": "",
-        "tests": {
-          "FEASIBILITY": "[-999999999999999, 999999999999999]"
-        },
-        "description": "No description"
+      "state_0.y": {
+        "description": "Vehicle 0's current state of y"
       },
-      "ACCELERATION": {
-        "conversion": "",
-        "tests": {
-          "FEASIBILITY": "[-20.1111, 20.1111]"
-        },
-        "description": "No description"
+      "state_1.x": {
+        "description": "Vehicle 1's current state of x"
       },
-      "SCIENCE_COLLECTION": {
-        "conversion": "",
-        "tests": {
-          "FEASIBILITY": "[-0.9999, 1.1111]"
-        },
-        "description": "No description"
+      "state_1.y": {
+        "description": "Vehicle 1's current state of y"
       },
-      "LABEL_ERROR_STATE": {
-        "conversion": "",
-        "tests": {
-          "NOOP": "[]"
-        },
-        "description": "No description"
-      }
-    },
-    "POWER": {
-      "VOLTAGE": {
-        "conversion": "",
-        "tests": {
-          "FEASIBILITY": "[12.9999, 18.1111]"
-        },
-        "description": "No description"
+      "state_2.x": {
+        "description": "Vehicle 2's current state of x"
       },
-      "CURRENT": {
-        "conversion": "",
-        "tests": {
-          "FEASIBILITY": "[2.9999, 5.1111]"
-        },
-        "description": "No description"
-      }
-    },
-    "THERMAL": {
-      "TEMPERATURE": {
-        "conversion": "",
-        "tests": {
-          "FEASIBILITY": "[9.9999, 90.1111]"
-        },
-        "description": "No description"
+      "state_2.y": {
+        "description": "Vehicle 2's current state of y"
       }
     }
   },
   "redis_subscriptions": [
-    "vehicle_0_state",
-    "vehicle_1_state",
-    "vehicle_2_state"
+    "state_0",
+    "state_1",
+    "state_2"
   ],
   "order": [
-    "Time",
-    "VOLTAGE",
-    "CURRENT",
-    "THRUST",
-    "ALTITUDE",
-    "ACCELERATION",
-    "TEMPERATURE",
-    "SCIENCE_COLLECTION",
-    "LABEL_ERROR_STATE"
+    "time",
+    "state_0.x",
+    "state_0.y",
+    "state_1.x",
+    "state_1.y",
+    "state_2.x",
+    "state_2.y"
   ]
 }
