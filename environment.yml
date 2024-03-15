@@ -3,12 +3,12 @@ channels:
   - default
   - conda-forge
 dependencies:
-  - python==3.11.2
-  - numpy==1.23.4
-  - coverage==6.5.0
-  - pytest==7.2.0
-  - pytest-mock==3.10.0
-  - pytest-randomly==3.12.0
+  - python>=3.9,<3.12
+  - numpy
+  - coverage
+  - pytest
+  - pytest-mock
+  - pytest-randomly
   - pip
   - pip:
-    - redis==4.6.0
+    - redis
