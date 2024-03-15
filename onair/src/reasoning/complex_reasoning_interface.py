@@ -25,7 +25,7 @@ class ComplexReasoningInterface:
         intelligent_outcomes['complex_systems'] = {}
         for plugin in self.reasoning_constructs:
             plugin.update(high_level_data=intelligent_outcomes)
-            intelligent_outcomes['complex_systems'] |= {plugin.component_name:plugin.render_reasoning()}
+            intelligent_outcomes['complex_systems'].update({plugin.component_name:plugin.render_reasoning()})
         return intelligent_outcomes
 
     def check_for_salient_event(self):
