@@ -59,7 +59,8 @@ def test_ComplexReasoningInterface_update_and_render_reasoning_returns_given_hig
     fake_high_level_key = MagicMock(name='fake_high_level_key')
     fake_high_level_value = MagicMock(name='fake_high_level_value')
     arg_high_level_data = {fake_high_level_key:fake_high_level_value}
-    expected_result = arg_high_level_data | {'complex_systems':{}}
+    expected_result = arg_high_level_data
+    expected_result.update({'complex_systems':{}})
 
     cut = ComplexReasoningInterface.__new__(ComplexReasoningInterface)
     cut.reasoning_constructs = []
@@ -75,7 +76,8 @@ def test_ComplexReasoningInterface_update_and_render_reasoning_invokes_on_all_re
     fake_high_level_key = MagicMock(name='fake_high_level_key')
     fake_high_level_value = MagicMock(name='fake_high_level_value')
     arg_high_level_data = {fake_high_level_key:fake_high_level_value}
-    expected_result = arg_high_level_data | {'complex_systems':{}}
+    expected_result = arg_high_level_data
+    expected_result.update({'complex_systems':{}})
 
     cut = ComplexReasoningInterface.__new__(ComplexReasoningInterface)
     cut.reasoning_constructs = []
@@ -85,7 +87,7 @@ def test_ComplexReasoningInterface_update_and_render_reasoning_invokes_on_all_re
         mocker.patch.object(cut.reasoning_constructs[-1], 'update')
         rv = f"{i}"
         mocker.patch.object(cut.reasoning_constructs[-1], 'render_reasoning', return_value=rv)
-        expected_result['complex_systems'] |= {cut.reasoning_constructs[-1].component_name : rv}
+        expected_result['complex_systems'].update({cut.reasoning_constructs[-1].component_name : rv})
 
     # Act
     result = cut.update_and_render_reasoning(arg_high_level_data)
