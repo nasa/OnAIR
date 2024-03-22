@@ -95,4 +95,3 @@ def test_Reporter_render_reasoning_outputs_all_info_when_verbose_mode(mocker):
     assert reporter_plugin.print.call_args_list[0].args == (f"{cut.component_name}: RENDER_REASONING", )
     assert reporter_plugin.print.call_args_list[1].args == (f" : My low_level_data is {fake_low_level_data}", )
     assert reporter_plugin.print.call_args_list[2].args == (f" : My high_level_data is {fake_high_level_data}", )
-
