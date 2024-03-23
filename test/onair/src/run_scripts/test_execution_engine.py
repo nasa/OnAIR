@@ -207,20 +207,55 @@ def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_whe
         f"Config file: '{arg_config_filepath}', missing key: {missing_key}")
 
 
-def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_when_the_required_key_OPTIONS_is_not_in_config(mocker):
+def test_ExecutionEngine_parse_configs_skips_OPTIONS_when_the_required_section_OPTIONS_is_not_in_config(mocker):
     # Arrange
     arg_config_filepath = MagicMock()
-
-    missing_key = 'OPTIONS'
+    fake_files = {
+        'TelemetryFilePath': MagicMock(),
+        'TelemetryFile': MagicMock(),
+        'MetaFilePath': MagicMock(),
+        'MetaFile': MagicMock()
+    }
+    fake_data_handling = {
+        'DataSourceFile': MagicMock()
+    }
+    fake_plugins = {
+        'KnowledgeRepPluginDict': "{fake_name:fake_path}",
+        'LearnersPluginDict': "{fake_name:fake_path}",
+        'PlannersPluginDict': "{fake_name:fake_path}",
+        'ComplexPluginDict': "{fake_name:fake_path}"
+    }
+    fake_plugin_dict = MagicMock()
+    fake_plugin_dict.body = MagicMock()
+    fake_plugin_dict.body.keys = MagicMock()
+    fake_plugin_dict.body.keys.__len__.return_value = 1
     fake_dict_for_Config = {
-        "FILES": MagicMock(),
-        "DATA_HANDLING": MagicMock(),
-        "PLUGINS": MagicMock()
+        "FILES": fake_files,
+        "DATA_HANDLING": fake_data_handling,
+        "PLUGINS": fake_plugins
     }
     fake_config = MagicMock()
     fake_config.__getitem__.side_effect = fake_dict_for_Config.__getitem__
     fake_config_read_result = MagicMock()
     fake_config_read_result.__len__.return_value = 1
+    fake_knowledge_rep_plugin_list = MagicMock()
+    fake_learners_plugin_list = MagicMock()
+    fake_planners_plugin_list = MagicMock()
+    fake_complex_plugin_list = MagicMock()
+    fake_plugins = [fake_knowledge_rep_plugin_list,
+                    fake_learners_plugin_list,
+                    fake_planners_plugin_list,
+                    fake_complex_plugin_list]
+    fake_IO_enabled = MagicMock()
+    fake_Dev_enabled = MagicMock()
+    fake_Viz_enabled = MagicMock()
+    fake_plugin_dict = MagicMock()
+    fake_keys = MagicMock()
+    fake_plugin = MagicMock()
+    fake_path = MagicMock()
+
+    fake_keys.__len__.return_value = 1
+    fake_keys.__iter__.return_value = iter([str(fake_plugin)])
 
     cut = ExecutionEngine.__new__(ExecutionEngine)
 
@@ -228,15 +263,32 @@ def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_whe
                  '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read',
                         return_value=fake_config_read_result)
-    mocker.patch.object(cut, 'parse_plugins_dict', return_value=None)
+    mocker.patch.object(fake_config, "has_section", return_value=False)
+    mocker.patch.object(cut, 'parse_plugins_dict', side_effect=fake_plugins)
+    mocker.patch(execution_engine.__name__ + '.isinstance', return_value=True)
+    mocker.patch(execution_engine.__name__ +
+                 '.os.path.exists', return_value=True)
+    mocker.patch.object(fake_plugin_dict, 'keys', return_value=fake_keys)
+    mocker.patch.object(fake_plugin_dict, '__getitem__',
+                        return_value=fake_path)
 
     # Act
-    with pytest.raises(KeyError) as e_info:
-        cut.parse_configs(arg_config_filepath)
+    cut.parse_configs(arg_config_filepath)
 
     # Assert
-    assert e_info.match(
-        f"Config file: '{arg_config_filepath}', missing key: {missing_key}")
+    assert execution_engine.configparser.ConfigParser.call_count == 1
+    assert fake_config.read.call_count == 1
+    assert cut.dataFilePath == fake_files['TelemetryFilePath']
+    assert cut.telemetryFile == fake_files['TelemetryFile']
+    assert cut.metadataFilePath == fake_files['MetaFilePath']
+    assert cut.metaFile == fake_files['MetaFile']
+    assert cut.data_source_file == fake_data_handling['DataSourceFile']
+    assert cut.parse_plugins_dict.call_count == 4
+    assert cut.knowledge_rep_plugin_dict == fake_knowledge_rep_plugin_list
+    assert cut.learners_plugin_dict == fake_learners_plugin_list
+    assert cut.planners_plugin_dict == fake_planners_plugin_list
+    assert cut.complex_plugin_dict == fake_complex_plugin_list
+    assert cut.IO_Enabled == False
 
 
 def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
@@ -297,6 +349,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
                  '.configparser.ConfigParser', return_value=fake_config)
     mocker.patch.object(fake_config, 'read',
                         return_value=fake_config_read_result)
+    mocker.patch.object(fake_config, "has_section", return_value=True)
     mocker.patch.object(cut, 'parse_plugins_dict', side_effect=fake_plugins)
     mocker.patch.object(fake_options, 'getboolean',
                         return_value=fake_IO_enabled)

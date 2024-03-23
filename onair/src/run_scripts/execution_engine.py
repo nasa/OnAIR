@@ -21,6 +21,7 @@ from time import gmtime, strftime
 
 from ..run_scripts.sim import Simulator
 
+
 class ExecutionEngine:
     def __init__(self, config_file='', run_name='', save_flag=False):
 
@@ -56,59 +57,77 @@ class ExecutionEngine:
         if config_file != '':
             self.init_save_paths()
             self.parse_configs(config_file)
-            self.parse_data(self.data_source_file, self.fullTelemetryFile, self.fullMetaFile)
+            self.parse_data(self.data_source_file,
+                            self.fullTelemetryFile, self.fullMetaFile)
             self.setup_sim()
 
     def parse_configs(self, config_filepath):
         config = configparser.ConfigParser()
 
         if len(config.read(config_filepath)) == 0:
-            raise FileNotFoundError(f"Config file at '{config_filepath}' could not be read.")
+            raise FileNotFoundError(
+                f"Config file at '{config_filepath}' could not be read.")
 
         try:
-            ## Parse Required Data: FILES
+            # Parse Required Data: FILES
             self.dataFilePath = config['FILES']['TelemetryFilePath']
-            self.telemetryFile = config['FILES']['TelemetryFile'] # Vehicle telemetry data
-            self.fullTelemetryFile = os.path.join(self.dataFilePath, self.telemetryFile)
+            # Vehicle telemetry data
+            self.telemetryFile = config['FILES']['TelemetryFile']
+            self.fullTelemetryFile = os.path.join(
+                self.dataFilePath, self.telemetryFile)
             self.metadataFilePath = config['FILES']['MetaFilePath']
-            self.metaFile = config['FILES']['MetaFile'] # Config for vehicle telemetry
-            self.fullMetaFile = os.path.join(self.metadataFilePath, self.metaFile)
+            # Config for vehicle telemetry
+            self.metaFile = config['FILES']['MetaFile']
+            self.fullMetaFile = os.path.join(
+                self.metadataFilePath, self.metaFile)
 
-            ## Parse Required Data: DATA_HANDLING
+            # Parse Required Data: DATA_HANDLING
             self.data_source_file = config['DATA_HANDLING']['DataSourceFile']
 
-            ## Parse Required Data: PLUGINS
-            self.knowledge_rep_plugin_dict = self.parse_plugins_dict(config['PLUGINS']['KnowledgeRepPluginDict'])
-            self.learners_plugin_dict = self.parse_plugins_dict(config['PLUGINS']['LearnersPluginDict'])
-            self.planners_plugin_dict = self.parse_plugins_dict(config['PLUGINS']['PlannersPluginDict'])
-            self.complex_plugin_dict = self.parse_plugins_dict(config['PLUGINS']['ComplexPluginDict'])
+            # Parse Required Data: PLUGINS
+            self.knowledge_rep_plugin_dict = self.parse_plugins_dict(
+                config['PLUGINS']['KnowledgeRepPluginDict'])
+            self.learners_plugin_dict = self.parse_plugins_dict(
+                config['PLUGINS']['LearnersPluginDict'])
+            self.planners_plugin_dict = self.parse_plugins_dict(
+                config['PLUGINS']['PlannersPluginDict'])
+            self.complex_plugin_dict = self.parse_plugins_dict(
+                config['PLUGINS']['ComplexPluginDict'])
 
-            ## Parse Optional Data: OPTIONS
-            ## 'OPTIONS' must exist, but individual options return False if missing
-            self.IO_Enabled = config['OPTIONS'].getboolean('IO_Enabled')
+            # Parse Optional Data: OPTIONS
+            # 'OPTIONS' must exist, but individual options return False if missing
+            if config.has_section('OPTIONS'):
+                self.IO_Enabled = config['OPTIONS'].getboolean('IO_Enabled')
+            else:
+                self.IO_Enabled = False
 
         except KeyError as e:
-            new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
+            new_message = f"Config file: '{
+                config_filepath}', missing key: {e.args[0]}"
             raise KeyError(new_message) from e
 
     def parse_plugins_dict(self, config_plugin_dict):
-        ## Parse Required Data: Plugin name to path dict
+        # Parse Required Data: Plugin name to path dict
         ast_plugin_dict = self.ast_parse_eval(config_plugin_dict)
         if isinstance(ast_plugin_dict.body, ast.Dict):
             temp_plugin_dict = ast.literal_eval(config_plugin_dict)
         else:
-            raise ValueError(f"Plugin dict {config_plugin_dict} from {self.config_filepath} is invalid. It must be a dict.")
+            raise ValueError(f"Plugin dict {config_plugin_dict} from {
+                             self.config_filepath} is invalid. It must be a dict.")
 
         for plugin_file in temp_plugin_dict.values():
-            if not(os.path.exists(plugin_file)):
-                raise FileNotFoundError(f"In config file '{self.config_filepath}' Plugin path '{plugin_file}' does not exist.")
+            if not (os.path.exists(plugin_file)):
+                raise FileNotFoundError(f"In config file '{self.config_filepath}' Plugin path '{
+                                        plugin_file}' does not exist.")
         return temp_plugin_dict
 
     def parse_data(self, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
-        data_source_spec = importlib.util.spec_from_file_location('data_source', parser_file_name)
+        data_source_spec = importlib.util.spec_from_file_location(
+            'data_source', parser_file_name)
         data_source_module = importlib.util.module_from_spec(data_source_spec)
         data_source_spec.loader.exec_module(data_source_module)
-        self.simDataSource = data_source_module.DataSource(data_file_name, metadata_file_name, subsystems_breakdown)
+        self.simDataSource = data_source_module.DataSource(
+            data_file_name, metadata_file_name, subsystems_breakdown)
 
     def setup_sim(self):
         self.sim = Simulator(self.simDataSource,
@@ -149,7 +168,8 @@ class ExecutionEngine:
 
     def save_results(self, save_name):
         complete_time = strftime("%H-%M-%S", gmtime())
-        save_path = os.environ['ONAIR_SAVE_PATH'] + 'saved/' + save_name + '_' + complete_time
+        save_path = os.environ['ONAIR_SAVE_PATH'] + \
+            'saved/' + save_name + '_' + complete_time
         os.makedirs(save_path, exist_ok=True)
         copy_tree(os.environ['ONAIR_TMP_SAVE_PATH'], save_path)
 
