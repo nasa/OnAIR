@@ -28,19 +28,19 @@ class ExecutionEngine:
         self.run_name = run_name
         self.config_filepath = config_file
 
-        # Init Flags
-        self.IO_Flag = False
+        # Init Options
+        self.IO_Enabled = False
 
         # Init Paths
         self.dataFilePath = ''
         self.telemetryFile = ''
-        self.fullTelemetryFileName = ''
+        self.fullTelemetryFile = ''
         self.metadataFilePath = ''
         self.metaFile = ''
-        self.fullMetaDataFileName = ''
+        self.fullMetaFile = ''
 
         # Init parsing/sim info
-        self.parser_file_name = ''
+        self.data_source_file = ''
         self.simDataSource = None
         self.sim = None
 
@@ -56,7 +56,7 @@ class ExecutionEngine:
         if config_file != '':
             self.init_save_paths()
             self.parse_configs(config_file)
-            self.parse_data(self.parser_file_name, self.fullTelemetryFileName, self.fullMetaDataFileName)
+            self.parse_data(self.data_source_file, self.fullTelemetryFile, self.fullMetaFile)
             self.setup_sim()
 
     def parse_configs(self, config_filepath):
@@ -66,26 +66,26 @@ class ExecutionEngine:
             raise FileNotFoundError(f"Config file at '{config_filepath}' could not be read.")
 
         try:
-            ## Parse Required Data: Telementry Data & Configuration
-            self.dataFilePath = config['DEFAULT']['TelemetryDataFilePath']
-            self.telemetryFile = config['DEFAULT']['TelemetryFile'] # Vehicle telemetry data
-            self.fullTelemetryFileName = os.path.join(self.dataFilePath, self.telemetryFile)
-            self.metadataFilePath = config['DEFAULT']['TelemetryMetadataFilePath']
-            self.metaFile = config['DEFAULT']['MetaFile'] # Config for vehicle telemetry
-            self.fullMetaDataFileName = os.path.join(self.metadataFilePath, self.metaFile)
+            ## Parse Required Data: FILES
+            self.dataFilePath = config['FILES']['TelemetryFilePath']
+            self.telemetryFile = config['FILES']['TelemetryFile'] # Vehicle telemetry data
+            self.fullTelemetryFile = os.path.join(self.dataFilePath, self.telemetryFile)
+            self.metadataFilePath = config['FILES']['MetaFilePath']
+            self.metaFile = config['FILES']['MetaFile'] # Config for vehicle telemetry
+            self.fullMetaFile = os.path.join(self.metadataFilePath, self.metaFile)
 
-            ## Parse Required Data: Names
-            self.parser_file_name = config['DEFAULT']['ParserFileName']
+            ## Parse Required Data: DATA_HANDLING
+            self.data_source_file = config['DATA_HANDLING']['DataSourceFile']
 
-            ## Parse Required Data: Plugins
-            self.knowledge_rep_plugin_dict = self.parse_plugins_dict(config['DEFAULT']['KnowledgeRepPluginDict'])
-            self.learners_plugin_dict = self.parse_plugins_dict(config['DEFAULT']['LearnersPluginDict'])
-            self.planners_plugin_dict = self.parse_plugins_dict(config['DEFAULT']['PlannersPluginDict'])
-            self.complex_plugin_dict = self.parse_plugins_dict(config['DEFAULT']['ComplexPluginDict'])
+            ## Parse Required Data: PLUGINS
+            self.knowledge_rep_plugin_dict = self.parse_plugins_dict(config['PLUGINS']['KnowledgeRepPluginDict'])
+            self.learners_plugin_dict = self.parse_plugins_dict(config['PLUGINS']['LearnersPluginDict'])
+            self.planners_plugin_dict = self.parse_plugins_dict(config['PLUGINS']['PlannersPluginDict'])
+            self.complex_plugin_dict = self.parse_plugins_dict(config['PLUGINS']['ComplexPluginDict'])
 
-            ## Parse Optional Data: Flags
-            ## 'RUN_FLAGS' must exist, but individual flags return False if missing
-            self.IO_Flag = config['RUN_FLAGS'].getboolean('IO_Flag')
+            ## Parse Optional Data: OPTIONS
+            ## 'OPTIONS' must exist, but individual options return False if missing
+            self.IO_Enabled = config['OPTIONS'].getboolean('IO_Enabled')
 
         except KeyError as e:
             new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
@@ -118,7 +118,7 @@ class ExecutionEngine:
                              self.complex_plugin_dict)
 
     def run_sim(self):
-        self.sim.run_sim(self.IO_Flag)
+        self.sim.run_sim(self.IO_Enabled)
         if self.save_flag:
             self.save_results(self.save_name)
 
