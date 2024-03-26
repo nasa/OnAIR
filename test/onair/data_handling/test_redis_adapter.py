@@ -12,6 +12,7 @@ from unittest.mock import MagicMock
 import onair.data_handling.redis_adapter as redis_adapter
 from onair.data_handling.redis_adapter import DataSource
 from onair.data_handling.on_air_data_source import OnAirDataSource
+from onair.data_handling.on_air_data_source import ConfigKeyError
 
 import redis
 import threading
@@ -33,6 +34,10 @@ def test_redis_adapter_DataSource__init__sets_redis_values_then_connects_and_sub
 
     cut = DataSource.__new__(DataSource)
     cut.subscriptions = expected_subscriptions
+    fake_order = MagicMock()
+    fake_order.__len__.return_value = \
+        pytest.gen.randint(1, 10) # from 1 to 10 arbitrary
+    cut.order = fake_order
 
     mocker.patch.object(OnAirDataSource, '__init__', new=MagicMock())
     mocker.patch('threading.Lock', return_value=fake_new_data_lock)
@@ -51,7 +56,10 @@ def test_redis_adapter_DataSource__init__sets_redis_values_then_connects_and_sub
     assert cut.server == expected_server
     assert cut.new_data_lock == fake_new_data_lock
     assert cut.new_data == False
-    assert cut.currentData == [{'headers':None, 'data':None}, {'headers':None, 'data':None}]
+    assert cut.currentData == [{'headers':fake_order,
+                                'data':list('-' * len(fake_order))},
+                               {'headers':fake_order,
+                                'data':list('-' * len(fake_order))}]
     assert cut.double_buffer_read_index == 0
     assert cut.connect.call_count == 1
     assert cut.connect.call_args_list[0].args == ()
@@ -206,7 +214,6 @@ def test_redis_adapter_DataSource_subscribe_states_no_subscriptions_given_when_s
     assert redis_adapter.print_msg.call_args_list[0].args == ("No subscriptions given!",)
 
 # get_next tests
-
 def test_redis_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_0():
     # Arrange
     # Renew DataSource to ensure test independence
@@ -324,61 +331,237 @@ def test_redis_adapter_DataSource_has_more_always_returns_True():
     assert cut.has_more() == True
 
 # message_listener tests
-def test_redis_adapter_DataSource_message_listener_does_not_load_json_when_receive_type_is_not_message(mocker):
+def test_redis_adapter_DataSource_message_listener_warns_of_exit_and_does_not_run_for_loop_when_listen_returns_StopIteration(mocker):
     # Arrange
     cut = DataSource.__new__(DataSource)
-    ignored_message_types = ['subscribe', 'unsubscribe', 'psubscribe', 'punsubscribe', 'pmessage']
-    fake_message = {}
-    fake_message['type'] = pytest.gen.choice(ignored_message_types)
 
-    cut.pubsub = MagicMock()
-    mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
+    cut.pubsub = MagicMock(name="cut.pubsub")
+    fake_listener = MagicMock(name='fake_listener')
+    fake_listener.__next__.side_effect = StopIteration
+    mocker.patch.object(cut.pubsub, 'listen', side_effect=[fake_listener])
     mocker.patch(redis_adapter.__name__ + '.json.loads')
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
 
     # Act
     cut.message_listener()
 
     # Assert
     assert redis_adapter.json.loads.call_count == 0
+    assert redis_adapter.print_msg.call_count == 1
+    assert redis_adapter.print_msg.call_args_list[0].args == ("Redis subscription listener exited.", ['WARNING'])
 
-def test_redis_adapter_DataSource_message_listener_loads_message_info_when_receive_type_is_message(mocker):
+def test_redis_adapter_DataSource_message_listener_prints_warning_when_receiving_non_message_type(mocker):
     # Arrange
     cut = DataSource.__new__(DataSource)
-    cut.new_data_lock = MagicMock()
-    cut.new_data = None
-    cut.double_buffer_read_index = pytest.gen.randint(0,1)
-    cut.currentData = [{}, {}]
+
     cut.pubsub = MagicMock()
-
+    ignored_message_types = ['subscribe', 'unsubscribe', 'psubscribe', 'punsubscribe', 'pmessage']
     fake_message = {}
-    fake_message_data = {}
-    fake_message['type'] = 'message'
-    fake_message['data'] = fake_message_data
-    fake_data = {}
-
-    expected_index = (cut.double_buffer_read_index + 1) % 2
-    expected_data_headers = []
-    expected_data_values = []
-
-    num_fake_data = pytest.gen.randint(1,10)
-    for i in range(num_fake_data):
-        fake_data_header = str(i)
-        fake_data_value = MagicMock()
-        fake_data[fake_data_header] = fake_data_value
-        expected_data_headers.append(fake_data_header)
-        expected_data_values.append(fake_data_value)
+    fake_message['type'] = pytest.gen.choice(ignored_message_types)
+    fake_message['channel'] = str(MagicMock(name='fake_message')).encode('utf-8')
     mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
-    mocker.patch(redis_adapter.__name__ + '.json.loads', return_value=fake_data)
+    mocker.patch(redis_adapter.__name__ + '.json.loads')
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+
+    # Act
+    cut.message_listener()
+
+    # Assert
+    assert redis_adapter.json.loads.call_count == 0
+    assert redis_adapter.print_msg.call_count == 2
+    assert redis_adapter.print_msg.call_args_list[0].args == (
+        f"Redis adapter: channel '{fake_message['channel'].decode()}' received " \
+                           f"message type: {fake_message['type']}.", ['WARNING'])
+    assert redis_adapter.print_msg.call_args_list[1].args == (
+        "Redis subscription listener exited.", ['WARNING'])
+
+def test_redis_adapter_DataSource_message_listener_prints_warning_when_data_not_json_format_and_does_not_update_frame(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+
+    cut.pubsub = MagicMock()
+    fake_message = {}
+    fake_message['type'] = 'message'
+    fake_message['channel'] = str(
+        MagicMock(name='fake_message_channel')).encode('utf-8')
+    fake_message['data'] = str(MagicMock(name='fake_message_data'))
+    mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
+    mocker.patch(redis_adapter.__name__ + '.json.loads', side_effect=ValueError)
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
 
     # Act
     cut.message_listener()
 
     # Assert
     assert redis_adapter.json.loads.call_count == 1
-    assert redis_adapter.json.loads.call_args_list[0].args == (fake_message_data,)
-    assert cut.currentData[expected_index]['headers'] == expected_data_headers
-    assert cut.currentData[expected_index]['data'] == expected_data_values
+    assert redis_adapter.json.loads.call_args_list[0].args == (
+        fake_message['data'], )
+    assert redis_adapter.print_msg.call_count == 2
+    assert redis_adapter.print_msg.call_args_list[0].args == (
+        f'Subscribed channel `{fake_message["channel"].decode()}\' message ' \
+         'received but is not in json format.\nMessage:\n' \
+        f'{fake_message["data"]}', ['WARNING'])
+    assert redis_adapter.print_msg.call_args_list[1].args == (
+        "Redis subscription listener exited.", ['WARNING'])
+
+def test_redis_adapter_DataSource_message_listener_warns_user_when_processed_data_did_not_contain_time(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.choice([0 , 1])
+    cut.currentData = {0: {'headers': [], 'data': []},
+                       1: {'headers': [], 'data': []}}
+    cut.pubsub = MagicMock()
+    cut.new_data_lock = MagicMock()
+    cut.new_data = False
+
+    fake_message = {}
+    fake_message['type'] = 'message'
+    fake_message['channel'] = str(
+        MagicMock(name='fake_message_channel')).encode('utf-8')
+    fake_message['data'] = '{}' # empty_message
+    mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
+    mocker.patch(redis_adapter.__name__ + '.json.loads', return_value={})
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+
+    # Act
+    cut.message_listener()
+
+    # Assert
+    assert redis_adapter.json.loads.call_count == 1
+    assert redis_adapter.json.loads.call_args_list[0].args == (
+        fake_message['data'], )
+    assert redis_adapter.print_msg.call_count == 2
+    assert redis_adapter.print_msg.call_args_list[0].args == (
+        f'Message from channel `{fake_message["channel"].decode()}\' ' \
+        f'did not contain `time\' key\nMessage:\n{fake_message["data"]}', \
+         ['WARNING'])
+    assert redis_adapter.print_msg.call_args_list[1].args == (
+        "Redis subscription listener exited.", ['WARNING'])
+
+def test_redis_adapter_DataSource_message_listener_warns_of_received_key_that_does_not_exist_in_header(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.choice([0 , 1])
+    cut.currentData = {0: {'headers': ['time'],
+                           'data': ['-']},
+                       1: {'headers': ['time'],
+                           'data': ['-']}}
+    cut.pubsub = MagicMock()
+    cut.new_data_lock = MagicMock()
+    cut.new_data = False
+
+    fake_message = {}
+    fake_message['type'] = 'message'
+    fake_message['channel'] = str(
+        MagicMock(name='fake_message_channel')).encode('utf-8')
+    fake_message['data'] = '{"time":0, "unknown_key":0}'
+    mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
+    mocker.patch(redis_adapter.__name__ + '.json.loads', return_value={"time":0, "unknown_key":0})
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+
+    # Act
+    cut.message_listener()
+
+    # Assert
+    assert redis_adapter.json.loads.call_count == 1
+    assert redis_adapter.json.loads.call_args_list[0].args == (
+        fake_message['data'], )
+    assert redis_adapter.print_msg.call_count == 2
+    assert redis_adapter.print_msg.call_args_list[0].args == (
+         f"Unused key `unknown_key' in message " \
+         f'from channel `{fake_message["channel"].decode()}.\'', ['WARNING'])
+    assert redis_adapter.print_msg.call_args_list[1].args == (
+        "Redis subscription listener exited.", ['WARNING'])
+
+def test_redis_adapter_DataSource_message_listener_warns_of_expected_keys_that_do_not_appear_in_message(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.choice([0 , 1])
+    cut.pubsub = MagicMock()
+    cut.new_data_lock = MagicMock()
+    cut.new_data = False
+
+    fake_message = {}
+    fake_message['type'] = 'message'
+    fake_message['channel'] = str(
+        MagicMock(name='fake_message_channel')).encode('utf-8')
+    cut.currentData = {0: {'headers': ['time',
+                                      f'{fake_message["channel"].decode()}' \
+                                       '.missing_key'],
+                           'data': ['-', '-']},
+                       1: {'headers': ['time',
+                                      f'{fake_message["channel"].decode()}' \
+                                       '.missing_key'],
+                           'data': ['-', '-']}}
+    fake_message['data'] = '{}'
+    mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
+    mocker.patch(redis_adapter.__name__ + '.json.loads', return_value={})
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+
+    # Act
+    cut.message_listener()
+
+    # Assert
+    assert redis_adapter.json.loads.call_count == 1
+    assert redis_adapter.json.loads.call_args_list[0].args == (
+        fake_message['data'], )
+    assert redis_adapter.print_msg.call_count == 3
+    assert redis_adapter.print_msg.call_args_list[0].args == (
+        f'Message from channel `{fake_message["channel"].decode()}\' ' \
+        f'did not contain `{fake_message["channel"].decode()}.missing_key\'' \
+        f' key\nMessage:\n{fake_message["data"]}', \
+         ['WARNING'])
+    assert redis_adapter.print_msg.call_args_list[1].args == (
+        f'Message from channel `{fake_message["channel"].decode()}\' ' \
+        f'did not contain `time\' key\nMessage:\n{fake_message["data"]}', \
+         ['WARNING'])
+    assert redis_adapter.print_msg.call_args_list[2].args == (
+        "Redis subscription listener exited.", ['WARNING'])
+
+def test_redis_adapter_DataSource_message_listener_updates_new_data_with_received_data_by_channel_and_key_matched_to_frame_header(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.choice([0 , 1])
+    cut.pubsub = MagicMock()
+    cut.new_data_lock = MagicMock()
+    cut.new_data = False
+
+    fake_message = {}
+    fake_message['type'] = 'message'
+    fake_message['channel'] = str(
+        MagicMock(name='fake_message_channel')).encode('utf-8')
+    cut.currentData = {0: {'headers': ['time',
+                                      f'{fake_message["channel"].decode()}' \
+                                       '.correct_key', 'fakeotherchannel.x'],
+                           'data': ['-', '-', '0']},
+                       1: {'headers': ['time',
+                                      f'{fake_message["channel"].decode()}' \
+                                       '.correct_key', 'fakeotherchannel.x'],
+                           'data': ['-', '-', '0']}}
+    fake_message['data'] = '{}'
+    mocker.patch.object(cut.pubsub, 'listen', return_value=[fake_message])
+    fake_data = {
+        'time': pytest.gen.randint(1, 100), # from 1 to 100 arbitrary
+        'correct_key': pytest.gen.randint(1, 100), # from 1 to 100 arbitrary
+    }
+    mocker.patch(redis_adapter.__name__ + '.json.loads',
+                 return_value=fake_data)
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+
+    # Act
+    cut.message_listener()
+
+    # Assert
+    assert redis_adapter.json.loads.call_count == 1
+    assert redis_adapter.json.loads.call_args_list[0].args == (
+        fake_message['data'], )
     assert cut.new_data == True
+    print(cut.currentData[cut.double_buffer_read_index])
+    assert cut.currentData[(cut.double_buffer_read_index + 1) % 2]['data'] == \
+        [fake_data['time'], fake_data['correct_key'], '-']
+    assert redis_adapter.print_msg.call_count == 1
+    assert redis_adapter.print_msg.call_args_list[0].args == (
+        "Redis subscription listener exited.", ['WARNING'])
 
 # has_data tests
 def test_redis_adapter_DataSource_has_data_returns_instance_new_data():
@@ -391,6 +574,34 @@ def test_redis_adapter_DataSource_has_data_returns_instance_new_data():
     assert result == expected_result
 
 # redis_adapter parse_meta_data tests
+def test_redis_adapter_DataSource_parse_meta_data_file_raises_ConfigKeyError_when_order_is_not_in_config_file(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    arg_configFile = MagicMock()
+    arg_ss_breakdown = MagicMock()
+
+    expected_extracted_configs = MagicMock()
+    expected_subscriptions = [MagicMock()] * pytest.gen.randint(0, 10) # 0 to 10 arbitrary
+    fake_meta = {'fake_other_stuff': MagicMock(),
+                 'redis_subscriptions':expected_subscriptions}
+
+    mocker.patch(redis_adapter.__name__ + '.extract_meta_data_handle_ss_breakdown', return_value=expected_extracted_configs)
+    mocker.patch(redis_adapter.__name__ + '.parseJson', return_value=fake_meta)
+
+    exception_message = (f'Config file: \'{arg_configFile}\' ' \
+                          'missing required key \'order\'')
+
+    # Act
+    with pytest.raises(ConfigKeyError) as e_info:
+        cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown, )
+
+    # Assert
+    assert redis_adapter.extract_meta_data_handle_ss_breakdown.call_count == 1
+    assert redis_adapter.extract_meta_data_handle_ss_breakdown.call_args_list[0].args == (arg_configFile, arg_ss_breakdown)
+    assert redis_adapter.parseJson.call_count == 1
+    assert redis_adapter.parseJson.call_args_list[0].args == (arg_configFile, )
+    assert e_info.match(exception_message)
+
 def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_handle_ss_breakdown_and_sets_subscriptions_when_redis_subscriptions_occupied(mocker):
     # Arrange
     cut = DataSource.__new__(DataSource)
@@ -399,8 +610,9 @@ def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_m
 
     expected_extracted_configs = MagicMock()
     expected_subscriptions = [MagicMock()] * pytest.gen.randint(0, 10) # 0 to 10 arbitrary
-    fake_meta = {'fake_other_stuff': MagicMock(), 'redis_subscriptions':expected_subscriptions}
-    expected_result_configs = {'redis_subscriptions':expected_subscriptions}
+    fake_meta = {'fake_other_stuff': MagicMock(),
+                 'order': MagicMock(),
+                 'redis_subscriptions':expected_subscriptions}
 
     mocker.patch(redis_adapter.__name__ + '.extract_meta_data_handle_ss_breakdown', return_value=expected_extracted_configs)
     mocker.patch(redis_adapter.__name__ + '.parseJson', return_value=fake_meta)
@@ -423,8 +635,7 @@ def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_m
     arg_ss_breakdown = MagicMock()
 
     fake_configs = {'fake_other_stuff': MagicMock()}
-    expected_subscriptions = [MagicMock()] * pytest.gen.randint(0, 10) # 0 to 10 arbitrary
-    fake_meta = {}
+    fake_meta = {'order': MagicMock()}
 
     mocker.patch(redis_adapter.__name__ + '.extract_meta_data_handle_ss_breakdown', return_value=fake_configs)
     mocker.patch(redis_adapter.__name__ + '.parseJson', return_value=fake_meta)
