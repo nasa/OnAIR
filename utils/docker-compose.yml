@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+    onair_test:
+        volumes:
+            - "./onair:/onair"
+            - "./.git:/.git"
+        working_dir: /onair/
+        build:
+          context: onair/
+          dockerfile: Dockerfile
+          args:
+            USER_ID: ${USER_ID:-0}
+            GROUP_ID: ${GROUP_ID:-0}
+        privileged: true
+        tty: true
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0
+        command: ["bash"]
+        networks:
+            onair_network:
+                ipv4_address: 172.40.1.1
+
+networks:
+    onair_network:
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.40.0.0/16

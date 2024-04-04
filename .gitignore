@@ -15,3 +15,4 @@ results/saved/sensitive/
 src/test/data/Model/
 **/runs
 .coverage
+.env

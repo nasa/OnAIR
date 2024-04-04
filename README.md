@@ -9,6 +9,11 @@ Create a conda environment with the necessary packages
 
     conda create --name onair --file requirements_pip.txt
 
+## Containerized Run
+
+The included [Dockerfile](./Dockerfile) may be used to run OnAIR in a container that is also capable of running cFS.
+
+
 ## Running unit tests
 
 Instructions on how to run unit tests for OnAIR
