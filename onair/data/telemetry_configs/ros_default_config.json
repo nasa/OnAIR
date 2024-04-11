@@ -1,0 +1,20 @@
+{
+  "subsystems": {
+    "STATES": {
+      "/example_topic": {
+        "description": "Example topic to subscribe to"
+      },
+      "/namespace/example_topic": {
+        "description": "Example topic with namespace"
+      }
+    }
+  },
+  "order": [
+    "/example_topic",
+    "/namespace/example_topic"
+  ],
+  "ros_subscriptions": [
+    {"topic": "/example_topic", "message_type": "String"},
+    {"topic": "/namespace/example_topic", "message_type": "String"}
+  ]
+}
