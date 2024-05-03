@@ -1,0 +1,41 @@
+{
+  "subsystems": {
+    "STATES": {
+      "time": {
+        "description": "Time of latest receipt of values"
+      },
+      "state_0.x": {
+        "description": "Vehicle 0's current state of x"
+      },
+      "state_0.y": {
+        "description": "Vehicle 0's current state of y"
+      },
+      "state_1.x": {
+        "description": "Vehicle 1's current state of x"
+      },
+      "state_1.y": {
+        "description": "Vehicle 1's current state of y"
+      },
+      "state_2.x": {
+        "description": "Vehicle 2's current state of x"
+      },
+      "state_2.y": {
+        "description": "Vehicle 2's current state of y"
+      }
+    }
+  },
+  "redis_subscriptions": [
+    "state_0",
+    "state_1",
+    "state_2"
+  ],
+  "order": [
+    "time",
+    "state_0.x",
+    "state_0.y",
+    "state_1.x",
+    "state_1.y",
+    "state_2.x",
+    "state_2.y"
+  ]
+}

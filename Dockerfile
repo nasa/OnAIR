@@ -39,12 +39,7 @@ RUN \
 
 # OnAIR Dependencies
 RUN \
-  apt-get install -y python3.9 && \
-  apt-get install -y python3.9-dev && \
-  apt-get install -y python3-pip
-
-# Add new packages to install here to prevent re-running previous instructions
-
+  apt-get install -y wget
 
 # Ensure that all packages are up to date after new packages have been added above
 RUN \
@@ -56,16 +51,26 @@ RUN \
 RUN adduser onair_dev sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# Make OnAir requirements file accessible by onair_dev user
-COPY requirements_pip.txt /home/onair_dev/requirements_onair.txt
-RUN chown onair_dev /home/onair_dev/requirements_onair.txt
-
 USER onair_dev
 
-# Python stuff is being installed for the local user
-ENV PATH="${PATH}:/home/onair_dev/.local/bin"
+# Install miniconda
+ENV CONDA_DIR /home/onair_dev/conda
+RUN \
+  mkdir -p $CONDA_DIR && \
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+  bash ~/miniconda.sh -b -u -p $CONDA_DIR && \
+  rm -rf ~/miniconda.sh
+ENV PATH=$CONDA_DIR/bin:$PATH
 
-# Install OnAIR deps
-RUN python3.9 -m pip install --upgrade pip setuptools wheel
-RUN python3.9 -m pip install --user -r /home/onair_dev/requirements_onair.txt
+# Make OnAir requirements file accessible by onair_dev user
+COPY environment.yml /home/onair_dev/environment.yml
+RUN \
+  . $CONDA_DIR/etc/profile.d/conda.sh && \
+  conda init bash && \
+  . ~/.bashrc && \
+  conda env create -f /home/onair_dev/environment.yml && \
+  conda activate onair
 
+# Make sure that the onair conda environment is loaded
+RUN \
+  echo "conda activate onair" >> ~/.bashrc
