@@ -1,0 +1,14 @@
+name: onair
+channels:
+  - default
+  - conda-forge
+dependencies:
+  - python>=3.8,<3.13
+  - numpy
+  - coverage
+  - pytest
+  - pytest-mock
+  - pytest-randomly
+  - pip
+  - pip:
+    - redis

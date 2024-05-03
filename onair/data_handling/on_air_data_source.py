@@ -8,7 +8,10 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 from abc import ABC, abstractmethod
-from .parser_util import * 
+from .parser_util import *
+
+class ConfigKeyError(KeyError):
+    pass
 
 class OnAirDataSource(ABC):
     def __init__(self, data_file, meta_file, ss_breakdown = False):
