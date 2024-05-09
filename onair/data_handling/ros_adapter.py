@@ -21,6 +21,7 @@ from functools import partial
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Bool, String
+from geometry_msgs.msg import PoseStamped
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
 from onair.data_handling.tlm_json_parser import parseJson
@@ -31,6 +32,7 @@ from onair.data_handling.parser_util import *
 ROS_MSG_TYPE_MAPPINGS = {
     "Bool": Bool,
     "String": String,
+    "PoseStamped": PoseStamped,
 }
 
 
@@ -107,12 +109,12 @@ class DataSource(OnAirDataSource):
             self.topic_active = True
             header_string = self.sub_node.received_topic
             index = low_level_data['headers'].index(header_string)
-            low_level_data['data'][index] = self.sub_node.received_msg.data
+            low_level_data['data'][index] = self.sub_node.received_msg
         else:
             rclpy.spin_once(self.sub_node)
             header_string = self.sub_node.received_topic
             index = low_level_data['headers'].index(header_string)
-            low_level_data['data'][index] = self.sub_node.received_msg.data
+            low_level_data['data'][index] = self.sub_node.received_msg
         
         self.low_level_data[self.double_buffer_read_index] = low_level_data
         return low_level_data['data']
