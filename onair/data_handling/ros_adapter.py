@@ -22,6 +22,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Bool, String
 from geometry_msgs.msg import PoseStamped
+from nav_msgs.msg import Odometry
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
 from onair.data_handling.tlm_json_parser import parseJson
@@ -33,6 +34,7 @@ ROS_MSG_TYPE_MAPPINGS = {
     "Bool": Bool,
     "String": String,
     "PoseStamped": PoseStamped,
+    "Odometry": Odometry
 }
 
 
@@ -40,6 +42,7 @@ class ROSSubscriber(Node):
     def __init__(self, name, topic_definitions):
         super().__init__(node_name=name)
         self.sub_list = []
+        self.recv = {}
         for topic_definition in topic_definitions:
             message_type = ROS_MSG_TYPE_MAPPINGS[topic_definition['message_type']]
 
@@ -51,8 +54,7 @@ class ROSSubscriber(Node):
             ))
     
     def listener_callback(self, msg, topic):
-        self.received_topic = topic
-        self.received_msg = msg
+        self.recv[topic] = msg
 
 class DataSource(OnAirDataSource):
 
@@ -107,14 +109,16 @@ class DataSource(OnAirDataSource):
             print(bcolors.WARNING + f"Waiting on heartbeat from subscribed topics" + bcolors.ENDC)
             rclpy.spin_once(self.sub_node)
             self.topic_active = True
-            header_string = self.sub_node.received_topic
-            index = low_level_data['headers'].index(header_string)
-            low_level_data['data'][index] = self.sub_node.received_msg
+            for key, value in self.sub_node.recv.items():
+                header_string = key
+                index = low_level_data['headers'].index(header_string)
+                low_level_data['data'][index] = value
         else:
             rclpy.spin_once(self.sub_node)
-            header_string = self.sub_node.received_topic
-            index = low_level_data['headers'].index(header_string)
-            low_level_data['data'][index] = self.sub_node.received_msg
+            for key, value in self.sub_node.recv.items():
+                header_string = key
+                index = low_level_data['headers'].index(header_string)
+                low_level_data['data'][index] = value
         
         self.low_level_data[self.double_buffer_read_index] = low_level_data
         return low_level_data['data']
