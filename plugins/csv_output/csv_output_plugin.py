@@ -35,11 +35,12 @@ class Plugin(AIPlugin):
         """
         Given streamed data point, system should update internally
         """
-
+        
         if (self.first_frame):
-            # TODO: Should look at vehicle_rep, learning_systems, and planning_systems
-            for plugin in high_level_data['learning_systems']:
-                self.headers.append(str(plugin))
+            # in each layer, find all plugins and append the name of the plugin to the headers
+            for layer in high_level_data.keys():
+                for plugin in high_level_data[layer]:
+                    self.headers.append(str(plugin))
 
         self.current_buffer = []
 
@@ -48,13 +49,14 @@ class Plugin(AIPlugin):
             self.current_buffer.append(str(telem_point))
 
         # Add high level data
-        # TODO: Should look at vehicle_rep, learning_systems, and planning_systems
-        for plugin in high_level_data['learning_systems']:
-            plugin_output = high_level_data['learning_systems'].get(plugin, "empty")
-            # Assume each plugin is outputting a list
-            for telem_point in plugin_output:
-                self.current_buffer.append(str(telem_point))
+        for layer in high_level_data.keys():
 
+            for plugin in high_level_data[layer]:
+                plugin_output = high_level_data[layer].get(plugin, "empty")
+                # Assume each plugin is outputting a list
+                for telem_point in plugin_output:
+                    self.current_buffer.append(str(telem_point))
+                    
     def render_reasoning(self):
         """
         System should return its diagnosis
