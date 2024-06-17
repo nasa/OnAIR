@@ -50,7 +50,9 @@ class Plugin(AIPlugin):
         Given streamed data point, system should update internally
         """              
         print(f'\nCOMPLEX REASONER sees high level data as: {high_level_data}')
-        self.drone_position = high_level_data['vehicle_rep']['KAST']['pose']
+        #self.drone_position = high_level_data['vehicle_rep']['KAST']['pose']
+        #Temporary change to remove the use of KAST, during initial testing for SPAR intern project
+        self.drone_position = (0,0,0)
         pass
 
     def render_reasoning(self):
