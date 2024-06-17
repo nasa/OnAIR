@@ -53,6 +53,7 @@ class Plugin(AIPlugin):
         #self.drone_position = high_level_data['vehicle_rep']['KAST']['pose']
         #Temporary change to remove the use of KAST, during initial testing for SPAR intern project
         self.drone_position = (0,0,0)
+
         pass
 
     def render_reasoning(self):
