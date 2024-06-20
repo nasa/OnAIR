@@ -75,6 +75,7 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_at
     cut.address = expected_address
     cut.port = expected_port
     cut.db = expected_db
+    cut.password = expected_password
 
     mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch('redis.Redis', return_value=fake_server)
@@ -103,6 +104,7 @@ def test_redis_adapter_DataSource_fails_to_connect_to_server(mocker):
     cut.address = expected_address
     cut.port = expected_port
     cut.db = expected_db
+    cut.password = expected_password
 
     mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch('redis.Redis', return_value=fake_server)
