@@ -29,8 +29,6 @@ class DataSource(OnAirDataSource):
 
     def __init__(self, data_file, meta_file, ss_breakdown = False):
         super().__init__(data_file, meta_file, ss_breakdown)
-        self.address = 'localhost'
-        self.port = 6379
         self.db = 0
         self.server = None
         self.new_data_lock = threading.Lock()
@@ -47,7 +45,7 @@ class DataSource(OnAirDataSource):
     def connect(self):
         """Establish connection to REDIS server."""
         print_msg('Redis adapter connecting to server...')
-        self.server = redis.Redis(self.address, self.port, self.db)
+        self.server = redis.Redis(self.address, self.port, self.db, password=self.password)
 
         if self.server.ping():
             print_msg('... connected!')
@@ -71,6 +69,21 @@ class DataSource(OnAirDataSource):
             meta_data_file, ss_breakdown)
         meta = parseJson(meta_data_file)
         keys = meta.keys()
+
+        if 'address' in keys:
+            self.address = meta['address']
+        else:
+            self.address = 'localhost'
+        
+        if 'port' in keys:
+            self.port = meta['port']
+        else:
+            self.port = 6379
+
+        if 'password' in keys:
+            self.password = meta['password']
+        else:
+            self.password = ''
 
         if 'order' in keys:
             self.order = meta['order']
