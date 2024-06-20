@@ -24,8 +24,6 @@ def test_init_initalizes_expected_default_variables():
 
     csv_out = CSV_Output(arg_name, arg_headers)
 
-    # could we not just csv_out = CSV_Output(arg_name, arg_headers)
-
     # assert
     assert csv_out.component_name == arg_name
     assert csv_out.headers == arg_headers
