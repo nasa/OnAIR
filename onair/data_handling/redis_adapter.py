@@ -45,7 +45,7 @@ class DataSource(OnAirDataSource):
     def connect(self):
         """Establish connection to REDIS server."""
         print_msg('Redis adapter connecting to server...')
-        self.server = redis.Redis(self.address, self.port, self.db, password=self.password)
+        self.server = redis.Redis(self.address, self.port, self.db, self.password)
 
         if self.server.ping():
             print_msg('... connected!')
