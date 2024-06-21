@@ -23,7 +23,7 @@ def test_ExecutionEngine__init__sets_expected_values_but_does_no_calls_when_conf
     arg_run_name = MagicMock()
     arg_save_flag = MagicMock()
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch.object(cut, 'init_save_paths')
     mocker.patch.object(cut, 'parse_configs')
@@ -59,7 +59,7 @@ def test_ExecutionEngine__init__does_calls_when_config_file_is_an_occupied_strin
     arg_run_name = MagicMock()
     arg_save_flag = MagicMock()
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch.object(cut, 'init_save_paths')
     mocker.patch.object(cut, 'parse_configs')
@@ -81,7 +81,7 @@ def test_ExecutionEngine__init__does_calls_when_config_file_is_an_occupied_strin
 
 def test_ExecutionEngine__init__accepts_no_arguments_using_defaults_instead_with_config_file_default_as_empty_string(mocker):
     # Arrange
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch.object(cut, 'init_save_paths')
     mocker.patch.object(cut, 'parse_configs')
@@ -108,7 +108,7 @@ def test_ExecutionEngine_parse_configs_raises_FileNotFoundError_when_config_cann
     fake_config_read_result = MagicMock()
     fake_config_read_result.__len__.return_value = 0
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ +
                  '.configparser.ConfigParser', return_value=fake_config)
@@ -120,8 +120,7 @@ def test_ExecutionEngine_parse_configs_raises_FileNotFoundError_when_config_cann
         cut.parse_configs(arg_bad_config_filepath)
 
     # Assert
-    assert e_info.match(f"Config file at '{
-                        arg_bad_config_filepath}' could not be read.")
+    assert e_info.match(f"Config file at '{arg_bad_config_filepath}' could not be read.")
 
 
 def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_when_the_required_key_FILES_is_not_in_config(mocker):
@@ -139,7 +138,7 @@ def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_whe
     fake_config_read_result = MagicMock()
     fake_config_read_result.__len__.return_value = 1
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ +
                  '.configparser.ConfigParser', return_value=fake_config)
@@ -190,7 +189,7 @@ def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_whe
     fake_config_read_result = MagicMock()
     fake_config_read_result.__len__.return_value = 1
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ +
                  '.configparser.ConfigParser', return_value=fake_config)
@@ -246,9 +245,6 @@ def test_ExecutionEngine_parse_configs_skips_OPTIONS_when_the_required_section_O
                     fake_learners_plugin_list,
                     fake_planners_plugin_list,
                     fake_complex_plugin_list]
-    fake_IO_enabled = MagicMock()
-    fake_Dev_enabled = MagicMock()
-    fake_Viz_enabled = MagicMock()
     fake_plugin_dict = MagicMock()
     fake_keys = MagicMock()
     fake_plugin = MagicMock()
@@ -257,7 +253,7 @@ def test_ExecutionEngine_parse_configs_skips_OPTIONS_when_the_required_section_O
     fake_keys.__len__.return_value = 1
     fake_keys.__iter__.return_value = iter([str(fake_plugin)])
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ +
                  '.configparser.ConfigParser', return_value=fake_config)
@@ -333,8 +329,6 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
                     fake_planners_plugin_list,
                     fake_complex_plugin_list]
     fake_IO_enabled = MagicMock()
-    fake_Dev_enabled = MagicMock()
-    fake_Viz_enabled = MagicMock()
     fake_plugin_dict = MagicMock()
     fake_keys = MagicMock()
     fake_plugin = MagicMock()
@@ -343,7 +337,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     fake_keys.__len__.return_value = 1
     fake_keys.__iter__.return_value = iter([str(fake_plugin)])
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ +
                  '.configparser.ConfigParser', return_value=fake_config)
@@ -391,7 +385,7 @@ def test_ExecutionEngine_parse_plugins_list_raises_ValueError_when_config_plugin
     fake_plugin_dict.body = MagicMock()
     fake_config_filepath = MagicMock()
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
     cut.config_filepath = fake_config_filepath
 
     mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_dict)
@@ -402,8 +396,7 @@ def test_ExecutionEngine_parse_plugins_list_raises_ValueError_when_config_plugin
         cut.parse_plugins_dict(arg_config_plugin_dict)
 
     # Assert
-    assert e_info.match(f"Plugin dict {arg_config_plugin_dict} from {
-                        fake_config_filepath} is invalid. It must be a dict.")
+    assert e_info.match(f"Plugin dict {arg_config_plugin_dict} from {fake_config_filepath} is invalid. It must be a dict.")
     assert cut.ast_parse_eval.call_count == 1
     assert cut.ast_parse_eval.call_args_list[0].args == (
         arg_config_plugin_dict,)
@@ -425,7 +418,7 @@ def test_ExecutionEngine_parse_plugins_list_raises_FileNotFoundError_when_single
 
     fake_values.__iter__.return_value = iter([fake_path])
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
     cut.config_filepath = fake_config_filepath
 
     mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_dict)
@@ -442,8 +435,7 @@ def test_ExecutionEngine_parse_plugins_list_raises_FileNotFoundError_when_single
         cut.parse_plugins_dict(arg_config_plugin_dict)
 
     # Assert
-    assert e_info.match(f"In config file '{fake_config_filepath}' Plugin path '{
-                        fake_path}' does not exist.")
+    assert e_info.match(f"In config file '{fake_config_filepath}' Plugin path '{fake_path}' does not exist.")
     assert cut.ast_parse_eval.call_count == 1
     assert cut.ast_parse_eval.call_args_list[0].args == (
         arg_config_plugin_dict,)
@@ -478,7 +470,7 @@ def test_ExecutionEngine_parse_plugins_list_raises_FileNotFoundError_when_any_co
 
     fake_values.__iter__.return_value = iter([fake_path] * num_fake_items)
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
     cut.config_filepath = fake_config_filepath
 
     mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_dict)
@@ -495,8 +487,7 @@ def test_ExecutionEngine_parse_plugins_list_raises_FileNotFoundError_when_any_co
         cut.parse_plugins_dict(arg_config_plugin_dict)
 
     # Assert
-    assert e_info.match(f"In config file '{fake_config_filepath}' Plugin path '{
-                        fake_path}' does not exist.")
+    assert e_info.match(f"In config file '{fake_config_filepath}' Plugin path '{fake_path}' does not exist.")
     assert cut.ast_parse_eval.call_count == 1
     assert cut.ast_parse_eval.call_args_list[0].args == (
         arg_config_plugin_dict,)
@@ -524,7 +515,7 @@ def test_ExecutionEngine_returns_empty_dict_when_config_dict_is_empty(mocker):
     fake_config_filepath = MagicMock()
     fake_temp_plugin_dict = {}
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
     cut.config_filepath = fake_config_filepath
 
     mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_dict)
@@ -564,7 +555,7 @@ def test_ExecutionEngine_returns_expected_dict_when_all_mapped_files_exist(mocke
 
     fake_values.__iter__.return_value = iter([fake_path] * num_fake_items)
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
     cut.config_filepath = fake_config_filepath
 
     mocker.patch.object(cut, 'ast_parse_eval', return_value=fake_plugin_dict)
@@ -612,7 +603,7 @@ def test_ExecutionEngine_parse_data_sets_the_simDataSource_to_a_new_data_source_
     fake_module = MagicMock()
     fake_parser_class_instance = MagicMock()
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ +
                  '.importlib.util.spec_from_file_location', return_value=fake_spec)
@@ -660,7 +651,7 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
     fake_module = MagicMock()
     fake_parser_class_instance = MagicMock()
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ +
                  '.importlib.util.spec_from_file_location', return_value=fake_spec)
@@ -683,7 +674,7 @@ def test_ExecutionEngine_parse_data_argument_subsystems_breakdown_optional_defau
 
 def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator(mocker):
     # Arrange
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
     cut.simDataSource = MagicMock()
     cut.knowledge_rep_plugin_dict = MagicMock()
     cut.learners_plugin_dict = MagicMock()
@@ -712,7 +703,7 @@ def test_ExecutionEngine_setup_sim_sets_self_sim_to_new_Simulator(mocker):
 
 def test_ExecutionEngine_run_sim_runs_but_does_not_save_results_when_save_flag_is_False(mocker):
     # Arrange
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
     cut.sim = MagicMock()
     cut.IO_Enabled = MagicMock()
     cut.save_flag = False
@@ -731,7 +722,7 @@ def test_ExecutionEngine_run_sim_runs_but_does_not_save_results_when_save_flag_i
 
 def test_ExecutionEngine_run_sim_runs_and_saves_results_when_save_flag_is_True(mocker):
     # Arrange
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
     cut.sim = MagicMock()
     cut.IO_Enabled = MagicMock()
     cut.save_flag = True
@@ -760,7 +751,7 @@ def test_ExecutionEngine_init_save_paths_makes_tmp_and_models_and_diagnosis_dire
     fake_tmp_models_path = str(MagicMock())
     fake_tmp_diagnosis_path = str(MagicMock())
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
     mocker.patch(execution_engine.__name__ + '.os.path.join',
@@ -799,7 +790,7 @@ def test_ExecutionEngine_delete_save_paths_does_nothing_when_save_path_has_no_tm
     for i in range(pytest.gen.randint(0, 5)):  # 0 to 5
         fake_dirs.append(str(MagicMock()))
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
     mocker.patch(execution_engine.__name__ +
@@ -828,7 +819,7 @@ def test_ExecutionEngine_delete_save_paths_removes_tmp_tree_when_it_exists(mocke
     for i in range(pytest.gen.randint(0, 5)):  # 0 to 5
         fake_dirs.append(str(MagicMock()))
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
     mocker.patch(execution_engine.__name__ +
@@ -862,7 +853,7 @@ def test_ExecutionEngine_delete_save_paths_prints_error_message_when_rmtree_rais
     for i in range(pytest.gen.randint(0, 5)):  # 0 to 5
         fake_dirs.append(str(MagicMock()))
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
     mocker.patch(execution_engine.__name__ +
@@ -902,7 +893,7 @@ def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_prop
     fake_save_path = fake_onair_save_path + 'saved/' + \
         arg_save_name + '_' + fake_complete_time
 
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ +
                  '.gmtime', return_value=fake_gmtime)
@@ -910,7 +901,7 @@ def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_prop
                  return_value=fake_complete_time)
     mocker.patch.dict(execution_engine.__name__ + '.os.environ', fake_environ)
     mocker.patch(execution_engine.__name__ + '.os.makedirs')
-    mocker.patch(execution_engine.__name__ + '.copy_tree')
+    mocker.patch(execution_engine.__name__ + '.copytree')
 
     # Act
     cut.save_results(arg_save_name)
@@ -926,8 +917,8 @@ def test_ExecutionEngine_save_results_creates_expected_save_path_and_copies_prop
         fake_save_path, )
     assert execution_engine.os.makedirs.call_args_list[0].kwargs == {
         "exist_ok": True}
-    assert execution_engine.copy_tree.call_count == 1
-    assert execution_engine.copy_tree.call_args_list[0].args == (
+    assert execution_engine.copytree.call_count == 1
+    assert execution_engine.copytree.call_args_list[0].args == (
         fake_onair_tmp_save_path, fake_save_path, )
 
 # set_run_param tests
@@ -937,7 +928,7 @@ def test_ExecutionEngine_set_run_param_passes_given_arguments_to_setattr(mocker)
     # Arrange
     arg_name = MagicMock()
     arg_val = MagicMock()
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ + '.setattr')
 
@@ -956,7 +947,7 @@ def test_ExecutionEngine_ast_parse_eval_returns_call_to_ast_parse_with_mode_eval
     # Arrange
     arg_config_list = MagicMock()
     expected_result = MagicMock()
-    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut = ExecutionEngine()
 
     mocker.patch(execution_engine.__name__ + ".ast.parse",
                  return_value=expected_result)
