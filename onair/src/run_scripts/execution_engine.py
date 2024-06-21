@@ -16,7 +16,7 @@ import configparser
 import importlib
 import ast
 import shutil
-from distutils.dir_util import copy_tree
+from shutil import copytree
 from time import gmtime, strftime
 
 from ..run_scripts.sim import Simulator
@@ -65,8 +65,7 @@ class ExecutionEngine:
         config = configparser.ConfigParser()
 
         if len(config.read(config_filepath)) == 0:
-            raise FileNotFoundError(
-                f"Config file at '{config_filepath}' could not be read.")
+            raise FileNotFoundError(f"Config file at '{config_filepath}' could not be read.")
 
         try:
             # Parse Required Data: FILES
@@ -102,8 +101,7 @@ class ExecutionEngine:
                 self.IO_Enabled = False
 
         except KeyError as e:
-            new_message = f"Config file: '{
-                config_filepath}', missing key: {e.args[0]}"
+            new_message = f"Config file: '{config_filepath}', missing key: {e.args[0]}"
             raise KeyError(new_message) from e
 
     def parse_plugins_dict(self, config_plugin_dict):
@@ -112,13 +110,11 @@ class ExecutionEngine:
         if isinstance(ast_plugin_dict.body, ast.Dict):
             temp_plugin_dict = ast.literal_eval(config_plugin_dict)
         else:
-            raise ValueError(f"Plugin dict {config_plugin_dict} from {
-                             self.config_filepath} is invalid. It must be a dict.")
+            raise ValueError(f"Plugin dict {config_plugin_dict} from {self.config_filepath} is invalid. It must be a dict.")
 
         for plugin_file in temp_plugin_dict.values():
             if not (os.path.exists(plugin_file)):
-                raise FileNotFoundError(f"In config file '{self.config_filepath}' Plugin path '{
-                                        plugin_file}' does not exist.")
+                raise FileNotFoundError(f"In config file '{self.config_filepath}' Plugin path '{plugin_file}' does not exist.")
         return temp_plugin_dict
 
     def parse_data(self, parser_file_name, data_file_name, metadata_file_name, subsystems_breakdown=False):
@@ -171,7 +167,7 @@ class ExecutionEngine:
         save_path = os.environ['ONAIR_SAVE_PATH'] + \
             'saved/' + save_name + '_' + complete_time
         os.makedirs(save_path, exist_ok=True)
-        copy_tree(os.environ['ONAIR_TMP_SAVE_PATH'], save_path)
+        copytree(os.environ['ONAIR_TMP_SAVE_PATH'], save_path)
 
     def set_run_param(self, name, val):
         setattr(self, name, val)
