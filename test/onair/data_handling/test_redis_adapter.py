@@ -773,12 +773,11 @@ def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_m
     expected_address = MagicMock()
     expected_port = MagicMock()
     expected_password = MagicMock()
+    expected_redis_configs = {'address': expected_address, 'port': expected_port, 'password': expected_password}
     fake_meta = {'fake_other_stuff': MagicMock(),
                  'order': MagicMock(),
                  'redis_subscriptions': expected_subscriptions,
-                 'address': expected_address,
-                 'port': expected_port,
-                 'password': expected_password}
+                 'redis': expected_redis_configs}
 
     mocker.patch(redis_adapter.__name__ + '.extract_meta_data_handle_ss_breakdown', return_value=expected_extracted_configs)
     mocker.patch(redis_adapter.__name__ + '.parseJson', return_value=fake_meta)
