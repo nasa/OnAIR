@@ -70,20 +70,23 @@ class DataSource(OnAirDataSource):
         meta = parseJson(meta_data_file)
         keys = meta.keys()
 
-        if 'address' in keys:
-            self.address = meta['address']
-        else:
-            self.address = 'localhost'
-        
-        if 'port' in keys:
-            self.port = meta['port']
-        else:
-            self.port = 6379
+        # Setup redis server configuration
+        if 'redis' in keys:
+            redis_config_keys = meta['redis'].keys()
+            if 'address' in redis_config_keys:
+                self.address = meta['redis']['address']
+            else:
+                self.address = 'localhost'
 
-        if 'password' in keys:
-            self.password = meta['password']
-        else:
-            self.password = ''
+            if 'port' in redis_config_keys:
+                self.port = meta['redis']['port']
+            else:
+                self.port = 6379
+
+            if 'password' in redis_config_keys:
+                self.password = meta['redis']['password']
+            else:
+                self.password = ''
 
         if 'order' in keys:
             self.order = meta['order']
