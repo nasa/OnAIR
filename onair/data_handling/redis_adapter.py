@@ -29,10 +29,9 @@ class DataSource(OnAirDataSource):
 
     def __init__(self, data_file, meta_file, ss_breakdown = False):
         super().__init__(data_file, meta_file, ss_breakdown)
-        self.db = 0
-        self.server = None
         self.new_data_lock = threading.Lock()
         self.new_data = False
+        self.servers = []
         self.currentData = []
         self.currentData.append({'headers':self.order,
                                  'data':list('-' * len(self.order))})
@@ -40,65 +39,82 @@ class DataSource(OnAirDataSource):
                                  'data':list('-' * len(self.order))})
         self.double_buffer_read_index = 0
         self.connect()
-        self.subscribe(self.subscriptions)
 
     def connect(self):
         """Establish connection to REDIS server."""
         print_msg('Redis adapter connecting to server...')
-        self.server = redis.Redis(self.address, self.port, self.db, self.password)
+        for idx, server_config in enumerate(self.server_configs):
+            server_config_keys = server_config.keys()
+            if 'address' in server_config_keys:
+                address = server_config['address']
+            else:
+                address = 'localhost'
 
-        if self.server.ping():
-            print_msg('... connected!')
+            if 'port' in server_config_keys:
+                port = server_config['port']
+            else:
+                port = 6379
+            
+            if 'db' in server_config_keys:
+                db = server_config['db']
+            else:
+                db = 0
 
-    def subscribe(self, subscriptions):
-        """Subscribe to REDIS message channel(s) and launch listener thread."""
-        if len(subscriptions) != 0 and self.server.ping():
-            self.pubsub = self.server.pubsub()
+            if 'password' in server_config_keys:
+                password = server_config['password']
+            else:
+                password = ''
 
-            for s in subscriptions:
-                self.pubsub.subscribe(s)
-                print_msg(f"Subscribing to channel: {s}")
+            self.servers.append(redis.Redis(address, port, db, password))
 
-            listen_thread = threading.Thread(target=self.message_listener)
-            listen_thread.start()
-        else:
-            print_msg(f"No subscriptions given!")
+            if self.servers[-1].ping():
+                print_msg(f'... connected to server # {idx}!')
+            else:
+                print_msg(f'Did not connect to server # {idx}', 'RED')
+            
+            #if there are subscriptions in this Redis server configuration's subscription key
+            if len(server_config['subscriptions']) !=0:
+                #Set up Redis pubsub function for the current server
+                pubsub = self.servers[-1].pubsub()
+
+                for s in server_config['subscriptions']:
+                    pubsub.subscribe(s)
+                    print_msg(f"Subscribing to channel: {s} on server # {idx}")
+
+                listen_thread = threading.Thread(target=self.message_listener, args=(pubsub,))
+                listen_thread.start()
+            else:
+                print_msg(f"No subscriptions given!")
+
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
+        self.server_configs = []
         configs = extract_meta_data_handle_ss_breakdown(
             meta_data_file, ss_breakdown)
         meta = parseJson(meta_data_file)
         keys = meta.keys()
 
         # Setup redis server configuration
+        #Checking in 'redis' exists
         if 'redis' in keys:
-            redis_config_keys = meta['redis'].keys()
-            if 'address' in redis_config_keys:
-                self.address = meta['redis']['address']
-            else:
-                self.address = 'localhost'
+            count_server_config = 0
+            #Checking if dictionaries within 'redis' key each have a 'subscription' key. Error will be thrown if not.
+            for server_config in meta['redis']:
+                redis_config_keys = server_config.keys()
+                if 'subscriptions' in redis_config_keys == False:
+                    raise ConfigKeyError(f'Config file: \'{meta_data_file}\' ' \
+                        f'missing required key \'suscriptions\' from {count_server_config} in key \'redis\' ')  
+                count_server_config +=1
 
-            if 'port' in redis_config_keys:
-                self.port = meta['redis']['port']
-            else:
-                self.port = 6379
-
-            if 'password' in redis_config_keys:
-                self.password = meta['redis']['password']
-            else:
-                self.password = ''
+            #Saving all of Redis dictionaries from JSON file to self.server_configs
+            self.server_configs = meta['redis']
 
         if 'order' in keys:
             self.order = meta['order']
         else:
             raise ConfigKeyError(f'Config file: \'{meta_data_file}\' ' \
-                                  'missing required key \'order\'')
-
-        if 'redis_subscriptions' in meta.keys():
-            self.subscriptions = meta['redis_subscriptions']
-        else:
-            self.subscriptions = []
-
+                                'missing required key \'order\'')
+    
         return configs
 
     def process_data_file(self, data_file):
@@ -131,9 +147,9 @@ class DataSource(OnAirDataSource):
         """Live connection should always return True"""
         return True
 
-    def message_listener(self):
+    def message_listener(self, pubsub):
         """Loop for listening for messages on channels"""
-        for message in self.pubsub.listen():
+        for message in pubsub.listen():
             if message['type'] == 'message':
                 channel_name = f"{message['channel'].decode()}"
                 # Attempt to load message as json
