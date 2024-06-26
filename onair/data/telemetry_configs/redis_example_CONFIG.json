@@ -24,15 +24,25 @@
       }
     }
   },
-  "redis_subscriptions": [
-    "state_0",
-    "state_1",
-    "state_2"
-  ],  
-  "redis" : {
-    "address": "localhost",
-    "port": 6379
-  },
+  
+  "redis" : [
+      {
+        "address": "localhost",
+        "port": 6379,
+        "subscriptions": [
+          "state_0"
+        ]
+      },
+      {
+        "address": "localhost",
+        "port": 6380,
+        "subscriptions": [
+          "state_1",
+          "state_2"
+        ]
+      }
+    ],
+
   "order": [
     "time",
     "state_0.x",
