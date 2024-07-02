@@ -56,7 +56,7 @@ class DataSource(OnAirDataSource):
 
     def gather_field_names(self, field_name, field_type):
         field_names = []
-        if "message_headers" in str(field_type):
+        if "message_headers" in str(field_type) and hasattr(field_type, "_fields_"):
             for sub_field_name, sub_field_type in field_type._fields_:
                 field_names.append(self.gather_field_names(field_name + "." + sub_field_name, sub_field_type))
         else:
