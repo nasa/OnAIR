@@ -54,7 +54,7 @@ def test_sbn_adapter_DataSource__init__sets_values_then_connects(mocker):
 # TODO !!!
 
 # gather_field_names tests
-def test_gather_field_names_returns_field_name_if_no_subfields_available(mocker):
+def test_gather_field_names_returns_field_name_if_type_not_defined_in_message_headers_and_no_subfields_available(mocker):
     '''
         def gather_field_names(self, field_name, field_type):
         field_names = []
@@ -66,12 +66,13 @@ def test_gather_field_names_returns_field_name_if_no_subfields_available(mocker)
             return field_name
         return field_names
     '''
-    # arrange
+    # Arrange
     field_name = MagicMock()
     field_type = MagicMock()
 
-    #field_type.__str__ = lambda: "mock field type with no subfields"
-    mocker.patch(field_name.__name__ + ",__str__", return_value = "temp")
+    # field type was not defined in message_headers.py and has no subfields of its own
+    field_type.__str__ = MagicMock()
+    field_type.__str__.return_value = 'fooble'
     del field_type._fields_
 
     cut = DataSource.__new__(DataSource)
@@ -80,7 +81,7 @@ def test_gather_field_names_returns_field_name_if_no_subfields_available(mocker)
     result = cut.gather_field_names(field_name, field_type)
 
     # assert
-    result == field_name
+    assert result == field_name
 
 def test_gather_field_names_returns_nested_list_for_nested_structures(mocker):
     mock_field_name = 0
