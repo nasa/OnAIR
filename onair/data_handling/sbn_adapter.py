@@ -56,9 +56,13 @@ class DataSource(OnAirDataSource):
 
     def gather_field_names(self, field_name, field_type):
         field_names = []
+        print(field_name)
         if "message_headers" in str(field_type) and hasattr(field_type, "_fields_"):
+            print(field_type._fields_)
             for sub_field_name, sub_field_type in field_type._fields_:
+                print(sub_field_name, sub_field_type)
                 field_names.append(self.gather_field_names(field_name + "." + sub_field_name, sub_field_type))
+            print('out of for loop')
         else:
             #field_names.append(field_name)
             return field_name
@@ -116,7 +120,7 @@ class DataSource(OnAirDataSource):
 
         while not data_available:
             with self.new_data_lock:
-                data_available = self.new_data
+                data_available = self.has_data()
 
             if not data_available:
                 time.sleep(0.01)
@@ -185,3 +189,6 @@ class DataSource(OnAirDataSource):
 
         with self.new_data_lock:
             self.new_data = True
+
+    def has_data(self):
+        return self.new_data
