@@ -20,6 +20,7 @@ import os
 import json
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
+from onair.data_handling.on_air_data_source import ConfigKeyError
 from ctypes import *
 import sbn_python_client as sbn
 import message_headers as msg_hdr
@@ -78,6 +79,10 @@ class DataSource(OnAirDataSource):
 
         meta_config = json.loads(file_str)
         file.close()
+
+        if 'channels' not in meta_config.keys():
+            raise ConfigKeyError(f'Config file: \'{meta_data_file}\' ' \
+                                  'missing required key \'channels\'')
 
         # Copy message ID table from .json, convert string hex to ints for ID
         for key in meta_config['channels']:
@@ -163,7 +168,6 @@ class DataSource(OnAirDataSource):
         # TODO: Lock needed here?
         current_buffer = self.currentData[(self.double_buffer_read_index + 1) %2]
         secondary_header = recv_msg.TlmHeader.Secondary
-
         #gets seconds from header and adds to current buffer
         start_time = datetime.datetime(1969, 12, 31, 20) # January 1, 1980
         seconds = secondary_header.Seconds
@@ -184,7 +188,7 @@ class DataSource(OnAirDataSource):
                 current_object = recv_msg
                 for sub_type in name.split('.'):
                     current_object = getattr(current_object, sub_type)
-                    data = str(current_object)
+                    data = str(current_object) # note does not work for arrays?
                 current_buffer['data'][idx] = data
 
         with self.new_data_lock:
