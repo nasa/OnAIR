@@ -55,18 +55,19 @@ class DataSource(OnAirDataSource):
         for msgID in self.msgID_lookup_table.keys():
             sbn.subscribe(msgID)
 
+    # TODO!!!!! Bug? Where levels of nesting affect return type
     def gather_field_names(self, field_name, field_type):
+
+        # recursively find field names in DFS manner
+        def gather_field_names_helper(field_name:str, field_type, field_names:list):
+            if "message_headers" in str(field_type) and hasattr(field_type, "_fields_"):
+                for sub_field_name, sub_field_type in field_type._fields_:
+                    gather_field_names_helper(field_name + "." + sub_field_name, sub_field_type,field_names)
+            else:
+                field_names.append(field_name)
+
         field_names = []
-        print(field_name)
-        if "message_headers" in str(field_type) and hasattr(field_type, "_fields_"):
-            print(field_type._fields_)
-            for sub_field_name, sub_field_type in field_type._fields_:
-                print(sub_field_name, sub_field_type)
-                field_names.append(self.gather_field_names(field_name + "." + sub_field_name, sub_field_type))
-            print('out of for loop')
-        else:
-            #field_names.append(field_name)
-            return field_name
+        gather_field_names_helper(field_name, field_type, field_names)
         return field_names
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
@@ -103,7 +104,6 @@ class DataSource(OnAirDataSource):
                 # Skip the header, walk through the stuct
                 for field_name, field_type in data_struct._fields_[1:]:
                     field_names = self.gather_field_names(app_name + "." + field_name, field_type)
-
                     for field_name in field_names:
                         self.currentData[x]['headers'].append(field_name)
                         self.currentData[x]['data'].append([0]) #initialize all the data arrays with zero
