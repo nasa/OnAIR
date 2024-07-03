@@ -22,6 +22,9 @@ from onair.data_handling.on_air_data_source import OnAirDataSource
 from onair.data_handling.on_air_data_source import ConfigKeyError
 
 import threading
+import datetime
+import copy
+import json
 
 # __init__ tests
 def test_sbn_adapter_DataSource__init__sets_values_then_connects(mocker):
@@ -54,7 +57,7 @@ def test_sbn_adapter_DataSource__init__sets_values_then_connects(mocker):
 # TODO !!!
 
 # gather_field_names tests
-def test_gather_field_names_returns_field_name_if_type_not_defined_in_message_headers_and_no_subfields_available(mocker):
+def test_sbn_adapter_DataSource_gather_field_names_returns_field_name_if_type_not_defined_in_message_headers_and_no_subfields_available(mocker):
     # Arrange
     cut = DataSource.__new__(DataSource)
 
@@ -70,9 +73,10 @@ def test_gather_field_names_returns_field_name_if_type_not_defined_in_message_he
     result = cut.gather_field_names(field_name, field_type)
 
     # Assert
-    assert result == field_name
+    # TODO return type depends on bugfix(?) in
+    assert result == [field_name]
 
-def test_gather_field_names_returns_nested_list_for_nested_structure(mocker):
+def test_sbn_adapter_Data_Source_gather_field_names_returns_nested_list_for_nested_structure(mocker):
     # Arrange
     cut = DataSource.__new__(DataSource)
 
@@ -111,13 +115,68 @@ def test_gather_field_names_returns_nested_list_for_nested_structure(mocker):
     assert isinstance(result, list)
     assert len(result) == 2
     print(result)
-    assert set(result) == set([child2_field_name, gchild_field_name])
+    assert set(result) == set([parent_field_name + '.' + child2_field_name, 
+                               parent_field_name + '.' + child1_field_name+ '.' +gchild_field_name])
 
 # parse_meta_data_file tests
 # TODO
+def test_sbn_adapter_DataSource_parse_meta_data_file_calls_rasies_ConfigKeyError_when_channels_not_in_config(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    arg_meta_data_file = MagicMock()
+    arg_ss_breakdown = MagicMock()
+
+    mocker.patch(sbn_adapter.__name__ + '.json.loads', return_value = {})
+
+    # Act
+    with pytest.raises(ConfigKeyError) as e_info:
+        cut.parse_meta_data_file(arg_meta_data_file,arg_ss_breakdown)
+
+def test_sbn_adapter_DataSource_parse_meta_data_file_populates_lookup_table_and_current_data_on_ideal_config(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    arg_meta_data_file = MagicMock()
+    arg_ss_breakdown = MagicMock()
+
+    ideal_config = {
+        "channels": {
+            "0x1": ["AppName1", "DataStruct1"],
+            "0x2": ["AppName2", "DataStruct2"]
+        }
+    }
+    
+    mock_struct_1 = MagicMock()
+    mock_struct_1.__name__ = "DataStruct1"
+    mock_struct_1._fields_ = [('TlmHeader', 'type0'), ('field1', 'type1')]
+
+    mock_struct_2 = MagicMock()
+    mock_struct_2.__name__ = "DataStruct2"
+    mock_struct_2._fields_ = [('field0', 'type0'), ('field1', 'type1')]
+
+    mocker.patch('message_headers.DataStruct1', mock_struct_1)
+    mocker.patch('message_headers.DataStruct2', mock_struct_2)
+
+    mocker.patch('builtins.open', mocker.mock_open(read_data=json.dumps(ideal_config)))
+    mocker.patch('json.loads', return_value=ideal_config)
+    expected_configs = MagicMock()
+    mocker.patch(sbn_adapter.__name__ + '.extract_meta_data_handle_ss_breakdown', return_value = expected_configs)
+
+    # Act
+    cut.parse_meta_data_file(arg_meta_data_file, arg_ss_breakdown)
+    print(cut.currentData)
+
+    # Assert
+    assert cut.msgID_lookup_table == {1: ['AppName1', mock_struct_1], 2: ['AppName2', mock_struct_2]}
+    assert len(cut.currentData) == 2
+    assert len(cut.currentData[0]['headers']) == 2
+    assert len(cut.currentData[1]['headers']) == 2
+    assert cut.currentData[0]['headers'] == ['AppName1.field1', 'AppName2.field1']
+    assert cut.currentData[0]['data'] == [[0], [0]]
+    assert cut.currentData[1]['headers'] == ['AppName1.field1', 'AppName2.field1']
+    assert cut.currentData[1]['data'] == [[0], [0]]
 
 # process_data_file tests
-def test_process_data_file_does_nothing(mocker):
+def test_sbn_adapter_DataSource_process_data_file_does_nothing(mocker):
     # copied from test_redis_adapter.py
     # test_redis_adapter_DataSource_process_data_file_does_nothing
     cut = DataSource.__new__(DataSource)
@@ -132,9 +191,11 @@ def test_process_data_file_does_nothing(mocker):
     assert result == expected_result
 
 # get_vehicle_metadata tests
-def test_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assignments():
+def test_sbn_adapter_DataSource_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assignments():
     # copied from test_redis_adapter.py
     # test_redis_adapter_DataSource_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assignments
+    
+    # Arrange
     cut = DataSource.__new__(DataSource)
     fake_all_headers = MagicMock()
     fake_test_assignments = MagicMock()
@@ -155,6 +216,9 @@ def test_get_vehicle_metadata_returns_list_of_headers_and_list_of_test_assignmen
 
 # get_next tests
 def test_sbn_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_0():
+    # copied from test_redis_adapter.py
+    # test_redis_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_0
+
     # Arrange
     # Renew DataSource to ensure test independence
     cut = DataSource.__new__(DataSource)
@@ -176,6 +240,9 @@ def test_sbn_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_
     assert result == expected_result
 
 def test_sbn_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_1():
+    # copied from test_redis_adapter.py
+    # test_redis_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_true_and_double_buffer_read_index_is_1
+
     # Arrange
     # Renew DataSource to ensure test independence
     cut = DataSource.__new__(DataSource)
@@ -197,6 +264,9 @@ def test_sbn_adapter_DataSource_get_next_returns_expected_data_when_new_data_is_
     assert result == expected_result
 
 def test_sbn_adapter_DataSource_get_next_when_called_multiple_times_when_new_data_is_true():
+    # copied from test_redis_adapter.py
+    # test_redis_adapter_DataSource_get_next_when_called_multiple_times_when_new_data_is_true
+    
     # Arrange
     # Renew DataSource to ensure test independence
     cut = DataSource.__new__(DataSource)
@@ -225,7 +295,10 @@ def test_sbn_adapter_DataSource_get_next_when_called_multiple_times_when_new_dat
         results[i] = expected_data[i]
     assert cut.double_buffer_read_index == (num_calls + pre_call_index) % 2
 
-def test_get_next_waits_until_new_data_is_available(mocker):
+def test_sbn_adapter_DataSource_get_next_waits_until_new_data_is_available(mocker):
+    # copied from test_redis_adapter.py
+    # test_redis_adapter_DataSource_get_next_waits_until_new_data_is_available
+    
     # Arrange
     # Renew DataSource to ensure test independence
     cut = DataSource.__new__(DataSource)
@@ -266,7 +339,116 @@ def test_get_next_waits_until_new_data_is_available(mocker):
     assert result == expected_result
 
 # has_more tests
+def test_sbn_adapter_DataSource_has_more_always_returns_True():
+    # copied from test_redis_adapter.py
+    # test_redis_adapter_DataSource_has_more_always_returns_True
+    cut = DataSource.__new__(DataSource)
+    assert cut.has_more() == True
 
 # mesage_listener_thread tests
+# TODO
 
 # get_current_data tests
+def test_sbn_adapter_Data_Source_get_current_data_only_changes_time_data_when_no_fields_present_in_msg(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.randint(0,1)
+    n = pytest.gen.randint(1,9)
+    cut.currentData =  [{'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}, 
+                        {'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}]
+    cut.new_data_lock = MagicMock()
+
+    arg_recv_msg = MagicMock()
+    arg_recv_msg._fields_ = ['header'] # other fields would populate indicies 1 and up. No actual fields in the struct 
+    arg_recv_msg.TlmHeader.Secondary = MagicMock()
+    arg_recv_msg.TlmHeader.Secondary.Seconds = pytest.gen.randint(0,9)
+    arg_recv_msg.TlmHeader.Secondary.Subseconds = pytest.gen.randint(0,9)
+
+    arg_data_struct = MagicMock()
+    arg_app_name = MagicMock()
+
+    start_time = datetime.datetime(1969, 12, 31, 20)
+    seconds = arg_recv_msg.TlmHeader.Secondary.Seconds
+    subseconds = arg_recv_msg.TlmHeader.Secondary.Subseconds
+    curr_time = seconds + (2**(-32) * subseconds)
+    time = start_time + datetime.timedelta(seconds=curr_time)
+    str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
+
+    expected_currentData = copy.deepcopy(cut.currentData)
+    expected_currentData[(cut.double_buffer_read_index + 1) % 2]['data'][0] = str_time
+
+    # Act
+    result = cut.get_current_data(arg_recv_msg, arg_data_struct, arg_app_name)
+
+    # Assert
+    assert result is None
+    assert isinstance(cut.currentData, list)
+    assert cut.currentData == expected_currentData
+    assert isinstance(cut.new_data, bool)
+    assert cut.new_data 
+
+def test_sbn_adapter_Data_Source_get_current_data_calls_gather_field_names_correctly(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.randint(0,1)
+    n = pytest.gen.randint(1,9)
+    cut.currentData =  [{'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}, 
+                        {'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}]
+    cut.new_data_lock = MagicMock()
+
+    arg_recv_msg = MagicMock()
+    arg_recv_msg._fields_ = [(MagicMock(), MagicMock()) for x in range(n)]
+    arg_recv_msg._fields_.insert(0, 'header')
+    arg_recv_msg.TlmHeader.Secondary = MagicMock()
+    arg_recv_msg.TlmHeader.Secondary.Seconds = pytest.gen.randint(0,9)
+    arg_recv_msg.TlmHeader.Secondary.Subseconds = pytest.gen.randint(0,9)
+
+    arg_data_struct = MagicMock()
+    arg_app_name = MagicMock()
+    
+    mocker.patch.object(cut, 'gather_field_names', return_value = [])
+
+    # act
+    cut.get_current_data(arg_recv_msg, arg_data_struct, arg_app_name)
+
+    # Assert
+    assert cut.gather_field_names.call_count == n
+    assert len(cut.gather_field_names.call_args_list) == n
+    for i in range(n):
+        expected_args = arg_recv_msg._fields_[i+1]
+        assert cut.gather_field_names.call_args_list[i].args == expected_args
+
+def test_sbn_adapter_DataSource_get_current_data_unpacks_sub_fields_correctly(mocker):
+    # TODO
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.randint(0,1)
+    n = pytest.gen.randint(1,9)
+    cut.currentData =  [{'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}, 
+                        {'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}]
+    cut.new_data_lock = MagicMock()
+
+    arg_recv_msg = MagicMock()
+    arg_recv_msg._fields_ = [(MagicMock(), MagicMock()) for x in range(n)]
+    arg_recv_msg._fields_.insert(0, 'header')
+    arg_recv_msg.TlmHeader.Secondary = MagicMock()
+    arg_recv_msg.TlmHeader.Secondary.Seconds = pytest.gen.randint(0,9)
+    arg_recv_msg.TlmHeader.Secondary.Subseconds = pytest.gen.randint(0,9)
+
+    arg_data_struct = MagicMock()
+    arg_app_name = 'mock_app'
+    
+    mocker.patch.object(cut, 'gather_field_names', return_value = [])
+
+
+# has_data tests
+def test_sbn_adapter_DataSource_has_data_returns_instance_new_data():
+    # copied from test_redis_adapter.py
+    # test_redis_adapter_DataSource_has_data_returns_instance_new_data
+    cut = DataSource.__new__(DataSource)
+    expected_result = MagicMock()
+    cut.new_data = expected_result
+
+    result = cut.has_data()
+
+    assert result == expected_result
