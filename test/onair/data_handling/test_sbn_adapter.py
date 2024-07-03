@@ -54,7 +54,43 @@ def test_sbn_adapter_DataSource__init__sets_values_then_connects(mocker):
     assert cut.connect.call_args_list[0].args == ()
 
 # connect tests
-# TODO !!!
+def test_sbn_adapter_DataSource_connect_starts_listener_thread_and_subscribes_to_messages(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    mocker.patch(sbn_adapter.__name__+'.time.sleep')
+    mocker.patch(sbn_adapter.__name__+'.os.chdir')
+    mocker.patch(sbn_adapter.__name__+'.sbn.sbn_load_and_init')
+    fake_listener_thread = MagicMock()
+    mocker.patch(sbn_adapter.__name__+'.threading.Thread', return_value = fake_listener_thread)
+    mocker.patch(sbn_adapter.__name__+'.sbn.subscribe')
+
+    
+    fake_msgID_lookup_table = {}
+    n_ids = pytest.gen.randint(0,9)
+    while len(fake_msgID_lookup_table) < n_ids:
+        fake_id = pytest.gen.randint(0,1000)
+        fake_msgID_lookup_table[fake_id] = "na"
+    
+    cut.__setattr__('msgID_lookup_table',fake_msgID_lookup_table)
+    
+    # Act
+    cut.connect()
+
+    # Assert
+    assert sbn_adapter.time.sleep.call_count == 1
+    assert sbn_adapter.os.chdir.call_count == 2
+    assert sbn_adapter.os.chdir.call_args_list[0].args == ("cf",)
+    assert sbn_adapter.os.chdir.call_args_list[1].args == ("../",)
+    assert sbn_adapter.threading.Thread.call_count == 1
+    assert fake_listener_thread.start.call_count == 1
+    assert sbn_adapter.sbn.subscribe.call_count == n_ids
+
+    subbed_message_ids = set()
+    for call in sbn_adapter.sbn.subscribe.call_args_list:
+        for arg in call.args:
+            subbed_message_ids.add(arg)
+
+    assert subbed_message_ids == set(fake_msgID_lookup_table.keys())
 
 # gather_field_names tests
 def test_sbn_adapter_DataSource_gather_field_names_returns_field_name_if_type_not_defined_in_message_headers_and_no_subfields_available(mocker):
@@ -114,12 +150,10 @@ def test_sbn_adapter_Data_Source_gather_field_names_returns_nested_list_for_nest
     # assert
     assert isinstance(result, list)
     assert len(result) == 2
-    print(result)
     assert set(result) == set([parent_field_name + '.' + child2_field_name, 
                                parent_field_name + '.' + child1_field_name+ '.' +gchild_field_name])
 
 # parse_meta_data_file tests
-# TODO
 def test_sbn_adapter_DataSource_parse_meta_data_file_calls_rasies_ConfigKeyError_when_channels_not_in_config(mocker):
     # Arrange
     cut = DataSource.__new__(DataSource)
@@ -346,7 +380,53 @@ def test_sbn_adapter_DataSource_has_more_always_returns_True():
     assert cut.has_more() == True
 
 # mesage_listener_thread tests
-# TODO
+def test_sbn_adapter_message_listener_thread_calls_get_current_data(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    expected_app_name = MagicMock()
+    expected_data_struct = MagicMock()
+    fake_msg_id = "1234"
+    fake_lookup_table = {fake_msg_id: (expected_app_name, expected_data_struct)}
+    cut.__setattr__('msgID_lookup_table', fake_lookup_table)
+
+    fake_generic_recv_msg_p = MagicMock()
+    fake_generic_recv_msg_p.contents = MagicMock()
+    fake_generic_recv_msg_p.contents.TlmHeader.Primary.StreamId = fake_msg_id
+
+    fake_recv_msg_p = MagicMock()
+    fake_recv_msg_p.contents = 'not heyy'
+
+
+    def mock_POINTER_func(struct):
+        if struct == sbn_adapter.sbn.sbn_data_generic_t:
+            def return_func():
+                return fake_generic_recv_msg_p
+
+        elif struct == expected_data_struct:
+            def return_func():
+                return fake_recv_msg_p
+            
+        else:
+            raise ValueError(f"Unexpected Struct {struct} used.")
+        
+        return return_func #return pointers wrapped in a function b/c that's how ctypes does it
+    
+    mocker.patch(sbn_adapter.__name__ + ".POINTER", side_effect = mock_POINTER_func)
+
+    # for exiting the while loop
+    intentional_exception = KeyboardInterrupt('[TEST]: Exiting infinite loop')
+    mocker.patch.object(cut, 'get_current_data', side_effect = [intentional_exception])
+
+    # Act
+    with pytest.raises(KeyboardInterrupt) as e_info:
+        cut.message_listener_thread()
+    
+    # Assert
+    assert cut.get_current_data.call_count == 1
+    assert fake_recv_msg_p.contents == fake_generic_recv_msg_p.contents
+    assert cut.get_current_data.call_args_list
+    expected_call = (fake_recv_msg_p.contents, expected_data_struct, expected_app_name)
+    assert cut.get_current_data.call_args_list[0].args == expected_call
 
 # get_current_data tests
 def test_sbn_adapter_Data_Source_get_current_data_only_changes_time_data_when_no_fields_present_in_msg(mocker):
