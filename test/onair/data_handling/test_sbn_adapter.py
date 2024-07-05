@@ -488,7 +488,7 @@ def test_sbn_adapter_Data_Source_get_current_data_calls_gather_field_names_corre
     
     mocker.patch.object(cut, 'gather_field_names', return_value = [])
 
-    # act
+    # Act
     cut.get_current_data(arg_recv_msg, arg_data_struct, arg_app_name)
 
     # Assert
@@ -499,27 +499,53 @@ def test_sbn_adapter_Data_Source_get_current_data_calls_gather_field_names_corre
         assert cut.gather_field_names.call_args_list[i].args == expected_args
 
 def test_sbn_adapter_DataSource_get_current_data_unpacks_sub_fields_correctly(mocker):
-    # TODO
     # Arrange
     cut = DataSource.__new__(DataSource)
-    cut.double_buffer_read_index = pytest.gen.randint(0,1)
-    n = pytest.gen.randint(1,9)
-    cut.currentData =  [{'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}, 
-                        {'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}]
+    cut.double_buffer_read_index = pytest.gen.randint(0,2)
     cut.new_data_lock = MagicMock()
+    cut.new_data = MagicMock()
+
+    #  Message structure & data for 'fake_app'
+    arg_app_name = 'fake_app'
 
     arg_recv_msg = MagicMock()
-    arg_recv_msg._fields_ = [(MagicMock(), MagicMock()) for x in range(n)]
-    arg_recv_msg._fields_.insert(0, 'header')
-    arg_recv_msg.TlmHeader.Secondary = MagicMock()
-    arg_recv_msg.TlmHeader.Secondary.Seconds = pytest.gen.randint(0,9)
-    arg_recv_msg.TlmHeader.Secondary.Subseconds = pytest.gen.randint(0,9)
+    arg_recv_msg._fields_ = [("TlmHeader", MagicMock()), ("field1", MagicMock())]
+    arg_recv_msg.TlmHeader.Secondary.Seconds = 0
+    arg_recv_msg.TlmHeader.Secondary.Subseconds = 1
+    arg_recv_msg.field1.temperature = 89
+    arg_recv_msg.field1.voltage = 5
+    arg_recv_msg.field1.velocity.x = 1
+    arg_recv_msg.field1.velocity.y = 2
 
-    arg_data_struct = MagicMock()
-    arg_app_name = 'mock_app'
+    fake_field_names = [
+        "field1.temperature",
+        "field1.voltage",
+        "field1.velocity.x",
+        "field1.velocity.y"
+    ]
+    mocker.patch.object(cut, 'gather_field_names', return_value = fake_field_names)
+
+    # initialize double buffer
+    cut.__setattr__('currentData', [{'headers':[], 'data': []}, {'headers':[], 'data': []}])
+    for x in range(0,2):
+        for name in fake_field_names:
+            cut.currentData[x]['headers'].append(arg_app_name + '.' + name)
+            cut.currentData[x]['data'].append([0])
+
+    expected_data = {'headers':[arg_app_name+'.'+"field1.temperature",
+                                arg_app_name+'.'+"field1.voltage",
+                                arg_app_name+'.'+"field1.velocity.x",
+                                arg_app_name+'.'+"field1.velocity.y"],
+                     'data':['89','5','1','2'] }
     
-    mocker.patch.object(cut, 'gather_field_names', return_value = [])
+    arg_data_struct = MagicMock()
 
+    # Act
+    cut.get_current_data(arg_recv_msg, arg_data_struct, arg_app_name)
+
+    # Assert
+    assert cut.currentData[(cut.double_buffer_read_index + 1) %2] == expected_data
+    assert cut.new_data == True
 
 # has_data tests
 def test_sbn_adapter_DataSource_has_data_returns_instance_new_data():
