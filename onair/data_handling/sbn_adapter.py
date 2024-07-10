@@ -55,7 +55,6 @@ class DataSource(OnAirDataSource):
         for msgID in self.msgID_lookup_table.keys():
             sbn.subscribe(msgID)
 
-    # TODO!!!!! Bug? Where levels of nesting affect return type
     def gather_field_names(self, field_name, field_type):
 
         # recursively find field names in DFS manner
