@@ -166,15 +166,6 @@ class DataSource(OnAirDataSource):
     def get_current_data(self, recv_msg, data_struct, app_name):
         # TODO: Lock needed here?
         current_buffer = self.currentData[(self.double_buffer_read_index + 1) %2]
-        secondary_header = recv_msg.TlmHeader.Secondary
-        #gets seconds from header and adds to current buffer
-        start_time = datetime.datetime(1969, 12, 31, 20) # January 1, 1980
-        seconds = secondary_header.Seconds
-        subseconds = secondary_header.Subseconds
-        curr_time = seconds + (2**(-32) * subseconds) # a subsecond is equal to 2^-32 second
-        time = start_time + datetime.timedelta(seconds=curr_time)
-        str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
-        current_buffer['data'][0] = str_time
 
         # Skip the header, walk through the stuct
         for field_name, field_type in recv_msg._fields_[1:]:
