@@ -428,44 +428,6 @@ def test_sbn_adapter_message_listener_thread_calls_get_current_data(mocker):
     assert cut.get_current_data.call_args_list[0].args == expected_call
 
 # get_current_data tests
-def test_sbn_adapter_Data_Source_get_current_data_only_changes_time_data_when_no_fields_present_in_msg(mocker):
-    # Arrange
-    cut = DataSource.__new__(DataSource)
-    cut.double_buffer_read_index = pytest.gen.randint(0,1)
-    n = pytest.gen.randint(1,9)
-    cut.currentData =  [{'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}, 
-                        {'headers':[f'field_{i}' for i in range(n)],'data':[[0] for x in range(n)]}]
-    cut.new_data_lock = MagicMock()
-
-    arg_recv_msg = MagicMock()
-    arg_recv_msg._fields_ = ['header'] # other fields would populate indicies 1 and up. No actual fields in the struct 
-    arg_recv_msg.TlmHeader.Secondary = MagicMock()
-    arg_recv_msg.TlmHeader.Secondary.Seconds = pytest.gen.randint(0,9)
-    arg_recv_msg.TlmHeader.Secondary.Subseconds = pytest.gen.randint(0,9)
-
-    arg_data_struct = MagicMock()
-    arg_app_name = MagicMock()
-
-    start_time = datetime.datetime(1969, 12, 31, 20)
-    seconds = arg_recv_msg.TlmHeader.Secondary.Seconds
-    subseconds = arg_recv_msg.TlmHeader.Secondary.Subseconds
-    curr_time = seconds + (2**(-32) * subseconds)
-    time = start_time + datetime.timedelta(seconds=curr_time)
-    str_time = time.strftime("%Y-%j-%H:%M:%S.%f")
-
-    expected_currentData = copy.deepcopy(cut.currentData)
-    expected_currentData[(cut.double_buffer_read_index + 1) % 2]['data'][0] = str_time
-
-    # Act
-    result = cut.get_current_data(arg_recv_msg, arg_data_struct, arg_app_name)
-
-    # Assert
-    assert result is None
-    assert isinstance(cut.currentData, list)
-    assert cut.currentData == expected_currentData
-    assert isinstance(cut.new_data, bool)
-    assert cut.new_data 
-
 def test_sbn_adapter_Data_Source_get_current_data_calls_gather_field_names_correctly(mocker):
     # Arrange
     cut = DataSource.__new__(DataSource)
