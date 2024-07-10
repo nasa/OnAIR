@@ -50,7 +50,7 @@ redis-server
 
 Start up OnAIR with the redis_example.ini file:
 ```
-python driver.py onair/config/example.ini
+python driver.py onair/config/redis_example.ini
 ```
 You should see:
 ```
