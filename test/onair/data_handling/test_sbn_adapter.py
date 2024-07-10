@@ -109,7 +109,6 @@ def test_sbn_adapter_DataSource_gather_field_names_returns_field_name_if_type_no
     result = cut.gather_field_names(field_name, field_type)
 
     # Assert
-    # TODO return type depends on bugfix(?) in
     assert result == [field_name]
 
 def test_sbn_adapter_Data_Source_gather_field_names_returns_nested_list_for_nested_structure(mocker):
