@@ -193,6 +193,9 @@ or
 then
 `<browser_here> htmlcov/index.html` - browsable coverage (i.e., `firefox htmlcov/index.html`)
 
+## Running with Core Flight System (cFS)
+OnAIR can be setup to subscribe to and recieve messages from cFS. For more information see doc/cfs-onair-guide.md
+
 ## License and Copyright
 
 Please refer to [NOSA GSC-19165-1 OnAIR.pdf](NOSA%20GSC-19165-1%20OnAIR.pdf) and [COPYRIGHT](COPYRIGHT).
