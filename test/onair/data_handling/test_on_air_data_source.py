@@ -11,7 +11,6 @@
 import pytest
 from unittest.mock import MagicMock
 
-import onair.data_handling.on_air_data_source as on_air_data_source
 from onair.data_handling.on_air_data_source import OnAirDataSource
 
 

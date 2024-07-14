@@ -8,7 +8,6 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 import copy
-import numpy as np
 import random 
 
 
