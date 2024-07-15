@@ -205,6 +205,7 @@ We are a small team, but will try to respond in a timely fashion.
 If you would like to contribute to the repository, GREAT!
 First you will need to complete the [Individual Contributor License Agreement (pdf)](doc/Indv_CLA_OnAIR.pdf).
 Then, email it to gsfc-softwarerequest@mail.nasa.gov with james.marshall-1@nasa.gov CCed.
+Please include your github username in the email.
 
 Next, please create an issue for the fix or feature and note that you intend to work on it.
 Fork the repository and create a branch with a name that starts with the issue number.
