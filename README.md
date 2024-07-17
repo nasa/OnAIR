@@ -140,10 +140,10 @@ python driver.py -t
 #### A few optional settings for the driver.py file
 Options that may be added to the driver.py test run. Use these at your own discretion.
 
-`--conftest-seed=###` - set the random values seed for this run
-`--randomly-seed=###` - set the random order seed for this run
-`--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.
-`-k KEYWORD` - only run tests that match the KEYWORD (see `pytest --help`)
+`--conftest-seed=###` - set the random values seed for this run  
+`--randomly-seed=###` - set the random order seed for this run  
+`--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.  
+`-k KEYWORD` - only run tests that match the KEYWORD (see `pytest --help`)  
 
 NOTE: Running tests will output results using provided seeds, but each seed is random when not set directly.
 Example start of test output:
@@ -164,31 +164,31 @@ python -m coverage run --branch --source=onair,plugins -m pytest ./test/
 
 #### Command breakdown:
 
-`python -m` - invokes the python runtime on the library following the -m
-`coverage run` - runs coverage data collection during testing, wrapping itself on the test runner used
-`--branch` - includes code branching information in the coverage report
-`--source=onair,plugins` - tells coverage where the code under test exists for reporting line hits
-`-m pytest` - tells coverage what test runner (framework) to wrap
-`./test` - run all tests found in this directory and subdirectories
+`python -m` - invokes the python runtime on the library following the -m  
+`coverage run` - runs coverage data collection during testing, wrapping itself on the test runner used  
+`--branch` - includes code branching information in the coverage report  
+`--source=onair,plugins` - tells coverage where the code under test exists for reporting line hits  
+`-m pytest` - tells coverage what test runner (framework) to wrap  
+`./test` - run all tests found in this directory and subdirectories  
 
 #### A few optional settings for the command line
 Options that may be added to the command line test run. Use these at your own discretion.
 
-`--disable-warnings` - removes the warning reports, but displays count (i.e., 124 passed, 1 warning in 0.65s)
-`-p no:randomly` - ONLY required to stop random order testing IFF pytest-randomly installed
-`--conftest-seed=###` - set the random values seed for this run
-`--randomly-seed=###` - set the random order seed for this run
-`--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.
-`-k KEYWORD` - only run tests that match the KEYWORD (see `pytest --help`)
+`--disable-warnings` - removes the warning reports, but displays count (i.e., 124 passed, 1 warning in 0.65s)  
+`-p no:randomly` - ONLY required to stop random order testing IFF pytest-randomly installed  
+`--conftest-seed=###` - set the random values seed for this run  
+`--randomly-seed=###` - set the random order seed for this run  
+`--verbose` or `-v` - set verbosity level, also -vv, -vvv, etc.  
+`-k KEYWORD` - only run tests that match the KEYWORD (see `pytest --help`)  
 
 NOTE: see note about seeds in driver.py section above
 
 ### To view testing line coverage after run:
 NOTE: you may or may not need the `python -m` to run coverage report or html
 
-`coverage report` - prints basic results in terminal
-or
-`coverage html` - creates htmlcov/index.html, automatic when using driver.py for testing
+`coverage report` - prints basic results in terminal  
+or  
+`coverage html` - creates htmlcov/index.html, automatic when using driver.py for testing  
 
 then
 `<browser_here> htmlcov/index.html` - browsable coverage (i.e., `firefox htmlcov/index.html`)
