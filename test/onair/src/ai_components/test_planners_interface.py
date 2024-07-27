@@ -14,6 +14,7 @@ from unittest.mock import MagicMock
 import onair.src.ai_components.planners_interface as planners_interface
 from onair.src.ai_components.planners_interface import PlannersInterface
 
+
 # __init__ tests
 def test_PlannersInterface__init__raises_AssertionError_when_given_headers_len_is_0():
     # Arrange
@@ -28,9 +29,12 @@ def test_PlannersInterface__init__raises_AssertionError_when_given_headers_len_i
         cut.__init__(arg_headers)
 
     # Assert
-    assert e_info.match('Headers are required')
+    assert e_info.match("Headers are required")
 
-def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_self_planner_constructs_to_return_value_of_import_plugins(mocker):
+
+def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_self_planner_constructs_to_return_value_of_import_plugins(
+    mocker,
+):
     # Arrange
     arg_headers = MagicMock()
     arg__planner_plugins = MagicMock()
@@ -39,7 +43,10 @@ def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_se
 
     forced_return_planner_constructs = MagicMock()
 
-    mocker.patch(planners_interface.__name__ + '.import_plugins', return_value=forced_return_planner_constructs)
+    mocker.patch(
+        planners_interface.__name__ + ".import_plugins",
+        return_value=forced_return_planner_constructs,
+    )
 
     cut = PlannersInterface.__new__(PlannersInterface)
 
@@ -49,8 +56,12 @@ def test_PlannersInterface__init__sets_self_headers_to_given_headers_and_sets_se
     # Assert
     assert cut.headers == arg_headers
     assert planners_interface.import_plugins.call_count == 1
-    assert planners_interface.import_plugins.call_args_list[0].args == (arg_headers, arg__planner_plugins)
+    assert planners_interface.import_plugins.call_args_list[0].args == (
+        arg_headers,
+        arg__planner_plugins,
+    )
     assert cut.planner_constructs == forced_return_planner_constructs
+
 
 # update tests
 def test_PlannersInterface_update_does_nothing_when_instance_planner_constructs_is_empty():
@@ -66,14 +77,19 @@ def test_PlannersInterface_update_does_nothing_when_instance_planner_constructs_
     # Assert
     assert result == None
 
-def test_PlannersInterface_update_calls_update_with_given_low_level_and_high_level_data_on_each_planner_constructs_item(mocker):
+
+def test_PlannersInterface_update_calls_update_with_given_low_level_and_high_level_data_on_each_planner_constructs_item(
+    mocker,
+):
     # Arrange
     arg_high_level_data = MagicMock()
 
     cut = PlannersInterface.__new__(PlannersInterface)
     cut.planner_constructs = []
 
-    num_fake_planner_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    num_fake_planner_constructs = pytest.gen.randint(
+        1, 10
+    )  # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_planner_constructs):
         cut.planner_constructs.append(MagicMock())
 
@@ -84,7 +100,10 @@ def test_PlannersInterface_update_calls_update_with_given_low_level_and_high_lev
     for i in range(num_fake_planner_constructs):
         assert cut.planner_constructs[i].update.call_count == 1
         assert cut.planner_constructs[i].update.call_args_list[0].args == ()
-        assert cut.planner_constructs[i].update.call_args_list[0].kwargs == {'high_level_data':arg_high_level_data}
+        assert cut.planner_constructs[i].update.call_args_list[0].kwargs == {
+            "high_level_data": arg_high_level_data
+        }
+
 
 # check_for_salient_event tests
 def test_PlannersInterface_check_for_salient_event_does_nothing():
@@ -97,8 +116,11 @@ def test_PlannersInterface_check_for_salient_event_does_nothing():
     # Assert
     assert result == None
 
+
 # render reasoning tests
-def test_PlannersInterface_render_reasoning_returns_empty_dict_when_instance_planner_constructs_is_empty(mocker):
+def test_PlannersInterface_render_reasoning_returns_empty_dict_when_instance_planner_constructs_is_empty(
+    mocker,
+):
     # Arrange
     cut = PlannersInterface.__new__(PlannersInterface)
     cut.planner_constructs = []
@@ -110,21 +132,31 @@ def test_PlannersInterface_render_reasoning_returns_empty_dict_when_instance_pla
     assert result == {}
 
 
-def test_PlannersInterface_render_reasoning_returns_dict_of_each_ai_construct_as_key_to_the_result_of_its_render_reasoning_when_instance_planner_constructs_is_occupied(mocker):
+def test_PlannersInterface_render_reasoning_returns_dict_of_each_ai_construct_as_key_to_the_result_of_its_render_reasoning_when_instance_planner_constructs_is_occupied(
+    mocker,
+):
     # Arrange
     cut = PlannersInterface.__new__(PlannersInterface)
     cut.planner_constructs = []
 
     expected_result = {}
 
-    num_fake_planner_constructs = pytest.gen.randint(1, 10) # arbitrary, from 1 to 10 (0 has own test)
+    num_fake_planner_constructs = pytest.gen.randint(
+        1, 10
+    )  # arbitrary, from 1 to 10 (0 has own test)
     for i in range(num_fake_planner_constructs):
         fake_ai_construct = MagicMock()
         forced_return_ai_construct_render_reasoning = MagicMock()
         cut.planner_constructs.append(fake_ai_construct)
-        mocker.patch.object(fake_ai_construct, 'render_reasoning', return_value=forced_return_ai_construct_render_reasoning)
+        mocker.patch.object(
+            fake_ai_construct,
+            "render_reasoning",
+            return_value=forced_return_ai_construct_render_reasoning,
+        )
         fake_ai_construct.component_name = MagicMock()
-        expected_result[fake_ai_construct.component_name] = forced_return_ai_construct_render_reasoning
+        expected_result[fake_ai_construct.component_name] = (
+            forced_return_ai_construct_render_reasoning
+        )
 
     # Act
     result = cut.render_reasoning()

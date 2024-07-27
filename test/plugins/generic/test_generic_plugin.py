@@ -13,6 +13,7 @@ from unittest.mock import MagicMock
 
 from plugins.generic.generic_plugin import Plugin
 
+
 def test_update_does_nothing():
     # Arrange
     cut = Plugin.__new__(Plugin)
@@ -22,6 +23,7 @@ def test_update_does_nothing():
 
     # Assert
     assert result == None
+
 
 def test_render_reasoning_does_nothing():
     # Arrange

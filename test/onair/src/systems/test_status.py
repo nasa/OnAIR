@@ -13,29 +13,35 @@ from unittest.mock import MagicMock
 
 from onair.src.systems.status import Status
 
+
 # tests for init
-def test_Status__init__with_empty_args_initializes_name_and_calls_set_status_with_default_values(mocker):
+def test_Status__init__with_empty_args_initializes_name_and_calls_set_status_with_default_values(
+    mocker,
+):
     # Arrange
     cut = Status.__new__(Status)
 
-    mocker.patch.object(cut, 'set_status')
+    mocker.patch.object(cut, "set_status")
 
     # Act
     cut.__init__()
 
     # Assert
-    assert cut.name == 'MISSION'
+    assert cut.name == "MISSION"
     assert cut.set_status.call_count == 1
-    assert cut.set_status.call_args_list[0].args == ('---', -1.0)
+    assert cut.set_status.call_args_list[0].args == ("---", -1.0)
 
-def test_Status__init__with_valid_args_initializes_name_and_calls_set_status_with_expected_values(mocker):
+
+def test_Status__init__with_valid_args_initializes_name_and_calls_set_status_with_expected_values(
+    mocker,
+):
     # Arrange
     cut = Status.__new__(Status)
     arg_name = MagicMock()
     arg_status = MagicMock()
     arg_bayesian_conf = MagicMock()
 
-    mocker.patch.object(cut, 'set_status')
+    mocker.patch.object(cut, "set_status")
 
     # Act
     cut.__init__(arg_name, arg_status, arg_bayesian_conf)
@@ -45,13 +51,16 @@ def test_Status__init__with_valid_args_initializes_name_and_calls_set_status_wit
     assert cut.set_status.call_count == 1
     assert cut.set_status.call_args_list[0].args == (arg_status, arg_bayesian_conf)
 
+
 # tests for set status
 def test_Status_set_status_when_both_args_are_provided_and_valid_sets_variables_to_expected_values():
     # Arrange
-    rand_index = pytest.gen.randint(0, 3) # index, from 0 to 3
-    valid_statuses = ['---', 'RED', 'YELLOW', 'GREEN']
+    rand_index = pytest.gen.randint(0, 3)  # index, from 0 to 3
+    valid_statuses = ["---", "RED", "YELLOW", "GREEN"]
     arg_status = valid_statuses[rand_index]
-    arg_bayesian_conf = pytest.gen.uniform(-1.0, 1.0) # float in accepted range from -1.0 to 1.0
+    arg_bayesian_conf = pytest.gen.uniform(
+        -1.0, 1.0
+    )  # float in accepted range from -1.0 to 1.0
 
     cut = Status.__new__(Status)
 
@@ -62,9 +71,10 @@ def test_Status_set_status_when_both_args_are_provided_and_valid_sets_variables_
     assert cut.bayesian_conf == arg_bayesian_conf
     assert cut.status == arg_status
 
+
 def test_Status_set_status_when_arg_status_is_valid_and_arg_conf_is_1_sets_variables_to_expected_values():
     # Arrange
-    arg_status = '---'
+    arg_status = "---"
     arg_bayesian_conf = 1.0
 
     cut = Status.__new__(Status)
@@ -76,9 +86,10 @@ def test_Status_set_status_when_arg_status_is_valid_and_arg_conf_is_1_sets_varia
     assert cut.bayesian_conf == arg_bayesian_conf
     assert cut.status == arg_status
 
+
 def test_Status_set_status_when_arg_status_is_valid_and_arg_conf_is_negative_1_sets_variables_to_expected_values():
     # Arrange
-    arg_status = '---'
+    arg_status = "---"
     arg_bayesian_conf = -1.0
 
     cut = Status.__new__(Status)
@@ -90,9 +101,10 @@ def test_Status_set_status_when_arg_status_is_valid_and_arg_conf_is_negative_1_s
     assert cut.bayesian_conf == arg_bayesian_conf
     assert cut.status == arg_status
 
+
 def test_Status_set_status_when_only_stat_arg_is_provided_sets_variables_to_expected_values():
     # Arrange
-    arg_status = '---'
+    arg_status = "---"
 
     cut = Status.__new__(Status)
 
@@ -103,33 +115,40 @@ def test_Status_set_status_when_only_stat_arg_is_provided_sets_variables_to_expe
     assert cut.bayesian_conf == -1.0
     assert cut.status == arg_status
 
+
 def test_Status_set_status_raises_error_because_bayesian_conf_greater_than_1():
     # Arrange
     cut = Status.__new__(Status)
 
-    arg_status = '---'
-    arg_bayesian_conf = pytest.gen.uniform(1.01, 10.0) # arbitrary float greater than 1.0 (top of accepted range)
+    arg_status = "---"
+    arg_bayesian_conf = pytest.gen.uniform(
+        1.01, 10.0
+    )  # arbitrary float greater than 1.0 (top of accepted range)
 
     # Act
     with pytest.raises(AssertionError) as e_info:
         cut.set_status(arg_status, arg_bayesian_conf)
 
     # Assert
-    assert e_info.match('')
+    assert e_info.match("")
+
 
 def test_Status_set_status_raises_error_because_bayesian_conf_less_than_neg_1():
     # Arrange
     cut = Status.__new__(Status)
 
-    arg_status = '---'
-    arg_bayesian_conf = pytest.gen.uniform(-10.0, -1.01) # arbitrary float less than -1.0 (bottom of accepted range)
+    arg_status = "---"
+    arg_bayesian_conf = pytest.gen.uniform(
+        -10.0, -1.01
+    )  # arbitrary float less than -1.0 (bottom of accepted range)
 
     # Act
     with pytest.raises(AssertionError) as e_info:
         cut.set_status(arg_status, arg_bayesian_conf)
 
     # Assert
-    assert e_info.match('')
+    assert e_info.match("")
+
 
 def test_Status_set_status_raises_error_because_invalid_status_arg():
     # Arrange
@@ -142,7 +161,8 @@ def test_Status_set_status_raises_error_because_invalid_status_arg():
         cut.set_status(arg_status, arg_bayesian_conf)
 
     # Assert
-    assert e_info.match('')
+    assert e_info.match("")
+
 
 # tests for get_status
 def test_Status_get_status_returns_expected_values():
@@ -156,6 +176,7 @@ def test_Status_get_status_returns_expected_values():
 
     # Assert
     assert result == fake_status
+
 
 # tests for get_bayesian_status
 def test_Status_get_bayesian_status_returns_expected_values():
@@ -173,6 +194,7 @@ def test_Status_get_bayesian_status_returns_expected_values():
     # Assert
     assert result_status == fake_status
     assert result_bayesian_conf == fake_bayesian_conf
+
 
 # tests for get_name
 def test_Status_get_name_returns_expected_value():

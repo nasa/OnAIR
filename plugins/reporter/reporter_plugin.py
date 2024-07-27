@@ -9,6 +9,7 @@
 
 from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
+
 class Plugin(AIPlugin):
     verbose_mode = False
 
@@ -23,7 +24,9 @@ class Plugin(AIPlugin):
         if self.verbose_mode:
             print(f" : headers {self.headers}")
             print(f" : low_level_data {low_level_data.__class__} = '{low_level_data}'")
-            print(f" : high_level_data {high_level_data.__class__} = '{high_level_data}'")
+            print(
+                f" : high_level_data {high_level_data.__class__} = '{high_level_data}'"
+            )
 
     def render_reasoning(self):
         """

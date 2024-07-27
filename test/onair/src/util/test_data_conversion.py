@@ -15,12 +15,15 @@ import onair.src.util.data_conversion as data_conversion
 
 from numpy import ndarray
 
+
 # status_to_oneHot tests
-def test_data_conversion_status_to_oneHot_returns_given_status_when_status_isinstance_of_np_ndarray(mocker):
+def test_data_conversion_status_to_oneHot_returns_given_status_when_status_isinstance_of_np_ndarray(
+    mocker,
+):
     # Arrange
     arg_status = MagicMock()
 
-    mocker.patch(data_conversion.__name__ + '.isinstance', return_value=True)
+    mocker.patch(data_conversion.__name__ + ".isinstance", return_value=True)
 
     # Act
     result = data_conversion.status_to_oneHot(arg_status)
@@ -30,22 +33,24 @@ def test_data_conversion_status_to_oneHot_returns_given_status_when_status_isins
     assert data_conversion.isinstance.call_args_list[0].args == (arg_status, ndarray)
     assert result == arg_status
 
-def test_data_conversion_status_to_oneHot_returns_one_hot_set_to_list_of_four_zeros_and_the_value_of_the_classes_status_to_1_point_0(mocker):
+
+def test_data_conversion_status_to_oneHot_returns_one_hot_set_to_list_of_four_zeros_and_the_value_of_the_classes_status_to_1_point_0(
+    mocker,
+):
     # Arrange
     arg_status = MagicMock()
 
-    fake_status = pytest.gen.randint(0,3) # size of array choice, from 0 to 3
+    fake_status = pytest.gen.randint(0, 3)  # size of array choice, from 0 to 3
 
     expected_result = [0.0, 0.0, 0.0, 0.0]
     expected_result[fake_status] = 1.0
 
     data_conversion.classes = {arg_status: fake_status}
 
-    mocker.patch(data_conversion.__name__ + '.isinstance', return_value=False)
+    mocker.patch(data_conversion.__name__ + ".isinstance", return_value=False)
 
     # Act
     result = data_conversion.status_to_oneHot(arg_status)
 
     # Assert
     assert result == expected_result
-

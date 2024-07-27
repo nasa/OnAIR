@@ -5,6 +5,8 @@ channels:
 dependencies:
   - python>=3.8,<3.13
   - numpy
+  - black
+  - pylint
   - coverage
   - pytest
   - pytest-mock

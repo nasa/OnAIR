@@ -16,6 +16,7 @@ import importlib.util
 import sys
 import os
 
+
 def import_plugins(headers, module_dict):
     plugin_list = []
     init_filename = "__init__.py"
@@ -23,7 +24,7 @@ def import_plugins(headers, module_dict):
         true_path = module_path
         # Compatibility for plugin paths that already include __init__.py
         if module_path.endswith(init_filename):
-            true_path = module_path[:-len(init_filename) - 1]
+            true_path = module_path[: -len(init_filename) - 1]
         # Last directory name is the module name
         mod_name = os.path.basename(true_path)
         # import module if not already available
@@ -39,9 +40,8 @@ def import_plugins(headers, module_dict):
             # add plugin module to system for importation
             sys.modules[mod_name] = module
         # import the created module's plugin file for use
-        plugin_name = f'{mod_name}_plugin'
-        plugin = __import__(f'{mod_name}.{plugin_name}',
-                            fromlist=[plugin_name])
+        plugin_name = f"{mod_name}_plugin"
+        plugin = __import__(f"{mod_name}.{plugin_name}", fromlist=[plugin_name])
         # add an instance of the module's was an OnAIR plugin
         plugin_list.append(plugin.Plugin(construct_name, headers))
-    return(plugin_list)
+    return plugin_list

@@ -17,18 +17,22 @@ from .telemetry_test_suite import TelemetryTestSuite
 
 from ..util.print_io import *
 from ..util.plugin_import import import_plugins
+
 # from ..util.data_conversion import *
+
 
 class VehicleRepresentation:
     def __init__(self, headers, tests, _knowledge_rep_plugins={}):
-        assert(len(headers) == len(tests))
+        assert len(headers) == len(tests)
         self.headers = headers
-        self.knowledge_synthesis_constructs = import_plugins(self.headers,_knowledge_rep_plugins)
+        self.knowledge_synthesis_constructs = import_plugins(
+            self.headers, _knowledge_rep_plugins
+        )
 
-        self.status = Status('MISSION')
+        self.status = Status("MISSION")
         self.test_suite = TelemetryTestSuite(headers, tests)
-   
-        self.curr_data = ['-']* len(self.headers) #stale data
+
+        self.curr_data = ["-"] * len(self.headers)  # stale data
 
     ##### UPDATERS #################################
     def update(self, frame):
@@ -44,7 +48,7 @@ class VehicleRepresentation:
 
     def update_curr_data(self, frame):
         for i in range(len(frame)):
-            if frame[i] != '-':
+            if frame[i] != "-":
                 self.curr_data[i] = frame[i]
 
     ##### GETTERS AND SETTERS #####
@@ -69,10 +73,8 @@ class VehicleRepresentation:
     def get_batch_status_reports(self, batch_data):
         return
 
-    def get_state_information(self, scope=['status']):
+    def get_state_information(self, scope=["status"]):
         state_info = {}
         for construct in self.knowledge_synthesis_constructs:
             state_info[construct.component_name] = construct.render_reasoning()
         return state_info
-
-

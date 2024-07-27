@@ -8,17 +8,20 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 from abc import ABC, abstractmethod
+
 """This object serves as a proxy for all plugins.
    Therefore, the AIPlugin object is meant to induce
    standards and structures of compliance for user-created
    and/or imported plugins/libraries
 """
+
+
 class AIPlugin(ABC):
     def __init__(self, _name, _headers):
         """
         Superclass for data driven components: VAE, PPO, etc. Allows for easier modularity.
         """
-        assert(len(_headers)>0)
+        assert len(_headers) > 0
         self.component_name = _name
         self.headers = _headers
 
@@ -35,4 +38,3 @@ class AIPlugin(ABC):
         System should return its diagnosis
         """
         raise NotImplementedError
-
