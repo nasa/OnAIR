@@ -10,8 +10,9 @@
 import numpy as np
 from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
+
 class Plugin(AIPlugin):
-    def update(self,low_level_data=[], high_level_data={}):
+    def update(self, low_level_data=[], high_level_data={}):
         """
         Given streamed data point, system should update internally
         """

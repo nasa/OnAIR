@@ -14,6 +14,7 @@ from unittest.mock import MagicMock
 import onair.src.ai_components.ai_plugin_abstract.ai_plugin as ai_plugin
 from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
+
 class FakeAIPlugin(AIPlugin):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
@@ -24,9 +25,11 @@ class FakeAIPlugin(AIPlugin):
     def render_reasoning(self):
         return dict()
 
+
 class IncompleteFakeAIPlugin(AIPlugin):
     def __init__(self, _name, _headers):
         return super().__init__(_name, _headers)
+
 
 class BadFakeAIPlugin(AIPlugin):
     def __init__(self, _name, _headers):
@@ -37,6 +40,7 @@ class BadFakeAIPlugin(AIPlugin):
 
     def render_reasoning(self):
         return super().render_reasoning()
+
 
 # abstract methods tests
 def test_AIPlugin_raises_error_because_of_unimplemented_abstract_methods():
@@ -50,6 +54,7 @@ def test_AIPlugin_raises_error_because_of_unimplemented_abstract_methods():
     assert "update" in e_info.__str__()
     assert "render_reasoning" in e_info.__str__()
 
+
 # Incomplete plugin call tests
 def test_AIPlugin_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
     # Arrange - None
@@ -58,9 +63,13 @@ def test_AIPlugin_raises_error_when_an_inherited_class_is_instantiated_because_a
         cut = IncompleteFakeAIPlugin.__new__(IncompleteFakeAIPlugin)
 
     # Assert
-    assert "Can't instantiate abstract class IncompleteFakeAIPlugin with" in e_info.__str__()
+    assert (
+        "Can't instantiate abstract class IncompleteFakeAIPlugin with"
+        in e_info.__str__()
+    )
     assert "update" in e_info.__str__()
     assert "render_reasoning" in e_info.__str__()
+
 
 def test_AIPlugin_raises_error_when_an_inherited_class_calls_abstract_methods_in_parent():
     # Act
@@ -72,6 +81,7 @@ def test_AIPlugin_raises_error_when_an_inherited_class_calls_abstract_methods_in
         with pytest.raises(NotImplementedError) as e_info:
             fnc()
         assert "NotImplementedError" in e_info.__str__()
+
 
 # Complete plugin call tests
 def test_AIPlugin_does_not_raise_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_implemented_by_that_class():
@@ -85,7 +95,9 @@ def test_AIPlugin_does_not_raise_error_when_an_inherited_class_is_instantiated_b
     # Assert
     assert exception_raised == False
 
+
 # Complete plugin call tests
+
 
 # __init__ tests
 def test_AIPlugin__init__raises_assertion_error_when_given__headers_len_is_not_greater_than_0():
@@ -100,16 +112,21 @@ def test_AIPlugin__init__raises_assertion_error_when_given__headers_len_is_not_g
         cut.__init__(arg__name, arg__headers)
 
     # Assert
-    assert e_info.match('')
+    assert e_info.match("")
 
-def test_AIPlugin__init__sets_instance_values_to_given_args_when_given__headers_len_is_greater_than_0(mocker):
+
+def test_AIPlugin__init__sets_instance_values_to_given_args_when_given__headers_len_is_greater_than_0(
+    mocker,
+):
     # Arrange
     arg__name = MagicMock()
     arg__headers = MagicMock()
 
     cut = FakeAIPlugin.__new__(FakeAIPlugin)
 
-    mocker.patch(ai_plugin.__name__ + '.len', return_value=pytest.gen.randint(1, 200)) # arbitrary, from 1 to 200 (but > 0)
+    mocker.patch(
+        ai_plugin.__name__ + ".len", return_value=pytest.gen.randint(1, 200)
+    )  # arbitrary, from 1 to 200 (but > 0)
 
     # Act
     cut.__init__(arg__name, arg__headers)

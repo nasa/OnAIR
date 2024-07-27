@@ -27,34 +27,53 @@ def main():
     Check the .ini file for the filenames used
     """
 
-    arg_parser = argparse.ArgumentParser(description='')
-    arg_parser.add_argument('configfile', nargs='?',
-                            default='./onair/config/default_config.ini',
-                            help='Config file to be used')
-    arg_parser.add_argument('--save', '-s', action='store_true',
-                            help='Should log files be saved?')
-    arg_parser.add_argument('--save_name', '--name', '-n',
-                            help='Name of saved log files')
-    arg_parser.add_argument('--mute', '-m', action='store_true',
-                            help='Mute all non-error output')
+    arg_parser = argparse.ArgumentParser(description="")
+    arg_parser.add_argument(
+        "configfile",
+        nargs="?",
+        default="./onair/config/default_config.ini",
+        help="Config file to be used",
+    )
+    arg_parser.add_argument(
+        "--save", "-s", action="store_true", help="Should log files be saved?"
+    )
+    arg_parser.add_argument(
+        "--save_name", "--name", "-n", help="Name of saved log files"
+    )
+    arg_parser.add_argument(
+        "--mute", "-m", action="store_true", help="Mute all non-error output"
+    )
 
     """
     Testing specific arguments
     """
-    arg_parser.add_argument('--test', '-t', action='store_true',
-                            help='Run tests')
-    arg_parser.add_argument('--verbose', '-v', action='count', default=0,
-                            help="Increase verbosity in tests")
-    arg_parser.add_argument('-k', action='store', dest='keyword', default="",
-                            metavar='EXPRESSION',
-                            help="Pass thru for pytest's -k option. Runs only"
-                                 " tests with names that match EXPRESSION.")
-    arg_parser.add_argument('--conftest-seed', action='store',
-                            type=int, default=None,
-                            help="Set the random seed for test values")
-    arg_parser.add_argument('--randomly-seed', action='store',
-                            type=int, default=None,
-                            help="Set the random seed for test run order")
+    arg_parser.add_argument("--test", "-t", action="store_true", help="Run tests")
+    arg_parser.add_argument(
+        "--verbose", "-v", action="count", default=0, help="Increase verbosity in tests"
+    )
+    arg_parser.add_argument(
+        "-k",
+        action="store",
+        dest="keyword",
+        default="",
+        metavar="EXPRESSION",
+        help="Pass thru for pytest's -k option. Runs only"
+        " tests with names that match EXPRESSION.",
+    )
+    arg_parser.add_argument(
+        "--conftest-seed",
+        action="store",
+        type=int,
+        default=None,
+        help="Set the random seed for test values",
+    )
+    arg_parser.add_argument(
+        "--randomly-seed",
+        action="store",
+        type=int,
+        default=None,
+        help="Set the random seed for test run order",
+    )
     args = arg_parser.parse_args()
 
     """
@@ -63,7 +82,8 @@ def main():
     """
     if args.test:
         import coverage
-        cov = coverage.Coverage(source=['onair', 'plugins'], branch=True)
+
+        cov = coverage.Coverage(source=["onair", "plugins"], branch=True)
         cov.start()
 
     """
@@ -80,10 +100,11 @@ def main():
     """ Runs all unit tests """
     if args.test:
         import pytest
+
         test_directory_name = "test"
         pytest_args = [test_directory_name]
 
-        pytest_args.extend(['-v'] * args.verbose)
+        pytest_args.extend(["-v"] * args.verbose)
         if args.conftest_seed:
             pytest_args.extend([f"--conftest-seed={args.conftest_seed}"])
         if args.randomly_seed:
@@ -95,7 +116,7 @@ def main():
         cov.save()
         cov.html_report()
     else:
-        setup_folders(os.environ['RESULTS_PATH'])
+        setup_folders(os.environ["RESULTS_PATH"])
         if args.save_name:
             save_name = args.save_name
         else:
@@ -108,26 +129,28 @@ def init_global_paths(test=False):
     """
     Initializes global paths, used throughout execution
     """
-    run_path = 'onair/src/test' if test else './'
-    results_path = 'onair/src/test/results' if test else 'results/'
+    run_path = "onair/src/test" if test else "./"
+    results_path = "onair/src/test/results" if test else "results/"
 
-    os.environ['BASE_PATH'] = os.path.dirname(os.path.realpath(__file__))
-    os.environ['RUN_PATH'] = os.path.join(os.path.dirname(
-        os.path.realpath(__file__)), run_path)
-    os.environ['RESULTS_PATH'] = os.path.join(os.path.dirname(
-        os.path.realpath(__file__)), results_path)
-    os.environ['SRC_ROOT_PATH'] = os.path.dirname(os.path.realpath(__file__))
+    os.environ["BASE_PATH"] = os.path.dirname(os.path.realpath(__file__))
+    os.environ["RUN_PATH"] = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), run_path
+    )
+    os.environ["RESULTS_PATH"] = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), results_path
+    )
+    os.environ["SRC_ROOT_PATH"] = os.path.dirname(os.path.realpath(__file__))
 
 
 def blockPrint():
-    """ Disable terminal output """
-    sys.stdout = open(os.devnull, 'w')
+    """Disable terminal output"""
+    sys.stdout = open(os.devnull, "w")
 
 
 def enablePrint():
-    """ Restore terminal output """
+    """Restore terminal output"""
     sys.stdout = sys.__stdout__
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

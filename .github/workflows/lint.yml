@@ -1,0 +1,28 @@
+name: Linting and Formatting
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up OnAIR conda environment
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        activate-environment: onair
+        environment-file: environment.yml
+        python-version: ${{ matrix.python-version }}
+        auto-activate-base: false
+    - name: Lint Project
+      shell: bash -l {0}
+      run: pylint onair plugins test
+    - name: Check Formatting
+      shell: bash -l {0}
+      run: black --check .
