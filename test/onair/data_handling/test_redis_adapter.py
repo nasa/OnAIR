@@ -19,12 +19,9 @@ import threading
 
 
 # __init__ tests
-def test_redis_adapter_DataSource__init__sets_redis_values_then_connects_and_subscribes_to_subscriptions(
-    mocker,
-):
+def test_redis_adapter_DataSource__init__sets_redis_values_then_connects(mocker):
     # Arrange
-    expected_db = 0
-    expected_server = None
+    expected_server = []
     expected_subscriptions = MagicMock()
 
     arg_data_file = MagicMock()
@@ -41,20 +38,20 @@ def test_redis_adapter_DataSource__init__sets_redis_values_then_connects_and_sub
     )  # from 1 to 10 arbitrary
     cut.order = fake_order
 
-    mocker.patch.object(OnAirDataSource, "__init__", new=MagicMock())
-    mocker.patch("threading.Lock", return_value=fake_new_data_lock)
-    mocker.patch.object(cut, "connect")
-    mocker.patch.object(cut, "subscribe")
+    mocker.patch.object(OnAirDataSource, '__init__', new=MagicMock())
+    mocker.patch('threading.Lock', return_value=fake_new_data_lock)
+    mocker.patch.object(cut, 'connect')
 
     # Act
     cut.__init__(arg_data_file, arg_meta_file, arg_ss_breakdown)
 
+    #TO CHECK: Anything you mocked, anything you changed, and what your test name is looking for
     # Assert
     assert OnAirDataSource.__init__.call_count == 1
     assert OnAirDataSource.__init__.call_args_list[0].args == (arg_data_file, arg_meta_file, arg_ss_breakdown)
-    assert cut.db == expected_db
-    assert cut.server == expected_server
+    assert cut.servers == expected_server
     assert cut.new_data_lock == fake_new_data_lock
+    assert threading.Lock.call_count == 1
     assert cut.new_data == False
     assert cut.currentData == [
         {"headers": fake_order, "data": list("-" * len(fake_order))},
@@ -63,75 +60,126 @@ def test_redis_adapter_DataSource__init__sets_redis_values_then_connects_and_sub
     assert cut.double_buffer_read_index == 0
     assert cut.connect.call_count == 1
     assert cut.connect.call_args_list[0].args == ()
-    assert cut.subscribe.call_count == 1
-    assert cut.subscribe.call_args_list[0].args == (expected_subscriptions,)
-
 
 # connect tests
 def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_attributes(
     mocker,
 ):
     # Arrange
-    expected_address = MagicMock()
-    expected_port = MagicMock()
-    expected_db = MagicMock()
-    expected_password = MagicMock()
+    expected_db = 0
+    expected_password = ''
+    #TODO: Run in a loop
+    fake_server_configs = [{"address": MagicMock(), "port": 1234,"db": 1, "password": 'test', "subscriptions": ["state_0", "state_1"]}, {"address": '000.000.000.222', "port": 5678, "db": 2, "password": 'test2', "subscriptions" : ["state_2", "state_3"]}]
+
     fake_server = MagicMock()
 
-    cut = DataSource.__new__(DataSource)
-    cut.address = expected_address
-    cut.port = expected_port
-    cut.db = expected_db
-    cut.password = expected_password
+    fake_message_listener = MagicMock()
+    fake_listen_thread = MagicMock()
 
-    mocker.patch(redis_adapter.__name__ + ".print_msg")
-    mocker.patch("redis.Redis", return_value=fake_server)
+    cut = DataSource.__new__(DataSource)
+    cut.server_configs = fake_server_configs
+    cut.servers = []
+    cut.message_listener = fake_message_listener
+    
+    
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+    mocker.patch('redis.Redis', return_value=fake_server)
+    mocker.patch.object(fake_server, 'ping')
+    mocker.patch('threading.Thread', return_value=fake_listen_thread)
+    mocker.patch.object(fake_listen_thread, 'start')
 
     # Act
     cut.connect()
 
     # Assert
-    assert redis_adapter.print_msg.call_count == 2
-    assert redis_adapter.print_msg.call_args_list[0].args == (
-        "Redis adapter connecting to server...",
-    )
-    assert redis.Redis.call_count == 1
-    assert redis.Redis.call_args_list[0].args == (expected_address, expected_port, expected_db, expected_password)
-    assert fake_server.ping.call_count == 1
-    assert redis_adapter.print_msg.call_args_list[1].args == ("... connected!",)
-    assert cut.server == fake_server
+    assert redis_adapter.print_msg.call_count == 7
+    assert redis_adapter.print_msg.call_args_list[0].args == ('Redis adapter connecting to server...',)
+    assert redis_adapter.print_msg.call_args_list[1].args == ('... connected to server # 0!',)
+    assert redis_adapter.print_msg.call_args_list[2].args == ('Subscribing to channel: state_0 on server # 0',) 
+    assert redis_adapter.print_msg.call_args_list[3].args == ('Subscribing to channel: state_1 on server # 0',) 
+    assert redis_adapter.print_msg.call_args_list[4].args == ('... connected to server # 1!',)
+    assert redis_adapter.print_msg.call_args_list[5].args == ('Subscribing to channel: state_2 on server # 1',)
+    assert redis_adapter.print_msg.call_args_list[6].args == ('Subscribing to channel: state_3 on server # 1',) 
+     
+    assert redis.Redis.call_count == 2
+    assert redis.Redis.call_args_list[0].args == (fake_server_configs[0]["address"], fake_server_configs[0]["port"], fake_server_configs[0]["db"], fake_server_configs[0]["password"] )
+    assert redis.Redis.call_args_list[1].args == (fake_server_configs[1]["address"], fake_server_configs[1]["port"], fake_server_configs[1]["db"], fake_server_configs[1]["password"] )
+    
+    assert fake_server.ping.call_count == 2
+    assert cut.servers == [fake_server, fake_server]
+
+#TODO: Need a test that shows that all of the default vals get used for server config
+# connect tests
+def test_redis_adapter_DataSource_connect_establishes_server_with_default_attributes(mocker):
+    # Arrange
+    expected_address = 'localhost'
+    expected_port = 6379
+    expected_db = 0
+    expected_password = ''
+
+    fake_server_configs = [{"subscriptions": ["state_0", "state_1"]}, {"subscriptions" : ["state_2", "state_3"]}]
+
+    fake_server = MagicMock()
+
+    fake_message_listener = MagicMock()
+    fake_listen_thread = MagicMock()
+
+    cut = DataSource.__new__(DataSource)
+    cut.server_configs = fake_server_configs
+    cut.servers = []
+    cut.message_listener = fake_message_listener
+    
+    
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+    mocker.patch('redis.Redis', return_value=fake_server)
+    mocker.patch.object(fake_server, 'ping')
+    mocker.patch('threading.Thread', return_value=fake_listen_thread)
+    mocker.patch.object(fake_listen_thread, 'start')
+
+    # Act
+    cut.connect()
+
+    # Assert
+    assert redis.Redis.call_count == 2
+    assert redis.Redis.call_args_list[0].args == (expected_address, expected_port, expected_db, expected_password )
+    assert redis.Redis.call_args_list[1].args == (expected_address, expected_port, expected_db, expected_password )
+    
 
 
 def test_redis_adapter_DataSource_fails_to_connect_to_server(mocker):
     # Arrange
-    expected_address = MagicMock()
-    expected_port = MagicMock()
-    expected_db = MagicMock()
-    expected_password = MagicMock()
+    expected_address = 'localhost'
+    expected_port = 6379
+    expected_db = 0
+    expected_password = ''
+    
+    fake_server_configs = [{"subscriptions": ["state_0", "state_1"]}, {"subscriptions" : ["state_2", "state_3"]}]
     fake_server = MagicMock()
 
-    cut = DataSource.__new__(DataSource)
-    cut.address = expected_address
-    cut.port = expected_port
-    cut.db = expected_db
-    cut.password = expected_password
+    fake_message_listener = MagicMock()
+    fake_listen_thread = MagicMock()
 
-    mocker.patch(redis_adapter.__name__ + ".print_msg")
-    mocker.patch("redis.Redis", return_value=fake_server)
-    mocker.patch.object(fake_server, "ping", return_value=False)
+    cut = DataSource.__new__(DataSource)
+    cut.server_configs = fake_server_configs
+    cut.servers = []
+
+    mocker.patch(redis_adapter.__name__ + '.print_msg')
+    mocker.patch('redis.Redis', return_value=fake_server)
+    mocker.patch.object(fake_server, 'ping', return_value=False)
+    mocker.patch('threading.Thread', return_value=fake_listen_thread)
+    mocker.patch.object(fake_listen_thread, 'start')
+    
 
     # Act
     cut.connect()
 
     # Assert
-    assert redis_adapter.print_msg.call_count == 1
-    assert redis_adapter.print_msg.call_args_list[0].args == (
-        "Redis adapter connecting to server...",
-    )
-    assert redis.Redis.call_count == 1
+    assert redis_adapter.print_msg.call_count == 7
+    assert redis_adapter.print_msg.call_args_list[0].args == ("Redis adapter connecting to server...",)
+    assert redis.Redis.call_count == 2
     assert redis.Redis.call_args_list[0].args == (expected_address, expected_port, expected_db, expected_password)
-    assert fake_server.ping.call_count == 1
-    assert cut.server == fake_server
+    assert fake_server.ping.call_count == 2
+    assert cut.servers  == [fake_server, fake_server]
 
 
 # subscribe_message tests
