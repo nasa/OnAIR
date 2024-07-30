@@ -41,8 +41,11 @@ class DataSource(OnAirDataSource):
         self.connect()
 
     def connect(self):
+        num_redis_print_msg_calls = 0
         """Establish connection to REDIS server."""
+        print("Here")
         print_msg('Redis adapter connecting to server...')
+        num_redis_print_msg_calls += 1
         for idx, server_config in enumerate(self.server_configs):
             server_config_keys = server_config.keys()
             if 'address' in server_config_keys:

@@ -19,7 +19,9 @@ import threading
 
 # __init__ tests
 def test_redis_adapter_DataSource__init__sets_redis_values_then_connects(mocker):
+def test_redis_adapter_DataSource__init__sets_redis_values_then_connects(mocker):
     # Arrange
+    expected_server = []
     expected_server = []
     expected_subscriptions = MagicMock()
 
@@ -42,11 +44,14 @@ def test_redis_adapter_DataSource__init__sets_redis_values_then_connects(mocker)
     # Act
     cut.__init__(arg_data_file, arg_meta_file, arg_ss_breakdown)
 
+    #TO CHECK: Anything you mocked, anything you changed, and what your test name is looking for
     # Assert
     assert OnAirDataSource.__init__.call_count == 1
     assert OnAirDataSource.__init__.call_args_list[0].args == (arg_data_file, arg_meta_file, arg_ss_breakdown)
     assert cut.servers == expected_server
+    assert cut.servers == expected_server
     assert cut.new_data_lock == fake_new_data_lock
+    assert threading.Lock.call_count == 1
     assert threading.Lock.call_count == 1
     assert cut.new_data == False
     assert cut.currentData == [{'headers':fake_order,
@@ -62,7 +67,15 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_at
     # Arrange
     fake_server_configs = [{"address": MagicMock(), "port": 1234,"db": 1, "password": 'test', "subscriptions": ["state_0", "state_1"]}, {"address": '000.000.000.222', "port": 5678, "db": 2, "password": 'test2', "subscriptions" : ["state_2", "state_3"]}]
 
+    expected_db = 0
+    expected_password = ''
+    #TODO: Run in a loop
+    fake_server_configs = [{"address": MagicMock(), "port": 1234,"db": 1, "password": 'test', "subscriptions": ["state_0", "state_1"]}, {"address": '000.000.000.222', "port": 5678, "db": 2, "password": 'test2', "subscriptions" : ["state_2", "state_3"]}]
+
     fake_server = MagicMock()
+
+    fake_message_listener = MagicMock()
+    fake_listen_thread = MagicMock()
 
     fake_message_listener = MagicMock()
     fake_listen_thread = MagicMock()
@@ -73,8 +86,16 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_at
     cut.message_listener = fake_message_listener
     
     
+    cut.server_configs = fake_server_configs
+    cut.servers = []
+    cut.message_listener = fake_message_listener
+    
+    
     mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch('redis.Redis', return_value=fake_server)
+    mocker.patch.object(fake_server, 'ping')
+    mocker.patch('threading.Thread', return_value=fake_listen_thread)
+    mocker.patch.object(fake_listen_thread, 'start')
     mocker.patch.object(fake_server, 'ping')
     mocker.patch('threading.Thread', return_value=fake_listen_thread)
     mocker.patch.object(fake_listen_thread, 'start')
@@ -83,6 +104,7 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_at
     cut.connect()
 
     # Assert
+    assert redis_adapter.print_msg.call_count == 7
     assert redis_adapter.print_msg.call_count == 7
     assert redis_adapter.print_msg.call_args_list[0].args == ('Redis adapter connecting to server...',)
     assert redis_adapter.print_msg.call_args_list[1].args == ('... connected to server # 0!',)
@@ -99,6 +121,7 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_at
     assert fake_server.ping.call_count == 2
     assert cut.servers == [fake_server, fake_server]
 
+#TODO: Need a test that shows that all of the default vals get used for server config
 # connect tests
 def test_redis_adapter_DataSource_connect_establishes_server_with_default_attributes(mocker):
     # Arrange
@@ -135,9 +158,21 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_default_attrib
     assert redis.Redis.call_args_list[1].args == (expected_address, expected_port, expected_db, expected_password )
     
 
-def test_redis_adapter_DataSource_fails_to_connect_to_server_with_ping_and_states_no_subscriptions_(mocker):    
-    fake_server_configs = [{"subscriptions": ["state_0", "state_1"]}, {"subscriptions": ["state_2", "state_3"]}]
+def test_redis_adapter_DataSource_fails_to_connect_to_server(mocker):
+    # Arrange
+    expected_address = 'localhost'
+    expected_port = 6379
+    expected_db = 0
+    expected_password = ''
+    
+    fake_server_configs = [{"subscriptions": ["state_0", "state_1"]}, {"subscriptions" : ["state_2", "state_3"]}]
     fake_server = MagicMock()
+
+    fake_message_listener = MagicMock()
+    fake_listen_thread = MagicMock()
+
+    fake_message_listener = MagicMock()
+    fake_listen_thread = MagicMock()
 
     cut = DataSource.__new__(DataSource)
     cut.server_configs = fake_server_configs
@@ -145,22 +180,21 @@ def test_redis_adapter_DataSource_fails_to_connect_to_server_with_ping_and_state
 
     mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch('redis.Redis', return_value=fake_server)
-    mocker.patch.object(fake_server, 'ping', side_effect=ConnectionError)
+    mocker.patch.object(fake_server, 'ping', return_value=False)
+    mocker.patch('threading.Thread', return_value=fake_listen_thread)
+    mocker.patch.object(fake_listen_thread, 'start')
+    
 
     # Act
-    cut.connect()   
+    cut.connect()
 
     # Assert
-    assert redis_adapter.print_msg.call_count == 3
+    assert redis_adapter.print_msg.call_count == 7
     assert redis_adapter.print_msg.call_args_list[0].args == ("Redis adapter connecting to server...",)
     assert redis.Redis.call_count == 2
+    assert redis.Redis.call_args_list[0].args == (expected_address, expected_port, expected_db, expected_password)
     assert fake_server.ping.call_count == 2
     assert cut.servers  == [fake_server, fake_server]
-    
-    assert redis_adapter.print_msg.call_args_list[0].args == ('Redis adapter connecting to server...',)
-    assert redis_adapter.print_msg.call_args_list[1].args == ('Did not connect to server # 0. Not setting up subscriptions.', 'RED')
-    assert redis_adapter.print_msg.call_args_list[2].args == ('Did not connect to server # 1. Not setting up subscriptions.', 'RED')
-       
 
 # subscribe_message tests
 def test_redis_adapter_DataSource_subscribe_subscribes_to_each_given_subscription_and_starts_listening_when_server_available(mocker):
