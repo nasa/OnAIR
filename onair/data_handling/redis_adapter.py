@@ -41,8 +41,11 @@ class DataSource(OnAirDataSource):
         self.connect()
 
     def connect(self):
+        num_redis_print_msg_calls = 0
         """Establish connection to REDIS server."""
+        print("Here")
         print_msg('Redis adapter connecting to server...')
+        num_redis_print_msg_calls += 1
         for idx, server_config in enumerate(self.server_configs):
             server_config_keys = server_config.keys()
             if 'address' in server_config_keys:
@@ -66,26 +69,34 @@ class DataSource(OnAirDataSource):
                 password = ''
 
             self.servers.append(redis.Redis(address, port, db, password))
-
-            if self.servers[-1].ping():
+            print("Appended to servers")
+           
+            try:
+                print("In try")
+                self.servers[-1].ping()
                 print_msg(f'... connected to server # {idx}!')
-            else:
-                print_msg(f'Did not connect to server # {idx}', 'RED')
-            
-            #if there are subscriptions in this Redis server configuration's subscription key
-            if len(server_config['subscriptions']) !=0:
-                #Set up Redis pubsub function for the current server
-                pubsub = self.servers[-1].pubsub()
+                num_redis_print_msg_calls += 1
 
-                for s in server_config['subscriptions']:
-                    pubsub.subscribe(s)
-                    print_msg(f"Subscribing to channel: {s} on server # {idx}")
+                #if there are subscriptions in this Redis server configuration's subscription key
+                if len(server_config['subscriptions']) !=0:
+                    #Set up Redis pubsub function for the current server
+                    pubsub = self.servers[-1].pubsub()
 
-                listen_thread = threading.Thread(target=self.message_listener, args=(pubsub,))
-                listen_thread.start()
-            else:
-                print_msg(f"No subscriptions given!")
+                    for s in server_config['subscriptions']:
+                        pubsub.subscribe(s)
+                        print_msg(f"Subscribing to channel: {s} on server # {idx}")
+                        num_redis_print_msg_calls += 1
+                    listen_thread = threading.Thread(target=self.message_listener, args=(pubsub,))
+                    listen_thread.start()
+                else:
+                    print_msg(f"No subscriptions given!")
+                    num_redis_print_msg_calls += 1
 
+            except:
+                print_msg(f'Did not connect to server # {idx}. Not setting up subscriptions.', 'RED')
+                num_redis_print_msg_calls += 1
+
+        print("num_redis_print_msg_calls: ", num_redis_print_msg_calls)
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         self.server_configs = []
