@@ -43,7 +43,6 @@ class DataSource(OnAirDataSource):
     def connect(self):
         num_redis_print_msg_calls = 0
         """Establish connection to REDIS server."""
-        print("Here")
         print_msg('Redis adapter connecting to server...')
         num_redis_print_msg_calls += 1
         for idx, server_config in enumerate(self.server_configs):
@@ -77,6 +76,7 @@ class DataSource(OnAirDataSource):
                     #Ping server to make sure we can connect
                     self.servers[-1].ping()
                     print_msg(f'... connected to server # {idx}!')
+                    num_redis_print_msg_calls += 1
 
                     #Set up Redis pubsub function for the current server
                     pubsub = self.servers[-1].pubsub()
@@ -90,9 +90,14 @@ class DataSource(OnAirDataSource):
                 #This except will be hit if self.servers[-1].ping() threw an exception (could not properly ping server)
                 except:
                     print_msg(f'Did not connect to server # {idx}. Not setting up subscriptions.', 'RED')
+                    num_redis_print_msg_calls += 1
 
             else:
-                print_msg("No subscriptions given! Redis server not created")       
+                print_msg("No subscriptions given! Redis server not created")
+                num_redis_print_msg_calls += 1           
+           
+
+        print("num_redis_print_msg_calls: ", num_redis_print_msg_calls)
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         self.server_configs = []
@@ -103,13 +108,16 @@ class DataSource(OnAirDataSource):
 
         # Setup redis server configuration
         #Checking if 'redis' exists
+        #Checking if 'redis' exists
         if 'redis' in keys:
             count_server_config = 0
             #Checking if dictionaries within 'redis' key each have a 'subscription' key. Error will be thrown if not.
             for server_config in meta['redis']:
                 redis_config_keys = server_config.keys()
                 if ('subscriptions' in redis_config_keys) == False:
+                if ('subscriptions' in redis_config_keys) == False:
                     raise ConfigKeyError(f'Config file: \'{meta_data_file}\' ' \
+                        f'missing required key \'subscriptions\' from {count_server_config} in key \'redis\'')  
                         f'missing required key \'subscriptions\' from {count_server_config} in key \'redis\'')  
                 count_server_config +=1
 
