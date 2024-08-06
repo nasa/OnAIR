@@ -44,10 +44,8 @@ class DataSource(OnAirDataSource):
         self.connect()
 
     def connect(self):
-        num_redis_print_msg_calls = 0
         """Establish connection to REDIS server."""
         print_msg('Redis adapter connecting to server...')
-        num_redis_print_msg_calls += 1
         for idx, server_config in enumerate(self.server_configs):
             server_config_keys = server_config.keys()
             if 'address' in server_config_keys:
@@ -79,7 +77,6 @@ class DataSource(OnAirDataSource):
                     #Ping server to make sure we can connect
                     self.servers[-1].ping()
                     print_msg(f'... connected to server # {idx}!')
-                    num_redis_print_msg_calls += 1
 
                     #Set up Redis pubsub function for the current server
                     pubsub = self.servers[-1].pubsub()
@@ -87,21 +84,15 @@ class DataSource(OnAirDataSource):
                     for s in server_config['subscriptions']:
                         pubsub.subscribe(s)
                         print_msg(f"Subscribing to channel: {s} on server # {idx}")
-                        num_redis_print_msg_calls += 1
                     listen_thread = threading.Thread(target=self.message_listener, args=(pubsub,))
                     listen_thread.start()
 
                 #This except will be hit if self.servers[-1].ping() threw an exception (could not properly ping server)
                 except:
                     print_msg(f'Did not connect to server # {idx}. Not setting up subscriptions.', 'RED')
-                    num_redis_print_msg_calls += 1
 
             else:
-                print_msg("No subscriptions given! Redis server not created")
-                num_redis_print_msg_calls += 1           
-           
-
-        print("num_redis_print_msg_calls: ", num_redis_print_msg_calls)
+                print_msg("No subscriptions given! Redis server not created")       
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         self.server_configs = []
