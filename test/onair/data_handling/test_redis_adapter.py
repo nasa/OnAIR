@@ -20,8 +20,6 @@ import threading
 # __init__ tests
 def test_redis_adapter_DataSource__init__sets_redis_values_then_connects_and_subscribes_to_subscriptions(mocker):
     # Arrange
-    expected_address = 'localhost'
-    expected_port = 6379
     expected_db = 0
     expected_server = None
     expected_subscriptions = MagicMock()
@@ -50,8 +48,6 @@ def test_redis_adapter_DataSource__init__sets_redis_values_then_connects_and_sub
     # Assert
     assert OnAirDataSource.__init__.call_count == 1
     assert OnAirDataSource.__init__.call_args_list[0].args == (arg_data_file, arg_meta_file, arg_ss_breakdown)
-    assert cut.address == expected_address
-    assert cut.port == expected_port
     assert cut.db == expected_db
     assert cut.server == expected_server
     assert cut.new_data_lock == fake_new_data_lock
@@ -72,12 +68,14 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_at
     expected_address = MagicMock()
     expected_port = MagicMock()
     expected_db = MagicMock()
+    expected_password = MagicMock()
     fake_server = MagicMock()
 
     cut = DataSource.__new__(DataSource)
     cut.address = expected_address
     cut.port = expected_port
     cut.db = expected_db
+    cut.password = expected_password
 
     mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch('redis.Redis', return_value=fake_server)
@@ -89,7 +87,7 @@ def test_redis_adapter_DataSource_connect_establishes_server_with_initialized_at
     assert redis_adapter.print_msg.call_count == 2
     assert redis_adapter.print_msg.call_args_list[0].args == ('Redis adapter connecting to server...',)
     assert redis.Redis.call_count == 1
-    assert redis.Redis.call_args_list[0].args == (expected_address, expected_port, expected_db)
+    assert redis.Redis.call_args_list[0].args == (expected_address, expected_port, expected_db, expected_password)
     assert fake_server.ping.call_count == 1
     assert redis_adapter.print_msg.call_args_list[1].args == ('... connected!',)
     assert cut.server == fake_server
@@ -99,12 +97,14 @@ def test_redis_adapter_DataSource_fails_to_connect_to_server(mocker):
     expected_address = MagicMock()
     expected_port = MagicMock()
     expected_db = MagicMock()
+    expected_password = MagicMock()
     fake_server = MagicMock()
 
     cut = DataSource.__new__(DataSource)
     cut.address = expected_address
     cut.port = expected_port
     cut.db = expected_db
+    cut.password = expected_password
 
     mocker.patch(redis_adapter.__name__ + '.print_msg')
     mocker.patch('redis.Redis', return_value=fake_server)
@@ -117,7 +117,7 @@ def test_redis_adapter_DataSource_fails_to_connect_to_server(mocker):
     assert redis_adapter.print_msg.call_count == 1
     assert redis_adapter.print_msg.call_args_list[0].args == ("Redis adapter connecting to server...",)
     assert redis.Redis.call_count == 1
-    assert redis.Redis.call_args_list[0].args == (expected_address, expected_port, expected_db)
+    assert redis.Redis.call_args_list[0].args == (expected_address, expected_port, expected_db, expected_password)
     assert fake_server.ping.call_count == 1
     assert cut.server == fake_server
 
@@ -627,6 +627,41 @@ def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_m
     assert redis_adapter.parseJson.call_args_list[0].args == (arg_configFile, )
     assert cut.subscriptions == expected_subscriptions
     assert result == expected_extracted_configs
+
+def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_for_redis_server_configurations(mocker):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    arg_configFile = MagicMock()
+    arg_ss_breakdown = MagicMock()
+
+
+    expected_extracted_configs = MagicMock()
+    expected_subscriptions = [MagicMock()] * pytest.gen.randint(0, 10) # 0 to 10 arbitrary
+    expected_address = MagicMock()
+    expected_port = MagicMock()
+    expected_password = MagicMock()
+    expected_redis_configs = {'address': expected_address, 'port': expected_port, 'password': expected_password}
+    fake_meta = {'fake_other_stuff': MagicMock(),
+                 'order': MagicMock(),
+                 'redis_subscriptions': expected_subscriptions,
+                 'redis': expected_redis_configs}
+
+    mocker.patch(redis_adapter.__name__ + '.extract_meta_data_handle_ss_breakdown', return_value=expected_extracted_configs)
+    mocker.patch(redis_adapter.__name__ + '.parseJson', return_value=fake_meta)
+
+    # Act
+    result = cut.parse_meta_data_file(arg_configFile, arg_ss_breakdown, )
+
+    # Assert
+    assert redis_adapter.extract_meta_data_handle_ss_breakdown.call_count == 1
+    assert redis_adapter.extract_meta_data_handle_ss_breakdown.call_args_list[0].args == (arg_configFile, arg_ss_breakdown)
+    assert redis_adapter.parseJson.call_count == 1
+    assert redis_adapter.parseJson.call_args_list[0].args == (arg_configFile, )
+    assert cut.subscriptions == expected_subscriptions
+    assert result == expected_extracted_configs
+    assert cut.address == expected_address
+    assert cut.port == expected_port
+    assert cut.password == expected_password
 
 def test_redis_adapter_DataSource_parse_meta_data_file_returns_call_to_extract_meta_data_handle_ss_breakdown_and_sets_subscriptions_to_empty_when_none_given(mocker):
     # Arrange
