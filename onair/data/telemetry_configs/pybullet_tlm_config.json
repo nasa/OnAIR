@@ -1,0 +1,35 @@
+{
+  "subsystems": {
+    "STATES": {
+      "time": {
+        "description": "Pybullet drone 0 state"
+      },
+      "sim_drone_0_state.pose": {
+        "description": "Pybullet drone 0 state"
+      },
+      "sim_drone_0_state.rpms": {
+        "description": "Pybullet drone 1 state"
+      },
+      "sim_drone_0_state.rpy": {
+        "description": "Pybullet drone 1 state"
+      },
+      "sim_drone_0_state.vel": {
+        "description": "Pybullet drone 1 state"
+      },
+      "sim_drone_0_state.ang_vel": {
+        "description": "Pybullet drone 1 state"
+      }
+    }
+  },
+  "redis_subscriptions": [
+    "sim_drone_0_state"
+  ],
+  "order": [
+    "time",
+    "sim_drone_0_state.pose",
+    "sim_drone_0_state.rpms",
+    "sim_drone_0_state.rpy",
+    "sim_drone_0_state.vel",
+    "sim_drone_0_state.ang_vel"
+  ]
+}
