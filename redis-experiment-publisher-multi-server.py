@@ -13,9 +13,9 @@ r1 = redis.Redis(host=redis_host,
                 password=redis_password,
                 decode_responses=True)
 
-# Initialize the Redis connection for server #1
+# Initialize the Redis connection for server #2
 redis_host = "localhost"
-redis_port = 6380
+redis_port = 6380 # Make sure you start your redis server with a different port
 # When your Redis server requires a password, fill it in here
 redis_password = ""
 # Connect to Redis
