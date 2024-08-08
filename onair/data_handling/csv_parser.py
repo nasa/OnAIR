@@ -11,7 +11,6 @@
 CSV Parser
 """
 
-import os
 import csv
 
 from onair.data_handling.on_air_data_source import OnAirDataSource
