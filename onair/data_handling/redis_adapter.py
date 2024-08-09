@@ -65,7 +65,6 @@ class DataSource(OnAirDataSource):
             else:
                 password = ''
                  
-                 
             #if there are subscriptions in this Redis server configuration's subscription key
             if len(server_config['subscriptions']) != 0:
                 #Create the servers and append them to self.servers list
@@ -78,27 +77,6 @@ class DataSource(OnAirDataSource):
 
                     #Set up Redis pubsub function for the current server
                     pubsub = self.servers[-1].pubsub()
-            if len(server_config['subscriptions']) != 0:
-                #Create the servers and append them to self.servers list
-                self.servers.append(redis.Redis(address, port, db, password))
-
-                try:
-                    #Ping server to make sure we can connect
-                    self.servers[-1].ping()
-                    print_msg(f'... connected to server # {idx}!')
-
-                    #Set up Redis pubsub function for the current server
-                    pubsub = self.servers[-1].pubsub()
-
-                    for s in server_config['subscriptions']:
-                        pubsub.subscribe(s)
-                        print_msg(f"Subscribing to channel: {s} on server # {idx}")
-                    listen_thread = threading.Thread(target=self.message_listener, args=(pubsub,))
-                    listen_thread.start()
-
-                #This except will be hit if self.servers[-1].ping() threw an exception (could not properly ping server)
-                except:
-                    print_msg(f'Did not connect to server # {idx}. Not setting up subscriptions.', 'RED')
 
                     for s in server_config['subscriptions']:
                         pubsub.subscribe(s)
@@ -112,7 +90,6 @@ class DataSource(OnAirDataSource):
 
             else:
                 print_msg("No subscriptions given! Redis server not created")       
-                print_msg("No subscriptions given! Redis server not created")       
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         self.server_configs = []
@@ -123,16 +100,13 @@ class DataSource(OnAirDataSource):
 
         # Setup redis server configuration
         #Checking if 'redis' exists
-        #Checking if 'redis' exists
         if 'redis' in keys:
             count_server_config = 0
             #Checking if dictionaries within 'redis' key each have a 'subscription' key. Error will be thrown if not.
             for server_config in meta['redis']:
                 redis_config_keys = server_config.keys()
                 if ('subscriptions' in redis_config_keys) == False:
-                if ('subscriptions' in redis_config_keys) == False:
                     raise ConfigKeyError(f'Config file: \'{meta_data_file}\' ' \
-                        f'missing required key \'subscriptions\' from {count_server_config} in key \'redis\'')  
                         f'missing required key \'subscriptions\' from {count_server_config} in key \'redis\'')  
                 count_server_config +=1
 
