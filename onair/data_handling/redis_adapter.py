@@ -57,7 +57,7 @@ class DataSource(OnAirDataSource):
                 port = server_config['port']
             else:
                 port = 6379
-            
+
             if 'db' in server_config_keys:
                 db = server_config['db']
             else:
@@ -67,7 +67,7 @@ class DataSource(OnAirDataSource):
                 password = server_config['password']
             else:
                 password = ''
-                 
+
             #if there are subscriptions in this Redis server configuration's subscription key
             if len(server_config['subscriptions']) != 0:
                 #Create the servers and append them to self.servers list
@@ -89,10 +89,10 @@ class DataSource(OnAirDataSource):
 
                 #This except will be hit if self.servers[-1].ping() threw an exception (could not properly ping server)
                 except:
-                    print_msg(f'Did not connect to server # {idx}. Not setting up subscriptions.', 'RED')
+                    print_msg(f'Did not connect to server # {idx}. Not setting up subscriptions.', ['FAIL'])
 
             else:
-                print_msg("No subscriptions given! Redis server not created")       
+                print_msg("No subscriptions given! Redis server not created")
 
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         self.server_configs = []
@@ -110,7 +110,7 @@ class DataSource(OnAirDataSource):
                 redis_config_keys = server_config.keys()
                 if ('subscriptions' in redis_config_keys) == False:
                     raise ConfigKeyError(f'Config file: \'{meta_data_file}\' ' \
-                        f'missing required key \'subscriptions\' from {count_server_config} in key \'redis\'')  
+                        f'missing required key \'subscriptions\' from {count_server_config} in key \'redis\'')
                 count_server_config +=1
 
             #Saving all of Redis dictionaries from JSON file to self.server_configs
@@ -121,7 +121,7 @@ class DataSource(OnAirDataSource):
         else:
             raise ConfigKeyError(f'Config file: \'{meta_data_file}\' ' \
                                 'missing required key \'order\'')
-    
+
         return configs
 
     def process_data_file(self, data_file):
