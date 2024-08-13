@@ -14,7 +14,8 @@ import numpy as np
 
 # mock dependencies of tflite_model plugin
 import sys
-sys.modules['tflite'] = MagicMock()
+sys.modules['tensorflow'] = MagicMock()
+sys.modules['tensorflow.lite'] = MagicMock()
 
 from plugins.tflite_model.tflite_model_plugin import Plugin as tflite_model_Plugin
 
