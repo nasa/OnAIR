@@ -28,7 +28,7 @@ It is intended to explore research concepts in autonomous operations in a simula
 ## Quick Start
 
 **NOTE:** You may need to put your specific python version in place of `python`, e.g., `python3.12`  
-**NOTE:** Some environments may require you to use the `-m` option to run python modules, e.g., `python -m coverage report`
+**NOTE:** You may need the `-m` option to run python modules, e.g., `python -m coverage report`
 
 ### 1. Clone the repository:  
 ```
@@ -50,7 +50,6 @@ conda activate onair-env
 - **Option C**: Whatever works for you!  
 
 ### 3. Run the unit tests:
-**NOTE:** You may need to run coverage with python and the -m option, `python -m coverage report`  
 ```
 python driver.py -t
 coverage report
@@ -97,7 +96,7 @@ Refer to the Documentation section for more detailed information on customizatio
 
 ** Under Construction, please pardon our dust. **
 
-### Welcome, You Are Now Live with OnAIR!
+### Welcome, You Are Now Live with <span style="color: DeepSkyBlue;">On</span><span style="color: orange;">AI</span><span style="color: DeepSkyBlue;">R</span>!
   - What is OnAIR?
   - More Importantly, What Isn't OnAIR?
   - How to Use This Guide
