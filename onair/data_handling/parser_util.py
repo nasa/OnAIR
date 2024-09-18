@@ -7,7 +7,6 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
-import os
 from .tlm_json_parser import parseTlmConfJson, str2lst
 import datetime
 
