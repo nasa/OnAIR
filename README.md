@@ -96,7 +96,7 @@ Refer to the Documentation section for more detailed information on customizatio
 
 ** Under Construction, please pardon our dust. **
 
-### Welcome, You Are Now Live with <span style="color: DeepSkyBlue;">On</span><span style="color: orange;">AI</span><span style="color: DeepSkyBlue;">R</span>!
+### Welcome, You Are Now Live with <font color="DeepSkyBlue">On</font><font color="orange">AI</font><font color="DeepSkyBlue">R</font>!
   - What is OnAIR?
   - More Importantly, What Isn't OnAIR?
   - How to Use This Guide
