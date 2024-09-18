@@ -11,9 +11,6 @@
 Sim class
 Helper class to create and run a simulation
 """
-
-import importlib
-
 from ..reasoning.agent import Agent
 from ..systems.vehicle_rep import VehicleRepresentation
 from ..util.file_io import *
