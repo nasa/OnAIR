@@ -92,11 +92,12 @@ Explore the [config directory](https://github.com/nasa/OnAIR/tree/main/onair/con
 Start developing by plugging in your data source and your own cognitive components.
 Refer to the Documentation section for more detailed information on customization and advanced features.
 
+
 ## User Guide
 
 ** Under Construction, please pardon our dust. **
 
-### Welcome, You Are Now Live with $\color{blue}{On}\color{orange}{AI}\color{blue}{R}$!
+### Welcome, You Are Now Live with $\color{dodgerblue}{On}\color{orangered}{AI}\color{dodgerblue}{R}$!
   - What is OnAIR?
   - More Importantly, What Isn't OnAIR?
   - How to Use This Guide
