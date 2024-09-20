@@ -9,6 +9,7 @@
 
 import simdkalman
 import numpy as np
+from onair.data_handling.parser_util import floatify_input
 from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
 class Plugin(AIPlugin):
@@ -19,11 +20,11 @@ class Plugin(AIPlugin):
         :param residual_threshold: (float) threshold of residual above which is considered a fault
         """
         super().__init__(name, headers)
-        self.frames = []
         self.component_name = name
         self.headers = headers
         self.window_size = window_size
         self.residual_threshold = residual_threshold
+        self.frames = [[] for _ in range(len(headers))]
 
         self.kf = simdkalman.KalmanFilter(
         state_transition = [[1,1],[0,1]],      # matrix A
@@ -31,23 +32,17 @@ class Plugin(AIPlugin):
         observation_model = np.array([[1,0]]), # H
         observation_noise = 1.0)               # R
 
-    #### START: Classes mandated by plugin architecture
-    def update(self, frame):
+    def update(self, low_level_data):
         """
-        :param frame: (list of floats) input sequence of len (input_dim)
+        :param low_level_data: (list of data points) input sequence of len (input_dim)
         :return: None
         """
-        for data_point_index in range(len(frame)):
-            # If the frames variable is empty, append each data point in frame to it, each point wrapped as a list
-            # This is done so the data can have each attribute grouped in one list before being passed to kalman
-            # Ex: [[1:00, 1:01, 1:02, 1:03, 1:04, 1:05], [1, 2, 3, 4, 5]]
-            if len(self.frames) < len(frame):
-                self.frames.append([float(frame[data_point_index])])
-            else:
-                self.frames[data_point_index].append(float(frame[data_point_index]))
-                # If after adding a point to the frame, that attribute is larger than the window_size, take out the first element
-                if len(self.frames[data_point_index]) > self.window_size:
-                    self.frames[data_point_index].pop(0)
+        frame = floatify_input(low_level_data)
+
+        for i, value in enumerate(frame):
+            self.frames[i].append(value)
+            if len(self.frames[i]) > self.window_size:
+                self.frames[i].pop(0)
 
     def render_reasoning(self):
         """
@@ -60,16 +55,15 @@ class Plugin(AIPlugin):
             if residuals_above_thresh[attribute_index] and not self.headers[attribute_index].upper() == 'TIME':
                 broken_attributes.append(self.headers[attribute_index])
         return broken_attributes
-    #### END: Classes mandated by plugin architecture
 
-    def _predict(self, subframe, forward_steps, initial_val = None):
+    def _predict(self, subframe, forward_steps, initial_val):
         '''
         :param subframe: (list of list of floats) data for kalman filter prediction
         :param forward_steps: (int) number of forward predictions to make
         :param initial_val: (list of floats) initial value for kalman filter
         :return: predicted values
         '''
-        smoothed = self.kf.smooth(subframe, initial_value = initial_val)
+        self.kf.smooth(subframe, initial_value = initial_val)
         predictions =  self.kf.predict(subframe, forward_steps)
         return predictions
 

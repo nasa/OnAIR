@@ -10,206 +10,250 @@
 """ Test Kalman Plugin Functionality """
 import pytest
 from unittest.mock import MagicMock
-import onair
 import numpy as np
 
 from plugins.kalman import kalman_plugin
 from plugins.kalman.kalman_plugin import Plugin as Kalman
 
 # test init
-def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args_except_window_size_and_residual_threshold(mocker):
+def test_Kalman__init__initializes_variables_using_both_given_and_default_arguments_and_creates_filter_when_only_given_required_arguments(mocker):
     # Arrange
     arg_name = MagicMock()
-    arg_headers = [MagicMock(), MagicMock()]
-
-    fake_var = MagicMock()
-    class Fake_KalmanFilter():
-        def __init__(self, state_transition, process_noise, observation_model, observation_noise):
-            self.test_var = fake_var
-            self.state_transition = state_transition
-            self.process_noise = process_noise
-            self.observation_model = observation_model
-            self.observation_noise = observation_noise
-
+    arg_headers = MagicMock()
+    arg_headers.__len__.return_value = pytest.gen.randint(1, 10)
+    fake_kf = MagicMock()
     forced_diag_return_value = MagicMock()
     forced_array_return_value = MagicMock()
-    mocker.patch(kalman_plugin.__name__ + '.simdkalman.KalmanFilter', Fake_KalmanFilter)
+    expected_default_window_size = 15
+    expected_default_residual_threshold = 1.5
+    expected_state_transition = [[1,1],[0,1]]
+    expected_process_noise = forced_diag_return_value
+    expected_observation_model = forced_array_return_value
+    expected_observation_noise = 1.0
+
+    mocker.patch(kalman_plugin.__name__ + '.simdkalman.KalmanFilter', return_value=fake_kf)
     mocker.patch(kalman_plugin.__name__ + '.np.diag', return_value=forced_diag_return_value)
     mocker.patch(kalman_plugin.__name__ + '.np.array', return_value=forced_array_return_value)
 
     cut = Kalman.__new__(Kalman)
+    parent_of_cut = cut.__class__.__mro__[1]
+
+    mocker.patch.object(parent_of_cut, "__init__", return_value=MagicMock())
 
     # Act
     cut.__init__(arg_name, arg_headers)
 
     # Assert
-    assert cut.frames == []
+    assert parent_of_cut.__init__.call_count == 1
+    assert parent_of_cut.__init__.call_args_list[0].args == (arg_name, arg_headers)
+    assert len(cut.frames) == len(arg_headers)
+    assert all(isinstance(frame, list) and len(frame) == 0 for frame in cut.frames)
     assert cut.component_name == arg_name
     assert cut.headers == arg_headers
-    assert cut.window_size == 15
-    assert cut.residual_threshold == 1.5
-    assert isinstance(cut.kf, Fake_KalmanFilter)
-    assert cut.kf.test_var == fake_var
-    assert cut.kf.state_transition == [[1,1],[0,1]]
-    assert cut.kf.process_noise == forced_diag_return_value
-    assert cut.kf.observation_model == forced_array_return_value
-    assert cut.kf.observation_noise == 1.0
+    assert cut.window_size == expected_default_window_size
+    assert cut.residual_threshold == expected_default_residual_threshold
+    assert cut.kf is fake_kf
+    assert kalman_plugin.simdkalman.KalmanFilter.call_count == 1
+    assert kalman_plugin.simdkalman.KalmanFilter.call_args_list[0].args == ()
+    assert kalman_plugin.simdkalman.KalmanFilter.call_args_list[0].kwargs == {
+        'state_transition':expected_state_transition,
+        'process_noise':expected_process_noise,
+        'observation_model':expected_observation_model,
+        'observation_noise':expected_observation_noise,
+    }
 
-def test_Kalman__init__initializes_variables_to_expected_values_when_given_all_args(mocker):
+def test_Kalman__init__initializes_variables_using_given_arguments_and_creates_filter_when_given_required_and_optional_arguments(mocker):
     # Arrange
     arg_name = MagicMock()
-    arg_headers = [MagicMock(), MagicMock()]
-    arg_window_size = MagicMock()
-    arg_residual_threshold = MagicMock()
-
-    fake_var = MagicMock()
-    class Fake_KalmanFilter():
-        def __init__(self, state_transition, process_noise, observation_model, observation_noise):
-            self.test_var = fake_var
-            self.state_transition = state_transition
-            self.process_noise = process_noise
-            self.observation_model = observation_model
-            self.observation_noise = observation_noise
-
+    arg_headers = MagicMock()
+    arg_headers.__len__.return_value = pytest.gen.randint(1, 10)
+    arg_default_window_size = MagicMock()
+    arg_default_residual_threshold = MagicMock()
+    fake_kf = MagicMock()
     forced_diag_return_value = MagicMock()
     forced_array_return_value = MagicMock()
-    mocker.patch(kalman_plugin.__name__ + '.simdkalman.KalmanFilter', Fake_KalmanFilter)
+    expected_state_transition = [[1,1],[0,1]]
+    expected_process_noise = forced_diag_return_value
+    expected_observation_model = forced_array_return_value
+    expected_observation_noise = 1.0
+
+    mocker.patch(kalman_plugin.__name__ + '.simdkalman.KalmanFilter', return_value=fake_kf)
     mocker.patch(kalman_plugin.__name__ + '.np.diag', return_value=forced_diag_return_value)
     mocker.patch(kalman_plugin.__name__ + '.np.array', return_value=forced_array_return_value)
 
     cut = Kalman.__new__(Kalman)
+    parent_of_cut = cut.__class__.__mro__[1]
+    mocker.patch.object(parent_of_cut, "__init__", return_value=MagicMock())
 
     # Act
-    cut.__init__(arg_name, arg_headers, arg_window_size, arg_residual_threshold)
+    cut.__init__(arg_name, arg_headers, arg_default_window_size, arg_default_residual_threshold)
 
     # Assert
-    assert cut.frames == []
+    assert parent_of_cut.__init__.call_count == 1
+    assert parent_of_cut.__init__.call_args_list[0].args == (arg_name, arg_headers)
+    assert len(cut.frames) == len(arg_headers)
+    assert all(isinstance(frame, list) and len(frame) == 0 for frame in cut.frames)
     assert cut.component_name == arg_name
     assert cut.headers == arg_headers
-    assert cut.window_size == arg_window_size
-    assert cut.residual_threshold == arg_residual_threshold
-    assert isinstance(cut.kf, Fake_KalmanFilter)
-    assert cut.kf.test_var == fake_var
-    assert cut.kf.state_transition == [[1,1],[0,1]]
-    assert cut.kf.process_noise == forced_diag_return_value
-    assert cut.kf.observation_model == forced_array_return_value
-    assert cut.kf.observation_noise == 1.0
+    assert cut.window_size == arg_default_window_size
+    assert cut.residual_threshold == arg_default_residual_threshold
+    assert cut.kf is fake_kf
+    assert kalman_plugin.simdkalman.KalmanFilter.call_count == 1
+    assert kalman_plugin.simdkalman.KalmanFilter.call_args_list[0].args == ()
+    assert kalman_plugin.simdkalman.KalmanFilter.call_args_list[0].kwargs == {
+        'state_transition':expected_state_transition,
+        'process_noise':expected_process_noise,
+        'observation_model':expected_observation_model,
+        'observation_noise':expected_observation_noise,
+    }
 
 # test update
-def test_Kalman_update_does_not_mutate_frames_attribute_when_arg_frame_is_empty():
+def test_Kalman_update_with_initially_empty_frames(mocker):
     # Arrange
-    fake_frames = MagicMock()
-    arg_frame = []
-
     cut = Kalman.__new__(Kalman)
-    cut.frames = fake_frames
+    num_fake_data_points = pytest.gen.randint(1, 10)
+    cut.frames = [[] for _ in range(num_fake_data_points)]
+    cut.window_size = 1 # smallest value without popping starting at none
+
+    input_data = [pytest.gen.uniform(-10, 10) for _ in range(num_fake_data_points)]
+    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=input_data)
 
     # Act
-    cut.update(arg_frame)
+    cut.update(input_data)
 
     # Assert
-    assert cut.frames == fake_frames
+    assert len(cut.frames) == num_fake_data_points
+    for i, frame in enumerate(cut.frames):
+        assert frame == [input_data[i]]
 
-def test_Kalman_update_mutates_frames_attribute_as_expected_when_frames_is_empty_and_arg_frame_is_not_empty():
+def test_Kalman_update_with_existing_data_in_frames_but_less_than_full_window_size(mocker):
     # Arrange
-    fake_frames = []
-    len_arg_frame = pytest.gen.randint(1, 10) # arbitrary, random integer from 1 to 10
-    arg_frame = [pytest.gen.randint(-10, 10)] * len_arg_frame
-
     cut = Kalman.__new__(Kalman)
-    cut.frames = fake_frames
+    num_headers = pytest.gen.randint(1, 10)
+    existing_data_points = pytest.gen.randint(1, 4)
+    cut.window_size = pytest.gen.randint(
+        existing_data_points + 1, 
+        existing_data_points + 5
+    ) # arbitrary 1-5 extra points left in sliding window
 
-    expected_result = []
-    for data_pt in arg_frame:
-        expected_result.append([float(data_pt)])
+    cut.frames = [
+        [pytest.gen.uniform(-10, 10) for _ in range(existing_data_points)]
+        for _ in range(num_headers)
+    ]
+
+    input_data = [pytest.gen.uniform(-10, 10) for _ in range(num_headers)]
+    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=input_data)
 
     # Act
-    cut.update(arg_frame)
+    cut.update(input_data)
 
     # Assert
-    assert cut.frames == expected_result
+    assert len(cut.frames) == num_headers
+    for i, frame in enumerate(cut.frames):
+        assert len(frame) == existing_data_points + 1
+        assert frame[-1] == input_data[i]
+        assert frame[:-1] == cut.frames[i][:-1]  # Check that previous data is preserved
 
-def test_Kalman_update_mutates_frames_attribute_as_expected_when_both_frames_and_arg_frame_are_not_empty_and_len_arg_frame_less_than_len_frames():
+def test_Kalman_update_with_full_window_size(mocker):
     # Arrange
-    len_fake_frames = pytest.gen.randint(6, 10) # arbitrary int greater than max len of arg_frame, from 6 to 10
-    fake_frames = [[MagicMock()]] * len_fake_frames
-    fake_window_size = pytest.gen.randint(1, 10) # arbitrary, random int from 1 to 10
-
-    len_arg_frame = pytest.gen.randint(1, 5) # arbitrary, random int from 1 to 5
-    arg_frame = [MagicMock()] * len_arg_frame
-
     cut = Kalman.__new__(Kalman)
-    cut.frames = fake_frames
-    cut.window_size = fake_window_size
+    num_headers = pytest.gen.randint(1, 10)
+    cut.window_size = 5
+    existing_data_points = cut.window_size  # Fill the window
 
-    expected_result = fake_frames.copy()
+    original_frames = [
+        [pytest.gen.uniform(-10, 10) for _ in range(existing_data_points)]
+        for _ in range(num_headers)
+    ]
+    cut.frames = [frame.copy() for frame in original_frames]  # Create a copy for the cut object
+
+    input_data = [pytest.gen.uniform(-10, 10) for _ in range(num_headers)]
+    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=input_data)
 
     # Act
-    cut.update(arg_frame)
+    cut.update(input_data)
 
     # Assert
-    assert cut.frames == expected_result
+    assert len(cut.frames) == num_headers
+    for i, frame in enumerate(cut.frames):
+        assert len(frame) == cut.window_size  # Length should still be window_size
+        assert frame[-1] == input_data[i]  # New data point should be at the end
+        assert frame[:-1] == original_frames[i][1:]  # Check that data shifted correctly
 
-# test render diagnosis
+# test render reasoning
+
+def test_Kalman_render_reasoning_returns_empty_list_when_all_values_below_threshold(mocker):
+    # Arrange
+    cut = Kalman.__new__(Kalman)
+    num_headers = pytest.gen.randint(2, 5)  # Random number of headers between 2 and 5
+    cut.frames = [list(range(pytest.gen.randint(3, 7))) for _ in range(num_headers)]  # Random frame sizes
+    cut.headers = [f"header{i}" for i in range(num_headers)]
+    cut.residual_threshold = pytest.gen.uniform(1.0, 5.0)  # Random threshold between 1.0 and 5.0
+    
+    # All residuals are below the threshold
+    forced_residuals = np.array([cut.residual_threshold - 0.1 - i * 0.1 for i in range(num_headers)])
+    mocker.patch.object(cut, '_generate_residuals', return_value=forced_residuals)
+
+    # Act
+    result = cut.render_reasoning()
+
+    # Assert
+    assert len(result) == 0  # The result should be an empty list
+    assert cut._generate_residuals.call_count == 1
+    assert cut._generate_residuals.call_args_list[0].args == ()  # No arguments passed to _generate_residuals
+
+    # Additional check to ensure all residuals are indeed below the threshold
+    assert all(residual < cut.residual_threshold for residual in forced_residuals)
+
 def test_Kalman_render_reasoning_returns_values_above_threshold(mocker):
     # Arrange
-
     cut = Kalman.__new__(Kalman)
-    cut.frames = ["fake_frames"] * 10
-    cut.headers = ["fake_headers"] * 10
-    cut.residual_threshold = pytest.gen.randint(5, 10)
-    forced__generate_residuals_return = np.array([pytest.gen.randint(cut.residual_threshold + 1, cut.residual_threshold + 10)] * 10)
-
-    mocker.patch.object(cut, '_generate_residuals', return_value=forced__generate_residuals_return)
+    num_headers = pytest.gen.randint(3, 6)  # Random number of headers between 3 and 5
+    cut.frames = [list(range(pytest.gen.randint(3, 7))) for _ in range(num_headers)]  # Random frame sizes
+    cut.headers = [f"header{i}" for i in range(num_headers)]
+    cut.residual_threshold = pytest.gen.uniform(1.0, 5.0)  # Random threshold between 1.0 and 5.0
+    
+    # Randomly select between 1 and num_headers-1 headers to fail
+    num_failing = pytest.gen.randint(1, num_headers-1)
+    failing_indices = np.random.choice(num_headers, num_failing, replace=False)
+    expected_result = [cut.headers[i] for i in failing_indices]
+    
+    # Create forced_residuals with values above threshold for failing headers
+    forced_residuals = np.array([cut.residual_threshold - 0.1] * num_headers)  # Initialize all below threshold
+    for i in failing_indices:
+        forced_residuals[i] = cut.residual_threshold + 0.1 + i * 0.1  # Set failing headers above threshold
+    
+    mocker.patch.object(cut, '_generate_residuals', return_value=forced_residuals)
 
     # Act
     result = cut.render_reasoning()
 
     # Assert
-    assert len(result) == len(forced__generate_residuals_return)
+    assert set(result) == set(expected_result)  # Check if the result contains all expected failing headers
+    assert cut._generate_residuals.call_count == 1
+    assert cut._generate_residuals.call_args_list[0].args == ()  # No arguments passed to _generate_residuals
 
-def test_Kalman_render_reasoning_returns_values_below_threshold(mocker):
+def test_Kalman_render_reasoning_handles_all_values_above_threshold(mocker):
     # Arrange
-
     cut = Kalman.__new__(Kalman)
-    cut.frames = ["fake_frames"] * 10
-    cut.headers = ["fake_headers"] * 10
-    cut.residual_threshold = pytest.gen.randint(5, 10)
-    forced__generate_residuals_return = np.array([pytest.gen.randint(0, cut.residual_threshold - 1)] * 10)
-
-    mocker.patch.object(cut, '_generate_residuals', return_value=forced__generate_residuals_return)
+    num_headers = pytest.gen.randint(2, 5)  # Random number of headers between 2 and 5
+    cut.frames = [list(range(pytest.gen.randint(3, 7))) for _ in range(num_headers)]  # Random frame sizes
+    cut.headers = [f"header{i}" for i in range(num_headers)]
+    cut.residual_threshold = pytest.gen.uniform(1.0, 5.0)  # Random threshold between 1.0 and 5.0
+    
+    # All residuals are above the threshold
+    forced_residuals = np.array([cut.residual_threshold + 0.1 + i * 0.1 for i in range(num_headers)])
+    mocker.patch.object(cut, '_generate_residuals', return_value=forced_residuals)
 
     # Act
     result = cut.render_reasoning()
 
     # Assert
-    assert len(result) == 0
+    assert set(result) == set(cut.headers)  # The result should contain all headers
+    assert cut._generate_residuals.call_count == 1
+    assert cut._generate_residuals.call_args_list[0].args == ()  # No arguments passed to _generate_residuals
 
-# test predict
-def test_Kalman__predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_initial_val_is_not_set(mocker):
-    # Arrange
-    arg_subframe = []
-    arg_forward_steps = MagicMock()
-
-    fake_kf = MagicMock()
-
-    forced_predict_return_value = MagicMock()
-    mocker.patch.object(fake_kf, 'smooth')
-    mocker.patch.object(fake_kf, 'predict', return_value=forced_predict_return_value)
-
-    cut = Kalman.__new__(Kalman)
-    cut.kf = fake_kf
-
-    # Act
-    result = cut._predict(arg_subframe, arg_forward_steps)
-
-    # Assert
-    assert result == forced_predict_return_value
-    assert fake_kf.smooth.call_count == 1
-    assert fake_kf.smooth.call_args_list[0].args == (arg_subframe, )
-    assert fake_kf.predict.call_count == 1
-    assert fake_kf.predict.call_args_list[0].args == (arg_subframe, arg_forward_steps)
-
+# test _predict
 def test_Kalman__predict_smoothes_data_and_predicts_result_using_KalmanFilter_functions_as_expected_when_initial_val_is_set(mocker):
     # Arrange
     arg_subframe = []
@@ -235,3 +279,43 @@ def test_Kalman__predict_smoothes_data_and_predicts_result_using_KalmanFilter_fu
     assert fake_kf.smooth.call_args_list[0].kwargs == {'initial_value' : arg_initial_val}
     assert fake_kf.predict.call_count == 1
     assert fake_kf.predict.call_args_list[0].args == (arg_subframe, arg_forward_steps)
+
+# test _generate_residuals
+def test_Kalman__generate_residuals_with_frame_data_length_less_than_3(mocker):
+    # Arrange
+    cut = Kalman.__new__(Kalman)
+    num_headers = pytest.gen.randint(2, 5)
+    short_frame_length = pytest.gen.randint(1, 2)  # Generate frames with 1 or 2 items
+    cut.frames = [[pytest.gen.uniform(-10, 10) for _ in range(short_frame_length)] for _ in range(num_headers)]
+
+    # Act
+    result = cut._generate_residuals()
+
+    # Assert
+    assert np.array_equal(result, np.zeros(num_headers))
+    assert len(result) == len(cut.frames)
+
+def test_Kalman__generate_residuals_with_sufficient_frame_data_length(mocker):
+    # Arrange
+    cut = Kalman.__new__(Kalman)
+    num_headers = pytest.gen.randint(2, 5)
+    frame_length = pytest.gen.randint(3, 7)
+    cut.frames = [[pytest.gen.uniform(-10, 10) for _ in range(frame_length)] for _ in range(num_headers)]
+    
+    mock_predict_result = MagicMock()
+    mock_predict_result.observations.mean = np.array([[pytest.gen.uniform(-100, 100)] for _ in range(num_headers)])
+    mocker.patch.object(cut, '_predict', return_value = mock_predict_result)
+    
+    expected_residuals = np.abs(np.subtract([frame[-1] for frame in cut.frames], 
+                                            [pred[0] for pred in mock_predict_result.observations.mean]))
+   
+    expected_initial_value = np.array([[[frame[0]], [0]] for frame in cut.frames])
+    # Act
+    result = cut._generate_residuals()
+
+    # Assert
+    assert cut._predict.call_count == 1
+    assert cut._predict.call_args[0][0] == [frame[1:-1] for frame in cut.frames]
+    assert cut._predict.call_args[0][1] == 1
+    np.testing.assert_array_almost_equal(cut._predict.call_args[0][2], expected_initial_value)
+    np.testing.assert_array_almost_equal(result, expected_residuals)
