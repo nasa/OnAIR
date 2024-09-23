@@ -26,7 +26,9 @@ jobs:
       run: conda config --show channels
     - name: Lint Project
       shell: bash -l {0}
-      run: pylint onair plugins test
+      run: |
+        conda env update
+        pylint onair plugins test
     - name: Check Formatting
       shell: bash -l {0}
       run: black --check .
