@@ -21,6 +21,7 @@ from onair.data_handling.parser_util import floatify_input
 from onair.src.util.print_io import print_msg
 from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
+
 class Plugin(AIPlugin):
     """
     A plugin for detecting faults using Kalman filtering.
@@ -102,7 +103,9 @@ class Plugin(AIPlugin):
         None
         """
         if low_level_data is None:
-            print_msg("Kalman plugin requires low_level_data but received None.", ['FAIL'])
+            print_msg(
+                "Kalman plugin requires low_level_data but received None.", ["FAIL"]
+            )
         else:
             frame = floatify_input(low_level_data)
 
