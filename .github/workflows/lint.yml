@@ -22,8 +22,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
         miniforge-version: latest
-    - name: Confirm no defaults post install
-      run: conda config --show channels
     - name: Lint Project
       shell: bash -l {0}
       run: |
