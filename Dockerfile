@@ -57,13 +57,13 @@ USER onair_dev
 ENV CONDA_DIR /home/onair_dev/conda
 RUN \
   mkdir -p $CONDA_DIR && \
-  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-  bash ~/miniconda.sh -b -u -p $CONDA_DIR && \
-  rm -rf ~/miniconda.sh
+  wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O ~/miniforge.sh && \
+  bash ~/miniforge.sh -b -u -p $CONDA_DIR && \
+  rm -rf ~/miniforge.sh
 ENV PATH=$CONDA_DIR/bin:$PATH
 
 # Make OnAir requirements file accessible by onair_dev user
-COPY environment.yml /home/onair_dev/environment.yml
+COPY environment_dev.yml /home/onair_dev/environment.yml
 RUN \
   . $CONDA_DIR/etc/profile.d/conda.sh && \
   conda init bash && \
