@@ -27,7 +27,7 @@ jobs:
     - name: Lint Project
       shell: bash -l {0}
       run: |
-        conda env update
+        conda config --remove channels defaults
         pylint onair plugins test
     - name: Check Formatting
       shell: bash -l {0}
