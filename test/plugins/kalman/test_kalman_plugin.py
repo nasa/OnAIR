@@ -107,7 +107,7 @@ def test_Kalman__init__initializes_variables_using_given_arguments_and_creates_f
         'observation_noise':expected_observation_noise,
     }
 
-def test_Kalman__init__raises_error_when_given_window_size_is_less_than_2(mocker):
+def test_Kalman__init__raises_error_when_given_window_size_is_less_than_3(mocker):
     # Arrange
     arg_name = MagicMock()
     arg_headers = MagicMock()
