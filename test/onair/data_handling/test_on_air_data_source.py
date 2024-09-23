@@ -27,8 +27,10 @@ class FakeOnAirDataSource(OnAirDataSource):
     def has_more(self):
         return super().has_more()
 
+
 class IncompleteOnAirDataSource(OnAirDataSource):
     pass
+
 
 class BadFakeOnAirDataSource(OnAirDataSource):
     def process_data_file(self, data_file):
@@ -43,26 +45,30 @@ class BadFakeOnAirDataSource(OnAirDataSource):
     def has_more(self):
         return super().has_more()
 
+
 @pytest.fixture
 def setup_teardown():
     pytest.cut = FakeOnAirDataSource.__new__(FakeOnAirDataSource)
-    yield 'setup_teardown'
+    yield "setup_teardown"
+
 
 # __init__ tests
-def test_OnAirDataSource__init__sets_instance_variables_as_expected_and_calls_parse_meta_data_file_and_process_data_file(setup_teardown, mocker):
+def test_OnAirDataSource__init__sets_instance_variables_as_expected_and_calls_parse_meta_data_file_and_process_data_file(
+    setup_teardown, mocker
+):
     # Arrange
     arg_rawDataFile = MagicMock()
     arg_metadataFile = MagicMock()
     arg_ss_breakdown = MagicMock()
 
     fake_configs = {}
-    fake_configs['subsystem_assignments'] = MagicMock()
-    fake_configs['test_assignments'] = MagicMock()
-    fake_configs['description_assignments'] = MagicMock()
-    fake_configs['data_labels'] = MagicMock()
+    fake_configs["subsystem_assignments"] = MagicMock()
+    fake_configs["test_assignments"] = MagicMock()
+    fake_configs["description_assignments"] = MagicMock()
+    fake_configs["data_labels"] = MagicMock()
 
-    mocker.patch.object(pytest.cut, 'parse_meta_data_file', return_value=fake_configs)
-    mocker.patch.object(pytest.cut, 'process_data_file')
+    mocker.patch.object(pytest.cut, "parse_meta_data_file", return_value=fake_configs)
+    mocker.patch.object(pytest.cut, "process_data_file")
 
     # Act
     pytest.cut.__init__(arg_rawDataFile, arg_metadataFile, arg_ss_breakdown)
@@ -70,16 +76,29 @@ def test_OnAirDataSource__init__sets_instance_variables_as_expected_and_calls_pa
     # Assert
     assert pytest.cut.raw_data_file == arg_rawDataFile
     assert pytest.cut.meta_data_file == arg_metadataFile
-    assert pytest.cut.all_headers == fake_configs['data_labels']
+    assert pytest.cut.all_headers == fake_configs["data_labels"]
     assert pytest.cut.sim_data == {}
     assert pytest.cut.parse_meta_data_file.call_count == 1
-    assert pytest.cut.parse_meta_data_file.call_args_list[0].args == (arg_metadataFile, arg_ss_breakdown, )
+    assert pytest.cut.parse_meta_data_file.call_args_list[0].args == (
+        arg_metadataFile,
+        arg_ss_breakdown,
+    )
     assert pytest.cut.process_data_file.call_count == 1
-    assert pytest.cut.process_data_file.call_args_list[0].args == (arg_rawDataFile, )
+    assert pytest.cut.process_data_file.call_args_list[0].args == (arg_rawDataFile,)
     # assert pytest.cut.binning_configs == fake_configs
-    assert pytest.cut.binning_configs['subsystem_assignments'] == fake_configs['subsystem_assignments']
-    assert pytest.cut.binning_configs['test_assignments'] == fake_configs['test_assignments']
-    assert pytest.cut.binning_configs['description_assignments'] == fake_configs['description_assignments']
+    assert (
+        pytest.cut.binning_configs["subsystem_assignments"]
+        == fake_configs["subsystem_assignments"]
+    )
+    assert (
+        pytest.cut.binning_configs["test_assignments"]
+        == fake_configs["test_assignments"]
+    )
+    assert (
+        pytest.cut.binning_configs["description_assignments"]
+        == fake_configs["description_assignments"]
+    )
+
 
 # abstract methods tests
 def test_OnAirDataSource_raises_error_because_of_unimplemented_abstract_methods():
@@ -95,6 +114,7 @@ def test_OnAirDataSource_raises_error_because_of_unimplemented_abstract_methods(
     assert "get_next" in e_info.__str__()
     assert "has_more" in e_info.__str__()
 
+
 # Incomplete plugin call tests
 def test_OnAirDataSource_raises_error_when_an_inherited_class_is_instantiated_because_abstract_methods_are_not_implemented_by_that_class():
     # Arrange - None
@@ -103,11 +123,15 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_is_instantiated_be
         cut = IncompleteOnAirDataSource.__new__(IncompleteOnAirDataSource)
 
     # Assert
-    assert "Can't instantiate abstract class IncompleteOnAirDataSource with" in e_info.__str__()
+    assert (
+        "Can't instantiate abstract class IncompleteOnAirDataSource with"
+        in e_info.__str__()
+    )
     assert "process_data_file" in e_info.__str__()
     assert "parse_meta_data_file" in e_info.__str__()
     assert "get_next" in e_info.__str__()
     assert "has_more" in e_info.__str__()
+
 
 def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_process_data_file():
     # Act
@@ -118,6 +142,7 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_met
         cut.process_data_file(None)
     assert "NotImplementedError" in e_info.__str__()
 
+
 def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_parse_meta_data_file():
     # Act
     cut = BadFakeOnAirDataSource.__new__(BadFakeOnAirDataSource)
@@ -127,6 +152,7 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_met
         cut.parse_meta_data_file(None, None)
     assert "NotImplementedError" in e_info.__str__()
 
+
 def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_get_next():
     # Act
     cut = BadFakeOnAirDataSource.__new__(BadFakeOnAirDataSource)
@@ -135,6 +161,7 @@ def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_met
     with pytest.raises(NotImplementedError) as e_info:
         cut.get_next()
     assert "NotImplementedError" in e_info.__str__()
+
 
 def test_OnAirDataSource_raises_error_when_an_inherited_class_calls_abstract_method_has_more():
     # Act

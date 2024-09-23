@@ -11,32 +11,36 @@ from unittest.mock import MagicMock
 
 import onair.src.util.cleanup as cleanup
 
+
 # test_setup_folders
-def test_cleanup_setup_folders_creates_dir_when_given_results_path_does_not_exist(mocker):
-  # Arrange
-  arg_results_path = str(MagicMock())
+def test_cleanup_setup_folders_creates_dir_when_given_results_path_does_not_exist(
+    mocker,
+):
+    # Arrange
+    arg_results_path = str(MagicMock())
 
-  mocker.patch(cleanup.__name__ + '.os.path.isdir', return_value=False)
-  mocker.patch(cleanup.__name__ + '.os.mkdir')
+    mocker.patch(cleanup.__name__ + ".os.path.isdir", return_value=False)
+    mocker.patch(cleanup.__name__ + ".os.mkdir")
 
-  # Act
-  cleanup.setup_folders(arg_results_path)
+    # Act
+    cleanup.setup_folders(arg_results_path)
 
-  # Assert
-  assert cleanup.os.path.isdir.call_count == 1
-  assert cleanup.os.mkdir.call_count == 1
-  assert cleanup.os.mkdir.call_args_list[0].args == (arg_results_path, )
+    # Assert
+    assert cleanup.os.path.isdir.call_count == 1
+    assert cleanup.os.mkdir.call_count == 1
+    assert cleanup.os.mkdir.call_args_list[0].args == (arg_results_path,)
+
 
 def test_cleanup_setup_folders_does_not_create_dir_when_it_already_exists(mocker):
-  # Arrange
-  arg_results_path = str(MagicMock())
+    # Arrange
+    arg_results_path = str(MagicMock())
 
-  mocker.patch(cleanup.__name__ + '.os.path.isdir', return_value=True)
-  mocker.patch(cleanup.__name__ + '.os.mkdir')
+    mocker.patch(cleanup.__name__ + ".os.path.isdir", return_value=True)
+    mocker.patch(cleanup.__name__ + ".os.mkdir")
 
-  # Act
-  cleanup.setup_folders(arg_results_path)
+    # Act
+    cleanup.setup_folders(arg_results_path)
 
-  # Assert
-  assert cleanup.os.path.isdir.call_count == 1
-  assert cleanup.os.mkdir.call_count == 0
+    # Assert
+    assert cleanup.os.path.isdir.call_count == 1
+    assert cleanup.os.mkdir.call_count == 0

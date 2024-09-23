@@ -1,11 +1,11 @@
-name: Unit test run
+name: Linting and Formatting
 
 on:
   push:
   pull_request:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -13,23 +13,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up OnAIR test environment
+    - name: Set up OnAIR conda environment
       uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: onair
         environment-file: environment_dev.yml
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
-    - name: Install dependencies
+    - name: Lint Project
       shell: bash -l {0}
-      run: |
-        conda info
-        conda list
-    - name: Test with pytest
+      run: pylint onair plugins test
+    - name: Check Formatting
       shell: bash -l {0}
-      run: python -m coverage run --branch --source=onair,plugins -m pytest ./test/
-    - name: Coverage report
-      shell: bash -l {0}
-      run: coverage report --skip-empty
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4
+      run: black --check .

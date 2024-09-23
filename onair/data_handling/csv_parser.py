@@ -17,22 +17,23 @@ from onair.data_handling.on_air_data_source import OnAirDataSource
 from onair.src.util.print_io import *
 from onair.data_handling.parser_util import *
 
+
 class DataSource(OnAirDataSource):
 
     def process_data_file(self, data_file):
         self.sim_data = self.parse_csv_data(data_file)
         self.frame_index = 0
 
-##### INITIAL PROCESSING ####
+    ##### INITIAL PROCESSING ####
     def parse_csv_data(self, data_file):
-        #Read in the data set
+        # Read in the data set
 
         all_data = []
 
-        with open(data_file, 'r', newline='') as csv_file:
-            dataset = csv.reader(csv_file, delimiter=',')
+        with open(data_file, "r", newline="") as csv_file:
+            dataset = csv.reader(csv_file, delimiter=",")
 
-            #Initialize the entire data dictionary
+            # Initialize the entire data dictionary
             index = 0
             for row in dataset:
                 if index == 0:
@@ -48,10 +49,10 @@ class DataSource(OnAirDataSource):
     def parse_meta_data_file(self, meta_data_file, ss_breakdown):
         return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
 
-##### GETTERS ##################################
+    ##### GETTERS ##################################
 
     def get_vehicle_metadata(self):
-        return self.all_headers, self.binning_configs['test_assignments']
+        return self.all_headers, self.binning_configs["test_assignments"]
 
     # Get the data at self.index and increment the index
     def get_next(self):
