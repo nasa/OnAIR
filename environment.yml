@@ -2,8 +2,6 @@ name: onair
 channels:
   - conda-forge
   - nodefaults
-exclude:
-  - defaults
 dependencies:
   - python>=3.8,<3.13
   - numpy
