@@ -62,13 +62,13 @@ def test_Kalman__init__initializes_variables_using_both_given_and_default_argume
         'observation_noise':expected_observation_noise,
     }
 
-def test_Kalman__init__initializes_variables_using_given_arguments_and_creates_filter_when_given_required_and_optional_arguments(mocker):
+def test_Kalman__init__initializes_variables_using_given_arguments_and_creates_filter_when_given_required_and_optional_arguments_with_window_size_greater_than_2(mocker):
     # Arrange
     arg_name = MagicMock()
     arg_headers = MagicMock()
     arg_headers.__len__.return_value = pytest.gen.randint(1, 10)
-    arg_default_window_size = MagicMock()
-    arg_default_residual_threshold = MagicMock()
+    arg_window_size = pytest.gen.randint(3, 20)
+    arg_residual_threshold = MagicMock()
     fake_kf = MagicMock()
     forced_diag_return_value = MagicMock()
     forced_array_return_value = MagicMock()
@@ -86,7 +86,7 @@ def test_Kalman__init__initializes_variables_using_given_arguments_and_creates_f
     mocker.patch.object(parent_of_cut, "__init__", return_value=MagicMock())
 
     # Act
-    cut.__init__(arg_name, arg_headers, arg_default_window_size, arg_default_residual_threshold)
+    cut.__init__(arg_name, arg_headers, arg_window_size, arg_residual_threshold)
 
     # Assert
     assert parent_of_cut.__init__.call_count == 1
@@ -95,8 +95,8 @@ def test_Kalman__init__initializes_variables_using_given_arguments_and_creates_f
     assert all(isinstance(frame, list) and len(frame) == 0 for frame in cut.frames)
     assert cut.component_name == arg_name
     assert cut.headers == arg_headers
-    assert cut.window_size == arg_default_window_size
-    assert cut.residual_threshold == arg_default_residual_threshold
+    assert cut.window_size == arg_window_size
+    assert cut.residual_threshold == arg_residual_threshold
     assert cut.kf is fake_kf
     assert kalman_plugin.simdkalman.KalmanFilter.call_count == 1
     assert kalman_plugin.simdkalman.KalmanFilter.call_args_list[0].args == ()
@@ -107,7 +107,42 @@ def test_Kalman__init__initializes_variables_using_given_arguments_and_creates_f
         'observation_noise':expected_observation_noise,
     }
 
+def test_Kalman__init__raises_error_when_given_window_size_is_less_than_2(mocker):
+    # Arrange
+    arg_name = MagicMock()
+    arg_headers = MagicMock()
+    arg_window_size = pytest.gen.randint(-1, 2)
+    arg_residual_threshold = MagicMock()
+
+    cut = Kalman.__new__(Kalman)
+
+    expected_exception_message = \
+        f"Kalman plugin unable to operate with window size < 3: given {arg_window_size}"
+
+    # Act
+    with pytest.raises(RuntimeError) as e_info:
+        cut.__init__(arg_name, arg_headers, arg_window_size, arg_residual_threshold)
+
+    # Assert
+    assert e_info.match(expected_exception_message)
+
 # test update
+def test_Kalman_update_not_providing_low_level_data_issues_warning(mocker):
+    # Arrange
+    cut = Kalman.__new__(Kalman)
+    num_fake_data_points = pytest.gen.randint(1, 10)
+    cut.frames = [[] for _ in range(num_fake_data_points)]
+    cut.window_size = 1 # smallest value without popping starting at none
+
+    mocker.patch(kalman_plugin.__name__ + '.print_msg')
+
+    # Act
+    cut.update()
+
+    # Assert
+    kalman_plugin.print_msg.call_count = 1
+
+
 def test_Kalman_update_with_initially_empty_frames(mocker):
     # Arrange
     cut = Kalman.__new__(Kalman)
@@ -115,16 +150,18 @@ def test_Kalman_update_with_initially_empty_frames(mocker):
     cut.frames = [[] for _ in range(num_fake_data_points)]
     cut.window_size = 1 # smallest value without popping starting at none
 
-    input_data = [pytest.gen.uniform(-10, 10) for _ in range(num_fake_data_points)]
-    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=input_data)
+    arg_low_level_data = [pytest.gen.uniform(-10, 10) for _ in range(num_fake_data_points)]
+    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=arg_low_level_data)
 
     # Act
-    cut.update(input_data)
+    cut.update(arg_low_level_data)
 
     # Assert
+    assert kalman_plugin.floatify_input.call_count == 1
+    assert kalman_plugin.floatify_input.call_args_list[0].args == (arg_low_level_data,)
     assert len(cut.frames) == num_fake_data_points
     for i, frame in enumerate(cut.frames):
-        assert frame == [input_data[i]]
+        assert frame == [arg_low_level_data[i]]
 
 def test_Kalman_update_with_existing_data_in_frames_but_less_than_full_window_size(mocker):
     # Arrange
@@ -141,17 +178,17 @@ def test_Kalman_update_with_existing_data_in_frames_but_less_than_full_window_si
         for _ in range(num_headers)
     ]
 
-    input_data = [pytest.gen.uniform(-10, 10) for _ in range(num_headers)]
-    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=input_data)
+    arg_low_level_data = [pytest.gen.uniform(-10, 10) for _ in range(num_headers)]
+    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=arg_low_level_data)
 
     # Act
-    cut.update(input_data)
+    cut.update(arg_low_level_data)
 
     # Assert
     assert len(cut.frames) == num_headers
     for i, frame in enumerate(cut.frames):
         assert len(frame) == existing_data_points + 1
-        assert frame[-1] == input_data[i]
+        assert frame[-1] == arg_low_level_data[i]
         assert frame[:-1] == cut.frames[i][:-1]  # Check that previous data is preserved
 
 def test_Kalman_update_with_full_window_size(mocker):
@@ -167,17 +204,17 @@ def test_Kalman_update_with_full_window_size(mocker):
     ]
     cut.frames = [frame.copy() for frame in original_frames]  # Create a copy for the cut object
 
-    input_data = [pytest.gen.uniform(-10, 10) for _ in range(num_headers)]
-    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=input_data)
+    arg_low_level_data = [pytest.gen.uniform(-10, 10) for _ in range(num_headers)]
+    mocker.patch(kalman_plugin.__name__ + '.floatify_input', return_value=arg_low_level_data)
 
     # Act
-    cut.update(input_data)
+    cut.update(arg_low_level_data)
 
     # Assert
     assert len(cut.frames) == num_headers
     for i, frame in enumerate(cut.frames):
         assert len(frame) == cut.window_size  # Length should still be window_size
-        assert frame[-1] == input_data[i]  # New data point should be at the end
+        assert frame[-1] == arg_low_level_data[i]  # New data point should be at the end
         assert frame[:-1] == original_frames[i][1:]  # Check that data shifted correctly
 
 # test render reasoning
