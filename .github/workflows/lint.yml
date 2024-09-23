@@ -16,11 +16,11 @@ jobs:
     - name: Set up OnAIR conda environment
       uses: conda-incubator/setup-miniconda@v3
       with:
+        installer-url: https://github.com/conda-forge/miniforge/releases/download/4.8.3-2/Miniforge-pypy3-4.8.3-2-Linux-x86_64.sh
         activate-environment: onair
         environment-file: environment_dev.yml
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
-        miniforge-version: latest
     - name: Lint Project
       shell: bash -l {0}
       run: pylint onair plugins test
