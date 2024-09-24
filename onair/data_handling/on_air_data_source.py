@@ -10,14 +10,16 @@
 from abc import ABC, abstractmethod
 from .parser_util import *
 
+
 class ConfigKeyError(KeyError):
     pass
 
+
 class OnAirDataSource(ABC):
-    def __init__(self, data_file, meta_file, ss_breakdown = False):
+    def __init__(self, data_file, meta_file, ss_breakdown=False):
         """An initial parsing needs to happen in order to use the parser classes
-            This means that, if you want to use this class to parse in real time,
-            it needs to at least have seen one sample of the anticipated format """
+        This means that, if you want to use this class to parse in real time,
+        it needs to at least have seen one sample of the anticipated format"""
 
         self.raw_data_file = data_file
         self.meta_data_file = meta_file
@@ -27,10 +29,12 @@ class OnAirDataSource(ABC):
         self.binning_configs = {}
 
         configs = self.parse_meta_data_file(self.meta_data_file, ss_breakdown)
-        self.binning_configs['subsystem_assignments'] = configs['subsystem_assignments']
-        self.binning_configs['test_assignments'] = configs['test_assignments']
-        self.binning_configs['description_assignments'] = configs['description_assignments']
-        self.all_headers = configs['data_labels']
+        self.binning_configs["subsystem_assignments"] = configs["subsystem_assignments"]
+        self.binning_configs["test_assignments"] = configs["test_assignments"]
+        self.binning_configs["description_assignments"] = configs[
+            "description_assignments"
+        ]
+        self.all_headers = configs["data_labels"]
 
         self.process_data_file(self.raw_data_file)
 

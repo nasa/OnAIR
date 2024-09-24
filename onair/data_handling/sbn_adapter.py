@@ -29,10 +29,11 @@ from onair.data_handling.parser_util import *
 
 # Note: The double buffer does not clear between switching. If fresh data doesn't come in, stale data is returned (delayed by 1 frame)
 
+
 class DataSource(OnAirDataSource):
 
-    def __init__(self, data_file, meta_file, ss_breakdown = False):
-        super().__init__(data_file, meta_file, ss_breakdown);
+    def __init__(self, data_file, meta_file, ss_breakdown=False):
+        super().__init__(data_file, meta_file, ss_breakdown)
 
         self.new_data_lock = threading.Lock()
         self.new_data = False
@@ -58,10 +59,12 @@ class DataSource(OnAirDataSource):
     def gather_field_names(self, field_name, field_type):
 
         # recursively find field names in DFS manner
-        def gather_field_names_helper(field_name:str, field_type, field_names:list):
+        def gather_field_names_helper(field_name: str, field_type, field_names: list):
             if "message_headers" in str(field_type) and hasattr(field_type, "_fields_"):
                 for sub_field_name, sub_field_type in field_type._fields_:
-                    gather_field_names_helper(field_name + "." + sub_field_name, sub_field_type,field_names)
+                    gather_field_names_helper(
+                        field_name + "." + sub_field_name, sub_field_type, field_names
+                    )
             else:
                 field_names.append(field_name)
 
@@ -74,19 +77,20 @@ class DataSource(OnAirDataSource):
         self.currentData = []
 
         # pull out message ids
-        file = open(meta_data_file, 'rb')
+        file = open(meta_data_file, "rb")
         file_str = file.read()
 
         meta_config = json.loads(file_str)
         file.close()
 
-        if 'channels' not in meta_config.keys():
-            raise ConfigKeyError(f'Config file: \'{meta_data_file}\' ' \
-                                  'missing required key \'channels\'')
+        if "channels" not in meta_config.keys():
+            raise ConfigKeyError(
+                f"Config file: '{meta_data_file}' " "missing required key 'channels'"
+            )
 
         # Copy message ID table from .json, convert string hex to ints for ID
-        for key in meta_config['channels']:
-            self.msgID_lookup_table[int(key, 16)] = meta_config['channels'][key]
+        for key in meta_config["channels"]:
+            self.msgID_lookup_table[int(key, 16)] = meta_config["channels"][key]
 
         # Use eval() to convert class name from .json to match with message_headers.py
         for key in self.msgID_lookup_table:
@@ -94,18 +98,22 @@ class DataSource(OnAirDataSource):
             self.msgID_lookup_table[key][1] = eval("msg_hdr." + msg_struct_name)
 
         # populate headers and reserve space for data
-        for x in range(0,2):
-            self.currentData.append({'headers':[], 'data':[]})
+        for x in range(0, 2):
+            self.currentData.append({"headers": [], "data": []})
 
             for msgID in self.msgID_lookup_table.keys():
                 app_name, data_struct = self.msgID_lookup_table[msgID]
                 struct_name = data_struct.__name__
                 # Skip the header, walk through the stuct
                 for field_name, field_type in data_struct._fields_[1:]:
-                    field_names = self.gather_field_names(app_name + "." + field_name, field_type)
+                    field_names = self.gather_field_names(
+                        app_name + "." + field_name, field_type
+                    )
                     for field_name in field_names:
-                        self.currentData[x]['headers'].append(field_name)
-                        self.currentData[x]['data'].append([0]) #initialize all the data arrays with zero
+                        self.currentData[x]["headers"].append(field_name)
+                        self.currentData[x]["data"].append(
+                            [0]
+                        )  # initialize all the data arrays with zero
 
         return extract_meta_data_handle_ss_breakdown(meta_data_file, ss_breakdown)
 
@@ -113,7 +121,7 @@ class DataSource(OnAirDataSource):
         print("SBN Adapter ignoring data file (telemetry should be live)")
 
     def get_vehicle_metadata(self):
-        return self.all_headers, self.binning_configs['test_assignments']
+        return self.all_headers, self.binning_configs["test_assignments"]
 
     def get_next(self):
         """Provides the latest data from SBN in a dictionary of lists structure.
@@ -135,18 +143,18 @@ class DataSource(OnAirDataSource):
             self.double_buffer_read_index = (self.double_buffer_read_index + 1) % 2
             read_index = self.double_buffer_read_index
 
-        return self.currentData[read_index]['data']
+        return self.currentData[read_index]["data"]
 
     def has_more(self):
         """Returns true if the adapter has more data.
-           For now always true: connection should be live as long as cFS is running.
-           TODO: allow to detect if cFS/the connection has died"""
+        For now always true: connection should be live as long as cFS is running.
+        TODO: allow to detect if cFS/the connection has died"""
         return True
 
     def message_listener_thread(self):
         """Thread to listen for incoming messages from SBN"""
 
-        while(True):
+        while True:
             generic_recv_msg_p = POINTER(sbn.sbn_data_generic_t)()
             sbn.recv_msg(generic_recv_msg_p)
 
@@ -158,28 +166,35 @@ class DataSource(OnAirDataSource):
             recv_msg = recv_msg_p.contents
 
             # prints out the data from the message to the terminal
-            print(", ".join([field_name + ": " + str(getattr(recv_msg, field_name)) for field_name, field_type in recv_msg._fields_[1:]]))
+            print(
+                ", ".join(
+                    [
+                        field_name + ": " + str(getattr(recv_msg, field_name))
+                        for field_name, field_type in recv_msg._fields_[1:]
+                    ]
+                )
+            )
 
             # TODO: Lock needed here?
             self.get_current_data(recv_msg, data_struct, app_name)
 
     def get_current_data(self, recv_msg, data_struct, app_name):
         # TODO: Lock needed here?
-        current_buffer = self.currentData[(self.double_buffer_read_index + 1) %2]
+        current_buffer = self.currentData[(self.double_buffer_read_index + 1) % 2]
 
         # Skip the header, walk through the stuct
         for field_name, field_type in recv_msg._fields_[1:]:
             field_names = self.gather_field_names(field_name, field_type)
 
             for name in field_names:
-                idx = current_buffer['headers'].index(app_name + "." + name)
+                idx = current_buffer["headers"].index(app_name + "." + name)
                 # Pull the data out of the message buy walking down the nested types
                 data = ""
                 current_object = recv_msg
-                for sub_type in name.split('.'):
+                for sub_type in name.split("."):
                     current_object = getattr(current_object, sub_type)
-                    data = str(current_object) # note does not work for arrays?
-                current_buffer['data'][idx] = data
+                    data = str(current_object)  # note does not work for arrays?
+                current_buffer["data"][idx] = data
 
         with self.new_data_lock:
             self.new_data = True

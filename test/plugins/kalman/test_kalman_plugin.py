@@ -15,6 +15,7 @@ import numpy as np
 from plugins.kalman import kalman_plugin
 from plugins.kalman.kalman_plugin import Plugin as Kalman
 
+
 # test init
 def test_Kalman__init__initializes_variables_using_both_given_and_default_arguments_and_creates_filter_when_only_given_required_arguments(mocker):
     # Arrange
@@ -298,8 +299,8 @@ def test_Kalman__predict_smoothes_data_and_predicts_result_using_KalmanFilter_fu
     fake_kf = MagicMock()
 
     forced_predict_return_value = MagicMock()
-    mocker.patch.object(fake_kf, 'smooth')
-    mocker.patch.object(fake_kf, 'predict', return_value=forced_predict_return_value)
+    mocker.patch.object(fake_kf, "smooth")
+    mocker.patch.object(fake_kf, "predict", return_value=forced_predict_return_value)
 
     cut = Kalman.__new__(Kalman)
     cut.kf = fake_kf

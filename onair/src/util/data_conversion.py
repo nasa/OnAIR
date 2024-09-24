@@ -11,12 +11,10 @@
 data_conversion.py
 Utility file to perform conversions for supervised learning, and beyond
 """
-import numpy as np 
+import numpy as np
 
-classes = {'RED' : 0,
-        'YELLOW' : 1,
-         'GREEN' : 2,
-           '---' : 3}
+classes = {"RED": 0, "YELLOW": 1, "GREEN": 2, "---": 3}
+
 
 def status_to_oneHot(status):
     if isinstance(status, np.ndarray):
