@@ -142,7 +142,6 @@ def test_Kalman_update_not_providing_low_level_data_issues_warning(mocker):
     # Assert
     kalman_plugin.print_msg.call_count = 1
 
-
 def test_Kalman_update_with_initially_empty_frames(mocker):
     # Arrange
     cut = Kalman.__new__(Kalman)
@@ -169,7 +168,7 @@ def test_Kalman_update_with_existing_data_in_frames_but_less_than_full_window_si
     num_headers = pytest.gen.randint(1, 10)
     existing_data_points = pytest.gen.randint(1, 4)
     cut.window_size = pytest.gen.randint(
-        existing_data_points + 1, 
+        existing_data_points + 1,
         existing_data_points + 5
     ) # arbitrary 1-5 extra points left in sliding window
 
@@ -218,7 +217,6 @@ def test_Kalman_update_with_full_window_size(mocker):
         assert frame[:-1] == original_frames[i][1:]  # Check that data shifted correctly
 
 # test render reasoning
-
 def test_Kalman_render_reasoning_returns_empty_list_when_all_values_below_threshold(mocker):
     # Arrange
     cut = Kalman.__new__(Kalman)
@@ -226,7 +224,7 @@ def test_Kalman_render_reasoning_returns_empty_list_when_all_values_below_thresh
     cut.frames = [list(range(pytest.gen.randint(3, 7))) for _ in range(num_headers)]  # Random frame sizes
     cut.headers = [f"header{i}" for i in range(num_headers)]
     cut.residual_threshold = pytest.gen.uniform(1.0, 5.0)  # Random threshold between 1.0 and 5.0
-    
+
     # All residuals are below the threshold
     forced_residuals = np.array([cut.residual_threshold - 0.1 - i * 0.1 for i in range(num_headers)])
     mocker.patch.object(cut, '_generate_residuals', return_value=forced_residuals)
@@ -249,17 +247,17 @@ def test_Kalman_render_reasoning_returns_values_above_threshold(mocker):
     cut.frames = [list(range(pytest.gen.randint(3, 7))) for _ in range(num_headers)]  # Random frame sizes
     cut.headers = [f"header{i}" for i in range(num_headers)]
     cut.residual_threshold = pytest.gen.uniform(1.0, 5.0)  # Random threshold between 1.0 and 5.0
-    
+
     # Randomly select between 1 and num_headers-1 headers to fail
     num_failing = pytest.gen.randint(1, num_headers-1)
     failing_indices = np.random.choice(num_headers, num_failing, replace=False)
     expected_result = [cut.headers[i] for i in failing_indices]
-    
+
     # Create forced_residuals with values above threshold for failing headers
     forced_residuals = np.array([cut.residual_threshold - 0.1] * num_headers)  # Initialize all below threshold
     for i in failing_indices:
         forced_residuals[i] = cut.residual_threshold + 0.1 + i * 0.1  # Set failing headers above threshold
-    
+
     mocker.patch.object(cut, '_generate_residuals', return_value=forced_residuals)
 
     # Act
@@ -277,7 +275,7 @@ def test_Kalman_render_reasoning_handles_all_values_above_threshold(mocker):
     cut.frames = [list(range(pytest.gen.randint(3, 7))) for _ in range(num_headers)]  # Random frame sizes
     cut.headers = [f"header{i}" for i in range(num_headers)]
     cut.residual_threshold = pytest.gen.uniform(1.0, 5.0)  # Random threshold between 1.0 and 5.0
-    
+
     # All residuals are above the threshold
     forced_residuals = np.array([cut.residual_threshold + 0.1 + i * 0.1 for i in range(num_headers)])
     mocker.patch.object(cut, '_generate_residuals', return_value=forced_residuals)
@@ -338,14 +336,14 @@ def test_Kalman__generate_residuals_with_sufficient_frame_data_length(mocker):
     num_headers = pytest.gen.randint(2, 5)
     frame_length = pytest.gen.randint(3, 7)
     cut.frames = [[pytest.gen.uniform(-10, 10) for _ in range(frame_length)] for _ in range(num_headers)]
-    
+
     mock_predict_result = MagicMock()
     mock_predict_result.observations.mean = np.array([[pytest.gen.uniform(-100, 100)] for _ in range(num_headers)])
     mocker.patch.object(cut, '_predict', return_value = mock_predict_result)
-    
-    expected_residuals = np.abs(np.subtract([frame[-1] for frame in cut.frames], 
+
+    expected_residuals = np.abs(np.subtract([frame[-1] for frame in cut.frames],
                                             [pred[0] for pred in mock_predict_result.observations.mean]))
-   
+
     expected_initial_value = np.array([[[frame[0]], [0]] for frame in cut.frames])
     # Act
     result = cut._generate_residuals()
