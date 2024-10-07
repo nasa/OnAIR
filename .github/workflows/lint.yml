@@ -18,11 +18,17 @@ jobs:
       with:
         activate-environment: onair
         environment-file: environment_dev.yml
+        channels: conda-forge, nodefaults
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
+        miniforge-version: latest
     - name: Lint Project
       shell: bash -l {0}
-      run: pylint onair plugins test
+      run: |
+        conda config --remove channels defaults
+        pylint onair plugins test
     - name: Check Formatting
       shell: bash -l {0}
       run: black --check .
+    - name: Confirm no defaults
+      run: conda config --show channels
