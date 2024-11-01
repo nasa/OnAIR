@@ -69,6 +69,7 @@ def test_ExecutionEngine__init__does_calls_when_config_file_is_an_occupied_strin
     mocker.patch.object(cut, "parse_configs")
     mocker.patch.object(cut, "parse_data")
     mocker.patch.object(cut, "setup_sim")
+    mocker.patch.object(cut, "setup_services")
 
     # Act
     cut.__init__(arg_config_file, arg_run_name, arg_save_flag)
@@ -172,7 +173,40 @@ def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_whe
     assert e_info.match(
         f"Config file: '{arg_config_filepath}', missing key: {missing_key}"
     )
+    
+def test_ExecutionEngine_parse_configs_does_not_raise_error_when_optional_key_SERVICES_is_not_in_config(
+    mocker,
+):
+    # Arrange
+    arg_config_filepath = MagicMock()
 
+    fake_dict_for_Config = {
+        "FILES": MagicMock(),
+        "DATA_HANDLING": MagicMock(),
+        "PLUGINS": MagicMock(),
+        "OPTIONS": MagicMock(),
+    }
+    fake_config = MagicMock()
+    fake_config.__getitem__.side_effect = fake_dict_for_Config.__getitem__
+    fake_config_read_result = MagicMock()
+    fake_config_read_result.__len__.return_value = 1
+
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+    
+    mocker.patch(
+        execution_engine.__name__ + ".configparser.ConfigParser",
+        return_value=fake_config,
+    )
+    mocker.patch.object(fake_config, "read", return_value=fake_config_read_result)
+    # config.has_section("SERVICES") is always returning true even without "SERVICES" key in fake_dict_for_config()?
+    mocker.patch.object(fake_config, "has_section", return_value=False)
+    mocker.patch.object(cut, "parse_plugins_dict", return_value=None)
+
+    # Act
+    try:
+        cut.parse_configs(arg_config_filepath)
+    except Exception as e:
+        pytest.fail(f"Unexpected exception: {e}")
 
 def test_ExecutionEngine_parse_configs_raises_KeyError_with_config_file_info_when_a_required_FILES_subkey_is_not_in_config(
     mocker,
@@ -325,6 +359,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
         "PlannersPluginDict": "{fake_name:fake_path}",
         "ComplexPluginDict": "{fake_name:fake_path}",
     }
+    fake_services = MagicMock()
     fake_options = MagicMock()
     fake_plugin_dict = MagicMock()
     fake_plugin_dict.body = MagicMock()
@@ -335,6 +370,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
         "DATA_HANDLING": fake_data_handling,
         "PLUGINS": fake_plugins,
         "OPTIONS": fake_options,
+        "SERVICES": fake_services,
     }
     fake_config = MagicMock()
     fake_config.__getitem__.side_effect = fake_dict_for_Config.__getitem__
@@ -393,6 +429,7 @@ def test_ExecutionEngine_parse_configs_sets_all_items_without_error(mocker):
     assert fake_options.getboolean.call_count == 1
     assert fake_options.getboolean.call_args_list[0].args == ("IO_Enabled",)
     assert cut.IO_Enabled == fake_IO_enabled
+    assert cut.services_dict != None
 
 
 # parse_plugins_dict
