@@ -22,6 +22,6 @@
 
 ## Further Reading/Learning
 
-[OnAIR's Architecture](architecture.md) : Describe's OnAIR's architecture
+[OnAIR's Architecture](architecture.md) : Describe's OnAIR's architecture. IN PROGRESS
 
 [Publications](publications.md) : Notable publications
