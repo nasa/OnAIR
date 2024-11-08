@@ -1,4 +1,4 @@
-![alt text](OnAIR_logo.svg "The OnAIR logo, italicized NASA worm style font in blue and orange")
+![alt text](../OnAIR_logo.svg "The OnAIR logo, italicized NASA worm style font in blue and orange")
 
 # Documents and Guides
 
