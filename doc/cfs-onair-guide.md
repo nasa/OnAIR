@@ -1,4 +1,4 @@
-# Using OnAIR with Core Flight System (cFS)
+# Using OnAIR with core Flight System (cFS)
 
 ## Overview
 
