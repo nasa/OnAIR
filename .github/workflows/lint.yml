@@ -13,22 +13,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up OnAIR conda environment
-      uses: conda-incubator/setup-miniconda@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
       with:
-        activate-environment: onair
-        environment-file: environment_dev.yml
-        channels: conda-forge, nodefaults
         python-version: ${{ matrix.python-version }}
-        auto-activate-base: false
-        miniforge-version: latest
-    - name: Lint Project
-      shell: bash -l {0}
+    - name: Install dependencies
       run: |
-        conda config --remove channels defaults
-        pylint onair plugins test
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pylint black
+    - name: Lint Project
+      run: pylint onair plugins test
     - name: Check Formatting
-      shell: bash -l {0}
       run: black --check .
-    - name: Confirm no defaults
-      run: conda config --show channels
