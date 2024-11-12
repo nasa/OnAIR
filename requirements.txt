@@ -1,0 +1,9 @@
+numpy
+black
+pylint
+coverage
+pytest
+pytest-mock
+pytest-randomly
+redis
+simdkalman
