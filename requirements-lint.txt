@@ -1,0 +1,3 @@
+# Requirements for linting code submissions
+black
+pylint

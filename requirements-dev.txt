@@ -1,0 +1,4 @@
+# All requirements for OnAIR developers
+-r 'requirements-run.txt'
+-r 'requirements-unittest.txt'
+-r 'requirements-lint.txt'

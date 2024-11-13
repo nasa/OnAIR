@@ -1,0 +1,5 @@
+# Requirements for unit testing
+coverage
+pytest
+pytest-mock
+pytest-randomly
