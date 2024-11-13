@@ -32,7 +32,6 @@ from onair.src.util.print_io import print_msg
 from onair.data_handling.parser_util import extract_meta_data_handle_ss_breakdown
 
 
-
 class DataSource(OnAirDataSource):
     """Implements OnAirDataSource interface for receiving data from REDIS servers.
 
