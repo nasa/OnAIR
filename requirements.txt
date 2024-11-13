@@ -1,0 +1,3 @@
+# Standard requirements to be able to run and test OnAIR
+-r 'requirements-run.txt'
+-r 'requirements-unittest.txt'

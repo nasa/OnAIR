@@ -1,3 +1,4 @@
+# Requirements to run OnAir and the example configs
 numpy
 redis
 simdkalman
