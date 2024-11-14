@@ -28,9 +28,9 @@ def import_services(service_dict):
                     'connection_timeout': '3'}
     """
     for service, kwargs in service_dict.items():
-        true_path = kwargs.pop('path') # path no longer needed afterwards
+        true_path = kwargs.pop("path")  # path no longer needed afterwards
         # Last directory name is the module name
-        mod_name = os.path.basename(true_path) # redis_fleet_interface
+        mod_name = os.path.basename(true_path)  # redis_fleet_interface
         # import module if not already available
         if mod_name not in sys.modules:
             # add init file to get proper path for spec
