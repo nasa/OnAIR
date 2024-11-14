@@ -25,18 +25,23 @@ def test_service_import_returns_empty_dict_when_given_service_dict_is_empty():
     assert result == {}
 
 
-def test_service_import_returns_service_dict_containing_single_entry_with_return_key_as_arg_dict_key_and_return_value_as_Service_object_initialized_with_arg_value_after_popping_path_key_when_not_already_in_sys_modules(mocker, ):
+def test_service_import_returns_service_dict_containing_single_entry_with_return_key_as_arg_dict_key_and_return_value_as_Service_object_initialized_with_arg_value_after_popping_path_key_when_not_already_in_sys_modules(
+    mocker,
+):
 
     # Arrange
     fake_service_name = MagicMock()
-    fake_service_kwarg = 'i_am_fake'
+    fake_service_kwarg = "i_am_fake"
     fake_service_kwarg_value = MagicMock()
     fake_service_info = MagicMock()
     fake_mod_name = MagicMock()
     fake_full_path = MagicMock()
     fake_true_path = MagicMock()
 
-    fake_service_info = {'path': fake_true_path, fake_service_kwarg: fake_service_kwarg_value}
+    fake_service_info = {
+        "path": fake_true_path,
+        fake_service_kwarg: fake_service_kwarg_value,
+    }
     arg_module_dict = {fake_service_name: fake_service_info}
 
     fake_spec = MagicMock()
@@ -44,10 +49,18 @@ def test_service_import_returns_service_dict_containing_single_entry_with_return
     fake_service = MagicMock()
     fake_Service_instance = MagicMock()
 
-    mocker.patch(service_import.__name__ + ".os.path.basename", return_value=fake_mod_name)
+    mocker.patch(
+        service_import.__name__ + ".os.path.basename", return_value=fake_mod_name
+    )
     mocker.patch(service_import.__name__ + ".os.path.join", return_value=fake_full_path)
-    mocker.patch(service_import.__name__ + ".importlib.util.spec_from_file_location",return_value=fake_spec)
-    mocker.patch(service_import.__name__ + ".importlib.util.module_from_spec", return_value=fake_module)
+    mocker.patch(
+        service_import.__name__ + ".importlib.util.spec_from_file_location",
+        return_value=fake_spec,
+    )
+    mocker.patch(
+        service_import.__name__ + ".importlib.util.module_from_spec",
+        return_value=fake_module,
+    )
 
     mocker.patch.object(fake_spec, "loader.exec_module")
 
@@ -73,13 +86,20 @@ def test_service_import_returns_service_dict_containing_single_entry_with_return
     mocker.stop(import_mock)
 
     assert service_import.os.path.basename.call_count == 1
-    assert service_import.os.path.basename.call_args_list[0].args == (fake_true_path, )
+    assert service_import.os.path.basename.call_args_list[0].args == (fake_true_path,)
     assert service_import.os.path.join.call_count == 1
-    assert service_import.os.path.join.call_args_list[0].args == (fake_true_path,  "__init__.py")
+    assert service_import.os.path.join.call_args_list[0].args == (
+        fake_true_path,
+        "__init__.py",
+    )
     assert service_import.importlib.util.spec_from_file_location.call_count == 1
-    assert service_import.importlib.util.spec_from_file_location.call_args_list[0].args == (fake_mod_name, fake_full_path)
+    assert service_import.importlib.util.spec_from_file_location.call_args_list[
+        0
+    ].args == (fake_mod_name, fake_full_path)
     assert service_import.importlib.util.module_from_spec.call_count == 1
-    assert service_import.importlib.util.module_from_spec.call_args_list[0].args == (fake_spec,)
+    assert service_import.importlib.util.module_from_spec.call_args_list[0].args == (
+        fake_spec,
+    )
 
     assert fake_spec.loader.exec_module.call_count == 1
     assert fake_spec.loader.exec_module.call_args_list[0].args == (fake_module,)
@@ -88,23 +108,27 @@ def test_service_import_returns_service_dict_containing_single_entry_with_return
 
     assert fake_service.Service.call_count == 1
     assert result == {fake_mod_name: fake_Service_instance}
-    assert fake_service.Service.call_args_list[0].kwargs == {fake_service_kwarg: fake_service_kwarg_value}
+    assert fake_service.Service.call_args_list[0].kwargs == {
+        fake_service_kwarg: fake_service_kwarg_value
+    }
 
-def test_service_import_returns_service_dict_containing_multiple_entries_with_return_keys_as_arg_dict_keys_and_return_values_as_Service_objects_initialized_with_arg_value_after_popping_path_key_when_not_already_in_sys_modules(mocker, ):
+
+def test_service_import_returns_service_dict_containing_multiple_entries_with_return_keys_as_arg_dict_keys_and_return_values_as_Service_objects_initialized_with_arg_value_after_popping_path_key_when_not_already_in_sys_modules(
+    mocker,
+):
 
     # Arrange
-    num_services = pytest.gen.randint(1,5)
-    num_service_kwargs = pytest.gen.randint(1,5)
+    num_services = pytest.gen.randint(1, 5)
+    num_service_kwargs = pytest.gen.randint(1, 5)
 
     fake_full_path = MagicMock()
     fake_mod_names = []
     fake_Service_instances = []
 
-    
     arg_module_dict = {}
 
     for service_number in range(num_services):  # 1-5 arbitrary length
-        temp_service_info = {'path': MagicMock()}
+        temp_service_info = {"path": MagicMock()}
         for arg_number in range(num_service_kwargs):
             temp_service_info.update({f"service_arg_{arg_number}": MagicMock()})
         arg_module_dict.update({MagicMock(): temp_service_info})
@@ -115,10 +139,18 @@ def test_service_import_returns_service_dict_containing_multiple_entries_with_re
     fake_module = MagicMock()
     fake_service = MagicMock()
 
-    mocker.patch(service_import.__name__ + ".os.path.basename", side_effect=fake_mod_names)
+    mocker.patch(
+        service_import.__name__ + ".os.path.basename", side_effect=fake_mod_names
+    )
     mocker.patch(service_import.__name__ + ".os.path.join", return_value=fake_full_path)
-    mocker.patch(service_import.__name__ + ".importlib.util.spec_from_file_location",return_value=fake_spec)
-    mocker.patch(service_import.__name__ + ".importlib.util.module_from_spec", return_value=fake_module)
+    mocker.patch(
+        service_import.__name__ + ".importlib.util.spec_from_file_location",
+        return_value=fake_spec,
+    )
+    mocker.patch(
+        service_import.__name__ + ".importlib.util.module_from_spec",
+        return_value=fake_module,
+    )
 
     mocker.patch.object(fake_spec, "loader.exec_module")
 
@@ -142,24 +174,32 @@ def test_service_import_returns_service_dict_containing_multiple_entries_with_re
     for i, service_info_dict in enumerate(arg_module_dict.values()):
         assert fake_service.Service.call_args_list[i].kwargs == service_info_dict
 
-def test_service_import_returns_service_dict_containing_single_entry_with_return_key_as_arg_dict_key_and_return_value_as_Service_object_initialized_with_arg_value_after_popping_path_key_when_exists_in_sys_modules(mocker, ):
+
+def test_service_import_returns_service_dict_containing_single_entry_with_return_key_as_arg_dict_key_and_return_value_as_Service_object_initialized_with_arg_value_after_popping_path_key_when_exists_in_sys_modules(
+    mocker,
+):
 
     # Arrange
     fake_service_name = MagicMock()
-    fake_service_kwarg = 'i_am_fake'
+    fake_service_kwarg = "i_am_fake"
     fake_service_kwarg_value = MagicMock()
     fake_service_info = MagicMock()
     fake_mod_name = MagicMock()
     fake_true_path = MagicMock()
 
-    fake_service_info = {'path': fake_true_path, fake_service_kwarg: fake_service_kwarg_value}
+    fake_service_info = {
+        "path": fake_true_path,
+        fake_service_kwarg: fake_service_kwarg_value,
+    }
     arg_module_dict = {fake_service_name: fake_service_info}
 
     fake_spec = MagicMock()
     fake_service = MagicMock()
     fake_Service_instance = MagicMock()
 
-    mocker.patch(service_import.__name__ + ".os.path.basename", return_value=fake_mod_name)
+    mocker.patch(
+        service_import.__name__ + ".os.path.basename", return_value=fake_mod_name
+    )
     mocker.patch(service_import.__name__ + ".os.path.join")
     mocker.patch(service_import.__name__ + ".importlib.util.spec_from_file_location")
     mocker.patch(service_import.__name__ + ".importlib.util.module_from_spec")
@@ -196,4 +236,6 @@ def test_service_import_returns_service_dict_containing_single_entry_with_return
 
     assert fake_service.Service.call_count == 1
     assert result == {fake_mod_name: fake_Service_instance}
-    assert fake_service.Service.call_args_list[0].kwargs == {fake_service_kwarg: fake_service_kwarg_value}
+    assert fake_service.Service.call_args_list[0].kwargs == {
+        fake_service_kwarg: fake_service_kwarg_value
+    }
