@@ -25,6 +25,7 @@ r2 = redis.Redis(
 # List of all channels
 all_channels = ["state_0", "state_1", "state_2"]
 
+
 # Publish messages on each channel in random order
 def publish_messages():
     loop_count = 0
@@ -36,7 +37,7 @@ def publish_messages():
         for channel in all_channels:
             # Choose the appropriate Redis connection based on the channel
             r = r1 if channel == "state_0" else r2
-            
+
             r.publish(
                 channel,
                 f'{{"time":{inner_loop_count}, '
