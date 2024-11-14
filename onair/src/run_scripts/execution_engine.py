@@ -133,7 +133,7 @@ class ExecutionEngine:
                     f"In config file '{self.config_filepath}' Plugin path '{plugin_file}' does not exist."
                 )
         return temp_plugin_dict
-    
+
     def parse_services_dict(self, config_service_dict):
         services_dict = {}
         # Parse Required Data: Plugin name to path dict
@@ -146,12 +146,12 @@ class ExecutionEngine:
                     f"Service dict {config_service_dict} from {self.config_filepath} is invalid. It must be a dict."
                 )
 
-            service_path = temp_service_dict['path']
+            service_path = temp_service_dict["path"]
             if not (os.path.exists(service_path)):
                 raise FileNotFoundError(
                     f"In config file '{self.config_filepath}' Service path '{service_path}' does not exist."
                 )
-            
+
             services_dict.update({service: temp_service_dict})
         return services_dict
 
