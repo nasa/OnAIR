@@ -149,7 +149,7 @@ class ExecutionEngine:
             service_path = temp_service_dict['path']
             if not (os.path.exists(service_path)):
                 raise FileNotFoundError(
-                    f"In config file {self.config_filepath} Service path '{service_path}' does not exist."
+                    f"In config file '{self.config_filepath}' Service path '{service_path}' does not exist."
                 )
             
             services_dict.update({service: temp_service_dict})
