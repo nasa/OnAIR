@@ -578,7 +578,160 @@ def test_ExecutionEngine_parse_plugins_list_raises_FileNotFoundError_when_any_co
     assert execution_engine.os.path.exists.call_count == len(exists_side_effects)
     for i in range(len(exists_side_effects)):
         assert execution_engine.os.path.exists.call_args_list[i].args == (fake_path,)
+        
+# parse_services_dict
 
+def test_ExecutionEngine_parse_services_list_raises_ValueError_when_config_service_dict_is_not_dict(
+    mocker,
+):
+    # Arrange
+    arg_config_service_dict = MagicMock()
+
+    fake_service_dict = MagicMock()
+    fake_service_dict.body = MagicMock()
+    fake_config_filepath = MagicMock()
+
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut.config_filepath = fake_config_filepath
+
+    mocker.patch.object(cut, "ast_parse_eval", return_value=fake_service_dict)
+    mocker.patch(execution_engine.__name__ + ".isinstance", return_value=False)
+    mocker.patch.object(arg_config_service_dict, "items", return_value=[(None, arg_config_service_dict)])
+
+    # Act
+    with pytest.raises(ValueError) as e_info:
+        cut.parse_services_dict(arg_config_service_dict)
+
+    # Assert
+    assert e_info.match(
+        f"Service dict {arg_config_service_dict} from {fake_config_filepath} is invalid. It must be a dict."
+    )
+    assert cut.ast_parse_eval.call_count == 1
+    assert cut.ast_parse_eval.call_args_list[0].args == (arg_config_service_dict,)
+    assert execution_engine.isinstance.call_count == 1
+    assert execution_engine.isinstance.call_args_list[0].args == (
+        fake_service_dict.body,
+        execution_engine.ast.Dict,
+    )
+
+
+def test_ExecutionEngine_parse_services_list_raises_FileNotFoundError_when_single_config_service_dict_key_maps_to_non_existing_file(
+    mocker,
+):
+    # Arrange
+    arg_config_service_dict = MagicMock()
+
+    fake_service_dict = MagicMock()
+    fake_service_dict.body = MagicMock()
+    fake_config_filepath = MagicMock()
+    fake_temp_service_dict = MagicMock()
+    fake_values = MagicMock()
+    fake_path = MagicMock()
+
+    fake_values.__iter__.return_value = iter([fake_path])
+
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut.config_filepath = fake_config_filepath
+
+    mocker.patch.object(cut, "ast_parse_eval", return_value=fake_service_dict)
+    mocker.patch(execution_engine.__name__ + ".isinstance", return_value=True)
+    mocker.patch.object(arg_config_service_dict, "items", return_value=[(None, arg_config_service_dict)])
+    mocker.patch(
+        execution_engine.__name__ + ".ast.literal_eval",
+        return_value=fake_temp_service_dict,
+    )
+    mocker.patch.object(fake_temp_service_dict, "__getitem__", return_value=fake_path)
+    mocker.patch(execution_engine.__name__ + ".os.path.exists", return_value=False)
+
+    # Act
+    with pytest.raises(FileNotFoundError) as e_info:
+        cut.parse_services_dict(arg_config_service_dict)
+
+    # Assert
+    assert e_info.match(
+        f"In config file '{fake_config_filepath}' Service path '{fake_path}' does not exist."
+    )
+    
+    assert cut.ast_parse_eval.call_count == 1
+    assert cut.ast_parse_eval.call_args_list[0].args == (arg_config_service_dict,)
+    assert execution_engine.isinstance.call_count == 1
+    assert execution_engine.isinstance.call_args_list[0].args == (
+        fake_service_dict.body,
+        execution_engine.ast.Dict,
+    )
+    assert execution_engine.ast.literal_eval.call_count == 1
+    assert execution_engine.ast.literal_eval.call_args_list[0].args == (
+        fake_service_dict,
+    )
+    assert fake_temp_service_dict.__getitem__.call_count == 1
+    assert fake_temp_service_dict.__getitem__.call_args_list[0].args == ('path',)
+    assert execution_engine.os.path.exists.call_count == 1
+    assert execution_engine.os.path.exists.call_args_list[0].args == (fake_path,)
+    
+def test_ExecutionEngine_parse_services_list_sets_service_without_error(
+    mocker,
+):
+    # Arrange
+    arg_config_service_dict = MagicMock()
+
+    fake_service_dict = MagicMock()
+    fake_service_dict.body = MagicMock()
+    fake_config_filepath = MagicMock()
+    fake_temp_service_dict = MagicMock()
+    fake_values = MagicMock()
+    fake_path = MagicMock()
+    fake_service_name = MagicMock()
+
+    fake_values.__iter__.return_value = iter([fake_path])
+
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut.config_filepath = fake_config_filepath
+
+    mocker.patch.object(cut, "ast_parse_eval", return_value=fake_service_dict)
+    mocker.patch(execution_engine.__name__ + ".isinstance", return_value=True)
+    mocker.patch.object(arg_config_service_dict, "items", return_value=[(fake_service_name, arg_config_service_dict)])
+    mocker.patch(
+        execution_engine.__name__ + ".ast.literal_eval",
+        return_value=fake_temp_service_dict,
+    )
+    mocker.patch.object(fake_temp_service_dict, "__getitem__", return_value=fake_path)
+    mocker.patch(execution_engine.__name__ + ".os.path.exists", return_value=True)
+
+    # Act
+    result = cut.parse_services_dict(arg_config_service_dict)
+    
+    assert list(result.keys()) == [fake_service_name]
+    assert list(result.values()) == [fake_temp_service_dict]
+    assert cut.ast_parse_eval.call_count == 1
+    assert cut.ast_parse_eval.call_args_list[0].args == (arg_config_service_dict,)
+    assert execution_engine.isinstance.call_count == 1
+    assert execution_engine.isinstance.call_args_list[0].args == (
+        fake_service_dict.body,
+        execution_engine.ast.Dict,
+    )
+    assert execution_engine.ast.literal_eval.call_count == 1
+    assert execution_engine.ast.literal_eval.call_args_list[0].args == (
+        fake_service_dict,
+    )
+    
+def test_ExecutionEngine_setup_services_sets_self_service_manager_to_new_ServiceManager(mocker):
+    # Arrange
+    cut = ExecutionEngine.__new__(ExecutionEngine)
+    cut.services_dict = MagicMock()
+    
+    fake_service_manager = MagicMock()
+
+    mocker.patch(execution_engine.__name__ + ".ServiceManager", return_value=fake_service_manager)
+
+    # Act
+    cut.setup_services()
+
+    # Assert
+    assert execution_engine.ServiceManager.call_count == 1
+    assert execution_engine.ServiceManager.call_args_list[0].args == (
+        cut.services_dict,
+    )
+    assert cut.service_manager == fake_service_manager
 
 def test_ExecutionEngine_returns_empty_dict_when_config_dict_is_empty(mocker):
     # Arrange
