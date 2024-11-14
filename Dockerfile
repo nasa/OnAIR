@@ -41,6 +41,10 @@ RUN \
   apt-get install -y python3.11-dev && \
   apt-get install -y python3-pip
 
+# Redis
+RUN \
+  apt-get install -y redis
+
 # Add new packages to install here to prevent re-running previous instructions
 
 # Ensure that all packages are up to date after new packages have been added above
