@@ -25,9 +25,14 @@ All messages sent must be json format (key to value) and will warn when it is no
 
 ## Running the example
 
-If not already running, start a Redis server on 'localhost', port:6379 (typical defaults)
+Start a Redis server on 'localhost', port:6379 (typical defaults)
 ```
 redis-server
+```
+
+Start a second Redis server on 'localhost', port:6380
+```
+redis-server --port 6380
 ```
 
 Start up OnAIR with the redis_example.ini file:
@@ -36,19 +41,19 @@ python driver.py onair/config/redis_example.ini
 ```
 You should see:
 ```
-Redis Adapter ignoring file
-
 ---- Redis adapter connecting to server...
 
----- ... connected!
+---- ... connected to server # 0!
 
----- Subscribing to channel: state_0
-
----- Subscribing to channel: state_1
-
----- Subscribing to channel: state_2
+---- Subscribing to channel: state_0 on server # 0
 
 ---- Redis adapter: channel 'state_0' received message type: subscribe.
+
+---- ... connected to server # 1!
+
+---- Subscribing to channel: state_1 on server # 1
+
+---- Subscribing to channel: state_2 on server # 1
 
 ---- Redis adapter: channel 'state_1' received message type: subscribe.
 
@@ -61,9 +66,9 @@ Redis Adapter ignoring file
 
 In another process run the experimental publisher:
 ```
-python redis-experiment-publisher.py
+python redis-experiment-publisher-multi-server.py
 ```
-This will send telemetry every 2 seconds, one channel at random until all 3 channels have recieved data then repeat for a total of 9 times (all of which can be changed in the file). Its output should be similar to this:
+This will send telemetry every 2 seconds, one channel at random until all 3 channels have recieved data then repeat for a total of 9 times (all of which can be changed in the file). Its output should be similar (but randomly different) to this:
 ```
 Published data to state_0, [0, 0.1, 0.2]
 Published data to state_1, [1, 1.1, 1.2]
@@ -98,4 +103,5 @@ INTERPRETED SYSTEM STATUS: ---
 
 CURRENT DATA: [4, 0.1, 0.2, 4.1, 4.2, 3.1, 3.2]
 INTERPRETED SYSTEM STATUS: ---
+...
 ```
