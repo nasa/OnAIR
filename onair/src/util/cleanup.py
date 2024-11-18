@@ -16,5 +16,8 @@ import os
 
 
 def setup_folders(results_path):
+    """
+    Check if given directory exists and create directory if not
+    """
     if not os.path.isdir(results_path):
         os.mkdir(results_path)

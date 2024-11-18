@@ -18,6 +18,9 @@ import os
 
 
 def import_plugins(headers, module_dict):
+    """
+    Function to import user-specified plugins (from config files) into interfaces
+    """
     plugin_list = []
     init_filename = "__init__.py"
     for construct_name, module_path in module_dict.items():
