@@ -1,12 +1,15 @@
+![Python Versions](https://img.shields.io/badge/python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue.svg)
+![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Build](https://github.com/nasa/OnAIR/actions/workflows/unit-test.yml/badge.svg)
 [![CodeCov](https://codecov.io/gh/nasa/OnAIR/branch/main/graph/badge.svg?token=L0WVOTD5X9)](https://codecov.io/gh/nasa/OnAIR)
 
-![alt text](OnAIR_logo.svg "The OnAIR logo, italicized NASA worm style font in blue and orange")
+![alt text](doc/images/OnAIR_logo.svg "The OnAIR logo, italicized NASA worm style font in blue and orange")
 
 # The On-board Artificial Intelligence Research (OnAIR) Platform
 
 The On-board Artificial Intelligence Research (OnAIR) Platform is a framework that enables AI algorithms written in Python to interact with NASA's [cFS](https://github.com/nasa/cFS).
-It is intended to explore research concepts in autonomous operations in a simulated environment. Featuring a plugin style architechture, it is designed to facilitate rapid prototyping of cognitive agents.
+It is intended to explore research concepts in autonomous operations in a simulated environment.
+Featuring a plugin style architechture, it is designed to facilitate rapid prototyping of cognitive agents.
 
 ## Key Features
 
@@ -24,33 +27,34 @@ It is intended to explore research concepts in autonomous operations in a simula
   - Planners
   - Complex Reasoners
 - Flexible plugin system for cognitive components
-  
+
 ## Quick Start
 
-**NOTE:** You may need to put your specific python or version in place of `python`, e.g., `python3.12`  
+**NOTE:** You may need to put your specific python or version in place of `python`, e.g., `python3.12`
+
 **NOTE:** You may need the `-m` option to run python modules, e.g., `python -m coverage report`
 
-### 1. Clone the repository:  
+### 1. Clone the repository:
 ```
-git clone https://github.com/nasa/OnAIR.git 
+git clone https://github.com/nasa/OnAIR.git
 cd OnAIR
 ```
-Gets the repository and enters the directory.  
+Gets the repository and enters the directory.
 
 ### 2. Set up the environment:
 Using your local Python installation (your `pip` command may vary, e.g., `pip3.12`)
 ```
 pip install -r requirements.txt
 ```
-This installs the packages necessary for testing and running. 
+This installs the packages necessary for testing and running.
 
 ### 3. Run the unit tests and check the coverage:
+NOTE: this step is technically optional, but highly recommended.
 ```
 python driver.py -t
 coverage report
 ```
-If all tests pass and coverage is shown to be at 100%, your setup is likely able to use OnAIR.  
-NOTE: this step is technically optional, but highly recommended.
+If all tests pass and coverage is shown to be at 100%, your setup is likely able to use OnAIR.
 
 ### 4. Run the default configuration for OnAIR:
 ```
@@ -81,18 +85,21 @@ INTERPRETED SYSTEM STATUS: ---
 CURRENT DATA: [946707839.0, 30.0, 12.0, 200.0, 0.0, 0.0, 182.28, 0.0, 1.0]
 INTERPRETED SYSTEM STATUS: ---
 ```
-At this point it should stop. This default used a CSV file as the data source and stops at end of file. The configuration file used is [default_config.ini](https://github.com/nasa/OnAIR/blob/5d74c18fedb4b64e519ca3d63cdce6001681f190/onair/config/default_config.ini). When this runs without errors, your basic setup is complete.
+At this point it should stop.
+This default used a CSV file as the data source and stops at end of file.
+The configuration file used is [default_config.ini](onair/config/default_config.ini).
+When this runs without errors, your basic setup is complete.
 
 ### 5. Next steps:
-#### [Documents and Guides](https://github.com/nasa/OnAIR/blob/5d74c18fedb4b64e519ca3d63cdce6001681f190/doc/README.md) 
-Information on how OnAIR is set up and operates.  
-#### [Initialization Files](https://github.com/nasa/OnAIR/tree/5d74c18fedb4b64e519ca3d63cdce6001681f190/onair/config)
+#### [Documents and Guides](doc/README.md)
+Information on how OnAIR is set up and operates.
+#### [Initialization Files](onair/config)
 Examples of how to configure OnAIR for use.
-#### [Telemetry Definition Files](https://github.com/nasa/OnAIR/tree/5d74c18fedb4b64e519ca3d63cdce6001681f190/onair/data/telemetry_configs)
-Example setup files for describing the pipeline's data frame. 
-#### [Plugins](https://github.com/nasa/OnAIR/tree/5d74c18fedb4b64e519ca3d63cdce6001681f190/plugins)
+#### [Telemetry Definition Files](onair/data/telemetry_configs)
+Example setup files for describing the pipeline's data frame.
+#### [Plugins](plugins)
 The provided cognitive components.
-#### [Data Sources](https://github.com/nasa/OnAIR/tree/5d74c18fedb4b64e519ca3d63cdce6001681f190/onair/data_handling)
+#### [Data Sources](onair/data_handling)
 Provided data handling for telemetry input.
 
 ## Contributing
@@ -113,7 +120,3 @@ You may want to make draft pull requests to solicit feedback on larger changes.
 ## License and Copyright
 
 Please refer to [NOSA GSC-19165-1 OnAIR.pdf](NOSA%20GSC-19165-1%20OnAIR.pdf) and [COPYRIGHT](COPYRIGHT).
-
-## Contact
-
-[Placeholder for contact information]
