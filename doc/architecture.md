@@ -159,7 +159,8 @@ There are two types of data used by the constructs in OnAIR, low and high level 
 The plugins in OnAIR operate on the data types described above.
 There are two methods required to be implemented by OnAIR for the plugins:
 
-- `update`: Pulls data into the plugin for use. This includes either `low_level_data`, `high_level_data`, or both, depending on the plugin type.
+- `update`: Pulls data into the plugin for use.
+This includes either `low_level_data`, `high_level_data`, or both, depending on the plugin type.
 - `render_reasoning`: Pushes out reasoned results data.
 This is the data you want made available to plugins further down the pipeline.
 
