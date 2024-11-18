@@ -7,30 +7,49 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
+"""
+This module defines the AIPlugIn abstract base class for the OnAIR Platform.
+
+The AIPlugIn class serves as a foundation for all AI plugins in the OnAIR system.
+It establishes standards and structures for compliance that must be adhered to by
+the four imported plugin types: Knowledge Representation, Learner, Planner, or
+Complex Reasoner.
+
+This abstract base class defines the basic structure and required methods that
+all AI plugins must implement.
+"""
+
 
 from abc import ABC, abstractmethod
 
 
 class AIPlugIn(ABC):
-    """This serves as a base for all plugins.
-
-    This is the superclass for data driven components: VAE, PPO, etc. It is
-    meant to induce standards and structures of compliance for imported
-    plugins: KnowledgeRep, Learner, Planner or Complex. Those plugins must
-    inherit this class.
-
-    Attributes:
-        component_name (str): Name given to instance of plugin.
-        headers (list[str]): Names for each data point in a data frame.
-
     """
+    This serves as a base for all plugins.
+
+    This is the superclass for data driven components. It is
+    meant to induce standards and structures of compliance for imported
+    plugins: Knowledge Representation, Learner, Planner or Complex Reasoner.
+    Those plugins must inherit this class.
+
+    Attributes
+    ----------
+    component_name : str
+        Name given to instance of plugin.
+    headers : list of str
+        Names for each data point in the OnAIR data frame.
+    """
+
     def __init__(self, _name: str, _headers: list[str]):
-        """Initializes a new AIPlugIn object.
+        """
+        Initialize a new AIPlugIn object.
 
-        Args:
-            _name: The name of this plugin instance.
-            _headers: Sequenced names of each item in OnAIR data frame.
-
+        Parameters
+        ----------
+        _name : str
+            The name of this plugin instance.
+        _headers : list of str
+            Sequenced names of each item in OnAIR data frame.
         """
         assert len(_headers) > 0
         self.component_name = _name
@@ -38,26 +57,50 @@ class AIPlugIn(ABC):
 
     @abstractmethod
     def update(
-        self, low_level_data: list[float] = [],
-        high_level_data: dict[str, dict[str, list[object]]] = {}
+        self,
+        low_level_data: list[float] = None,
+        high_level_data: dict[str, dict[str, Any]] = None,
     ) -> None:
-        """Updates plugin's data using provided data.
+        """
+        Update the plugin's internal state with new data.
 
-        Args:
-            low_level_data: Frame of floats, one for each header.
-            high_level_data: Reasoned data results from previous plugins.
+        This method is called to update the plugin with the latest data from the system.
+        It can process either low-level sensor data or high-level reasoning results
+        from other plugins, or both dependent upon plugin type.
 
-        Returns:
-        None: This function only updates the data for this plugin
+        Parameters
+        ----------
+        low_level_data : list of float, optional
+            Raw sensor data as a list of floats, corresponding to the headers defined in the plugin.
+        high_level_data : dict of {str: dict of {str: any}}, optional
+            Processed data and reasoning results from other plugins, organized by plugin type and name.
+
+        Returns
+        -------
+        None
+            This method does not return any value.
+
+        Raises
+        ------
+        NotImplementedError
+            This method must be implemented by subclasses.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def render_reasoning(self) -> list[object]:
-        """Plugin reasons with current data and provides analysis.
+    def render_reasoning(self) -> Any:
+        """
+        Plugin reasons with current data and provides analysis.
 
-        Returns:
-            list[object]: The list of reasoned outcomes, where contents are
-            relevant to this plugin. May be an empty list.
+        Returns
+        -------
+        Any
+            The reasoned outcome, which can be of any type.
+            May return None if there are no results.
+
+        Raises
+        ------
+        NotImplementedError
+            This method must be implemented by subclasses.
         """
         raise NotImplementedError
