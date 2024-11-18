@@ -167,7 +167,7 @@ What a plugin does with the data and how it renders its reasoning is up to the p
   - CRs in turn get progressively more data than the one before it
 
 Here is a illustration of this relationship:
-![Pipeline Data Flow](../images/OnAIR_pipeline_data_flow_.png)
+![Pipeline Data Flow](../images/OnAIR_pipeline_data_flow.png)
 
 
 The best way to see this relationship in action is to run the reporter example:
