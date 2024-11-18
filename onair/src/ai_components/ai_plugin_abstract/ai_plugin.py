@@ -41,7 +41,7 @@ class AIPlugin(ABC):
         Names for each data point in the OnAIR data frame.
     """
 
-    def __init__(self, _name: str, _headers: list[str]):
+    def __init__(self, _name: str, _headers: list):
         """
         Initialize a new AIPlugIn object.
 
@@ -59,8 +59,8 @@ class AIPlugin(ABC):
     @abstractmethod
     def update(
         self,
-        low_level_data: list[float] = None,
-        high_level_data: dict[str, dict[str, Any]] = None,
+        low_level_data: list = None,
+        high_level_data: dict = None,
     ) -> None:
         """
         Update the plugin's internal state with new data.
