@@ -21,9 +21,10 @@ all AI plugins must implement.
 
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 
-class AIPlugIn(ABC):
+class AIPlugin(ABC):
     """
     This serves as a base for all plugins.
 
