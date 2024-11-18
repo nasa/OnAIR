@@ -27,7 +27,7 @@ It is intended to explore research concepts in autonomous operations in a simula
   
 ## Quick Start
 
-**NOTE:** You may need to put your specific python version in place of `python`, e.g., `python3.12`  
+**NOTE:** You may need to put your specific python or version in place of `python`, e.g., `python3.12`  
 **NOTE:** You may need the `-m` option to run python modules, e.g., `python -m coverage report`
 
 ### 1. Clone the repository:  
@@ -38,23 +38,19 @@ cd OnAIR
 Gets the repository and enters the directory.  
 
 ### 2. Set up the environment:
-- **Option A**: Using your local Python installation
+Using your local Python installation (your `pip` command may vary, e.g., `pip3.12`)
 ```
 pip install -r requirements.txt
 ```
-- **Option B**: Using Conda
-```
-conda env create -f environment.yml
-conda activate onair-env
-```
-- **Option C**: Whatever works for you!  
+This installs the packages necessary for testing and running. 
 
-### 3. Run the unit tests:
+### 3. Run the unit tests and check the coverage:
 ```
 python driver.py -t
 coverage report
 ```
-If all tests pass and coverage is shown to be at 100%, your setup is likely able to use OnAIR.
+If all tests pass and coverage is shown to be at 100%, your setup is likely able to use OnAIR.  
+NOTE: this step is technically optional, but highly recommended.
 
 ### 4. Run the default configuration for OnAIR:
 ```
@@ -85,62 +81,19 @@ INTERPRETED SYSTEM STATUS: ---
 CURRENT DATA: [946707839.0, 30.0, 12.0, 200.0, 0.0, 0.0, 182.28, 0.0, 1.0]
 INTERPRETED SYSTEM STATUS: ---
 ```
-At this point it should stop. This default used a CSV file as the data source and stops at end of file. The configuration file used is [default_config.ini](https://github.com/nasa/OnAIR/blob/main/onair/config/default_config.ini). When this runs without errors, your basic setup is complete.
+At this point it should stop. This default used a CSV file as the data source and stops at end of file. The configuration file used is [default_config.ini](https://github.com/nasa/OnAIR/blob/5d74c18fedb4b64e519ca3d63cdce6001681f190/onair/config/default_config.ini). When this runs without errors, your basic setup is complete.
 
 ### 5. Next steps:
-Explore the [config directory](https://github.com/nasa/OnAIR/tree/main/onair/config) for example configuration files.
-Start developing by plugging in your data source and your own cognitive components.
-Refer to the Documentation section for more detailed information on customization and advanced features.
-
-
-## User Guide
-
-** Under Construction, please pardon our dust. **
-
-### Welcome, You Are Now Live with $\color{dodgerblue}{On}\color{orangered}{AI}\color{dodgerblue}{R}$!
-  - What is OnAIR?
-  - More Importantly, What Isn't OnAIR?
-  - How to Use This Guide
-### Detailed Installation
-  - Requirements and Dependencies
-  - Using pip
-  - Using Conda
-  - Troubleshooting
-### Unit Testing
-  - Philosopy
-  - How to Run the Unit Tests
-  - How to Read a Unit Test
-  - How to Write a Unit Test for OnAIR
-### Configuration
-  - Configuration File Structure (INI)
-  - Meta Data File Structure (JSON)
-### Data Sources
-  - Provided Examples
-    - Core Flight System (cFS)
-    - CSV Files
-    - Redis
-  - Developing Your Own Data Sources
-  - How to Attach a Data Source
-### The Cognitive Components
-  - Knowledge Representation
-  - Learner
-  - Planner
-  - Complex Reasoner
-  - Data Flow Through Components 
-### Plugins
-  - Plugin Development
-  - How to Attach Your Plugin
-### Provided Usage Examples
-  - The Default
-  - The Reporter
-  - The cFS?
-  - The Redis
-### Advanced Usage Examples
-  - A Mock Mission
-### Troubleshooting
-  - Error Outputs During Use
-  - Debugging
-  - Issue Reporting
+#### [Documents and Guides](https://github.com/nasa/OnAIR/blob/5d74c18fedb4b64e519ca3d63cdce6001681f190/doc/README.md) 
+Information on how OnAIR is set up and operates.  
+#### [Initialization Files](https://github.com/nasa/OnAIR/tree/5d74c18fedb4b64e519ca3d63cdce6001681f190/onair/config)
+Examples of how to configure OnAIR for use.
+#### [Telemetry Definition Files](https://github.com/nasa/OnAIR/tree/5d74c18fedb4b64e519ca3d63cdce6001681f190/onair/data/telemetry_configs)
+Example setup files for describing the pipeline's data frame. 
+#### [Plugins](https://github.com/nasa/OnAIR/tree/5d74c18fedb4b64e519ca3d63cdce6001681f190/plugins)
+The provided cognitive components.
+#### [Data Sources](https://github.com/nasa/OnAIR/tree/5d74c18fedb4b64e519ca3d63cdce6001681f190/onair/data_handling)
+Provided data handling for telemetry input.
 
 ## Contributing
 
