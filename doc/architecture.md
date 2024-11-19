@@ -90,7 +90,7 @@ What should be known about file parsing and usage.
 - Acceptable values, all will become floats
   - Integer
   - Float
-  - Timestamp str
+  - Timestamp in format parsable by [convert_str_to_timestamp](../onair/data_handling/parser_util.py#L68)
 - All other values are unacceptable and turned into 0.0 (by the [floatify_input](../onair/data_handling/parser_util.py#L49) method)
 - Parser loads the entire floatified CSV file into memory at once.
 - Memory usage increases with file size
