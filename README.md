@@ -1,6 +1,7 @@
 ![Python Versions](https://img.shields.io/badge/python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue.svg)
 ![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)
-![Build](https://github.com/nasa/OnAIR/actions/workflows/unit-test.yml/badge.svg)
+[![GitHub License](https://img.shields.io/badge/License-NOSA-green)](https://github.com/nasa/OnAIR/blob/main/NOSA%20GSC-19165-1%20OnAIR.pdf)
+[![Build](https://github.com/nasa/OnAIR/actions/workflows/unit-test.yml/badge.svg)](https://github.com/nasa/OnAIR/actions)
 [![CodeCov](https://codecov.io/gh/nasa/OnAIR/branch/main/graph/badge.svg?token=L0WVOTD5X9)](https://codecov.io/gh/nasa/OnAIR)
 
 ![alt text](doc/images/OnAIR_logo.svg "The OnAIR logo, italicized NASA worm style font in blue and orange")
