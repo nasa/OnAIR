@@ -51,6 +51,9 @@ class ExecutionEngine:
         self.planners_plugin_dict = [""]
         self.complex_plugin_dict = [""]
 
+        # Init Services
+        self.services_dict = {}
+
         self.save_flag = save_flag
         self.save_name = run_name
 
