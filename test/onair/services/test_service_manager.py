@@ -95,7 +95,7 @@ def test_ServiceManager_get_services_returns_dict_of_services_and_their_function
         "service1": {"path": "path/to/service1"},
         "service2": {"path": "path/to/service2"},
     }
-            
+
     fake_imported_services = {
         "service1": FakeService1(),
         "service2": FakeService2(),
