@@ -485,7 +485,9 @@ def test_print_io_subsystem_status_str_returns_expected_string_when_stat_exists_
     fake_uncertainty = MagicMock()
     fake_str = MagicMock()
 
-    expected_s = print_io.BCOLORS["BOLD"] + "[" + fake_str + "] : " + print_io.BCOLORS["ENDC"]
+    expected_s = (
+        print_io.BCOLORS["BOLD"] + "[" + fake_str + "] : " + print_io.BCOLORS["ENDC"]
+    )
     expected_s = (
         expected_s
         + "\n"
@@ -528,7 +530,9 @@ def test_print_io_subsystem_str_returns_string_without_any_data_when_headers_tes
     arg_ss.tests = []
     arg_ss.test_data = []
 
-    expected_result = print_io.BCOLORS["BOLD"] + arg_ss.type + "\n" + print_io.BCOLORS["ENDC"]
+    expected_result = (
+        print_io.BCOLORS["BOLD"] + arg_ss.type + "\n" + print_io.BCOLORS["ENDC"]
+    )
     expected_result = expected_result + "--[headers] \n--[tests] \n--[test data] "
 
     # Act
@@ -552,7 +556,9 @@ def test_print_io_subsystem_str_returns_string_all_data_when_headers_tests_and_t
     num_test_data = pytest.gen.randint(1, 10)  # arbitrary from 1 to 10
     arg_ss.test_data = []
 
-    expected_result = print_io.BCOLORS["BOLD"] + arg_ss.type + "\n" + print_io.BCOLORS["ENDC"]
+    expected_result = (
+        print_io.BCOLORS["BOLD"] + arg_ss.type + "\n" + print_io.BCOLORS["ENDC"]
+    )
     expected_result = expected_result + "--[headers] "
     for i in range(num_headers):
         arg_ss.headers.append(MagicMock())
