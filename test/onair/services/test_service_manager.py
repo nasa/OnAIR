@@ -13,9 +13,8 @@
 # which have a single instance per global scope (which the tests are running in).
 #
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from onair.services.service_manager import ServiceManager
-import onair.services.service_manager as service_manager_import
 
 
 def test_ServiceManager__init__raises_ValueError_when_service_dict_is_None_on_first_instantiation(
@@ -49,7 +48,7 @@ def test_ServiceManager__init__imports_services_and_sets_attributes(mocker):
     # Assert
     assert service_manager.service1 == fake_imported_services["service1"]
     assert service_manager.service2 == fake_imported_services["service2"]
-    assert service_manager._initialized == True
+    assert hasattr(service_manager, "services")
 
     # Teardown
     del ServiceManager.instance
@@ -58,7 +57,8 @@ def test_ServiceManager__init__imports_services_and_sets_attributes(mocker):
 def test_ServiceManager__init__does_not_reinitialize_if_already_initialized(mocker):
     # Arrange
     fake_service_dict = {"service1": {"path": "path/to/service1"}}
-    mocker.patch.object(ServiceManager, "_initialized", True, create=True)
+    fake_service_functions = {"service1": {"func1"}}
+    mocker.patch.object(ServiceManager, "services", fake_service_functions, create=True)
     mock_import_services = mocker.patch(
         "onair.src.util.service_import.import_services"
     )  # called in __init__
@@ -91,9 +91,21 @@ def test_ServiceManager_get_services_returns_dict_of_services_and_their_function
         def func3(self):
             pass
 
-    service_manager = ServiceManager.__new__(ServiceManager)
-    service_manager.service1 = FakeService1()
-    service_manager.service2 = FakeService2()
+    fake_service_dict = {
+        "service1": {"path": "path/to/service1"},
+        "service2": {"path": "path/to/service2"},
+    }
+            
+    fake_imported_services = {
+        "service1": FakeService1(),
+        "service2": FakeService2(),
+    }
+
+    mocker.patch(
+        "onair.services.service_manager.import_services",
+        return_value=fake_imported_services,
+    )
+    service_manager = ServiceManager(fake_service_dict)
 
     # Act
     result = service_manager.get_services()
@@ -110,7 +122,8 @@ def test_ServiceManager_get_services_returns_dict_of_services_and_their_function
 
 def test_ServiceManager_get_services_returns_empty_dict_when_no_services(mocker):
     # Arrange
-    service_manager = ServiceManager.__new__(ServiceManager)
+    fake_service_dict = {}
+    service_manager = ServiceManager(fake_service_dict)
 
     # Act
     result = service_manager.get_services()
@@ -120,31 +133,6 @@ def test_ServiceManager_get_services_returns_empty_dict_when_no_services(mocker)
 
     # Teardown
     del ServiceManager.instance
-
-
-def test_ServiceManager_get_services_returns_empty_dict_and_does_reach_second_for_loop_when_own_items_returns_only_internal_or_private_attributes(
-    mocker,
-):
-    # Arrange
-    service_manager = ServiceManager.__new__(ServiceManager)
-    fake_vars_return = MagicMock()
-    fake_internal_variable = MagicMock()
-
-    mocker.patch(
-        service_manager_import.__name__ + ".vars", return_value=fake_vars_return
-    )
-    mocker.patch(service_manager_import.__name__ + ".dir")
-    fake_vars_return.items.return_value = iter([(fake_internal_variable, MagicMock())])
-    fake_internal_variable.startswith.return_value = True
-
-    # Act
-    result = service_manager.get_services()
-
-    # Assert
-    assert result == {}
-    assert fake_internal_variable.startswith.call_count == 1
-    assert fake_internal_variable.startswith.call_args_list[0].args == ("_",)
-    assert service_manager_import.dir.call_count == 0
 
 
 def test_ServiceManager_behaves_as_singleton(mocker):

@@ -8,8 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 """
-plugin_import.py
-Function to import user-specified plugins (from config files) into interfaces
+Import user-specified services (from config files) into interfaces.
 """
 
 import importlib.util
@@ -18,19 +17,21 @@ import os
 
 
 def import_services(service_dict):
-    services_dict = {}
+    """
+    Return a dictionary, pairing service names with an instance of the service.
+
+    Parameters
+    ----------
+    service_dict : dict
+        service names paired with their class file path
+    """
+    services = {}
     init_filename = "__init__.py"
-    """
-    services_dict format = {service1: service1_args, service2: service2_args}
-    e.g.
-    fleetinterface: {'path': 'service/redis_fleet_interface',
-                    'agent_callsign': 'agent1',
-                    'connection_timeout': '3'}
-    """
+
     for service, kwargs in service_dict.items():
         true_path = kwargs.pop("path")  # path no longer needed afterwards
         # Last directory name is the module name
-        mod_name = os.path.basename(true_path)  # redis_fleet_interface
+        mod_name = os.path.basename(true_path)
         # import module if not already available
         if mod_name not in sys.modules:
             # add init file to get proper path for spec
@@ -47,5 +48,5 @@ def import_services(service_dict):
         service_name = f"{mod_name}_service"
         service = __import__(f"{mod_name}.{service_name}", fromlist=[service_name])
         # add an instance of the module's was an OnAIR plugin
-        services_dict[mod_name] = service.Service(**kwargs)
-    return services_dict
+        services[mod_name] = service.Service(**kwargs)
+    return services
