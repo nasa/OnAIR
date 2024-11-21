@@ -13,12 +13,15 @@ Utility file to perform conversions for supervised learning, and beyond
 """
 import numpy as np
 
-classes = {"RED": 0, "YELLOW": 1, "GREEN": 2, "---": 3}
+CLASSES = {"RED": 0, "YELLOW": 1, "GREEN": 2, "---": 3}
 
 
-def status_to_oneHot(status):
+def status_to_one_hot(status):
+    """
+    Convert status string to one hot positional array
+    """
     if isinstance(status, np.ndarray):
         return status
     one_hot = [0.0, 0.0, 0.0, 0.0]
-    one_hot[classes[status]] = 1.0
+    one_hot[CLASSES[status]] = 1.0
     return list(one_hot)

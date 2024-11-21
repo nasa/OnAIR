@@ -16,12 +16,14 @@ import json
 
 
 def parse_associations_from_json(filepath):
-    with open(filepath) as f:
-        data = json.load(f)
+    """
+    Parse associations from given JSON file
+    """
+    with open(filepath) as file:
+        data = json.load(file)
 
     associations_list = []
-    raw_associations = data["children"]
-    for association in raw_associations:
+    for association in data["children"]:
         antecedant = association["name"]
         for connection in association["connections"]:
             consequent = connection["target"]
@@ -40,4 +42,7 @@ def parse_associations_from_json(filepath):
 
 
 def aggregate_results():
+    """
+    TODO: This function is a placeholder
+    """
     return
