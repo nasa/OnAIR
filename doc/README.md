@@ -4,7 +4,7 @@
 
 ## Start Here
 
-[Tutorial](tutorial.md) : Steps through installation, running, updating configuration files, and loading plugins. IN PROGRESS
+[Tutorial](tutorial.md) : Steps through installation, running, updating configuration files, loading plugins, and writting your own plugin.
 
 [Purpose and Use](purpose-and-use.md) : When to use OnAIR (and when _not_ to). NOT COMPLETE
 
@@ -15,8 +15,6 @@
 [Running with cFS](cfs-onair-guide.md) : How to run OnAIR with NASA's core Flight System as a live data source.
 
 [Unit-Testing](unit-testing.md) : How to run the unit-tests and generate a coverage report.
-
-[Writing your own Plugin](writing-your-own-plugin.md) : NOT COMPLETE
 
 [Writing your own DataSource](writing-your-own-data-source.md) : NOT COMPLETE
 
