@@ -19,6 +19,7 @@ from shutil import copytree, rmtree
 from time import gmtime, strftime
 
 from ..run_scripts.sim import Simulator
+from onair.services.service_manager import ServiceManager
 
 
 class ExecutionEngine:
@@ -50,6 +51,9 @@ class ExecutionEngine:
         self.planners_plugin_dict = [""]
         self.complex_plugin_dict = [""]
 
+        # Init Services
+        self.services_dict = {}
+
         self.save_flag = save_flag
         self.save_name = run_name
 
@@ -59,7 +63,11 @@ class ExecutionEngine:
             self.parse_data(
                 self.data_source_file, self.fullTelemetryFile, self.fullMetaFile
             )
+            self.setup_services()
             self.setup_sim()
+
+    def setup_services(self):
+        self.service_manager = ServiceManager(self.services_dict)
 
     def parse_configs(self, config_filepath):
         config = configparser.ConfigParser()
@@ -97,6 +105,10 @@ class ExecutionEngine:
                 config["PLUGINS"]["ComplexPluginDict"]
             )
 
+            # Parse Service information
+            if config.has_section("SERVICES"):
+                self.services_dict = self.parse_services_dict(config["SERVICES"])
+
             # Parse Optional Data: OPTIONS
             # 'OPTIONS' must exist, but individual options return False if missing
             if config.has_section("OPTIONS"):
@@ -124,6 +136,27 @@ class ExecutionEngine:
                     f"In config file '{self.config_filepath}' Plugin path '{plugin_file}' does not exist."
                 )
         return temp_plugin_dict
+
+    def parse_services_dict(self, config_service_dict):
+        services_dict = {}
+        # Parse Required Data: Plugin name to path dict
+        for service, args in config_service_dict.items():
+            ast_service_dict = self.ast_parse_eval(args)
+            if isinstance(ast_service_dict.body, ast.Dict):
+                temp_service_dict = ast.literal_eval(ast_service_dict)
+            else:
+                raise ValueError(
+                    f"Service dict {config_service_dict} from {self.config_filepath} is invalid. It must be a dict."
+                )
+
+            service_path = temp_service_dict["path"]
+            if not (os.path.exists(service_path)):
+                raise FileNotFoundError(
+                    f"In config file '{self.config_filepath}' Service path '{service_path}' does not exist."
+                )
+
+            services_dict.update({service: temp_service_dict})
+        return services_dict
 
     def parse_data(
         self,

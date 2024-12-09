@@ -127,6 +127,7 @@ def test_AIPlugin__init__sets_instance_values_to_given_args_when_given__headers_
     mocker.patch(
         ai_plugin.__name__ + ".len", return_value=pytest.gen.randint(1, 200)
     )  # arbitrary, from 1 to 200 (but > 0)
+    mocker.patch(ai_plugin.__name__ + ".ServiceManager")
 
     # Act
     cut.__init__(arg__name, arg__headers)
@@ -136,3 +137,26 @@ def test_AIPlugin__init__sets_instance_values_to_given_args_when_given__headers_
     assert ai_plugin.len.call_args_list[0].args == (arg__headers,)
     assert cut.component_name == arg__name
     assert cut.headers == arg__headers
+
+
+def test_AIPlugin__init__sets_service_manager_to_instantiation_of_ServiceManager_class(
+    mocker,
+):
+    # Arrange
+    arg__name = MagicMock()
+    arg__headers = MagicMock()
+    fake_service_manager = MagicMock()
+
+    mocker.patch.object(arg__headers, "__len__", return_value=2)
+
+    cut = FakeAIPlugin.__new__(FakeAIPlugin)
+
+    mocker.patch(
+        ai_plugin.__name__ + ".ServiceManager", return_value=fake_service_manager
+    )
+
+    # Act
+    cut.__init__(arg__name, arg__headers)
+
+    # Assert
+    assert cut.service_manager == fake_service_manager
