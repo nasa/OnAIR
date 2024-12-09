@@ -19,6 +19,7 @@ from plugins.csv_output.csv_output_plugin import Plugin as CSV_Output
 def test_csv_output_plugin_init_initalizes_expected_default_variables(mocker):
 
     # Arrange
+    # Arrange
     arg_name = MagicMock()
     arg_headers = [MagicMock(), MagicMock()]
 
@@ -54,6 +55,7 @@ def test_csv_output_plugin_update_adds_plugins_to_headers_on_first_frame(mocker)
     }
 
     intial_headers = copy(cut.headers)
+    intial_headers = copy(cut.headers)
     expected_headers = intial_headers + ["plugin1", "plugin2", "plugin3"]
 
     mocker.patch("onair.src.ai_components.ai_plugin_abstract.ai_plugin.ServiceManager")
@@ -77,8 +79,14 @@ def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missi
     high_level_data = {"layer1": {}, "layer2": {}}
 
     intial_headers = copy(cut.headers)
+    intial_headers = copy(cut.headers)
     expected_headers = intial_headers
 
+    # Act
+    cut.update([], high_level_data)
+
+    # Assert
+    assert cut.headers == expected_headers
     # Act
     cut.update([], high_level_data)
 
@@ -98,6 +106,7 @@ def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missi
     high_level_data = {}
 
     intial_headers = copy(cut.headers)
+    intial_headers = copy(cut.headers)
     expected_headers = intial_headers
 
     # Act
@@ -114,6 +123,7 @@ def test_csv_output_plugin_update_skips_headers_after_first_frame(mocker):
     cut.headers = fake_headers
     cut.first_frame = False
 
+    intial_headers = copy(cut.headers)
     intial_headers = copy(cut.headers)
     expected_headers = intial_headers
 
