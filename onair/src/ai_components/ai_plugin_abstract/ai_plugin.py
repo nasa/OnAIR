@@ -8,6 +8,7 @@
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
 from abc import ABC, abstractmethod
+from onair.services.service_manager import ServiceManager
 
 """This object serves as a proxy for all plugins.
    Therefore, the AIPlugin object is meant to induce
@@ -24,6 +25,7 @@ class AIPlugin(ABC):
         assert len(_headers) > 0
         self.component_name = _name
         self.headers = _headers
+        self.service_manager = ServiceManager()
 
     @abstractmethod
     def update(self, low_level_data=[], high_level_data={}):
