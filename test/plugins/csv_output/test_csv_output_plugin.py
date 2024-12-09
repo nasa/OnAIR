@@ -24,7 +24,7 @@ def test_csv_output_plugin_init_initalizes_expected_default_variables(mocker):
 
     cut = CSV_Output.__new__(CSV_Output)
 
-    mocker.patch('onair.src.ai_components.ai_plugin_abstract.ai_plugin.ServiceManager')
+    mocker.patch("onair.src.ai_components.ai_plugin_abstract.ai_plugin.ServiceManager")
 
     # Act
 
@@ -56,7 +56,7 @@ def test_csv_output_plugin_update_adds_plugins_to_headers_on_first_frame(mocker)
     intial_headers = copy(cut.headers)
     expected_headers = intial_headers + ["plugin1", "plugin2", "plugin3"]
 
-    mocker.patch('onair.src.ai_components.ai_plugin_abstract.ai_plugin.ServiceManager')
+    mocker.patch("onair.src.ai_components.ai_plugin_abstract.ai_plugin.ServiceManager")
 
     # Act
     cut.update([], high_level_data)
@@ -65,7 +65,9 @@ def test_csv_output_plugin_update_adds_plugins_to_headers_on_first_frame(mocker)
     assert cut.headers == expected_headers
 
 
-def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missing_plugins(mocker):
+def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missing_plugins(
+    mocker,
+):
     # Arrange
     fake_headers = ["header1", "header2"]
     cut = CSV_Output.__new__(CSV_Output)
@@ -84,7 +86,9 @@ def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missi
     assert cut.headers == expected_headers
 
 
-def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missing_layers(mocker):
+def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missing_layers(
+    mocker,
+):
     # Arrange
     fake_headers = ["header1", "header2"]
     cut = CSV_Output.__new__(CSV_Output)
@@ -98,7 +102,7 @@ def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missi
 
     # Act
     cut.update([], high_level_data)
-    
+
     # Assert
     assert cut.headers == expected_headers
 
@@ -115,7 +119,7 @@ def test_csv_output_plugin_update_skips_headers_after_first_frame(mocker):
 
     # Act
     cut.update(low_level_data=[], high_level_data={})
- 
+
     # Assert
     assert cut.headers == expected_headers
 
@@ -127,7 +131,7 @@ def test_csv_output_plugin_update_leaves_buffer_empty_when_given_no_data(mocker)
 
     # Act
     cut.update(low_level_data=[], high_level_data={})
-    
+
     # Assert
     assert cut.current_buffer == []
 
@@ -166,7 +170,9 @@ def test_csv_output_plugin_update_fills_buffer_with_high_level_data(mocker):
     assert cut.current_buffer == expected_buffer
 
 
-def test_csv_output_plugin_render_reasoning_creates_expected_file_on_first_frame(mocker):
+def test_csv_output_plugin_render_reasoning_creates_expected_file_on_first_frame(
+    mocker,
+):
     # Arrange
     cut = CSV_Output.__new__(CSV_Output)
     cut.filename_preamble = "test_"
@@ -188,8 +194,10 @@ def test_csv_output_plugin_render_reasoning_creates_expected_file_on_first_frame
         os.remove(cut.file_name)
 
 
-def test_csv_output_plugin_render_reasoning_does_not_create_new_file_when_not_first_frame(mocker):
-    # Arrange 
+def test_csv_output_plugin_render_reasoning_does_not_create_new_file_when_not_first_frame(
+    mocker,
+):
+    # Arrange
     cut = CSV_Output.__new__(CSV_Output)
     cut.filename_preamble = "test_"
     cut.first_frame = True
@@ -226,7 +234,9 @@ def test_csv_output_plugin_render_reasoning_does_not_create_new_file_when_not_fi
         os.remove(target_file_name)
 
 
-def test_csv_output_plugin_render_reasoning_changes_file_when_lines_per_file_reached(mocker):
+def test_csv_output_plugin_render_reasoning_changes_file_when_lines_per_file_reached(
+    mocker,
+):
     # Arrange
     cut = CSV_Output.__new__(CSV_Output)
     cut.filename_preamble = "test_"
