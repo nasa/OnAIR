@@ -26,11 +26,6 @@ class ServiceManager(Singleton):
         Determine if an instance of the class exists
     <SERVICE_NAME> : object
         An instance of that service class
-
-    Methods
-    -------
-    get_services():
-        Returns dictionary of services and their functions.
     """
 
     def __init__(self, service_dict=None):
