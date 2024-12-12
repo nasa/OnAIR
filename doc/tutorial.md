@@ -133,7 +133,7 @@ ComplexPluginDict = {'generic':'plugins/generic/__init__.py'}
 ## Tutorial: Using the Kalman Plugin
 
 In the default configuration, OnAIR doesn't do any processing of the data.
-Now, we'll take a look at the Kalman example which processes frames of data with a Kalman Filter ([wikipedia: Kalman Filter(https://en.wikipedia.org/wiki/Kalman_filter), [PyPI: simdkalman](https://pypi.org/project/simdkalman/)) in one plugin and outputs the results to a file using a second plugin.
+Now, we'll take a look at the Kalman example which processes frames of data with a Kalman Filter ([Wikipedia: Kalman Filter(https://en.wikipedia.org/wiki/Kalman_filter), [PyPI: simdkalman](https://pypi.org/project/simdkalman/)) in one plugin and outputs the results to a file using a second plugin.
 
 ### Kalman Configuration
 
@@ -147,12 +147,10 @@ PlannersPluginDict = {}
 ComplexPluginDict = {}
 ```
 
-Note: you can set plugins to be blank or the 'generic' empty plugin.
-
-You can see that there is now a KnowledgeRep plugin, Kalman Filter: this plugin will see the low-level data frame and use it to build up higher level information.
+You can see that there is a KnowledgeRep plugin, Kalman Filter: this plugin will see the low-level data frame and use it to build up higher level information.
 In this case, a list of telemetry points that have violated their Kalman filter prediction for a time step.
-There is also a Learners plugin, csv output: normally a learner would use both the low-level data and the higher level information from the Knowledge Representation to TODO.
-In this example we want the csv output plugin to see both the Kalman filter output and the low level data so that it can be written to a file.
+There is also a Learners plugin, csv output: normally a learner would use both the low-level data and the higher level information from Knowledge Representation plugins to make sense of the environment.
+In this example we make the the csv output plugin a Learner so that it can see both the Kalman filter output and the low level data and write them to a file.
 
 The image below shows the data flow from a csv file, into OnAIR, into the plugins (in yellow), and back out to csv files:
 
@@ -160,10 +158,10 @@ The image below shows the data flow from a csv file, into OnAIR, into the plugin
 
 ### Inside the Kalman Plugin
 
-The Kalman Plugin [kalman_plugin.py](../onair/plugins/kalman/kalman_plugin.py) is an [`AIPlugin`](../onair/src/ai_components/ai_plugin_abstract/ai_plugin.py) which requires two functions: `update` and `render_reasoning`.
+The Kalman Plugin [kalman_plugin.py](../onair/plugins/kalman/kalman_plugin.py) inherits from the abstract class [`AIPlugin`](../onair/src/ai_components/ai_plugin_abstract/ai_plugin.py) which requires two functions: `update` and `render_reasoning`.
 `AIPlugin` also defines an `__init__` function which stores the plugin name and a list of names of the telemetry points in the low level data (called "headers").
 
-The `update` function is how the plugin recieves each new data frame:
+The `update` function is how the plugin receives each new data frame:
 
 ```
     def update(self, low_level_data=None, _high_level_data=None):
@@ -268,11 +266,12 @@ Here you see that the 3rd column (CURRENT) is steady at 5.0.
 When it drops to 2.0, "CURRENT" is added to the output from the Kalman plugin.
 This happens again when the current jumps again from 3.0 to 5.0.
 
-Note: not every telemetry point flagged by the Kalman filter is idicative of a fault, some are false positives.
+Note: The Kalman filter is not detecting faults, just telemetry points that are outside of the expected range given the filter's configuration and previous readings.
+This _may_ indicate a fault; further analysis should be done by a human or higher level plugin.
 
 ## Write a New Plugin
 
-Now we are going to write a new plugin to "scream" every time a tlemetry point has been marked as broken by the Kalman plugin.
+Now we are going to write a new plugin to "scream" every time a telemetry point has been marked as broken by the Kalman plugin.
 
 First we need to create a directory and files for the plugin.
 The easiest way to do this is to just copy the generic plugin directory.
@@ -336,13 +335,14 @@ class Plugin(AIPlugin):
         pass
 ```
 
-We do everything in the `update` function since scream doesn't actually have anything useful to pass on to other plugins.
+Normally the `update` function is use to process incoming data and the `render_reasoning` function is used to produce and return the plugin's output.
+Here we do everything in the `update` function for simplicity (and scream doesn't actually have anything useful to pass on to other plugins).
 First we check that the high level data does in fact have an entry named "Kalman Filter", which is the name of the Kalman plugin in the config file.
 
 Next, the plugin checks the Kalman plugins rendered output (`high_level_data['vehicle_rep']['Kalman Filter']` is the list returned by the Kalman plugin's `render_reasoning` function).
-If something is there, the scream plugin will, well scream about it.
+If something is there, the scream plugin will, well, scream about it.
 
-When you run your scream example, you should now see the following amoung the output:
+When you run your scream example, you should now see the following among the output:
 
 ```
 --- snip ---
