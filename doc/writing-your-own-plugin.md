@@ -1,1 +1,0 @@
-TODO: Walk through writing a plug-in to print kalman results to a file.
