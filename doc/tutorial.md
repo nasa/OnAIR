@@ -335,7 +335,7 @@ class Plugin(AIPlugin):
         pass
 ```
 
-Normally the `update` function is use to process incoming data and the `render_reasoning` function is used to produce and return the plugin's output.
+Normally the `update` function is used to process incoming data and the `render_reasoning` function is used to produce and return the plugin's output.
 Here we do everything in the `update` function for simplicity (and scream doesn't actually have anything useful to pass on to other plugins).
 First we check that the high level data does in fact have an entry named "Kalman Filter", which is the name of the Kalman plugin in the config file.
 
