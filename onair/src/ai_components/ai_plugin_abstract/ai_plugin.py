@@ -38,7 +38,8 @@ class AIPlugin(ABC):
     component_name : str
         Name given to instance of plugin.
     headers : list of str
-        Names for each data point in the OnAIR data frame.
+        Names for each data point, corresponding to the OnAIR low_level_data and frame
+        elements by matching index position.
     """
 
     def __init__(self, _name: str, _headers: list):
@@ -50,7 +51,7 @@ class AIPlugin(ABC):
         _name : str
             The name of this plugin instance.
         _headers : list of str
-            Sequenced names of each item in OnAIR data frame.
+            Sequenced list of names for each item in OnAIR low_level_data and frame.
         """
         assert len(_headers) > 0
         self.component_name = _name
