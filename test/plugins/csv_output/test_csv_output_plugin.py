@@ -13,140 +13,148 @@ from unittest.mock import MagicMock
 import os
 from copy import copy
 
-from plugins.csv_output import csv_output_plugin
 from plugins.csv_output.csv_output_plugin import Plugin as CSV_Output
 
 
-def test_init_initalizes_expected_default_variables():
+def test_csv_output_plugin_init_initalizes_expected_default_variables(mocker):
 
+    # Arrange
     arg_name = MagicMock()
     arg_headers = [MagicMock(), MagicMock()]
 
-    csv_out = CSV_Output(arg_name, arg_headers)
+    cut = CSV_Output.__new__(CSV_Output)
 
-    # assert
-    assert csv_out.component_name == arg_name
-    assert csv_out.headers == arg_headers
-    assert csv_out.first_frame == True
-    assert csv_out.lines_per_file == 10
-    assert csv_out.lines_current == 0
-    assert csv_out.current_buffer == []
-    assert csv_out.filename_preamble == "csv_out_"
-    assert csv_out.filename == ""
+    mocker.patch("onair.src.ai_components.ai_plugin_abstract.ai_plugin.ServiceManager")
+
+    # Act
+
+    cut.__init__(arg_name, arg_headers)
+
+    # Assert
+    assert cut.component_name == arg_name
+    assert cut.headers == arg_headers
+    assert cut.first_frame == True
+    assert cut.lines_per_file == 10
+    assert cut.lines_current == 0
+    assert cut.current_buffer == []
+    assert cut.filename_preamble == "csv_out_"
+    assert cut.filename == ""
 
 
-def test_update_adds_plugins_to_headers_on_first_frame():
-    arg_name = MagicMock()
-    arg_name = MagicMock()
-    arg_headers = ["header1", "header2"]
-    csv_out = CSV_Output(arg_name, arg_headers)
+def test_csv_output_plugin_update_adds_plugins_to_headers_on_first_frame(mocker):
+    # Arrange
+    fake_headers = ["header1", "header2"]
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.headers = fake_headers
+    cut.first_frame = True
 
-    # test specific conditions
-    csv_out.first_frame = True
     high_level_data = {
         "layer1": {"plugin1": []},
         "layer2": {"plugin2": [], "plugin3": []},
     }
 
-    # initial state
-    intial_headers = copy(csv_out.headers)
-
-    # expected state
+    intial_headers = copy(cut.headers)
     expected_headers = intial_headers + ["plugin1", "plugin2", "plugin3"]
 
-    # check
-    csv_out.update([], high_level_data)
-    assert csv_out.headers == expected_headers
+    mocker.patch("onair.src.ai_components.ai_plugin_abstract.ai_plugin.ServiceManager")
+
+    # Act
+    cut.update([], high_level_data)
+
+    # Assert
+    assert cut.headers == expected_headers
 
 
-def test_update_does_not_add_headers_on_first_frame_when_missing_plugins():
-    arg_name = MagicMock()
-    arg_name = MagicMock()
-    arg_headers = ["header1", "header2"]
-    csv_out = CSV_Output(arg_name, arg_headers)
+def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missing_plugins(
+    mocker,
+):
+    # Arrange
+    fake_headers = ["header1", "header2"]
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.headers = fake_headers
 
-    # test specific conditions
-    csv_out.first_frame = True
+    cut.first_frame = True
     high_level_data = {"layer1": {}, "layer2": {}}
 
-    # initial state
-    intial_headers = copy(csv_out.headers)
-
-    # expected state
+    intial_headers = copy(cut.headers)
     expected_headers = intial_headers
 
-    # check
-    csv_out.update([], high_level_data)
-    assert csv_out.headers == expected_headers
+    # Act
+    cut.update([], high_level_data)
+
+    # Assert
+    assert cut.headers == expected_headers
 
 
-def test_update_does_not_add_headers_on_first_frame_when_missing_layers():
-    arg_name = MagicMock()
-    arg_name = MagicMock()
-    arg_headers = ["header1", "header2"]
-    csv_out = CSV_Output(arg_name, arg_headers)
+def test_csv_output_plugin_update_does_not_add_headers_on_first_frame_when_missing_layers(
+    mocker,
+):
+    # Arrange
+    fake_headers = ["header1", "header2"]
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.headers = fake_headers
+    cut.first_frame = True
 
-    # test specific conditions
-    csv_out.first_frame = True
     high_level_data = {}
 
-    # initial state
-    intial_headers = copy(csv_out.headers)
-
-    # expected state
+    intial_headers = copy(cut.headers)
     expected_headers = intial_headers
 
-    # check
-    csv_out.update([], high_level_data)
-    assert csv_out.headers == expected_headers
+    # Act
+    cut.update([], high_level_data)
+
+    # Assert
+    assert cut.headers == expected_headers
 
 
-def test_update_skips_headers_after_first_frame():
-    arg_name = MagicMock()
-    arg_name = MagicMock()
-    arg_headers = ["header1", "header2"]
-    csv_out = CSV_Output(arg_name, arg_headers)
+def test_csv_output_plugin_update_skips_headers_after_first_frame(mocker):
+    # Arrange
+    fake_headers = ["header1", "header2"]
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.headers = fake_headers
+    cut.first_frame = False
 
-    # test specific conditions
-    csv_out.first_frame = False
-
-    # initial state
-    intial_headers = copy(csv_out.headers)
-
-    # expected state
+    intial_headers = copy(cut.headers)
     expected_headers = intial_headers
 
-    # check
-    csv_out.update(low_level_data=[], high_level_data={})
-    assert csv_out.headers == expected_headers
+    # Act
+    cut.update(low_level_data=[], high_level_data={})
+
+    # Assert
+    assert cut.headers == expected_headers
 
 
-def test_update_leaves_buffer_empty_when_given_no_data():
-    arg_name = MagicMock()
-    arg_headers = [MagicMock(), MagicMock()]
-    csv_out = CSV_Output(arg_name, arg_headers)
+def test_csv_output_plugin_update_leaves_buffer_empty_when_given_no_data(mocker):
+    # Arrange
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.first_frame = False
 
-    csv_out.update(low_level_data=[], high_level_data={})
-    assert csv_out.current_buffer == []
+    # Act
+    cut.update(low_level_data=[], high_level_data={})
+
+    # Assert
+    assert cut.current_buffer == []
 
 
-def test_update_fills_buffer_with_low_level_data():
-    arg_name = MagicMock()
-    arg_headers = [MagicMock(), MagicMock()]
-    csv_out = CSV_Output(arg_name, arg_headers)
+def test_csv_output_plugin_update_fills_buffer_with_low_level_data(mocker):
+    # Arrange
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.first_frame = False
 
     low_level_data = [MagicMock() for x in range(10)]
     high_level_data = {}
 
-    csv_out.update(low_level_data, high_level_data)
+    # Act
+    cut.update(low_level_data, high_level_data)
 
-    assert csv_out.current_buffer == [str(item) for item in low_level_data]
+    # Assert
+    assert cut.current_buffer == [str(item) for item in low_level_data]
 
 
-def test_update_fills_buffer_with_high_level_data():
-    arg_name = MagicMock()
-    arg_headers = [MagicMock(), MagicMock()]
-    csv_out = CSV_Output(arg_name, arg_headers)
+def test_csv_output_plugin_update_fills_buffer_with_high_level_data(mocker):
+    # Arrange
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.first_frame = False
 
     example = {
         "vehicle_rep": {"plugin_1": ["1", "2", "3"]},
@@ -155,81 +163,99 @@ def test_update_fills_buffer_with_high_level_data():
     }
     expected_buffer = ["1", "2", "3", "a", "b", "c", "x", "y", "z"]
 
-    csv_out.update(low_level_data=[], high_level_data=example)
+    # Act
+    cut.update(low_level_data=[], high_level_data=example)
 
-    assert csv_out.current_buffer == expected_buffer
+    # Assert
+    assert cut.current_buffer == expected_buffer
 
 
-def test_render_reasoning_creates_expected_file_on_first_frame():
-    arg_name = MagicMock()
-    arg_headers = ["header1", "header2"]
-    csv_out = CSV_Output(arg_name, arg_headers)
-    csv_out.filename_preamble = "test_"
+def test_csv_output_plugin_render_reasoning_creates_expected_file_on_first_frame(
+    mocker,
+):
+    # Arrange
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.filename_preamble = "test_"
+    cut.first_frame = True
+    cut.headers = ["header1", "header2"]
+    cut.current_buffer = []
+    cut.lines_per_file = 10
+    cut.lines_current = 0
 
-    csv_out.render_reasoning()
+    # Act
+    cut.render_reasoning()
 
-    assert csv_out.file_name.startswith(csv_out.filename_preamble)
-    assert os.path.exists(csv_out.file_name)
+    # Assert
+    assert cut.file_name.startswith(cut.filename_preamble)
+    assert os.path.exists(cut.file_name)
 
     # cleanup
-    if os.path.exists(csv_out.file_name):
-        os.remove(csv_out.file_name)
+    if os.path.exists(cut.file_name):
+        os.remove(cut.file_name)
 
 
-def test_render_reasoning_does_not_create_new_file_when_not_first_frame():
-    arg_name = MagicMock()
-    arg_headers = ["header1", "header2"]
-    csv_out = CSV_Output(arg_name, arg_headers)
-    csv_out.filename_preamble = "test_"
+def test_csv_output_plugin_render_reasoning_does_not_create_new_file_when_not_first_frame(
+    mocker,
+):
+    # Arrange
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.filename_preamble = "test_"
+    cut.first_frame = True
+    cut.headers = ["header1", "header2"]
+    cut.current_buffer = []
+    cut.lines_per_file = 10
+    cut.lines_current = 0
 
     # test specific conditions
     target_file_name = (
-        csv_out.filename_preamble + "render_reasoning_not_first_frame" + ".csv"
+        cut.filename_preamble + "render_reasoning_not_first_frame" + ".csv"
     )
-    csv_out.file_name = target_file_name
-    csv_out.first_frame = False
+    cut.file_name = target_file_name
+    cut.first_frame = False
 
     # create file first so csv_out pluging has something to write to
     with open(target_file_name, "a") as file:
         delimiter = ","
-        file.write(delimiter.join(csv_out.headers) + "\n")
+        file.write(delimiter.join(cut.headers) + "\n")
 
     # act
-    csv_out.render_reasoning()
+    cut.render_reasoning()
 
     try:
         # if the current file name attribute doesn't match the original target file name
         # then a new file was created
-        assert csv_out.file_name == target_file_name
+        assert cut.file_name == target_file_name
 
     except:
-        os.remove(csv_out.file_name)
+        os.remove(cut.file_name)
         raise AssertionError("Unexpected new file created after first frame")
 
     finally:
         os.remove(target_file_name)
 
 
-def test_render_reasoning_changes_file_when_lines_per_file_reached():
-    arg_name = MagicMock()
-    arg_headers = ["header1", "header2"]
-    csv_out = CSV_Output(arg_name, arg_headers)
-    csv_out.filename_preamble = "test_"
+def test_csv_output_plugin_render_reasoning_changes_file_when_lines_per_file_reached(
+    mocker,
+):
+    # Arrange
+    cut = CSV_Output.__new__(CSV_Output)
+    cut.filename_preamble = "test_"
+    cut.headers = ["header1", "header2"]
+    cut.current_buffer = []
+    cut.first_frame = False
+    cut.lines_per_file = 1
+    cut.lines_current = 0
 
-    # test specific conditions
-    old_file_name = csv_out.filename_preamble + "render_reasoning_end_of_file" + ".csv"
-    csv_out.file_name = old_file_name
-    csv_out.first_frame = False
-    csv_out.lines_per_file = 1
-    csv_out.lines_current = 0
+    old_file_name = cut.filename_preamble + "render_reasoning_end_of_file" + ".csv"
+    cut.file_name = old_file_name
 
-    # act
-    csv_out.render_reasoning()
+    # Act
+    cut.render_reasoning()
 
-    # check if a new file was set, but NOT yet created
+    # Assert
     try:
-        assert csv_out.file_name != old_file_name
-        assert not os.path.exists(csv_out.file_name)
+        assert cut.file_name != old_file_name
+        assert not os.path.exists(cut.file_name)
     except:
         raise AssertionError(
             "file name was not updated or new file was created prematurely"
