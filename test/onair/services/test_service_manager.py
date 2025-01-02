@@ -12,13 +12,38 @@
 # access to the last test's instance. This happens due to the nature of singletons,
 # which have a single instance per global scope (which the tests are running in).
 #
+
 import pytest
 from unittest.mock import MagicMock
-from onair.services.service_manager import ServiceManager
+import types
+import sys
 
+fake_singleton = types.ModuleType("singleton")
+fake_singleton.Singleton = object
 
-def test_ServiceManager__init__raises_ValueError_when_service_dict_is_None_on_first_instantiation(
+@pytest.fixture
+def ServiceManager():
+    # Setup
+    # create a fake Singleton for ServiceManager to inherit
+    sys.modules["onair.src.util.singleton"] = fake_singleton
+    if "onair.services.service_manager" in sys.modules:
+        del sys.modules["onair.services.service_manager"]
+    from onair.services.service_manager import ServiceManager
+    yield ServiceManager
+    # Teardown
+    # Remove service manager and singleton for test isolation
+    del sys.modules["onair.services.service_manager"]
+    del sys.modules["onair.src.util.singleton"]
+
+# special test
+def test_ServiceManager_inherits_Singleton(ServiceManager):
+    # Proves that ServiceManager not only inherits Singleton but also test replaced it
+    assert ServiceManager.__base__ is fake_singleton.Singleton
+
+# __init__ tests
+def test_ServiceManager__init__raises_ValueError_when_service_dict_is_not_provided_on_first_instantiation(
     mocker,
+    ServiceManager
 ):
     # Arrange / Act
     with pytest.raises(ValueError) as e_info:
@@ -30,127 +55,407 @@ def test_ServiceManager__init__raises_ValueError_when_service_dict_is_None_on_fi
     )
 
 
-def test_ServiceManager__init__imports_services_and_sets_attributes(mocker):
-    # Arrange
-    fake_service_dict = {
-        "service1": {"path": "path/to/service1"},
-        "service2": {"path": "path/to/service2"},
-    }
-    fake_imported_services = {"service1": MagicMock(), "service2": MagicMock()}
-    mocker.patch(
-        "onair.services.service_manager.import_services",
-        return_value=fake_imported_services,
+def test_ServiceManager__init__raises_ValueError_when_service_dict_is_None_on_first_instantiation(
+    mocker,
+    ServiceManager
+):
+    # Arrange / Act
+    with pytest.raises(ValueError) as e_info:
+        ServiceManager(None)
+
+    # Assert
+    assert (
+        str(e_info.value) == "'service_dict' parameter required on first instantiation"
     )
 
-    # Act
-    service_manager = ServiceManager(fake_service_dict)
 
-    # Assert
-    assert service_manager.service1 == fake_imported_services["service1"]
-    assert service_manager.service2 == fake_imported_services["service2"]
-    assert hasattr(service_manager, "services")
-
-    # Teardown
-    del ServiceManager.instance
-
-
-def test_ServiceManager__init__does_not_reinitialize_if_already_initialized(mocker):
-    # Arrange
-    fake_service_dict = {"service1": {"path": "path/to/service1"}}
-    fake_service_functions = {"service1": {"func1"}}
-    mocker.patch.object(ServiceManager, "services", fake_service_functions, create=True)
-    mock_import_services = mocker.patch(
-        "onair.src.util.service_import.import_services"
-    )  # called in __init__
-
-    # Act
-    ServiceManager(fake_service_dict)
-
-    # Assert
-    assert mock_import_services.call_count == 0
-
-    # Teardown
-    del ServiceManager.instance
-
-
-def test_ServiceManager_get_services_returns_dict_of_services_and_their_functions(
+def test_ServiceManager__init__sets_services_to_empty_dict_when_import_services_returns_empty_dict(
     mocker,
+    ServiceManager
 ):
     # Arrange
-    class FakeService1:
-        def func1(self):
-            pass
-
-        def _private_func(self):
-            pass
-
-    class FakeService2:
-        def func2(self):
-            pass
-
-        def func3(self):
-            pass
-
-    fake_service_dict = {
-        "service1": {"path": "path/to/service1"},
-        "service2": {"path": "path/to/service2"},
-    }
-
-    fake_imported_services = {
-        "service1": FakeService1(),
-        "service2": FakeService2(),
-    }
-
-    mocker.patch(
-        "onair.services.service_manager.import_services",
+    arg_service_dict = MagicMock()
+    fake_imported_services = {}
+    mock_import_services = mocker.patch(
+        ServiceManager.__module__ + ".import_services",
         return_value=fake_imported_services,
     )
-    service_manager = ServiceManager(fake_service_dict)
 
     # Act
-    result = service_manager.get_services()
+    result = ServiceManager(arg_service_dict)
 
     # Assert
-    assert result == {
-        "service1": {"func1"},  # correctly avoids _private_func
-        "service2": {"func2", "func3"},
-    }
-
-    # Teardown
-    del ServiceManager.instance
+    assert result.services == dict()
+    assert mock_import_services.call_count == 1
+    assert mock_import_services.call_args_list[0].args == (arg_service_dict,)
 
 
-def test_ServiceManager_get_services_returns_empty_dict_when_no_services(mocker):
+def test_ServiceManager__init__when_single_service_has_only_a_noncallable_function_sets_its_services_to_empty_set(
+        mocker,
+        ServiceManager
+):
     # Arrange
-    fake_service_dict = {}
-    service_manager = ServiceManager(fake_service_dict)
+    arg_service_dict = MagicMock()
+    forced_return_import_services = {}
 
-    # Act
-    result = service_manager.get_services()
+    fake_service_name = str(MagicMock())
+    fake_path_value = str(MagicMock())
+    fake_function_name = str(MagicMock())
+    fake_functions = [fake_function_name]
+    fake_attr = MagicMock()
+    
+    forced_return_import_services[fake_service_name] = fake_path_value
 
-    # Assert
-    assert result == {}
-
-    # Teardown
-    del ServiceManager.instance
-
-
-def test_ServiceManager_behaves_as_singleton(mocker):
-    # Arrange
-    fake_service_dict1 = {"service1": "path1"}
-    fake_imported_service = {"service1": MagicMock()}
-    mocker.patch(
-        "onair.services.service_manager.import_services",
-        return_value=fake_imported_service,
+    mock_import_services = mocker.patch(
+        ServiceManager.__module__ + ".import_services",
+        return_value=forced_return_import_services,
+    )
+    mock_setattr = mocker.patch(
+        ServiceManager.__module__ + ".setattr"
+    )
+    mock_dir = mocker.patch(
+        ServiceManager.__module__ + ".dir",
+        return_value = fake_functions
+    )
+    mock_getattr = mocker.patch(
+        ServiceManager.__module__ + ".getattr",
+        return_value = fake_attr
+    )
+    mock_callable = mocker.patch(
+        ServiceManager.__module__ + ".callable",
+        return_value = False
     )
 
     # Act
-    service_manager1 = ServiceManager(fake_service_dict1)
-    service_manager2 = ServiceManager()
+    result = ServiceManager(arg_service_dict)
 
     # Assert
-    assert service_manager1 is service_manager2
-    assert hasattr(service_manager2, "service1")
+    # assert result.services == forced_return_import_services
+    assert mock_import_services.call_count == 1
+    assert mock_import_services.call_args_list[0].args == (arg_service_dict,)
+    assert mock_setattr.call_count == 1
+    assert mock_setattr.call_args_list[0].args == (result, fake_service_name, fake_path_value)
+    assert mock_dir.call_count == 1
+    assert mock_dir.call_args_list[0].args == (fake_path_value,)
+    assert mock_getattr.call_count == 1
+    assert mock_getattr.call_args_list[0].args == (fake_path_value, fake_function_name)
+    assert mock_callable.call_count == 1
+    assert mock_callable.call_args_list[0].args == (fake_attr,)
+    assert result.services[fake_service_name] == set([])
 
-    # Teardown
-    del ServiceManager.instance
+
+def test_ServiceManager__init__when_single_service_has_only_a_callable_function_starting_with_underscore_sets_its_services_to_empty_set(
+        mocker,
+        ServiceManager
+):
+    # Arrange
+    arg_service_dict = MagicMock()
+    forced_return_import_services = {}
+
+    fake_service_name = str(MagicMock())
+    fake_path_value = str(MagicMock())
+    fake_function_name = "_" + str(MagicMock())
+    fake_functions = [fake_function_name]
+    fake_attr = MagicMock()
+    
+    forced_return_import_services[fake_service_name] = fake_path_value
+
+    mock_import_services = mocker.patch(
+        ServiceManager.__module__ + ".import_services",
+        return_value=forced_return_import_services,
+    )
+    mock_setattr = mocker.patch(
+        ServiceManager.__module__ + ".setattr"
+    )
+    mock_dir = mocker.patch(
+        ServiceManager.__module__ + ".dir",
+        return_value = fake_functions
+    )
+    mock_getattr = mocker.patch(
+        ServiceManager.__module__ + ".getattr",
+        return_value = fake_attr
+    )
+    mock_callable = mocker.patch(
+        ServiceManager.__module__ + ".callable",
+        return_value = True
+    )
+
+    # Act
+    result = ServiceManager(arg_service_dict)
+
+    # Assert
+    # assert result.services == forced_return_import_services
+    assert mock_import_services.call_count == 1
+    assert mock_import_services.call_args_list[0].args == (arg_service_dict,)
+    assert mock_setattr.call_count == 1
+    assert mock_setattr.call_args_list[0].args == (result, fake_service_name, fake_path_value)
+    assert mock_dir.call_count == 1
+    assert mock_dir.call_args_list[0].args == (fake_path_value,)
+    assert mock_getattr.call_count == 1
+    assert mock_getattr.call_args_list[0].args == (fake_path_value, fake_function_name)
+    assert mock_callable.call_count == 1
+    assert mock_callable.call_args_list[0].args == (fake_attr,)
+    assert result.services[fake_service_name] == set([])
+    
+
+def test_ServiceManager__init__when_single_service_has_only_a_callable_function_not_starting_in_underscore_sets_its_services_to_set_with_that_function(
+        mocker,
+        ServiceManager
+):
+    # Arrange
+    arg_service_dict = MagicMock()
+    forced_return_import_services = {}
+
+    fake_service_name = str(MagicMock())
+    fake_path_value = str(MagicMock())
+    fake_function_name = str(MagicMock())
+    fake_functions = [fake_function_name]
+    fake_attr = MagicMock()
+    
+    forced_return_import_services[fake_service_name] = fake_path_value
+
+    mock_import_services = mocker.patch(
+        ServiceManager.__module__ + ".import_services",
+        return_value=forced_return_import_services,
+    )
+    mock_setattr = mocker.patch(
+        ServiceManager.__module__ + ".setattr"
+    )
+    mock_dir = mocker.patch(
+        ServiceManager.__module__ + ".dir",
+        return_value = fake_functions
+    )
+    mock_getattr = mocker.patch(
+        ServiceManager.__module__ + ".getattr",
+        return_value = fake_attr
+    )
+    mock_callable = mocker.patch(
+        ServiceManager.__module__ + ".callable",
+        return_value = True
+    )
+
+    # Act
+    result = ServiceManager(arg_service_dict)
+
+    # Assert
+    # assert result.services == forced_return_import_services
+    assert mock_import_services.call_count == 1
+    assert mock_import_services.call_args_list[0].args == (arg_service_dict,)
+    assert mock_setattr.call_count == 1
+    assert mock_setattr.call_args_list[0].args == (result, fake_service_name, fake_path_value)
+    assert mock_dir.call_count == 1
+    assert mock_dir.call_args_list[0].args == (fake_path_value,)
+    assert mock_getattr.call_count == 1
+    assert mock_getattr.call_args_list[0].args == (fake_path_value, fake_function_name)
+    assert mock_callable.call_count == 1
+    assert mock_callable.call_args_list[0].args == (fake_attr,)
+    assert result.services[fake_service_name] == set([fake_function_name])
+    
+
+def generate_random_functions():
+    fake_non_callable_functions = [str(MagicMock()) for _ in range(pytest.gen.randint(1, 5))]
+    
+    fake_callable_start_underscore_functions = [
+        "_" + str(MagicMock()) for _ in range(pytest.gen.randint(1, 5))
+    ]
+    
+    fake_callable_non_underscore_start_functions = [
+        str(MagicMock()) for _ in range(pytest.gen.randint(1, 5))
+    ]
+    fake_callable_functions = fake_callable_start_underscore_functions + fake_callable_non_underscore_start_functions
+    fake_functions = fake_non_callable_functions + fake_callable_functions
+    pytest.gen.shuffle(fake_functions)
+
+    return {
+        'all_functions': fake_functions,
+        'callable_non_underscore': fake_callable_non_underscore_start_functions
+    }
+
+
+def test_ServiceManager__init__when_single_service_has_functions_its_services_are_set_to_only_callable_not_starting_with_underscore_functions(
+        mocker,
+        ServiceManager
+):
+    # Arrange
+    arg_service_dict = MagicMock()
+    forced_return_import_services = {}
+    
+    fake_service_name = str(MagicMock())
+    fake_path_value = str(MagicMock())
+
+    random_functions = generate_random_functions()
+    fake_functions = random_functions['all_functions']
+    fake_callable_non_underscore_start_functions = random_functions['callable_non_underscore']
+    
+    forced_return_import_services[fake_service_name] = fake_path_value
+
+    def determine_attr_callability(_service, f):
+        return f in fake_callable_non_underscore_start_functions
+
+    def determine_callable(fake_attr_determination):
+        return fake_attr_determination
+
+    mock_import_services = mocker.patch(
+        ServiceManager.__module__ + ".import_services",
+        return_value=forced_return_import_services,
+    )
+    mock_setattr = mocker.patch(
+        ServiceManager.__module__ + ".setattr"
+    )
+    mock_dir = mocker.patch(
+        ServiceManager.__module__ + ".dir",
+        return_value = fake_functions
+    )
+    mock_getattr = mocker.patch(
+        ServiceManager.__module__ + ".getattr",
+        side_effect = determine_attr_callability
+    )
+    mock_callable = mocker.patch(
+        ServiceManager.__module__ + ".callable",
+        side_effect = determine_callable
+    )
+
+    # Act
+    result = ServiceManager(arg_service_dict)
+
+    # Assert
+    assert mock_import_services.call_count == 1
+    assert mock_import_services.call_args_list[0].args == (arg_service_dict,)
+    assert mock_setattr.call_count == 1
+    assert mock_setattr.call_args_list[0].args == (result, fake_service_name, fake_path_value)
+    assert mock_dir.call_count == 1
+    assert mock_dir.call_args_list[0].args == (fake_path_value,)
+    assert mock_getattr.call_count == len(fake_functions)
+    for i in range(len(fake_functions)):
+        assert mock_getattr.call_args_list[i].args == (fake_path_value, fake_functions[i])
+    assert mock_callable.call_count == len(fake_functions)
+    for i in range(len(fake_functions)):
+        assert mock_callable.call_args_list[i].args == (fake_functions[i] in fake_callable_non_underscore_start_functions,)
+    assert result.services[fake_service_name] == set(fake_callable_non_underscore_start_functions)
+
+
+def test_ServiceManager__init__when_multiple_services_all_services_set_to_only_callable_not_starting_with_underscore_functions(
+    mocker,
+    ServiceManager
+):
+    # Arrange
+    arg_service_dict = MagicMock()
+    forced_return_import_services = {}
+    
+    num_services = pytest.gen.randint(1, 10)  # arbitrary 1 to 10
+    services_data = {}
+
+    for _ in range(num_services):
+        fake_service_name = str(MagicMock())
+        fake_path_value = str(MagicMock())
+        random_functions = generate_random_functions()
+        fake_functions = random_functions['all_functions']
+        fake_callable_non_underscore_start_functions = random_functions['callable_non_underscore']
+        
+        services_data[fake_service_name] = {
+            'path': fake_path_value,
+            'all_functions': fake_functions,
+            'callable_non_underscore': fake_callable_non_underscore_start_functions
+        }
+        
+        forced_return_import_services[fake_service_name] = fake_path_value
+
+    def determine_attr_callability(service, f):
+        for service_name, data in services_data.items():
+            if data['path'] == service:
+                return f in data['callable_non_underscore']
+        return False
+
+    def determine_callable(fake_attr_determination):
+        return fake_attr_determination
+
+    mock_import_services = mocker.patch(
+        ServiceManager.__module__ + ".import_services",
+        return_value=forced_return_import_services,
+    )
+    mock_setattr = mocker.patch(
+        ServiceManager.__module__ + ".setattr"
+    )
+    mock_dir = mocker.patch(
+        ServiceManager.__module__ + ".dir",
+        side_effect=lambda x: next(data['all_functions'] for data in services_data.values() if data['path'] == x)
+    )
+    mock_getattr = mocker.patch(
+        ServiceManager.__module__ + ".getattr",
+        side_effect=determine_attr_callability
+    )
+    mock_callable = mocker.patch(
+        ServiceManager.__module__ + ".callable",
+        side_effect=determine_callable
+    )
+
+    # Act
+    result = ServiceManager(arg_service_dict)
+
+    # Assert
+    assert mock_import_services.call_count == 1
+    assert mock_import_services.call_args_list[0].args == (arg_service_dict,)
+    
+    # Check that setattr was called for each service in result.services
+    assert mock_setattr.call_count == len(result.services)
+    setattr_calls = {mock_setattr.call_args_list[i].args[1:] for i in range(mock_setattr.call_count)}
+    for service_name, service_path in forced_return_import_services.items():
+        if service_name in result.services:
+            assert (service_name, service_path) in setattr_calls
+
+    assert mock_dir.call_count == len(result.services)
+    for i in range(mock_dir.call_count):
+        assert mock_dir.call_args_list[i].args == (mock_setattr.call_args_list[i].args[2],)
+
+    getattr_calls = set(mock_getattr.call_args_list[i].args for i in range(mock_getattr.call_count))
+
+    # Check that getattr was called for all functions
+    for service_name, service_data in services_data.items():
+        if service_name in result.services:
+            for func in service_data['all_functions']:
+                assert (service_data['path'], func) in getattr_calls
+
+    assert mock_callable.call_count == mock_getattr.call_count
+
+    # Verify the final result
+    for service_name, service_data in services_data.items():
+        if service_name in result.services:
+            assert result.services[service_name] == set(service_data['callable_non_underscore'])
+
+def test_ServiceManager__init__does_not_import_services_when_services_already_exist(
+    mocker,
+    ServiceManager
+):
+    # Arrange
+    mock_hasattr = mocker.patch(
+        ServiceManager.__module__ + ".hasattr",
+        return_value=True
+    )
+    mock_import_services = mocker.patch(
+        ServiceManager.__module__ + ".import_services"
+    )
+
+    # Act
+    result = ServiceManager()
+
+    # Assert
+    assert mock_hasattr.call_count == 1
+    assert mock_hasattr.call_args_list[0].args == (result, "services")
+    assert mock_import_services.call_count == 0
+    
+
+# get_services tests
+def test_ServiceManager_get_services_returns_services_attribute(
+    mocker,
+    ServiceManager
+):
+    # Arrange
+    cut = ServiceManager.__new__(ServiceManager)
+    fake_services = MagicMock()
+    cut.services = fake_services
+
+    # Act
+    result = cut.get_services()
+
+    # Assert
+    assert result is fake_services
