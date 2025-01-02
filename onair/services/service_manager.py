@@ -22,20 +22,28 @@ class ServiceManager(Singleton):
 
     Attributes
     ----------
-    _initialized : bool
-        Determine if an instance of the class exists
-    <SERVICE_NAME> : object
-        An instance of that service class
+    services : dict
+        A dictionary containing service names and their associated functions.
     """
 
     def __init__(self, service_dict=None):
         """
-        Constructs all service-related attributes on first instantiation.
+        Construct all service-related attributes on first instantiation.
 
         Parameters
         ----------
-            service_dict : dict
-                service names paired with their class file path
+        service_dict : dict, optional
+            Service names paired with their class file path.
+
+        Raises
+        ------
+        ValueError
+            If 'service_dict' parameter is not provided on first instantiation.
+
+        Note
+        ----
+        Properly follows singleton behavior by only allowing initialize behavior to run
+        upon first instantiation, subsequent initializations will ignore any provided service_dict.
         """
         if not hasattr(self, "services"):
             # Ensure service info is provided on the first instantiation
@@ -60,6 +68,12 @@ class ServiceManager(Singleton):
 
     def get_services(self):
         """
-        Return dict of services and their functions
+        Return a dictionary of services and their functions.
+
+        Returns
+        -------
+        dict
+            A dictionary containing service names as keys and sets of their
+            associated function names as values.
         """
         return self.services

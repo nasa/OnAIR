@@ -16,11 +16,43 @@ Implement singleton design pattern.
 class Singleton:
     """
     A class for implementing singleton design pattern.
+
+    This class ensures that only one instance of the class is created.
+
+    Attributes
+    ----------
+    instance : cls
+        The single instance of the Singleton subclass.
     """
 
-    def __new__(cls, *args):
+    def __new__(cls, *args, **kwargs):
         """
-        If the class has never been created, create a new one.
+        Ensures only one instance of the cls is created.
+
+        This method overrides the default __new__ to implement the Singleton pattern.
+        It creates a new instance only if one doesn't already exist, otherwise
+        it returns the existing instance.
+
+        Parameters
+        ----------
+        cls : type
+            The class that is instantiated, it must be a subclass of Singleton.
+        *args : tuple
+            Variable length argument list. Not used by Singleton, but may
+            be used by the cls.
+        **kwargs : dict
+            Arbitrary keyword arguments. Not used by Singleton, but may
+            be used by the cls.
+
+        Returns
+        -------
+        instance : cls
+            The single instance of the Singleton subclass.
+
+        Note
+        ----
+        The __init__ method of the subclass will be called on every instantiation,
+        therefore the subclass __init__ still needs to ensure proper singleton behavior.
         """
         if not hasattr(cls, "instance"):
             # Create the one and only instance of this class
