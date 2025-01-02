@@ -10,14 +10,16 @@
 import pytest
 from unittest.mock import MagicMock
 
+
 @pytest.fixture
 def Singleton():
     from onair.src.util.singleton import Singleton
+
     yield Singleton
 
+
 def test_Singleton__new__returns_new_instance_when_class_does_not_have_instance_attribute(
-    mocker,
-    Singleton
+    mocker, Singleton
 ):
     # Arrange
     # TestSingleton inherits Singleton
@@ -66,8 +68,7 @@ def test_Singleton__new__returns_new_instance_when_class_does_not_have_instance_
 
 
 def test_Singleton__new__returns_singleton_instance_when_class_has_instance_attribute(
-    mocker,
-    Singleton
+    mocker, Singleton
 ):
     # Arrange
     # TestSingleton inherits Singleton
