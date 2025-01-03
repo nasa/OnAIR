@@ -22,6 +22,7 @@ all AI plugins must implement.
 
 from abc import ABC, abstractmethod
 from typing import Any
+from onair.services.service_manager import ServiceManager
 
 
 class AIPlugin(ABC):
@@ -56,6 +57,7 @@ class AIPlugin(ABC):
         assert len(_headers) > 0
         self.component_name = _name
         self.headers = _headers
+        self.service_manager = ServiceManager()
 
     @abstractmethod
     def update(
