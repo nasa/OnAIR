@@ -116,7 +116,7 @@ def test_print_io_print_sim_header_prints_expected_strings(mocker):
 
     # Assert
     for i in range(3):
-        print_io.print.call_args_list[i].args == (expected_print[i],)
+        assert print_io.print.call_args_list[i].args == (expected_print[i],)
 
 
 # print_sim_step tests
@@ -574,7 +574,7 @@ def test_print_io_subsystem_str_returns_string_all_data_when_headers_tests_and_t
 
 
 # headers_string tests
-def test_print_io_format_status_returns_empty_string_when_headers_is_vacant():
+def test_print_io_headers_string_returns_empty_string_when_headers_is_vacant():
     # Arrange
     arg_headers = []
 
@@ -585,7 +585,7 @@ def test_print_io_format_status_returns_empty_string_when_headers_is_vacant():
     assert result == str()
 
 
-def test_print_io_format_status_returns_all_headers_in_formatted_string_when_occupied():
+def test_print_io_headers_string_returns_all_headers_in_formatted_string_when_occupied():
     # Arrange
     num_headers = pytest.gen.randint(1, 10)  # arbitrary from 1 to 10
     arg_headers = []
@@ -604,8 +604,6 @@ def test_print_io_format_status_returns_all_headers_in_formatted_string_when_occ
 
 
 # format_status tests
-
-
 def test_print_io_format_status_raises_KeyError_when_stat_is_string_and_not_in_status_color_keys():
     # Arrange
     arg_stat = str(MagicMock())
