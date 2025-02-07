@@ -2,7 +2,7 @@
 #
 # Copyright © 2023 United States Government as represented by the Administrator of
 # the National Aeronautics and Space Administration. No copyright is claimed in the
-# United States under Title 17, U.S. Code. All Other Rights Reserved.
+# United States under Title 17, U.print_string. Code. All Other Rights Reserved.
 #
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
@@ -15,159 +15,189 @@ Helper script used by sim.py to print out simulation data with pretty colors
 
 #############################     COLORS    #############################
 # Static class to hold color constants
-class bcolors:
-    HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
-    OKGREEN = "\033[92m"
-    WARNING = "\033[93m"
-    FAIL = "\033[91m"
-    ENDC = "\033[0m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
+BCOLORS = {
+    "HEADER": "\033[95m",
+    "OKBLUE": "\033[94m",
+    "OKGREEN": "\033[92m",
+    "WARNING": "\033[93m",
+    "FAIL": "\033[91m",
+    "ENDC": "\033[0m",
+    "BOLD": "\033[1m",
+    "UNDERLINE": "\033[4m",
+}
 
 
 # Global colors dictionary
-scolors = {
-    "HEADER": bcolors.HEADER,
-    "OKBLUE": bcolors.OKBLUE,
-    "OKGREEN": bcolors.OKGREEN,
-    "WARNING": bcolors.WARNING,
-    "FAIL": bcolors.FAIL,
-    "ENDC": bcolors.ENDC,
-    "BOLD": bcolors.BOLD,
-    "UNDERLINE": bcolors.UNDERLINE,
+SCOLORS = {
+    "HEADER": BCOLORS["HEADER"],
+    "OKBLUE": BCOLORS["OKBLUE"],
+    "OKGREEN": BCOLORS["OKGREEN"],
+    "WARNING": BCOLORS["WARNING"],
+    "FAIL": BCOLORS["FAIL"],
+    "ENDC": BCOLORS["ENDC"],
+    "BOLD": BCOLORS["BOLD"],
+    "UNDERLINE": BCOLORS["UNDERLINE"],
 }
 
 # Global dictionary for STATUS -> COLOR
-status_colors = {
-    "GREEN": bcolors.OKGREEN,
-    "YELLOW": bcolors.WARNING,
-    "RED": bcolors.FAIL,
-    "---": bcolors.OKBLUE,
+STATUS_COLORS = {
+    "GREEN": BCOLORS["OKGREEN"],
+    "YELLOW": BCOLORS["WARNING"],
+    "RED": BCOLORS["FAIL"],
+    "---": BCOLORS["OKBLUE"],
 }
 
 
 #############################      I/O     #############################
-# Print that the simulation started
 def print_sim_header():
+    """
+    Print that the simulation started
+    """
     print(
-        bcolors.HEADER
-        + bcolors.BOLD
+        BCOLORS["HEADER"]
+        + BCOLORS["BOLD"]
         + "\n***************************************************"
     )
     print("************    SIMULATION STARTED     ************")
-    print("***************************************************" + bcolors.ENDC)
+    print("***************************************************" + BCOLORS["ENDC"])
 
 
-# Print when a new step is starting
 def print_sim_step(step_num):
+    """
+    Print when a new sim step is starting
+    """
     print(
-        bcolors.HEADER
-        + bcolors.BOLD
+        BCOLORS["HEADER"]
+        + BCOLORS["BOLD"]
         + "\n--------------------- STEP "
         + str(step_num)
         + " ---------------------\n"
-        + bcolors.ENDC
+        + BCOLORS["ENDC"]
     )
 
 
-# Print a line to separate things
-def print_separator(color=bcolors.HEADER):
+def print_separator(color=BCOLORS["HEADER"]):
+    """
+    Print a line to separate things
+    """
     print(
         color
-        + bcolors.BOLD
+        + BCOLORS["BOLD"]
         + "\n------------------------------------------------\n"
-        + bcolors.ENDC
+        + BCOLORS["ENDC"]
     )
 
 
-# Print header update
-def update_header(msg, clr=bcolors.BOLD):
-    print(clr + "--------- " + msg + " update" + bcolors.ENDC)
+def update_header(msg, clr=BCOLORS["BOLD"]):
+    """
+    Print header update
+    """
+    print(clr + "--------- " + msg + " update" + BCOLORS["ENDC"])
 
 
-# Print header update
-def print_msg(msg, clrs=["HEADER"]):
+def print_msg(msg, clrs=None):
+    """
+    Print a message
+    """
+    if clrs is None:
+        clrs = ["HEADER"]
     for clr in clrs:
-        print(scolors[clr])
-    print("---- " + msg + bcolors.ENDC)
+        print(SCOLORS[clr])
+    print("---- " + msg + BCOLORS["ENDC"])
 
 
-# Print interpreted system status
 def print_system_status(agent, data=None):
-    # print_separator(bcolors.OKBLUE)
-    if data != None:
+    """
+    Print interpreted system status
+    """
+    # print_separator(BCOLORS["OKBLUE"])
+    if data is not None:
         print("CURRENT DATA: " + str(data))
     print("INTERPRETED SYSTEM STATUS: " + str(format_status(agent.mission_status)))
-    # print_separator(bcolors.OKBLUE)
+    # print_separator(BCOLORS["OKBLUE"])
 
 
-# Print diagnosis info
 def print_diagnosis(diagnosis):
+    """
+    Print diagnosis info
+    """
     status_list = diagnosis.get_status_list()
-    tree_traversal = diagnosis.fault_tree
     activations = diagnosis.current_activations
     print_separator()
-    print(bcolors.HEADER + bcolors.BOLD + "DIAGNOSIS INFO: \n" + bcolors.ENDC)
+    print(BCOLORS["HEADER"] + BCOLORS["BOLD"] + "DIAGNOSIS INFO: \n" + BCOLORS["ENDC"])
     for status in status_list:
         stat = status[1]
         print(status[0] + ": " + format_status(stat))
 
-    print(bcolors.HEADER + bcolors.BOLD + "\nCURRENT ACTIVATIONS: \n" + bcolors.ENDC)
+    print(
+        BCOLORS["HEADER"]
+        + BCOLORS["BOLD"]
+        + "\nCURRENT ACTIVATIONS: \n"
+        + BCOLORS["ENDC"]
+    )
     if len(activations) > 0:
         for activation in activations:
             print("---" + str(activation))
     print_separator()
 
 
-# Print subsystem status
-def subsystem_status_str(ss):
-    s = bcolors.BOLD + "[" + str(ss.type) + "] : " + bcolors.ENDC
-    stat = ss.get_status()
-    s = (
-        s
+def subsystem_status_str(subsystem):
+    """
+    Print subsystem status
+    """
+    print_string = (
+        BCOLORS["BOLD"] + "[" + str(subsystem.type) + "] : " + BCOLORS["ENDC"]
+    )
+    stat = subsystem.get_status()
+    print_string = (
+        print_string
         + "\n"
-        + status_colors[stat]
+        + STATUS_COLORS[stat]
         + " ---- "
         + str(stat)
-        + bcolors.ENDC
+        + BCOLORS["ENDC"]
         + " ("
-        + str(ss.uncertainty)
+        + str(subsystem.uncertainty)
         + ")"
     )
-    return s + "\n"
+    return print_string + "\n"
 
 
-# Print out subsystem information
-def subsystem_str(ss):
-    s = bcolors.BOLD + ss.type + "\n" + bcolors.ENDC
-    s = s + "--[headers] "
-    for h in ss.headers:
-        s = s + "\n---" + str(h)
-    s = s + "\n--[tests] "
-    for t in ss.tests:
-        s = s + "\n---" + str(t)
-    s = s + "\n--[test data] "
-    for d in ss.test_data:
-        s = s + "\n---" + str(d)
-    return s
+def subsystem_str(subsystem):
+    """
+    Print out subsystem information
+    """
+    print_string = BCOLORS["BOLD"] + subsystem.type + "\n" + BCOLORS["ENDC"]
+    print_string = print_string + "--[headers] "
+    for header in subsystem.headers:
+        print_string = print_string + "\n---" + str(header)
+    print_string = print_string + "\n--[tests] "
+    for test in subsystem.tests:
+        print_string = print_string + "\n---" + str(test)
+    print_string = print_string + "\n--[test data] "
+    for data in subsystem.test_data:
+        print_string = print_string + "\n---" + str(data)
+    return print_string
 
 
-# Print out headers
 def headers_string(headers):
-    s = ""
+    """
+    Print out headers
+    """
+    print_string = ""
     for hdr in headers:
-        s = s + "\n  -- " + hdr
-    return s
+        print_string = print_string + "\n  -- " + hdr
+    return print_string
 
 
-# Print out status
 def format_status(stat):
-    if type(stat) == str:
-        return status_colors[stat] + stat + scolors["ENDC"]
-    else:
-        s = "("
-        for status in stat:
-            s = s + format_status(status) + ", "
-        s = s[:-2] + ")"
-        return s
+    """
+    Print out status
+    """
+    if isinstance(stat, str):
+        return STATUS_COLORS[stat] + stat + SCOLORS["ENDC"]
+    print_string = "("
+    for status in stat:
+        print_string = print_string + format_status(status) + ", "
+    print_string = print_string[:-2] + ")"
+    return print_string

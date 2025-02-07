@@ -17,6 +17,9 @@ import json
 
 
 def render_reasoning(diagnosis_list):
+    """
+    Write reasoning to diagnosis output files
+    """
     with open(
         os.path.join(os.environ.get("ONAIR_DIAGNOSIS_SAVE_PATH"), "diagnosis.txt"),
         mode="a",
@@ -43,6 +46,9 @@ def render_reasoning(diagnosis_list):
 
 
 def render_viz(status_data, sensor_data, sim_name, diagnosis=None):
+    """
+    Write status, associativity, and diagnosis to JSON files
+    """
     # Status Staburst
     status_report = {}
     status_report["filename"] = sim_name
@@ -71,10 +77,13 @@ def render_viz(status_data, sensor_data, sim_name, diagnosis=None):
             json.dump(results, outfile)
 
 
-def print_dots(ts):
-    incrFlag = ts % 20
-    if incrFlag < 10:
-        dots = ts % 10
+def print_dots(timestep):
+    """
+    Print some dots
+    """
+    incr_flag = timestep % 20
+    if incr_flag < 10:
+        dots = timestep % 10
     else:
-        dots = 10 - (ts % 10)
+        dots = 10 - (timestep % 10)
     print("\033[95m" + (dots + 1) * "." + "\033[0m")
