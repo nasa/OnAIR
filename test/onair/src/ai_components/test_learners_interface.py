@@ -7,7 +7,7 @@
 # Licensed under the NASA Open Source Agreement version 1.3
 # See "NOSA GSC-19165-1 OnAIR.pdf"
 
-""" Test LearnersInterface Functionality """
+"""Test LearnersInterface Functionality"""
 import pytest
 from unittest.mock import MagicMock
 
