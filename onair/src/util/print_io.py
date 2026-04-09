@@ -12,7 +12,6 @@ print_io.py
 Helper script used by sim.py to print out simulation data with pretty colors
 """
 
-
 #############################     COLORS    #############################
 # Static class to hold color constants
 BCOLORS = {

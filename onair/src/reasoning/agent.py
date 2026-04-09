@@ -11,6 +11,7 @@
 Agent Class
 Deals with supervised learning for diagnosing statuses
 """
+
 from ..ai_components.learners_interface import LearnersInterface
 from ..ai_components.planners_interface import PlannersInterface
 from ..reasoning.complex_reasoning_interface import ComplexReasoningInterface

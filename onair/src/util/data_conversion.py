@@ -11,6 +11,7 @@
 data_conversion.py
 Utility file to perform conversions for supervised learning, and beyond
 """
+
 import numpy as np
 
 CLASSES = {"RED": 0, "YELLOW": 1, "GREEN": 2, "---": 3}

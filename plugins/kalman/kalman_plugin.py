@@ -15,6 +15,7 @@ between predicted and actual values to identify potential faults in the system.
 
 The module is part of NASA's On-Board Artificial Intelligence Research (OnAIR) Platform.
 """
+
 import simdkalman
 import numpy as np
 from onair.data_handling.parser_util import floatify_input
