@@ -19,7 +19,6 @@ This abstract base class defines the basic structure and required methods that
 all AI plugins must implement.
 """
 
-
 from abc import ABC, abstractmethod
 from typing import Any
 from onair.services.service_manager import ServiceManager
