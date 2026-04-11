@@ -11,10 +11,14 @@ from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 
 
 class Plugin(AIPlugin):
-    def update(self, low_level_data=[], high_level_data={}):
+    def update(self, low_level_data=None, high_level_data=None):
         """
         Given streamed data point, system should update internally
         """
+        if low_level_data is None:
+            low_level_data = []
+        if high_level_data is None:
+            high_level_data = {}
         pass
 
     def render_reasoning(self):

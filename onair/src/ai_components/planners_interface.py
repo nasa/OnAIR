@@ -16,7 +16,9 @@ from ..util.data_conversion import *
 
 
 class PlannersInterface:
-    def __init__(self, headers, _planner_plugins={}):
+    def __init__(self, headers, _planner_plugins=None):
+        if _planner_plugins is None:
+            _planner_plugins = {}
         assert len(headers) > 0, "Headers are required"
         self.headers = headers
         self.planner_constructs = import_plugins(self.headers, _planner_plugins)

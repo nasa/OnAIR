@@ -22,7 +22,9 @@ from ..util.plugin_import import import_plugins
 
 
 class VehicleRepresentation:
-    def __init__(self, headers, tests, _knowledge_rep_plugins={}):
+    def __init__(self, headers, tests, _knowledge_rep_plugins=None):
+        if _knowledge_rep_plugins is None:
+            _knowledge_rep_plugins = {}
         assert len(headers) == len(tests)
         self.headers = headers
         self.knowledge_synthesis_constructs = import_plugins(
