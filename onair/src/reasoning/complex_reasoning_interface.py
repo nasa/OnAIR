@@ -16,8 +16,10 @@ from ..util.plugin_import import import_plugins
 
 
 class ComplexReasoningInterface:
-    def __init__(self, headers, _reasoning_plugins={}):
+    def __init__(self, headers, _reasoning_plugins=None):
         assert len(headers) > 0, "Headers are required"
+        if _reasoning_plugins is None:
+            _reasoning_plugins = {}
         self.headers = headers
         self.reasoning_constructs = import_plugins(self.headers, _reasoning_plugins)
 

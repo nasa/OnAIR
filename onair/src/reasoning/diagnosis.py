@@ -49,12 +49,12 @@ class Diagnosis:
 
         return ret
 
-    def walkdown(self, mnemonic_name, used_mnemonics=[]):
+    def walkdown(self, mnemonic_name, used_mnemonics=None):
         """
         Go through the active AIComponents in an ordered way to decide on a diagnosis.
         There's a lot of specificity in this function until the method of combining the AIComponents is learned
         """
-        if len(used_mnemonics) == 0:
+        if used_mnemonics is None or len(used_mnemonics) == 0:
             used_mnemonics = copy.deepcopy(self.currently_faulting_mnemonics)
 
         if mnemonic_name == "":

@@ -1530,3 +1530,21 @@ def test_TelemetryTestSuite_get_status_specific_mnemonics_default_given_status_i
 
     # Assert
     assert result == [expected_name]
+
+
+def test_TelemetryTestSuite__init__does_not_share_mutable_defaults_between_instances():
+    # Regression for #197: previously `headers=[]` and `tests=[]` were mutable
+    # default arguments, so every no-arg instance shared the SAME list object.
+    # Mutating one instance leaked into others. The fix defaults to None and
+    # builds a fresh list per call.
+    a = TelemetryTestSuite()
+    b = TelemetryTestSuite()
+
+    assert a.dataFields is not b.dataFields
+    assert a.tests is not b.tests
+
+    a.dataFields.append("leaked")
+    a.tests.append(["leaked"])
+
+    assert b.dataFields == []
+    assert b.tests == []

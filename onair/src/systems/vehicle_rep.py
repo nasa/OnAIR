@@ -22,8 +22,10 @@ from ..util.plugin_import import import_plugins
 
 
 class VehicleRepresentation:
-    def __init__(self, headers, tests, _knowledge_rep_plugins={}):
+    def __init__(self, headers, tests, _knowledge_rep_plugins=None):
         assert len(headers) == len(tests)
+        if _knowledge_rep_plugins is None:
+            _knowledge_rep_plugins = {}
         self.headers = headers
         self.knowledge_synthesis_constructs = import_plugins(
             self.headers, _knowledge_rep_plugins
@@ -73,7 +75,9 @@ class VehicleRepresentation:
     def get_batch_status_reports(self, batch_data):
         return
 
-    def get_state_information(self, scope=["status"]):
+    def get_state_information(self, scope=None):
+        if scope is None:
+            scope = ["status"]
         state_info = {}
         for construct in self.knowledge_synthesis_constructs:
             state_info[construct.component_name] = construct.render_reasoning()

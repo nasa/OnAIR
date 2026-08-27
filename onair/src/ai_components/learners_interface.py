@@ -16,8 +16,10 @@ from ..util.data_conversion import *
 
 
 class LearnersInterface:
-    def __init__(self, headers, _learner_plugins={}):
+    def __init__(self, headers, _learner_plugins=None):
         assert len(headers) > 0, "Headers are required"
+        if _learner_plugins is None:
+            _learner_plugins = {}
         self.headers = headers
         self.learner_constructs = import_plugins(self.headers, _learner_plugins)
 
