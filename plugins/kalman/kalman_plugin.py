@@ -16,6 +16,8 @@ between predicted and actual values to identify potential faults in the system.
 The module is part of NASA's On-Board Artificial Intelligence Research (OnAIR) Platform.
 """
 
+import math
+
 import simdkalman
 import numpy as np
 from onair.data_handling.parser_util import floatify_input
@@ -94,6 +96,16 @@ class Plugin(AIPlugin):
         corresponding frames, and maintains the window size by removing older
         data points if necessary.
 
+        Hardened ingestion policy:
+
+        - ``low_level_data`` of ``None`` triggers a FAIL message and no store.
+        - Frames whose length does not match the header length are REJECTED
+          with a WARNING (both lengths reported) and no data is stored; this
+          prevents frame/window desynchronization.
+        - After floatification, non-finite values (``math.nan`` substituted by
+          ``floatify_input`` for ``"-"``/junk, or genuine NaN/Inf readings)
+          are skipped, so windows only ever contain finite floats.
+
         Parameters
         ----------
         low_level_data : list
@@ -107,10 +119,18 @@ class Plugin(AIPlugin):
             print_msg(
                 "Kalman plugin requires low_level_data but received None.", ["FAIL"]
             )
+        elif len(low_level_data) != len(self.headers):
+            print_msg(
+                f"Kalman plugin update: frame length {len(low_level_data)} does not match header length {len(self.headers)}; frame rejected.",
+                ["WARNING"],
+            )
+            return
         else:
             frame = floatify_input(low_level_data)
 
             for i, value in enumerate(frame):
+                if not math.isfinite(value):
+                    continue  # windows hold only finite floats
                 self.frames[i].append(value)
                 if len(self.frames[i]) > self.window_size:
                     self.frames[i].pop(0)
