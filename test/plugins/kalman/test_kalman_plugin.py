@@ -169,6 +169,9 @@ def test_Kalman_update_with_initially_empty_frames(mocker):
     # Arrange
     cut = Kalman.__new__(Kalman)
     num_fake_data_points = pytest.gen.randint(1, 10)
+    # updated: mock-only variant -- arranges cut.headers for the frame-length
+    # guard added to Plugin.update (see policy in floatify_input)
+    cut.headers = [f"header{i}" for i in range(num_fake_data_points)]
     cut.frames = [[] for _ in range(num_fake_data_points)]
     cut.window_size = 1  # smallest value without popping starting at none
 
@@ -201,6 +204,10 @@ def test_Kalman_update_with_existing_data_in_frames_but_less_than_full_window_si
         existing_data_points + 1, existing_data_points + 5
     )  # arbitrary 1-5 extra points left in sliding window
 
+    # updated: mock-only variant -- arranges cut.headers for the frame-length
+    # guard added to Plugin.update (see policy in floatify_input)
+    cut.headers = [f"header{i}" for i in range(num_headers)]
+
     cut.frames = [
         [pytest.gen.uniform(-10, 10) for _ in range(existing_data_points)]
         for _ in range(num_headers)
@@ -228,6 +235,10 @@ def test_Kalman_update_with_full_window_size(mocker):
     num_headers = pytest.gen.randint(1, 10)
     cut.window_size = 5
     existing_data_points = cut.window_size  # Fill the window
+
+    # updated: mock-only variant -- arranges cut.headers for the frame-length
+    # guard added to Plugin.update (see policy in floatify_input)
+    cut.headers = [f"header{i}" for i in range(num_headers)]
 
     original_frames = [
         [pytest.gen.uniform(-10, 10) for _ in range(existing_data_points)]
@@ -444,3 +455,145 @@ def test_Kalman__generate_residuals_with_sufficient_frame_data_length(mocker):
         cut._predict.call_args[0][2], expected_initial_value
     )
     np.testing.assert_array_almost_equal(result, expected_residuals)
+
+
+# ---------------------------------------------------------------------------
+# Deterministic kill-tests for the hardened Plugin.update ingestion policy
+# (length guard + finite-only windows; see the Plugin.update docstring and the
+# policy in floatify_input).  These example-based asserts exist so the scoped
+# mutation-testing runner -- which does NOT include the hypothesis property
+# files -- reaches zero survivors in update().
+# ---------------------------------------------------------------------------
+def _make_cut_for_update_kill_tests(num_headers, window_size, existing=0):
+    cut = Kalman.__new__(Kalman)
+    cut.headers = [f"header{i}" for i in range(num_headers)]
+    cut.window_size = window_size
+    cut.frames = [
+        [float(100 + i * 10 + j) for j in range(existing)] for i in range(num_headers)
+    ]
+    return cut
+
+
+def test_kill_update_none_frame_exact_FAIL_warning_and_no_store(mocker):
+    # Arrange
+    cut = _make_cut_for_update_kill_tests(3, 3, existing=2)
+    mock_print = mocker.patch(kalman_plugin.__name__ + ".print_msg")
+    before = [list(frame) for frame in cut.frames]
+
+    # Act
+    cut.update(None)
+
+    # Assert
+    assert cut.frames == before
+    assert mock_print.call_count == 1
+    assert mock_print.call_args_list[0].args == (
+        "Kalman plugin requires low_level_data but received None.",
+        ["FAIL"],
+    )
+
+
+def test_kill_update_short_frame_rejected_with_exact_warning(mocker):
+    # Arrange
+    cut = _make_cut_for_update_kill_tests(4, 3, existing=2)
+    mock_print = mocker.patch(kalman_plugin.__name__ + ".print_msg")
+    before = [list(frame) for frame in cut.frames]
+
+    # Act
+    cut.update([1.0, 2.0])  # 2 values vs 4 headers
+
+    # Assert
+    assert cut.frames == before  # nothing stored
+    assert mock_print.call_count == 1
+    assert mock_print.call_args_list[0].args == (
+        "Kalman plugin update: frame length 2 does not match header length 4; frame rejected.",
+        ["WARNING"],
+    )
+
+
+def test_kill_update_long_frame_rejected_with_exact_warning(mocker):
+    # Arrange
+    cut = _make_cut_for_update_kill_tests(2, 3, existing=0)
+    mock_print = mocker.patch(kalman_plugin.__name__ + ".print_msg")
+    before = [list(frame) for frame in cut.frames]
+
+    # Act
+    cut.update([1.0, 2.0, 3.0, 4.0])  # 4 values vs 2 headers
+
+    # Assert
+    assert cut.frames == before  # nothing stored
+    assert mock_print.call_count == 1
+    assert mock_print.call_args_list[0].args == (
+        "Kalman plugin update: frame length 4 does not match header length 2; frame rejected.",
+        ["WARNING"],
+    )
+
+
+def test_kill_update_valid_frame_stored_in_lockstep_windows(mocker):
+    # Arrange
+    mocker.patch(kalman_plugin.__name__ + ".print_msg")
+    cut = _make_cut_for_update_kill_tests(3, 5, existing=0)
+
+    # Act
+    cut.update([1.5, 2.5, 3.5])
+
+    # Assert
+    assert cut.frames == [[1.5], [2.5], [3.5]]  # kills != -> == guard mutants
+
+
+def test_kill_update_junk_frame_stores_nothing(mocker):
+    # Arrange
+    cut = _make_cut_for_update_kill_tests(3, 3, existing=1)
+    mock_floatify_warning = mocker.patch(
+        "onair.data_handling.parser_util.print_msg"
+    )
+    before = [list(frame) for frame in cut.frames]
+
+    # Act
+    cut.update(["-", "nan", "abc"])  # junk becomes nan and is skipped
+
+    # Assert
+    assert cut.frames == before  # junk frame stores nothing
+    assert mock_floatify_warning.call_count == 3  # one WARNING per junk value
+
+
+def test_kill_update_nan_input_frame_stores_nothing(mocker):
+    # Arrange
+    mocker.patch(kalman_plugin.__name__ + ".print_msg")
+    mocker.patch("onair.data_handling.parser_util.print_msg")
+    cut = _make_cut_for_update_kill_tests(3, 3, existing=0)
+
+    # Act
+    cut.update([float("nan"), float("inf"), float("-inf")])
+
+    # Assert
+    assert cut.frames == [[], [], []]  # NaN input stores nothing
+
+
+def test_kill_update_nan_spiked_frame_skips_only_spiked_attribute(mocker):
+    # Arrange
+    mocker.patch(kalman_plugin.__name__ + ".print_msg")
+    mocker.patch("onair.data_handling.parser_util.print_msg")
+    cut = _make_cut_for_update_kill_tests(3, 5, existing=0)
+
+    # Act
+    cut.update([float("nan"), 2.5, 3.5])
+
+    # Assert
+    assert cut.frames[0] == []  # nan skipped
+    assert cut.frames[1] == [2.5]  # later attributes still stored (kills continue->break)
+    assert cut.frames[2] == [3.5]
+
+
+def test_kill_update_window_saturates_to_exactly_window_size(mocker):
+    # Arrange
+    mocker.patch(kalman_plugin.__name__ + ".print_msg")
+    cut = _make_cut_for_update_kill_tests(2, 3, existing=0)
+
+    # Act
+    for step in range(5):
+        cut.update([float(step), float(100 + step)])
+
+    # Assert
+    assert all(len(frame) == 3 for frame in cut.frames)  # exactly window_size
+    assert cut.frames[0] == [2.0, 3.0, 4.0]  # oldest dropped (kills pop mutants)
+    assert cut.frames[1] == [102.0, 103.0, 104.0]
