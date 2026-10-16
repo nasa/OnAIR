@@ -15,6 +15,7 @@ import numpy as np
 
 from plugins.kalman import kalman_plugin
 from plugins.kalman.kalman_plugin import Plugin as Kalman
+from onair.data_handling.parser_util import floatify_input as real_floatify_input
 
 
 # test init
@@ -251,6 +252,57 @@ def test_Kalman_update_with_full_window_size(mocker):
         assert len(frame) == cut.window_size  # Length should still be window_size
         assert frame[-1] == arg_low_level_data[i]  # New data point should be at the end
         assert frame[:-1] == original_frames[i][1:]  # Check that data shifted correctly
+
+
+def test_Kalman_update_with_unparseable_value_in_frame_skips_the_whole_frame(mocker):
+    # Arrange
+    cut = Kalman.__new__(Kalman)
+    num_headers = pytest.gen.randint(2, 5)
+    existing_data_points = pytest.gen.randint(1, 4)
+    cut.window_size = existing_data_points + pytest.gen.randint(1, 5)
+
+    original_frames = [
+        [pytest.gen.uniform(-10, 10) for _ in range(existing_data_points)]
+        for _ in range(num_headers)
+    ]
+    cut.frames = [frame.copy() for frame in original_frames]
+
+    # One attribute failed to parse; floatify_input marks it with the dash sentinel
+    bad_index = pytest.gen.randint(0, num_headers - 1)
+    arg_low_level_data = [MagicMock() for _ in range(num_headers)]
+    forced_frame = [pytest.gen.uniform(-10, 10) for _ in range(num_headers)]
+    forced_frame[bad_index] = "-"
+    mocker.patch(
+        kalman_plugin.__name__ + ".floatify_input", return_value=forced_frame
+    )
+
+    # Act
+    cut.update(arg_low_level_data)
+
+    # Assert
+    assert kalman_plugin.floatify_input.call_count == 1
+    assert cut.frames == original_frames  # no attribute's window was touched
+
+
+def test_Kalman_update_with_real_floatify_input_and_unparseable_value_leaves_frames_unchanged(
+    mocker,
+):
+    # Arrange
+    cut = Kalman.__new__(Kalman)
+    cut.window_size = 5
+    original_frames = [[1.0, 2.0], [3.0, 4.0]]
+    cut.frames = [frame.copy() for frame in original_frames]
+
+    mocker.patch(
+        kalman_plugin.__name__ + ".floatify_input", side_effect=real_floatify_input
+    )
+    arg_low_level_data = ["1.5", "not-a-number"]
+
+    # Act
+    cut.update(arg_low_level_data)
+
+    # Assert
+    assert cut.frames == original_frames
 
 
 # test render reasoning

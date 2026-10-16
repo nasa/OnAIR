@@ -528,7 +528,7 @@ def test_parser_util_flotify_input_returns_list_of_size_one_that_contains_0_dot_
     assert parser_util.convert_str_to_timestamp.call_args_list[0].args == (
         arg__input[0],
     )
-    assert result == [0.0]
+    assert result == ["-"]
 
 
 def test_parser_util_flotify_input_default_arg_remove_str_is_False(mocker):
@@ -547,7 +547,7 @@ def test_parser_util_flotify_input_default_arg_remove_str_is_False(mocker):
     result = parser_util.floatify_input(arg__input)
 
     # Assert
-    assert result == [0.0]  # shows flow was correct for remove_str being False
+    assert result == ["-"]  # invalid data is the dash sentinel, not 0.0
 
 
 def test_parser_util_flotify_input_returns_empty_list_when_two_Exceptions_are_thrown_and_remove_str_is_True(
@@ -689,7 +689,7 @@ def test_parser_util_flotify_input_returns_expected_values_for_given__input_that
             resultant_float = MagicMock()
             side_effects_for_float.append(ValueError)
             side_effects_for_convert_str.append(Exception)
-            expected_result.append(0.0)
+            expected_result.append("-")
         else:  # other
             arg__input.append(MagicMock())
             resultant_float = MagicMock()

@@ -56,12 +56,14 @@ def floatify_input(_input, remove_str=False):
             try:
                 x = convert_str_to_timestamp(i)
                 floatified.append(x)
-            except:
-                if remove_str == False:
-                    floatified.append(0.0)
-                else:
+            except Exception:
+                if remove_str:
                     continue
-                continue
+                # OnAIR#161: never coerce unparseable telemetry to 0.0 — it is
+                # then read downstream as a VALID zero reading. Return the dash
+                # sentinel (the no-value marker OnAIR already uses in frames)
+                # so invalid data is explicit instead of masquerading as 0.0.
+                floatified.append("-")
     return floatified
 
 
