@@ -40,10 +40,14 @@ def import_services(service_dict):
             spec = importlib.util.spec_from_file_location(mod_name, full_path)
             # create uninitialize module from spec
             module = importlib.util.module_from_spec(spec)
-            # initialize the created module
-            spec.loader.exec_module(module)
-            # add plugin module to system for importation
+            # Register before initialization so relative imports can find the package.
             sys.modules[mod_name] = module
+            try:
+                spec.loader.exec_module(module)
+            except BaseException:
+                # Do not reuse a partially initialized package on the next attempt.
+                sys.modules.pop(mod_name, None)
+                raise
         # import the created module's plugin file for use
         service_name = f"{mod_name}_service"
         service = __import__(f"{mod_name}.{service_name}", fromlist=[service_name])
