@@ -163,8 +163,7 @@ class Plugin(AIPlugin):
         predictions : object
             Predicted values from the Kalman filter with fields for states and observations.
         """
-        self.kf.smooth(subframe, initial_value=initial_val)
-        predictions = self.kf.predict(subframe, forward_steps)
+        predictions = self.kf.predict(subframe, forward_steps, initial_value=initial_val)
         return predictions
 
     def _generate_residuals(self):
