@@ -9,6 +9,9 @@
 
 """Test Parser Util Functionality"""
 
+import datetime
+import math
+
 import pytest
 from unittest.mock import MagicMock
 
@@ -462,7 +465,9 @@ def test_parser_util_flotify_input_returns_list_of_size_one_that_contains_the_ca
     fake_item = str(MagicMock())
     arg__input.append(fake_item)  # list of single str, one iteration
 
-    expected_result = MagicMock()
+    # updated: mock-only variant -- mock returns a finite float because
+    # floatify_input now gates appends on math.isfinite (see policy in floatify_input)
+    expected_result = 7.5
 
     mocker.patch("builtins.float", return_value=expected_result)
 
@@ -528,7 +533,9 @@ def test_parser_util_flotify_input_returns_list_of_size_one_that_contains_0_dot_
     assert parser_util.convert_str_to_timestamp.call_args_list[0].args == (
         arg__input[0],
     )
-    assert result == [0.0]
+    # updated: encodes removed 0.0-masking behavior, see policy in floatify_input
+    assert len(result) == 1
+    assert math.isnan(result[0])
 
 
 def test_parser_util_flotify_input_default_arg_remove_str_is_False(mocker):
@@ -547,7 +554,9 @@ def test_parser_util_flotify_input_default_arg_remove_str_is_False(mocker):
     result = parser_util.floatify_input(arg__input)
 
     # Assert
-    assert result == [0.0]  # shows flow was correct for remove_str being False
+    # updated: encodes removed 0.0-masking behavior, see policy in floatify_input
+    assert len(result) == 1
+    assert math.isnan(result[0])  # shows flow was correct for remove_str being False
 
 
 def test_parser_util_flotify_input_returns_empty_list_when_two_Exceptions_are_thrown_and_remove_str_is_True(
@@ -585,7 +594,9 @@ def test_parser_util_flotify_input_returns_call_to_float_that_was_given___input_
     fake_item = MagicMock()
     arg__input.append(fake_item)  # list of one item, one iteration
 
-    expected_result = MagicMock()
+    # updated: mock-only variant -- mock returns a finite float because
+    # floatify_input now gates appends on math.isfinite (see policy in floatify_input)
+    expected_result = 3.25
 
     mocker.patch(parser_util.__name__ + ".float", return_value=expected_result)
 
@@ -616,27 +627,29 @@ def test_parser_util_flotify_input_returns_expected_values_for_given__input_that
             ["str", "str_need_replace", "str_fail_replace", "other"], 1
         )[0]
 
+        # updated: mock-only variant -- mocked float/convert results are
+        # finite floats because floatify_input now gates appends on
+        # math.isfinite (see policy in floatify_input)
         if rand_type_of_item == "str":
             arg__input.append(MagicMock())
-            resultant_float = MagicMock()
+            resultant_float = pytest.gen.uniform(-10, 10)
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
         elif rand_type_of_item == "str_need_replace":
             fake_input = MagicMock()
             arg__input.append(fake_input)
-            resultant_float = MagicMock()
+            resultant_float = pytest.gen.uniform(-10, 10)
             side_effects_for_float.append(ValueError)
             side_effects_for_convert_str.append(resultant_float)
             expected_result.append(resultant_float)
         elif rand_type_of_item == "str_fail_replace":
             fake_input = MagicMock()
             arg__input.append(fake_input)
-            resultant_float = MagicMock()
             side_effects_for_float.append(ValueError)
             side_effects_for_convert_str.append(Exception)
         else:
             arg__input.append(MagicMock())
-            resultant_float = MagicMock()
+            resultant_float = pytest.gen.uniform(-10, 10)
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
 
@@ -671,28 +684,31 @@ def test_parser_util_flotify_input_returns_expected_values_for_given__input_that
             ["str", "str_need_replace", "str_fail_replace", "other"], 1
         )[0]
 
+        # updated: mock-only variant -- mocked float/convert results are
+        # finite floats because floatify_input now gates appends on
+        # math.isfinite (see policy in floatify_input)
         if rand_type_of_item == "str":
             arg__input.append(MagicMock())
-            resultant_float = MagicMock()
+            resultant_float = pytest.gen.uniform(-10, 10)
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
         elif rand_type_of_item == "str_need_replace":
             fake_input = MagicMock()
             arg__input.append(fake_input)
-            resultant_float = MagicMock()
+            resultant_float = pytest.gen.uniform(-10, 10)
             side_effects_for_float.append(ValueError)
             side_effects_for_convert_str.append(resultant_float)
             expected_result.append(resultant_float)
         elif rand_type_of_item == "str_fail_replace":
             fake_input = MagicMock()
             arg__input.append(fake_input)
-            resultant_float = MagicMock()
             side_effects_for_float.append(ValueError)
             side_effects_for_convert_str.append(Exception)
-            expected_result.append(0.0)
+            # updated: encodes removed 0.0-masking behavior, see policy in floatify_input
+            expected_result.append(math.nan)
         else:  # other
             arg__input.append(MagicMock())
-            resultant_float = MagicMock()
+            resultant_float = pytest.gen.uniform(-10, 10)
             side_effects_for_float.append(resultant_float)
             expected_result.append(resultant_float)
 
@@ -760,7 +776,11 @@ def test_parser_util_convert_str_to_timestamp_returns_datetime_timestamp_when_st
             assert subsecond == 0
 
         def strptime(arg1, arg2):
-            raise Exception
+            # updated: encodes removed mock-only behavior; real
+            # datetime.strptime raises ValueError on format mismatch, so the
+            # fake must match the real dependency's contract for the narrowed
+            # handler (see policy in convert_str_to_timestamp)
+            raise ValueError
 
         def timestamp(self):
             Fake_Datetime.timestamp_call_count = self.timestamp_call_count + 1
@@ -807,3 +827,149 @@ def test_parser_util_convert_str_to_timestamp_raises_error_when_both_strptime_an
 
     # Assert
     assert e_info.match("")
+
+
+# ---------------------------------------------------------------------------
+# Deterministic kill-tests for the hardened floatify_input /
+# convert_str_to_timestamp policy (see the policy docstring on floatify_input).
+# These example-based asserts exist so the scoped mutation-testing runner --
+# which does NOT include the hypothesis property files -- reaches zero
+# survivors in the two target functions.
+# ---------------------------------------------------------------------------
+def test_kill_convert_str_to_timestamp_exact_epochs_for_boundaries_and_doy():
+    # exact-epoch asserts: kill datetime-literal, index-swap and 0/59 boundary mutants
+    assert parser_util.convert_str_to_timestamp("12:34") == datetime.datetime(
+        2000, 1, 1, 1, 12, 34, 0
+    ).timestamp()
+    assert parser_util.convert_str_to_timestamp("00:00") == datetime.datetime(
+        2000, 1, 1, 1, 0, 0, 0
+    ).timestamp()
+    assert parser_util.convert_str_to_timestamp("59:59") == datetime.datetime(
+        2000, 1, 1, 1, 59, 59, 0
+    ).timestamp()
+    assert parser_util.convert_str_to_timestamp(
+        "2020-001-12:34:56.789"
+    ) == datetime.datetime(2020, 1, 1, 12, 34, 56, 789000).timestamp()
+    # updated: pin single-digit MM:SS acceptance ("1:2" == 1m 2s), matching
+    # int() semantics documented in convert_str_to_timestamp
+    assert parser_util.convert_str_to_timestamp("1:2") == datetime.datetime(
+        2000, 1, 1, 1, 1, 2, 0
+    ).timestamp()
+    # updated: post-2020 full-format timestamp (2024 is a leap year; doy 032 = Feb 1)
+    assert parser_util.convert_str_to_timestamp(
+        "2024-032-14:30:45.123456"
+    ) == datetime.datetime(2024, 2, 1, 14, 30, 45, 123456).timestamp()
+
+
+def test_kill_convert_str_to_timestamp_malformed_inputs_raise_ValueError():
+    # updated: extended per external review -- negative components ("12:-1",
+    # "-1:30") are caught by the 0..59 range check, non-integer seconds
+    # ("12:ab") by the int() parse, and 4-part strings by the part-count guard
+    for bad in [
+        "12:34:56",
+        "1:2:3",
+        "99:99",
+        "12:60",
+        "60:00",
+        "-",
+        "",
+        "12:",
+        ":34",
+        "12:-1",
+        "-1:30",
+        "12:ab",
+        "1:2:3:4",
+    ]:
+        # ^-anchored: the message must START with the production prefix, which
+        # kills any string mutation of the message text
+        with pytest.raises(ValueError, match=r"^convert_str_to_timestamp: "):
+            parser_util.convert_str_to_timestamp(bad)
+    with pytest.raises(
+        ValueError, match=r"^convert_str_to_timestamp: expected MM:SS, got '12:34:56'$"
+    ):
+        parser_util.convert_str_to_timestamp("12:34:56")
+    with pytest.raises(
+        ValueError,
+        match=r"^convert_str_to_timestamp: minute and second must be in 0\.\.59, got '99:99'$",
+    ):
+        parser_util.convert_str_to_timestamp("99:99")
+    with pytest.raises(
+        ValueError,
+        match=r"^convert_str_to_timestamp: minute and second must be in 0\.\.59, got '12:60'$",
+    ):
+        parser_util.convert_str_to_timestamp("12:60")
+    with pytest.raises(
+        ValueError,
+        match=r"^convert_str_to_timestamp: expected MM:SS with integer minute and second, got 'aa:bb'$",
+    ):
+        parser_util.convert_str_to_timestamp("aa:bb")
+    # updated: anchored asserts for review-driven cases -- negative second
+    with pytest.raises(
+        ValueError,
+        match=r"^convert_str_to_timestamp: minute and second must be in 0\.\.59, got '12:-1'$",
+    ):
+        parser_util.convert_str_to_timestamp("12:-1")
+    # updated: non-integer second component
+    with pytest.raises(
+        ValueError,
+        match=r"^convert_str_to_timestamp: expected MM:SS with integer minute and second, got '12:ab'$",
+    ):
+        parser_util.convert_str_to_timestamp("12:ab")
+
+
+def test_kill_convert_str_to_timestamp_non_string_raises_ValueError_not_AttributeError():
+    for non_str in [None, 5, 5.0, True, [], {}]:
+        with pytest.raises(
+            ValueError, match=r"^convert_str_to_timestamp: expected a time string, got"
+        ):
+            parser_util.convert_str_to_timestamp(non_str)
+
+
+def test_kill_floatify_input_finite_values_pass_through_identically(mocker):
+    mocker.patch(parser_util.__name__ + ".print_msg")
+    out = parser_util.floatify_input([12.5, -0.0, 1e308, 0, "2.75"])
+    assert out == [12.5, -0.0, 1e308, 0.0, 2.75]
+
+
+def test_kill_floatify_input_mixed_frame_keeps_order_length_and_exact_values(mocker):
+    mocker.patch(parser_util.__name__ + ".print_msg")
+    out = parser_util.floatify_input(["1.5", "12:34", 2, "-", "nan", None])
+    assert len(out) == 6  # length + ordering: kills continue->break mutants
+    assert out[0] == 1.5
+    assert out[1] == datetime.datetime(2000, 1, 1, 1, 12, 34, 0).timestamp()
+    assert out[2] == 2.0
+    assert math.isnan(out[3])
+    assert math.isnan(out[4])
+    assert math.isnan(out[5])
+
+
+def test_kill_floatify_input_junk_substitutes_nan_with_exact_warning(mocker):
+    mock_print = mocker.patch(parser_util.__name__ + ".print_msg")
+    out = parser_util.floatify_input(["-", "-"])
+    assert len(out) == 2
+    assert math.isnan(out[0]) and math.isnan(out[1])
+    assert mock_print.call_count == 2
+    for call in mock_print.call_args_list:
+        assert call.args == (
+            "floatify_input: could not parse '-' to a finite float; substituting math.nan",
+            ["WARNING"],
+        )
+
+
+def test_kill_floatify_input_remove_str_true_drops_junk_without_warning(mocker):
+    mock_print = mocker.patch(parser_util.__name__ + ".print_msg")
+    assert parser_util.floatify_input(["-", "abc", None], remove_str=True) == []
+    # junk followed by a valid value: the loop must CONTINUE past junk, not break
+    assert parser_util.floatify_input(["-", "abc", 2.5], remove_str=True) == [2.5]
+    assert mock_print.call_count == 0  # dropped silently; no substitution warning
+
+
+def test_kill_floatify_input_nonfinite_spellings_become_nan(mocker):
+    mocker.patch(parser_util.__name__ + ".print_msg")
+    for s in ["inf", "-inf", "Infinity", "-Infinity", "nan", "NaN", "1e309", "INF"]:
+        out = parser_util.floatify_input([s])
+        assert len(out) == 1
+        assert math.isnan(out[0]), s
+    for v in [float("nan"), float("inf"), float("-inf")]:
+        out = parser_util.floatify_input([v])
+        assert math.isnan(out[0])
