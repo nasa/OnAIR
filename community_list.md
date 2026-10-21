@@ -18,8 +18,8 @@ Submit a pull request with your link added to the appropriate section below with
 
 ## Community Plugins
 
-- not items at this time
+- no items at this time
 
 ## Community Services
 
-- not items at this time
+- no items at this time

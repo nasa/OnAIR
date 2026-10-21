@@ -122,7 +122,7 @@ Fork the repository and create a branch with a name that starts with the issue n
 Once done, submit your pull request and we'll take a look.
 You may want to make draft pull requests to solicit feedback on larger changes.
 
-> [!NOTE]
+> [!IMPORTANT]
 > Please do a human review of all pull request code and commentary.
 > Edit for accuracy and _brevity_: our team does not have the capacity to be the first editors of LLM generated pull requests.
 
