@@ -13,11 +13,15 @@ from onair.src.ai_components.ai_plugin_abstract.ai_plugin import AIPlugin
 class Plugin(AIPlugin):
     verbose_mode = False
 
-    def update(self, low_level_data=[], high_level_data={}):
+    def update(self, low_level_data=None, high_level_data=None):
         """
         Reporter outputs that it is updating and outputs known headers and
         given low and high level data.
         """
+        if low_level_data is None:
+            low_level_data = []
+        if high_level_data is None:
+            high_level_data = {}
         self.low_level_data = low_level_data
         self.high_level_data = high_level_data
         print(f"{self.component_name}: UPDATE")
