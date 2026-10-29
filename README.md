@@ -100,6 +100,7 @@ Examples of how to configure OnAIR for use.
 Example setup files for describing the pipeline's data frame.
 #### [Plugins](plugins)
 The provided cognitive components.
+The [Community List](community_list.md) has third party plugins and services (use at your own risk: not reviewed or vetted).
 #### [Data Sources](onair/data_handling)
 Provided data handling for telemetry input.
 
@@ -107,6 +108,9 @@ Provided data handling for telemetry input.
 
 Please open an issue if you find any problems.
 We are a small team, but will try to respond in a timely fashion.
+
+We are not accepting pull requests to add new plugins and services.
+However, you may add your plugin/service to the [Community List](community_list.md).
 
 If you would like to contribute to the repository, GREAT!
 First you will need to complete either the [Individual Contributor License Agreement (pdf)](doc/Indv_CLA_OnAIR.pdf) or the [Corporate Contributor License Agreement (pdf)](doc/Corp_CLA_OnAIR.pdf).
@@ -117,6 +121,10 @@ Next, please create an issue for the fix or feature and note that you intend to 
 Fork the repository and create a branch with a name that starts with the issue number.
 Once done, submit your pull request and we'll take a look.
 You may want to make draft pull requests to solicit feedback on larger changes.
+
+> [!IMPORTANT]
+> Please do a human review of all pull request code and commentary.
+> Edit for accuracy and _brevity_: our team does not have the capacity to be the first editors of LLM generated pull requests.
 
 ## License and Copyright
 
