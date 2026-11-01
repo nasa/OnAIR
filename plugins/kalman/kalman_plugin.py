@@ -110,6 +110,13 @@ class Plugin(AIPlugin):
         else:
             frame = floatify_input(low_level_data)
 
+            if "-" in frame:
+                # A partial/unparseable frame can't be appended: _generate_residuals
+                # index-aligns each attribute's window by position, so dropping just
+                # the bad values (rather than the whole frame) would desynchronize
+                # per-attribute windows. Skip the entire frame instead.
+                return
+
             for i, value in enumerate(frame):
                 self.frames[i].append(value)
                 if len(self.frames[i]) > self.window_size:
