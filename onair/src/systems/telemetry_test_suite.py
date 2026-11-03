@@ -18,7 +18,11 @@ from collections import Counter
 
 
 class TelemetryTestSuite:
-    def __init__(self, headers=[], tests=[]):
+    def __init__(self, headers=None, tests=None):
+        if headers is None:
+            headers = []
+        if tests is None:
+            tests = []
         self.dataFields = headers
         self.tests = tests
         self.latest_results = None
@@ -32,7 +36,9 @@ class TelemetryTestSuite:
     ################################################
     ################  Running Tests  ###############
 
-    def execute_suite(self, updated_frame, sync_data={}):
+    def execute_suite(self, updated_frame, sync_data=None):
+        if sync_data is None:
+            sync_data = {}
         results = []
         for i in range(len(updated_frame)):
             results.append(self.run_tests(i, updated_frame[i], sync_data))
