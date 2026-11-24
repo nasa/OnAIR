@@ -451,6 +451,32 @@ def test_redis_adapter_DataSource_get_next_returns_expected_data_when_new_data_i
     assert result == expected_result
 
 
+def test_redis_adapter_DataSource_get_next_turns_all_data_points_of_new_write_buffer_to_unknown():
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.new_data = True
+    cut.new_data_lock = MagicMock()
+    cut.double_buffer_read_index = pytest.gen.randint(0, 1)
+    pre_call_index = cut.double_buffer_read_index
+    num_data_points = pytest.gen.randint(1, 10)  # arbitrary, 1 to 10
+    fake_last_frame = [MagicMock() for _ in range(num_data_points)]
+    fake_next_frame = [MagicMock() for _ in range(num_data_points)]
+    expected_last_frame = fake_last_frame.copy()
+    expected_result = fake_next_frame.copy()
+    cut.current_data = [None, None]
+    cut.current_data[pre_call_index] = {"data": fake_last_frame}
+    cut.current_data[(pre_call_index + 1) % 2] = {"data": fake_next_frame}
+
+    # Act
+    result = cut.get_next()
+
+    # Assert
+    assert result == expected_result
+    assert cut.current_data[pre_call_index]["data"] == ["-"] * num_data_points
+    # the frame handed out by the previous call is left as it was
+    assert fake_last_frame == expected_last_frame
+
+
 def test_redis_adapter_DataSource_get_next_when_called_multiple_times_when_new_data_is_true():
     # Arrange
     cut = DataSource.__new__(DataSource)
@@ -821,16 +847,108 @@ def test_redis_adapter_DataSource_message_listener_updates_new_data_with_receive
     assert redis_adapter.json.loads.call_args_list[0].args == (fake_message["data"],)
     assert cut.new_data == True
     print(cut.current_data[cut.double_buffer_read_index])
+    # data already received from the other channel is kept
     assert cut.current_data[(cut.double_buffer_read_index + 1) % 2]["data"] == [
         fake_data["time"],
         fake_data["correct_key"],
-        "-",
+        "0",
     ]
     assert redis_adapter.print_msg.call_count == 1
     assert redis_adapter.print_msg.call_args_list[0].args == (
         "Redis subscription listener exited.",
         ["WARNING"],
     )
+
+
+def test_redis_adapter_DataSource_message_listener_writes_message_and_sets_new_data_in_one_hold_of_new_data_lock(
+    mocker,
+):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.choice([0, 1])
+    cut.new_data = False
+    lock_events = []
+
+    class FakeData(list):
+        def __setitem__(self, index, value):
+            lock_events.append("write")
+            super().__setitem__(index, value)
+
+    cut.current_data = {
+        0: {"headers": ["time"], "data": FakeData(["-"])},
+        1: {"headers": ["time"], "data": FakeData(["-"])},
+    }
+    cut.new_data_lock = MagicMock()
+    cut.new_data_lock.__enter__.side_effect = lambda: lock_events.append("acquire")
+    cut.new_data_lock.__exit__.side_effect = lambda *_: lock_events.append(
+        ("release", cut.new_data)
+    )
+    fake_server = MagicMock()
+    fake_server.fake_pubsub = MagicMock()
+
+    fake_message = {}
+    fake_message["type"] = "message"
+    fake_message["channel"] = str(MagicMock(name="fake_message_channel")).encode(
+        "utf-8"
+    )
+    fake_message["data"] = '{"time":0}'
+    mocker.patch.object(fake_server.fake_pubsub, "listen", return_value=[fake_message])
+    mocker.patch(redis_adapter.__name__ + ".json.loads", return_value={"time": 0})
+    mocker.patch(redis_adapter.__name__ + ".print_msg")
+
+    # Act
+    cut.message_listener(fake_server.fake_pubsub)
+
+    # Assert
+    assert lock_events == ["acquire", "write", ("release", True)]
+
+
+def test_redis_adapter_DataSource_frame_holds_every_message_received_since_the_previous_frame(
+    mocker,
+):
+    # Arrange
+    cut = DataSource.__new__(DataSource)
+    cut.double_buffer_read_index = pytest.gen.choice([0, 1])
+    cut.new_data_lock = MagicMock()
+    cut.new_data = False
+    fake_headers = ["time", "fake_channel_0.x", "fake_channel_1.x"]
+    cut.current_data = [
+        {"headers": fake_headers, "data": ["-", "-", "-"]},
+        {"headers": fake_headers, "data": ["-", "-", "-"]},
+    ]
+    fake_x = [pytest.gen.randint(1, 100) for _ in range(3)]  # 1 to 100 arbitrary
+    fake_messages = [
+        {
+            "type": "message",
+            "channel": b"fake_channel_0",
+            "data": f'{{"time":1, "x":{fake_x[0]}}}',
+        },
+        {
+            "type": "message",
+            "channel": b"fake_channel_1",
+            "data": f'{{"time":2, "x":{fake_x[1]}}}',
+        },
+        {
+            "type": "message",
+            "channel": b"fake_channel_1",
+            "data": f'{{"time":3, "x":{fake_x[2]}}}',
+        },
+    ]
+    fake_pubsub = MagicMock()
+    mocker.patch(redis_adapter.__name__ + ".print_msg")
+
+    # Act
+    # two channels publish before the first frame is taken, one before the second
+    fake_pubsub.listen.return_value = fake_messages[:2]
+    cut.message_listener(fake_pubsub)
+    first_frame = cut.get_next()
+    fake_pubsub.listen.return_value = fake_messages[2:]
+    cut.message_listener(fake_pubsub)
+    second_frame = cut.get_next()
+
+    # Assert
+    assert first_frame == [2, fake_x[0], fake_x[1]]
+    assert second_frame == [3, "-", fake_x[2]]
 
 
 # has_data tests

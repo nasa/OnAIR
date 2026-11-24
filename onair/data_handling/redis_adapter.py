@@ -259,7 +259,8 @@ class DataSource(OnAirDataSource):
         Returns
         -------
         list
-            The latest data retrieved from the buffer.
+            The data received since the previous call, with "-" for every
+            data point that was not received.
 
         Notes
         -----
@@ -270,7 +271,8 @@ class DataSource(OnAirDataSource):
         1. Waiting for the `new_data` flag to become True.
         2. Resetting the `new_data` flag to False.
         3. Updating the read index for the double buffer.
-        4. Returning the data from the current read buffer.
+        4. Turning all data points of the new write buffer to unknown.
+        5. Returning the data from the current read buffer.
 
         This approach allows one buffer to be read while the other is being
         written to, ensuring data consistency and thread safety.
@@ -289,6 +291,9 @@ class DataSource(OnAirDataSource):
             self.new_data = False
             self.double_buffer_read_index = (self.double_buffer_read_index + 1) % 2
             read_index = self.double_buffer_read_index
+            # turn all data points of the new write buffer to unknown
+            write_buffer = self.current_data[(read_index + 1) % 2]
+            write_buffer["data"] = ["-" for _ in write_buffer["data"]]
 
         return self.current_data[read_index]["data"]
 
@@ -362,38 +367,38 @@ class DataSource(OnAirDataSource):
                     )
                     print_msg(non_json_msg, ["WARNING"])
                     continue
-                # Select the current data
-                current_data = self.current_data[
-                    (self.double_buffer_read_index + 1) % 2
-                ]
-                # turn all data points to unknown
-                current_data["data"] = ["-" for _ in current_data["data"]]
-                # Find expected keys for received channel
-                expected_message_keys = [
-                    k for k in current_data["headers"] if channel_name in k
-                ]
-                # Time is an expected key for all channels
-                expected_message_keys.append("time")
-                # Parse through the message keys for data points
-                for key in list(data.keys()):
-                    if key.lower() == "time":
-                        header_string = key.lower()
-                    else:
-                        header_string = f"{channel_name}.{key}"
-                    # Look for channel specific values
-                    try:
-                        index = current_data["headers"].index(header_string)
-                        current_data["data"][index] = data[key]
-                        expected_message_keys.remove(header_string)
-                    # Unexpected key in data
-                    except ValueError:
-                        # warn user about key in data that is not in header
-                        print_msg(
-                            f"Unused key `{key}' in message "
-                            f"from channel `{channel_name}.'",
-                            ["WARNING"],
-                        )
+                # Hold the lock so get_next cannot switch buffers part way
+                # through a message
                 with self.new_data_lock:
+                    # Select the current data
+                    current_data = self.current_data[
+                        (self.double_buffer_read_index + 1) % 2
+                    ]
+                    # Find expected keys for received channel
+                    expected_message_keys = [
+                        k for k in current_data["headers"] if channel_name in k
+                    ]
+                    # Time is an expected key for all channels
+                    expected_message_keys.append("time")
+                    # Parse through the message keys for data points
+                    for key in list(data.keys()):
+                        if key.lower() == "time":
+                            header_string = key.lower()
+                        else:
+                            header_string = f"{channel_name}.{key}"
+                        # Look for channel specific values
+                        try:
+                            index = current_data["headers"].index(header_string)
+                            current_data["data"][index] = data[key]
+                            expected_message_keys.remove(header_string)
+                        # Unexpected key in data
+                        except ValueError:
+                            # warn user about key in data that is not in header
+                            print_msg(
+                                f"Unused key `{key}' in message "
+                                f"from channel `{channel_name}.'",
+                                ["WARNING"],
+                            )
                     self.new_data = True
                 # Warn user about expected keys missing from received data
                 for k in expected_message_keys:
