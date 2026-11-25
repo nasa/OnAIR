@@ -133,3 +133,7 @@ dmypy.json
 
 # macOS
 .DS_Store
+
+# Should not track tflite models
+*.tflite
+

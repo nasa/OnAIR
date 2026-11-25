@@ -20,7 +20,7 @@ class Plugin(AIPlugin):
     def __init__(self, _name, _headers):
         super().__init__(_name, _headers)
         # Your model here
-        model_path = r"tflite_models\mobilebert-tflite-default-v1\1.tflite"
+        model_path = r"tflite_models/mobilebert-tflite-default-v1/1.tflite"
 
         # Load and initialize the model
         self.interpreter = tflite.Interpreter(model_path)
@@ -69,4 +69,4 @@ class Plugin(AIPlugin):
             rand_tensor = rand_tensor.astype(model_input['dtype'])
             tensors.append(rand_tensor)
         return tuple(tensors)
-    
+

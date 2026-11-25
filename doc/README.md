@@ -14,6 +14,8 @@
 
 [Running with cFS](cfs-onair-guide.md) : How to run OnAIR with NASA's core Flight System as a live data source.
 
+[TFLite example](tflite-example.md) : Using the TFLite plugin. NOT COMPLETE
+
 [Unit-Testing](unit-testing.md) : How to run the unit-tests and generate a coverage report.
 
 [Writing your own DataSource](writing-your-own-data-source.md) : NOT COMPLETE

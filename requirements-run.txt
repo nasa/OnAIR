@@ -2,3 +2,6 @@
 numpy
 redis
 simdkalman
+
+# Required for onair/configs/tflite_test_config.ini
+tensorflow
